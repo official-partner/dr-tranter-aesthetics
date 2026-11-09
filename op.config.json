@@ -1,9 +1,9 @@
 {
-  "id": "op-astro",
-  "name": "Gabarit de site",
-  "client": "",
+  "id": "dr-tranter-aesthetics",
+  "name": "Dr Tranter Aesthetics",
+  "client": "Dr Tranter Aesthetics",
   "studio": "Official Partner",
-  "description": "Le point de départ d’un nouveau site, relu dans OP System.",
+  "description": "The website of Dr Tranter Aesthetics.",
   "staging": "",
   "domain": "",
   "live": false,

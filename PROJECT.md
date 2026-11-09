@@ -95,3 +95,6 @@ One line per decision: the date, who asked, what was decided and why. The newest
   the credit in README.md and LICENSE only). The swatches, themes and first page are replaced with the client's.
 - 2026-10-17, Sam: the site starts from OP's starter `official-partner/op-astro` (Lumos for Astro 1.0.0). `main` is
   the live site, `review` the one OP System shows; content in files until a CMS is decided.
+
+## 2026-11-09, setup (asked by Samuel Charpentier)
+- op.config.json: id dr-tranter-aesthetics, name and client Dr Tranter Aesthetics. src/consts.ts: SITE_NAME, SITE_DESCRIPTION (a plain placeholder: the Brief holds no description yet), SITE_LOCALE en. Worker name in wrangler.jsonc kept: dr-tranter-aesthetics.
