@@ -98,3 +98,17 @@ One line per decision: the date, who asked, what was decided and why. The newest
 
 ## 2026-11-09, setup (asked by Samuel Charpentier)
 - op.config.json: id dr-tranter-aesthetics, name and client Dr Tranter Aesthetics. src/consts.ts: SITE_NAME, SITE_DESCRIPTION (a plain placeholder: the Brief holds no description yet), SITE_LOCALE en. Worker name in wrangler.jsonc kept: dr-tranter-aesthetics.
+
+## 2026-11-09, reading of the design (start, asked by Samuel Charpentier)
+- Way: from scratch. Read the design in Marque (Home.pdf at 1728 px, images of the menu, Concerns, Melasma, Treatments,
+  Morpheus8) and the font file. Measures, direction and motion in DESIGN.md; the decision cards, problems, improvements
+  and supplies in OP System (« Lire et proposer »); the brand (provisional) and the wireframes of the 5 drawn pages in
+  OP System. Only the home page goes to the page list, as the team asked.
+- Font: SeasonCollectionVF-TRIAL.ttf (Displaay) forbids storage on a public server: it is never committed; the review
+  site uses a system stand-in until the licensed woff2 arrives.
+- Copy errors flagged, corrected at build: « Alreay know w hat youre lookin for? » (Already know what you're looking
+  for?), « Ready to talk about Morpheus8 ? » (no space), footer year 2027 (the build writes the current year), AHPRA
+  number MED0000000000 (placeholder, to supply).
+- Proposed (cards): fluid 390 to 1728 with the content capped at 1728; phone layouts drawn by the build; collections
+  concerns, treatments, articles, results; AA contrast for the secondary greys; no loader, fade transition, light smooth
+  scroll; a Before / After switch; /book as the one booking address; day-first dates.
