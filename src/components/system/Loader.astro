@@ -1,0 +1,479 @@
+---
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { SITE_NAME } from "@/consts.ts";
+import type { LoaderPreset } from "@/utils/finishes.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** `head`: its styles and the script that decides, before the first paint, whether it plays. `cover`: the screen itself, first in the body. */
+  part: "head" | "cover";
+  /** The screen: the site's logo revealed on the brand's ground (`logo`, the default), the site's square mark (`mark`), a count to 100 (`counter`), a curtain in the brand's colour that lifts away (`curtain`), or the site's own (`custom`: src/components/system/LoaderCustom.astro). */
+  preset?: LoaderPreset;
+}
+
+const { render = true, part, preset: asked = "logo" } = Astro.props;
+
+/* The site's own screen (op.config.json "loader": "custom"), made by Claude from the team's words: its markup and
+   styles in LoaderCustom.astro, inside the cover; the cover's timing stays this one's. Missing, the logo stands in. */
+const [Custom] = Object.values(
+  import.meta.glob<{ default: (props: object) => unknown }>(
+    "/src/components/system/LoaderCustom.astro",
+    { eager: true },
+  ),
+).map((m) => m.default);
+const preset: LoaderPreset = asked === "custom" && !Custom ? "logo" : asked;
+
+const read = (...file: string[]) => {
+  try {
+    return readFileSync(path.join(process.cwd(), ...file), "utf8");
+  } catch {
+    return "";
+  }
+};
+const clean = (svg: string) =>
+  svg.replace(/<\?xml[\s\S]*?\?>|<!--[\s\S]*?-->/g, "").trim();
+
+/* The ground of the logo and the curtain: the theme that carries the logo on the brand's colour. op.config.json
+   "loaderTheme" names it; else `.theme-brand`; else the theme whose background is the swatch of "brandColor"; else
+   `.theme-dark`. Only a theme src/styles/base.css defines. */
+const ground = (() => {
+  if (part !== "cover" || !["logo", "curtain"].includes(preset)) return "";
+  const css = read("src", "styles", "base.css");
+  let config: Record<string, unknown> = {};
+  try {
+    config = JSON.parse(read("op.config.json") || "{}");
+  } catch {}
+  const has = (theme: unknown) =>
+    typeof theme === "string" &&
+    new RegExp(`\\.theme-${theme}\\s*[,{]`).test(css);
+  const brand = String(config.brandColor ?? "").toLowerCase();
+  const swatch = brand
+    ? [...css.matchAll(/--([\w-]+):\s*(#[0-9a-f]{3,8})\s*;/gi)].find(
+        (m) => m[2].toLowerCase() === brand,
+      )?.[1]
+    : undefined;
+  const byColour = swatch
+    ? [
+        ...css.matchAll(
+          /\.theme-([\w-]+)\s*\{[^}]*?--background:\s*var\(--([\w-]+)\)/g,
+        ),
+      ].find((m) => m[2] === swatch)?.[1]
+    : undefined;
+  return (
+    ([config.loaderTheme, "brand", byColour, "dark"].find(has) as
+      string | undefined) ?? ""
+  );
+})();
+
+/* The logo preset: the site's logo (src/assets/logo/logo.svg), inline so it takes the ground's text colour
+   (`currentColor`), each of its shapes a part that rises into place, from left to right. Never the favicon nor the
+   square mark. Without a logo yet, the site's name rises in its place. */
+const [logoFile] = Object.values(
+  import.meta.glob<string>("/src/assets/logo/logo.svg", {
+    eager: true,
+    query: "?raw",
+    import: "default",
+  }),
+);
+const SHAPES =
+  /<(path|polygon|polyline|rect|circle|ellipse|line|text)\b([^>]*?)(\/?)>/g;
+const leftOf = (attrs: string) => {
+  const n = (re: RegExp) => {
+    const m = re.exec(attrs);
+    return m ? parseFloat(m[1]) : NaN;
+  };
+  const x = [
+    n(/\sd\s*=\s*["']\s*[mM]\s*(-?[\d.]+)/),
+    n(/\sx1?\s*=\s*["'](-?[\d.]+)/),
+    n(/\scx\s*=\s*["'](-?[\d.]+)/),
+    n(/\spoints\s*=\s*["']\s*(-?[\d.]+)/),
+  ].find((v) => !Number.isNaN(v));
+  return x ?? Infinity;
+};
+const logo = (() => {
+  if (part !== "cover" || preset !== "logo" || !logoFile) return null;
+  let svg = clean(logoFile).replace(/<svg\b([^>]*)>/, (_, attrs: string) => {
+    const kept = attrs.replace(
+      /\s(width|height|class|aria-hidden|focusable)\s*=\s*("[^"]*"|'[^']*')/g,
+      "",
+    );
+    return `<svg${kept} aria-hidden="true" focusable="false">`;
+  });
+  const shapes = [...svg.matchAll(SHAPES)];
+  const order = shapes
+    .map((m, i) => ({ i, x: leftOf(m[2]) }))
+    .sort((a, b) => a.x - b.x || a.i - b.i)
+    .map((s) => s.i);
+  let k = 0;
+  svg = svg.replace(SHAPES, (_, tag: string, attrs: string, end: string) => {
+    const i = order.indexOf(k++);
+    const style = /\sstyle\s*=\s*"([^"]*)"/.exec(attrs);
+    const rest = attrs.replace(/\sstyle\s*=\s*"[^"]*"/, "");
+    const withClass = /\sclass\s*=\s*"/.test(rest)
+      ? rest.replace(/\sclass\s*=\s*"/, ' class="loader_part ')
+      : ` class="loader_part"${rest}`;
+    return `<${tag}${withClass} style="--i: ${i};${style ? ` ${style[1]}` : ""}"${end ? " /" : ""}>`;
+  });
+  return { svg, parts: shapes.length };
+})();
+
+/* The mark preset: the site's square mark (src/assets/logo/mark.svg), else its favicon (scripts/favicon.mjs) */
+const [mark] = Object.values(
+  import.meta.glob<string>("/src/assets/logo/mark.svg", {
+    eager: true,
+    query: "?raw",
+    import: "default",
+  }),
+);
+const icon =
+  part === "cover" && preset === "mark"
+    ? clean(mark ?? read("public", "favicon.svg"))
+    : "";
+
+/* Its styles, inline before the site's stylesheets, so the screen is there at the first paint; the head's stylesheets
+   hold that paint until they load, so the tokens are there too */
+const CSS = String.raw`
+@layer components {
+  .loader_wrap {
+    display: none;
+  }
+
+  html[data-loader] .loader_wrap {
+    /* If the script never ends it: gone a second after its longest wait */
+    --_failsafe: 3.5s;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    background-color: var(--background);
+    color: var(--text);
+    transition: opacity var(--loader-duration) var(--loader-ease);
+  }
+
+  html[data-loader="play"] .loader_wrap {
+    animation: loader-failsafe 1ms linear var(--_failsafe) forwards;
+  }
+
+  html[data-loader="leave"] .loader_wrap {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* The logo: its parts rise into place through the logo's own box, left to right, on the loader's curve; once the
+     page is ready they rise out, and the ground lifts away whole, the page already in place under it */
+  html[data-loader] .loader_wrap.logo {
+    --_rise: calc(var(--loader-duration) * 1.2);
+    --_step: min(60ms, calc(360ms / max(var(--_parts, 1) - 1, 1)));
+  }
+
+  .loader_logo {
+    display: block;
+    inline-size: var(--loader-logo-width, clamp(8rem, 6rem + 10vw, 14rem));
+    overflow: clip;
+  }
+
+  .loader_logo.is-name {
+    inline-size: auto;
+    white-space: nowrap;
+  }
+
+  .loader_logo > svg {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    overflow: hidden;
+  }
+
+  .loader_logo .loader_part {
+    display: block;
+    transform-box: view-box;
+  }
+
+  html[data-loader] .loader_part {
+    animation: loader-rise var(--_rise) var(--loader-ease) both;
+    animation-delay: calc(var(--i, 0) * var(--_step));
+  }
+
+  html[data-loader="leave"] .loader_wrap.logo {
+    opacity: 1;
+    translate: 0 -100%;
+    transition: translate calc(var(--loader-duration) * 1.2) var(--loader-ease)
+      calc(var(--loader-duration) / 4);
+  }
+
+  html[data-loader="leave"] .loader_part {
+    animation: loader-out calc(var(--loader-duration) * 0.6) var(--loader-ease)
+      both;
+    animation-delay: calc(var(--i, 0) * var(--_step) / 3);
+  }
+
+  @keyframes loader-rise {
+    from {
+      translate: 0 100%;
+    }
+  }
+
+  @keyframes loader-out {
+    to {
+      translate: 0 -100%;
+    }
+  }
+
+  /* The curtain: the brand's ground over the page, lifting away whole once the page is ready */
+  html[data-loader="leave"] .loader_wrap.curtain {
+    opacity: 1;
+    translate: 0 -100%;
+    transition: translate calc(var(--loader-duration) * 1.5) var(--loader-ease)
+      calc(var(--loader-duration) / 4);
+  }
+
+  /* The counter: a count to 100 at the foot of the screen and a line filling under it, as the page loads */
+  html[data-loader] .loader_wrap.counter {
+    place-items: end start;
+    padding: var(--site-margin);
+  }
+
+  .loader_count {
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .loader_line {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: calc(var(--border-width) * 2);
+    background-color: currentcolor;
+    transform-origin: 0 50%;
+    scale: var(--_progress, 0) 1;
+  }
+
+  .loader_mark {
+    display: block;
+    inline-size: 4rem;
+    border-radius: 21.875%;
+    overflow: clip;
+  }
+
+  .loader_mark > svg {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+
+  /* The mark arrives at the first paint (from its starting style), and leaves first */
+  .loader_mark,
+  .loader_name,
+  .loader_count {
+    transition:
+      opacity calc(var(--loader-duration) * 0.6) var(--ease-smooth),
+      translate calc(var(--loader-duration) * 0.6) var(--ease-smooth);
+  }
+
+  @starting-style {
+    html[data-loader] :is(.loader_mark, .loader_name, .loader_count) {
+      opacity: 0;
+      translate: 0 0.5rem;
+    }
+  }
+
+  html[data-loader="leave"] :is(.loader_mark, .loader_name, .loader_count) {
+    opacity: 0;
+    translate: 0 -0.5rem;
+    transition-duration: calc(var(--loader-duration) / 2);
+    transition-timing-function: var(--loader-ease);
+  }
+
+  /* Reduced motion (only with ?op-loader): the screen shows still, then cuts */
+  @media (prefers-reduced-motion: reduce) {
+    html[data-loader] .loader_wrap,
+    html[data-loader] .loader_wrap * {
+      transition: none;
+    }
+    html[data-loader] .loader_wrap * {
+      animation: none;
+    }
+  }
+
+  @keyframes loader-failsafe {
+    from,
+    to {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+}
+`;
+
+const SCRIPT = String.raw`
+(() => {
+  /* The loading screen (src/components/system/Loader.astro): once per tab session, every time with
+     ?op-loader in the address (OP System's replay), never again in the same tab nor, unless asked for,
+     with reduced motion. It holds at least MIN and at most MAX milliseconds, until the fonts are loaded
+     and the first image in view is decoded (and, for the logo, its reveal has ended and held HOLD),
+     then leaves. The counter counts toward 90 while it waits, then to 100 once the page is ready, and
+     leaves at 100. */
+  const MIN = 600;
+  const MAX = 2500;
+  const HOLD = 150;
+  const PRESET = "__PRESET__";
+  const root = document.documentElement;
+  const replay = new URLSearchParams(location.search).has("op-loader");
+  let seen = true;
+  try {
+    seen = sessionStorage.getItem("op-loader") === "1";
+    sessionStorage.setItem("op-loader", "1");
+  } catch {}
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!replay && (seen || reduce)) return;
+
+  root.dataset.loader = "play";
+  const start = performance.now();
+  const wait = (ms) => new Promise((done) => setTimeout(done, ms));
+  const until = (ms) => wait(Math.max(0, start + ms - performance.now()));
+
+  const leave = () => {
+    if (root.dataset.loader !== "play") return;
+    root.dataset.loader = "leave";
+    document.dispatchEvent(new Event("op:loader-leave"));
+    const end = () => {
+      if (root.dataset.loader === "leave") delete root.dataset.loader;
+    };
+    const cover = document.querySelector(".loader_wrap");
+    if (!cover) return end();
+    void getComputedStyle(cover).opacity;
+    const moves = cover
+      .getAnimations({ subtree: true })
+      .map((move) => move.finished);
+    Promise.race([Promise.allSettled(moves), wait(2000)]).then(end);
+  };
+
+  /* The logo's reveal, to its last part, then a short hold so it reads before it goes */
+  const revealed = () => {
+    const cover = document.querySelector(".loader_wrap");
+    if (PRESET !== "logo" || !cover || reduce) return;
+    const rise = cover
+      .getAnimations({ subtree: true })
+      .filter((move) => move.animationName === "loader-rise");
+    return Promise.allSettled(rise.map((move) => move.finished)).then(() =>
+      wait(HOLD),
+    );
+  };
+
+  const ready = () => {
+    /* The first image a visitor will see: in view and shown (a hidden menu's lazy image never loads, and waited
+       for, it held every loader to MAX: Oct 27) */
+    const image = [...document.images].find((img) => {
+      if (img.closest(".loader_wrap")) return false;
+      if (
+        img.checkVisibility &&
+        !img.checkVisibility({ visibilityProperty: true })
+      )
+        return false;
+      const box = img.getBoundingClientRect();
+      return box.width > 0 && box.bottom > 0 && box.top < innerHeight;
+    });
+    return Promise.all([
+      image && image.decode().catch(() => {}),
+      document.fonts && document.fonts.ready,
+      revealed(),
+      until(MIN),
+    ]);
+  };
+
+  let go = leave;
+  if (PRESET === "counter") {
+    let shown = 0;
+    let done = false;
+    let last = start;
+    go = () => {
+      done = true;
+    };
+    const count = (now) => {
+      if (root.dataset.loader !== "play") return;
+      const goal = done ? 1 : 0.9 * (1 - Math.exp(-(now - start) / 700));
+      const pull = 1 - Math.exp(-(now - last) / (done ? 90 : 160));
+      last = now;
+      const near = goal === 1 && 1 - shown < 0.004;
+      shown = reduce || near ? goal : shown + (goal - shown) * pull;
+      const cover = document.querySelector(".loader_wrap");
+      if (cover) {
+        cover.style.setProperty("--_progress", shown.toFixed(3));
+        const figure = cover.querySelector(".loader_count");
+        const n = String(Math.round(shown * 100));
+        if (figure && figure.textContent !== n) figure.textContent = n;
+      }
+      if (shown >= 1) leave();
+      else requestAnimationFrame(count);
+    };
+    requestAnimationFrame(count);
+    until(MAX + 600).then(leave);
+  }
+
+  until(MAX).then(go);
+  if (document.readyState !== "loading") ready().then(go);
+  else
+    addEventListener("DOMContentLoaded", () => ready().then(go), {
+      once: true,
+    });
+})();
+`;
+
+/* Each page carries them: without their comments and line breaks */
+const compact = (code: string) =>
+  code
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\s*\n\s*/g, " ")
+    .trim();
+---
+
+{
+  render && part === "head" && (
+    <Fragment>
+      <style is:inline set:html={compact(CSS)} />
+      <script
+        is:inline
+        set:html={compact(SCRIPT).replace("__PRESET__", preset)}
+      />
+    </Fragment>
+  )
+}
+
+{
+  render && part === "cover" && (
+    <div
+      class:list={[
+        "loader_wrap",
+        preset !== "mark" && preset,
+        ground && `theme-${ground}`,
+      ]}
+      style={logo ? `--_parts: ${logo.parts}` : undefined}
+      aria-hidden="true"
+    >
+      {preset === "custom" && Custom ? (
+        <Custom />
+      ) : preset === "logo" ? (
+        logo ? (
+          <span class="loader_logo" set:html={logo.svg} />
+        ) : (
+          <span class="loader_logo is-name">
+            <span class="loader_part text-style-h2">{SITE_NAME}</span>
+          </span>
+        )
+      ) : preset === "counter" ? (
+        <Fragment>
+          <span class="loader_count text-style-display">0</span>
+          <span class="loader_line" />
+        </Fragment>
+      ) : preset === "mark" && icon ? (
+        <span class="loader_mark" set:html={icon} />
+      ) : (
+        <span class="loader_name text-style-h5">{SITE_NAME}</span>
+      )}
+    </div>
+  )
+}

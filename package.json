@@ -1,0 +1,34 @@
+{
+  "name": "dr-tranter-aesthetics",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "check": "astro check",
+    "prebuild": "node scripts/favicon.mjs --if-missing",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "format": "prettier --write .",
+    "favicon": "node scripts/favicon.mjs",
+    "shot": "node scripts/shot.mjs"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/cloudflare": "14.3.4",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.8",
+    "lenis": "^1.3.27",
+    "typescript": "^6.0.3"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.64.1",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
+    "wrangler": "^4.135.0"
+  }
+}

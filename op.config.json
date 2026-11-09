@@ -1,0 +1,18 @@
+{
+  "id": "op-astro",
+  "name": "Gabarit de site",
+  "client": "",
+  "studio": "Official Partner",
+  "description": "Le point de départ d’un nouveau site, relu dans OP System.",
+  "staging": "",
+  "domain": "",
+  "live": false,
+  "loader": false,
+  "transition": false,
+  "smoothScroll": false,
+  "brandColor": "#141413",
+  "systemPages": [
+    "composantes",
+    "test-contenu"
+  ]
+}

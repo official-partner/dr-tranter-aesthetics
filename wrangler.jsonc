@@ -1,0 +1,34 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // The Worker's name: the project's id (op.config.json), in lowercase letters, digits and dashes. It is in every
+  // address Cloudflare gives the site: <name>.<account>.workers.dev, and <branch>-<name>.<account>.workers.dev for a
+  // branch's preview (the review branch: review-<name>...).
+  "name": "dr-tranter-aesthetics",
+  "compatibility_date": "2026-08-13",
+  // AsyncLocalStorage, for the staging: a page OP System's frame asks for carries its draft proof for that request only
+  // (src/utils/draft.ts)
+  "compatibility_flags": ["nodejs_als"],
+
+  // The built site. There is no `main`, so this deploys as an assets-only
+  // Worker: Cloudflare serves the files and no script runs per request.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+  },
+
+  // The workers.dev address until the client's domain is added (in Cloudflare's dashboard, when the site goes live),
+  // and a preview address for each branch other than main. Cloudflare marks the previews noindex on workers.dev; the
+  // build marks every page noindex until op.config.json says "live": true.
+  "workers_dev": true,
+  "preview_urls": true,
+  "previews": {},
+
+  // The staging (branch review) reads OP's working copy of the collections with the Worker's secrets OP_CONTENT_URL and
+  // OP_CONTENT_TOKEN (CLAUDE.md, Content). Variables set in Cloudflare's dashboard (OP_PROJECT, OP_CONTENT_TTL) are kept
+  // when main deploys, since they are not written here.
+  "keep_vars": true,
+
+  "observability": {
+    "enabled": true,
+  },
+}

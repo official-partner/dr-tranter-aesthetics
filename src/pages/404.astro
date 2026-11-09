@@ -1,0 +1,30 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import ButtonWrapper from "@/components/wrapper/ButtonWrapper.astro";
+import Button from "@/components/Button.astro";
+import ContentWrapper from "@/components/wrapper/ContentWrapper.astro";
+---
+
+<Layout
+  title="Page introuvable"
+  description="Cette page n’existe pas."
+  overlap={true}
+>
+  <Section paddingTop="navoverlap" paddingBottom="navoverlap" class="flex-grow">
+    <ContentWrapper>
+      <Heading variant="h3" tag="h1" maxWidth={17}
+        >Cette page n’existe pas</Heading
+      >
+      <Paragraph variant="large" maxWidth={44} class="color-faded"
+        >Elle a peut-être changé d’adresse, ou le lien qui vous a mené ici n’est
+        plus à jour.</Paragraph
+      >
+      <ButtonWrapper>
+        <Button element="link" href="/">Retour à l’accueil</Button>
+      </ButtonWrapper>
+    </ContentWrapper>
+  </Section>
+</Layout>

@@ -1,0 +1,133 @@
+---
+import type { SvgComponent } from "astro/types";
+import Icon from "@/components/media/Icon.astro";
+import { SITE_NAME } from "@/consts.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+
+/* The client's logo once it is in src/assets/logo/logo.svg; the site's name in the copyright line until then. */
+const [logo] = Object.values(
+  import.meta.glob<SvgComponent>("/src/assets/logo/logo.svg", {
+    eager: true,
+    import: "default",
+  }),
+);
+---
+
+{
+  render && (
+    <footer class="footer_wrap">
+      <div class="footer_inner">
+        <div class="footer_start">
+          {logo && (
+            <a class="footer_logo" href="/" aria-label={SITE_NAME}>
+              <Icon src={logo} variant="full-width" />
+            </a>
+          )}
+          <p class="footer_copyright">
+            &copy; <span id="year">{new Date().getFullYear()}</span>&#160;
+            {SITE_NAME}
+          </p>
+        </div>
+        <nav aria-label="Pied de page">
+          <ul class="footer_links">
+            <li>
+              <a class="footer_link" href="/">
+                Accueil
+              </a>
+            </li>
+            <li>
+              <a class="footer_link" href="/composantes">
+                Composantes
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+  )
+}
+
+<script>
+  import { onPage } from "@/utils/page.ts";
+
+  onPage(() => {
+    const year = document.querySelector<HTMLSpanElement>("#year");
+
+    if (year) {
+      year.textContent = new Date().getFullYear().toString();
+    }
+  });
+</script>
+
+<style is:global>
+  @layer components {
+    .footer_wrap {
+      display: flex;
+      justify-content: center;
+      padding-block: var(--space-5);
+      padding-inline: var(--site-margin);
+      background-color: var(--background);
+      color: var(--text);
+      border-top: var(--border-width) solid var(--border);
+      font-size: var(--text-small);
+      line-height: var(--line-height-large);
+    }
+
+    .footer_inner {
+      width: 100%;
+      max-width: var(--max-width-main);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3) var(--space-6);
+    }
+
+    .footer_start {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3) var(--space-5);
+    }
+
+    .footer_logo {
+      display: block;
+      width: 6.5rem;
+      max-width: 100%;
+      transition: opacity var(--hover-duration) var(--hover-ease);
+      @media (hover: hover) {
+        &:hover {
+          opacity: 0.6;
+        }
+      }
+    }
+
+    .footer_copyright {
+      color: var(--text-2);
+    }
+
+    .footer_links {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .footer_link {
+      color: var(--text-2);
+      text-decoration: none;
+      transition: color var(--hover-duration) var(--hover-ease);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--text);
+        }
+      }
+    }
+  }
+</style>
