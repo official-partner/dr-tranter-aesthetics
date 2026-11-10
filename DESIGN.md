@@ -135,3 +135,19 @@ licensed Season Collection variable, subset to Latin).
 - `.site-grid`: the page grid on `--site-columns` with the site's gutter. Every section lays its content on it.
 - `.column-head` and `.column-body`: a section's label and heading, and its content, on that grid.
 - `.marker`: the small square beside a section label and the concern the pointer is on. Not used until the components.
+
+### Components (built 2026-11-10)
+
+`Button`, `Wordmark`, `SiteHeader`, `SiteMenu`, `SiteFooter`, `Statement`, `SectionHead`, `ConcernIndex`, `StepList`,
+`ResultsScatter`, `JournalCards`, `ClosingInvitation`, each shown on `/composantes`. Content from the collections
+`concerns`, `treatments`, `articles` and `results`, and from `src/data/site.ts` (hours, address, links).
+
+Global classes (src/styles/project.css), each with its uses:
+
+- `.media-frame`: a picture's fixed shape, the picture filling it; with `.media-placeholder` for a photo still to come
+  (menu, concern preview, results, journal).
+- `.bracketed`: a number or a date in square brackets (steps, results, journal dates).
+- `.pill`: the pill shape for what is shown or chosen (the Before / After switch, the Learn more pill).
+- `.swipe-row`: a row swiped sideways below 64rem (results, journal).
+- `.site-grid`, `.column-head`, `.column-body`, `.marker`: from the system (the grid, the label and the body columns, the
+  small square).

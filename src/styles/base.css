@@ -97,6 +97,14 @@
   /* The small square beside a section label and the concern the pointer is on */
   --marker-size: 0.5rem; /* provisional */
 
+  /* The picture frame's default shape (a component sets --media-ratio on itself for another) */
+  --media-ratio: 4 / 5;
+
+  /* The wordmark: 27.5 px at 1728 and 26 at 1440 in the design, 22 on a phone (proposed) */
+  --logo-size: clamp(var(--logo-size-min) / 16 * 1rem, ((var(--logo-size-min) - ((var(--logo-size-max) - var(--logo-size-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--logo-size-max) - var(--logo-size-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--logo-size-max) / 16 * 1rem);
+  --logo-size-min: 22;
+  --logo-size-max: 27.5;
+
   /* Typography styles. Sizes at 1728 are the design's, at 390 they are proposed (the design has no phone frame). Body
      text never goes under 16. */
   --display: clamp(var(--display-min) / 16 * 1rem, ((var(--display-min) - ((var(--display-max) - var(--display-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--display-max) - var(--display-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--display-max) / 16 * 1rem);
@@ -302,6 +310,8 @@
    only at 24 px and up (3 to 1 at least). There is no accent colour: the outlined pill is the action. */
 :root,
 .theme-stone,
+.theme-sand,
+.theme-mist,
 .theme-light,
 .theme-dark .theme-invert,
 .theme-brand .theme-invert {

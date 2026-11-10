@@ -1,0 +1,77 @@
+---
+import type { SvgComponent } from "astro/types";
+import Icon from "@/components/media/Icon.astro";
+import { SITE_NAME } from "@/consts.ts";
+
+/* The client's logo once it is in src/assets/logo/logo.svg; until then the name set in type, « Dr » smaller. */
+const [logo] = Object.values(
+  import.meta.glob<SvgComponent>("/src/assets/logo/logo.svg", {
+    eager: true,
+    import: "default",
+  }),
+);
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Where the wordmark leads. */
+  href?: string;
+}
+
+const { render = true, href = "/" } = Astro.props;
+---
+
+{
+  render && (
+    <a class="wordmark_wrap" href={href} aria-label={SITE_NAME}>
+      {logo ? (
+        <Icon class="wordmark_logo" src={logo} variant="full-width" />
+      ) : (
+        <span class="wordmark_name" aria-hidden="true">
+          <span class="wordmark_prefix">Dr</span>
+          <span>Tranter Aesthetics</span>
+        </span>
+      )}
+    </a>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .wordmark_wrap {
+      display: inline-flex;
+      align-items: center;
+      min-height: var(--nav-height);
+      color: inherit;
+      transition: opacity var(--hover-duration) var(--hover-ease);
+      @media (hover: hover) {
+        &:hover {
+          opacity: 0.7;
+        }
+      }
+    }
+
+    .wordmark_logo {
+      width: 8rem;
+    }
+
+    .wordmark_name {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 0.2em;
+      font-family: var(--primary-family);
+      font-variation-settings: var(--primary-variation);
+      font-size: var(--logo-size);
+      font-weight: var(--primary-light);
+      line-height: 1;
+      letter-spacing: var(--letter-spacing-tight);
+      white-space: nowrap;
+    }
+
+    /* « Dr » at 14.7 of the 27.5 of the name in the design: 0.535 of it */
+    .wordmark_prefix {
+      font-size: 0.535em;
+      letter-spacing: var(--letter-spacing-normal);
+    }
+  }
+</style>

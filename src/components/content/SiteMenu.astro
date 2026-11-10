@@ -1,0 +1,335 @@
+---
+import Button from "@/components/Button.astro";
+import { getItems } from "@/utils/content";
+import {
+  BOOK_URL,
+  clinicLinks,
+  concernHref,
+  connectLinks,
+} from "@/data/site.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+
+const concerns = await getItems("concerns");
+const structure = concerns.filter(({ data }) => data.group === "Structure");
+const surface = concerns.filter(({ data }) => data.group === "Surface");
+const connect = connectLinks.filter((link) => link.href);
+---
+
+{
+  render && (
+    <Fragment>
+    <div class="site-menu_wrap theme-mist" id="site-menu" data-lenis-prevent>
+      <div class="site-menu_inner site-grid">
+        <div class="site-menu_photo media-frame" aria-hidden="true">
+          <span class="media-placeholder">Photo to supply</span>
+        </div>
+        <nav class="site-menu_nav" aria-label="Menu">
+          <div class="site-menu_group" style="--i: 0">
+            <h2 class="site-menu_title text-style-label">Structure</h2>
+            <ul
+              class="site-menu_list"
+              data-op-list="menu-structure"
+              data-op-source="astro:concerns"
+            >
+              {structure.map(({ id, data }) => (
+                <li data-op-item={id}>
+                  <a class="site-menu_link" href={concernHref(id)}>
+                    {data.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="site-menu_group" style="--i: 1">
+            <h2 class="site-menu_title text-style-label">Surface</h2>
+            <ul
+              class="site-menu_list"
+              data-op-list="menu-surface"
+              data-op-source="astro:concerns"
+            >
+              {surface.map(({ id, data }) => (
+                <li data-op-item={id}>
+                  <a class="site-menu_link" href={concernHref(id)}>
+                    {data.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="site-menu_group" style="--i: 2">
+            <h2 class="site-menu_title text-style-label">Clinic</h2>
+            <ul
+              class="site-menu_list"
+              data-op-list="menu-clinic"
+              data-op-source="src/data/site.ts"
+            >
+              {clinicLinks.map((link) => (
+                <li data-op-item="">
+                  <a class="site-menu_link" href={link.href}>
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="site-menu_group" style="--i: 3">
+            <h2 class="site-menu_title text-style-label">Connect</h2>
+            <ul
+              class="site-menu_list"
+              data-op-list="menu-connect"
+              data-op-source="src/data/site.ts"
+            >
+              {connect.map((link) => (
+                <li data-op-item="">
+                  <a class="site-menu_link" href={link.href}>
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <div class="site-menu_book theme-mist">
+      <Button element="link" href={BOOK_URL}>
+        Book a consultation
+      </Button>
+    </div>
+    </Fragment>
+  )
+}
+
+<script>
+  import { onPage } from "@/utils/page.ts";
+  import { onLenis } from "@/utils/smooth-scroll.ts";
+
+  onPage((signal) => {
+    const header = document.querySelector<HTMLElement>(".site-header_wrap");
+    const toggle = header?.querySelector<HTMLButtonElement>(
+      "[data-menu-toggle]",
+    );
+    const panel = header?.querySelector<HTMLElement>(".site-menu_wrap");
+    if (!header || !toggle || !panel) return;
+
+    /* job: the page behind an open menu is out of reach (focus, pointer, the smooth scroll) */
+    const behind = document.querySelectorAll<HTMLElement>(
+      "main, .site-footer_wrap",
+    );
+    let lenis: { stop(): void; start(): void } | null = null;
+    const stopWaiting = onLenis((instance) => {
+      lenis = instance;
+      if (header.dataset.open === "true") instance.stop();
+    });
+
+    const setOpen = (open: boolean, giveFocusBack = false) => {
+      header.dataset.open = String(open);
+      toggle.setAttribute("aria-expanded", String(open));
+      behind.forEach((el) => (el.inert = open));
+      if (open) {
+        lenis?.stop();
+        /* the panel is shown a frame or two later: a link takes the focus once it can */
+        const first = panel.querySelector<HTMLElement>("a");
+        let tries = 0;
+        const focusFirst = () => {
+          if (header.dataset.open !== "true" || !first) return;
+          first.focus({ preventScroll: true });
+          if (document.activeElement !== first && tries++ < 12)
+            requestAnimationFrame(focusFirst);
+        };
+        requestAnimationFrame(focusFirst);
+      } else {
+        lenis?.start();
+        if (giveFocusBack) toggle.focus();
+      }
+    };
+
+    toggle.addEventListener(
+      "click",
+      () => setOpen(header.dataset.open !== "true"),
+      { signal },
+    );
+    panel.addEventListener("click", (event) => {
+      if ((event.target as Element).closest("a")) setOpen(false);
+    }, { signal });
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.key === "Escape" && header.dataset.open === "true")
+          setOpen(false, true);
+      },
+      { signal },
+    );
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (
+          header.dataset.open === "true" &&
+          event.target instanceof Node &&
+          !header.contains(event.target)
+        )
+          setOpen(false);
+      },
+      { signal },
+    );
+    signal.addEventListener("abort", () => {
+      stopWaiting();
+      behind.forEach((el) => (el.inert = false));
+      lenis?.start();
+    });
+  });
+</script>
+
+<style is:global>
+  @layer components {
+    /* The panel opens from the bar (medium, out); leaving takes about 55 % of that (fast). */
+    .site-menu_wrap {
+      position: absolute;
+      top: 100%;
+      inset-inline: 0;
+      max-height: calc(100svh - var(--nav-height));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: var(--space-6) var(--site-margin) var(--space-7);
+      visibility: hidden;
+      opacity: 0;
+      translate: 0 -0.75rem;
+      transition:
+        opacity var(--duration-fast) var(--open-ease),
+        translate var(--duration-fast) var(--open-ease),
+        visibility 0s linear var(--duration-fast);
+
+      @media (width < 48rem) {
+        position: fixed;
+        top: var(--nav-height);
+        bottom: 0;
+        max-height: none;
+        padding-bottom: calc(var(--nav-height) + var(--space-5));
+      }
+    }
+
+    .site-header_wrap[data-open="true"] .site-menu_wrap {
+      visibility: visible;
+      opacity: 1;
+      translate: 0 0;
+      transition:
+        opacity var(--open-duration) var(--open-ease),
+        translate var(--open-duration) var(--open-ease),
+        visibility 0s;
+    }
+
+    .site-menu_inner {
+      width: 100%;
+      max-width: var(--max-width-main);
+      margin-inline: auto;
+      row-gap: var(--space-6);
+    }
+
+    .site-menu_photo {
+      --media-ratio: 4 / 5;
+      grid-column: 1 / span 3;
+      align-self: start;
+      @media (width < 64rem) {
+        display: none;
+      }
+    }
+
+    .site-menu_nav {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: subgrid;
+      row-gap: var(--space-6);
+
+      @media (width >= 64rem) {
+        grid-column: 5 / -1;
+      }
+    }
+
+    /* Phone: one tall list of four headed groups. Tablet: two by two. Computer: four lists of two columns. */
+    .site-menu_group {
+      grid-column: 1 / -1;
+      @media (width >= 48rem) {
+        grid-column: span 4;
+      }
+      @media (width >= 64rem) {
+        grid-column: span 2;
+      }
+      opacity: 0;
+      translate: 0 0.5rem;
+      transition:
+        opacity var(--duration-fast) var(--open-ease),
+        translate var(--duration-fast) var(--open-ease);
+    }
+
+    .site-header_wrap[data-open="true"] .site-menu_group {
+      opacity: 1;
+      translate: 0 0;
+      transition-duration: var(--open-duration);
+      transition-delay: calc(var(--i) * 50ms);
+    }
+
+    .site-menu_title {
+      margin: 0 0 var(--space-3);
+      color: var(--text-2);
+    }
+
+    .site-menu_list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-menu_link {
+      display: block;
+      padding-block: var(--space-1);
+      font-family: var(--primary-family);
+      font-variation-settings: var(--primary-variation);
+      font-size: var(--text-main);
+      line-height: var(--line-height-large);
+      color: var(--link-text);
+      transition: color var(--hover-duration) var(--hover-ease);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--link-text-hover);
+        }
+      }
+      &:focus-visible {
+        color: var(--link-text-hover);
+      }
+    }
+
+    /* Book a consultation stays within reach at the foot of the phone menu */
+    .site-menu_book {
+      display: none;
+      @media (width < 48rem) {
+        position: fixed;
+        inset-inline: 0;
+        bottom: 0;
+        display: flex;
+        padding: var(--space-4) var(--site-margin);
+        background-color: var(--background);
+        visibility: hidden;
+        opacity: 0;
+        transition:
+          opacity var(--duration-fast) var(--open-ease),
+          visibility 0s linear var(--duration-fast);
+        & > .button_wrap {
+          flex: 1;
+        }
+      }
+    }
+
+    .site-header_wrap[data-open="true"] .site-menu_book {
+      visibility: visible;
+      opacity: 1;
+      transition:
+        opacity var(--open-duration) var(--open-ease),
+        visibility 0s;
+    }
+  }
+</style>

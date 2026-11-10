@@ -96,6 +96,38 @@ One line per decision: the date, who asked, what was decided and why. The newest
 - 2026-10-17, Sam: the site starts from OP's starter `official-partner/op-astro` (Lumos for Astro 1.0.0). `main` is
   the live site, `review` the one OP System shows; content in files until a CMS is decided.
 
+## 2026-11-10, the components (start, session components, asked by Samuel Charpentier)
+
+- Built from the Web System's tokens only, each with a sample on `composantes`: `Button` (restyled: outlined pill in the
+  round radius, label capitals, press feedback, the link variant with its arrow; card d-buttons), `Wordmark` (the name in
+  type until the logo SVG arrives), `SiteHeader` and `SiteMenu` (sticky Burgundy bar, Book pill shortening to « Book » on a
+  phone, menu panel in Mist with four lists and a photo, full screen on a phone with the Book pill fixed at the foot;
+  focus moves in, the page behind is inert, Escape and a click outside close it, focus returns to the button),
+  `SiteFooter` (3, 3 and 2 columns on a computer, the lists folded on a phone), `Statement` (the opening, CSS only: lines
+  rise from masks once; no GSAP needed, a loading screen would hold it), `SectionHead`, `ConcernIndex` (the signature:
+  a hover and focus preview, a tapped list on a phone and tablet; card c-concern-index), `StepList`, `ResultsScatter`
+  (scattered on a computer, a swipe row below; Before / After switch, After by default; cards c-before-after and
+  c-phone), `JournalCards` (dates day first; card c-dates), `ClosingInvitation`.
+- Layout: the starter's Nav and Footer are replaced by `SiteHeader` and `SiteFooter` (the old files are gone); the skip
+  link and the 404 are in English; `ClinicSchema` writes the MedicalClinic data from `src/data/site.ts`.
+- Collections (card c-collections): `concerns` (15, with their group and the design's summaries), `treatments` (19, with
+  their summaries, no category yet), `articles` (3, dated 22 January 2026), `results` (4). Labels in English, the
+  client's language. No photos yet: the frames say « Photo to supply ».
+- Global classes added: `.media-frame`, `.media-placeholder`, `.bracketed`, `.pill`, `.swipe-row` (and `.site-grid` got a
+  row gap, so a phone's stacked head and body do not touch). `.marker` is now used (section labels, the hovered concern).
+- Fix in the system: Sand and Mist now carry the light theme's roles (text, links, buttons); before, a Sand or Mist
+  block inside a Burgundy one (the menu panel under the header) kept the Burgundy roles.
+- Token added: `--logo-size` (22 to 27.5) and `--media-ratio`.
+- Decided: the concern preview photo is 2 columns wide, not the design's 3, and the hovered line is above it, so the
+  longest names are never covered; the photo is placed inside the list and centred on its line as far as it allows (a
+  small script, delegated, no layout shift). The Learn more pill sits on the photo's foot. The group label shows in
+  the left columns on the hovered line. The menu's lists are Structure, Surface, Clinic and Connect (the last two names
+  are ours). Concern pages are at /concerns/<slug>, other addresses are ours (src/data/site.ts): the pages are not
+  built, so those links lead to the 404 until they are. The footer keeps the design's AHPRA placeholder, flagged as
+  supply. The scatter's sizes and positions are ours: only the design's idea (four cases, four sizes) is kept.
+- Not built here: filter pills of the Treatments page and its empty state, the concern and treatment cards, form fields
+  beyond Lumos's (they follow the pages).
+
 ## 2026-11-10, the Web System (start, session system, asked by Samuel Charpentier)
 
 - base.css rewritten from the design (DESIGN.md, The Web System): scale model A (390 to 1728, content capped at 1728),

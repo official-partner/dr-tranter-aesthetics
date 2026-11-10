@@ -24,4 +24,65 @@ const team = defineCollection({
       .describe("Équipe"),
 });
 
-export const collections = { team };
+const concerns = defineCollection({
+  loader: glob({ pattern: "*.json", base: "./src/content/concerns" }),
+  schema: ({ image }) =>
+    z
+      .object({
+        name: z.string().describe("Name"),
+        group: z.enum(["Structure", "Surface"]).describe("Group"),
+        summary: z.string().optional().describe("Summary"),
+        photo: image().optional().describe("Photo"),
+        visible: z.boolean().default(true).describe("Visible on the site"),
+        order: z.number().optional().describe("Order"),
+      })
+      .describe("Concerns"),
+});
+
+const treatments = defineCollection({
+  loader: glob({ pattern: "*.json", base: "./src/content/treatments" }),
+  schema: ({ image }) =>
+    z
+      .object({
+        name: z.string().describe("Name"),
+        category: z
+          .enum(["Injectables", "RF treatments", "Laser & light", "Facials & peels"])
+          .optional()
+          .describe("Category"),
+        summary: z.string().optional().describe("Summary"),
+        photo: image().optional().describe("Photo"),
+        visible: z.boolean().default(true).describe("Visible on the site"),
+        order: z.number().optional().describe("Order"),
+      })
+      .describe("Treatments"),
+});
+
+const articles = defineCollection({
+  loader: glob({ pattern: "*.json", base: "./src/content/articles" }),
+  schema: ({ image }) =>
+    z
+      .object({
+        title: z.string().describe("Title"),
+        date: z.coerce.date().optional().describe("Date"),
+        photo: image().optional().describe("Photo"),
+        visible: z.boolean().default(true).describe("Visible on the site"),
+        order: z.number().optional().describe("Order"),
+      })
+      .describe("Journal articles"),
+});
+
+const results = defineCollection({
+  loader: glob({ pattern: "*.json", base: "./src/content/results" }),
+  schema: ({ image }) =>
+    z
+      .object({
+        treatment: z.string().describe("Treatment"),
+        beforePhoto: image().optional().describe("Before photo"),
+        afterPhoto: image().optional().describe("After photo"),
+        visible: z.boolean().default(true).describe("Visible on the site"),
+        order: z.number().optional().describe("Order"),
+      })
+      .describe("Results"),
+});
+
+export const collections = { team, concerns, treatments, articles, results };

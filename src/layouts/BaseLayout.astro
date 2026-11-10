@@ -2,8 +2,9 @@
 import "@/styles/global.css";
 import BaseHead from "@/components/utility/BaseHead.astro";
 import SkipLink from "@/components/global/SkipLink.astro";
-import Nav from "@/components/global/Nav.astro";
-import Footer from "@/components/global/Footer.astro";
+import SiteHeader from "@/components/content/SiteHeader.astro";
+import SiteFooter from "@/components/content/SiteFooter.astro";
+import ClinicSchema from "@/components/system/ClinicSchema.astro";
 import Loader from "@/components/system/Loader.astro";
 import PageTransitions from "@/components/system/PageTransitions.astro";
 import SmoothScroll from "@/components/system/SmoothScroll.astro";
@@ -15,15 +16,9 @@ import config from "../../op.config.json";
 type Props = SeoProps & {
   /** Theme for the whole page. `inherit` leaves the root defaults in place. */
   theme?: Theme;
-  /**
-   * Fix the nav over the page rather than letting it stick in flow, so the
-   * first section starts underneath it. Give that section
-   * `paddingTop="navoverlap"` to clear the bar.
-   */
-  overlap?: boolean;
 };
 
-const { theme = "inherit", overlap = false, ...seo } = Astro.props;
+const { theme = "inherit", ...seo } = Astro.props;
 
 /* The finishing touches, each off until op.config.json turns it on (src/utils/finishes.ts): the loading screen, the
    transition between pages, the smooth scroll. A "custom" one without its file stands in as its first preset. */
@@ -66,11 +61,12 @@ const { smoothScroll } = finish;
   <body>
     {loader && <Loader part="cover" preset={loader} />}
     {transition && <PageTransitions part="body" preset={transition} />}
-    <SkipLink />
-    <Nav overlap={overlap} />
+    <SkipLink label="Skip to content" />
+    <SiteHeader />
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <Footer />
+    <SiteFooter />
+    <ClinicSchema />
   </body>
 </html>

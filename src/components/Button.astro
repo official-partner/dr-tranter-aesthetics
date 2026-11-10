@@ -128,6 +128,7 @@ const named = {
     <Tag
       class:list={[
         "button_wrap",
+        "text-style-label",
         emphasis !== "primary" && emphasis,
         variant !== "main" && variant,
         variant === "arrow" && direction === "back" && "back",
@@ -142,6 +143,9 @@ const named = {
         <span class="button_text text-style-trim">
           <Fragment set:html={content} />
         </span>
+      )}
+      {variant === "link" && (
+        <Icon class="button_mark button_arrow" src={arrow} variant="small" />
       )}
       {variant === "play" && (
         <Fragment>
@@ -170,14 +174,17 @@ const named = {
       background-color: var(--button-background);
       color: var(--button-text);
       border: var(--border-width) solid var(--button-border);
-      border-radius: 0.5em;
-      line-height: 1.2;
+      border-radius: var(--radius-round);
       text-decoration: none;
       text-align: center;
       transition:
         background-color var(--hover-duration) var(--hover-ease),
         color var(--hover-duration) var(--hover-ease),
-        border-color var(--hover-duration) var(--hover-ease);
+        border-color var(--hover-duration) var(--hover-ease),
+        scale var(--duration-faster) var(--hover-ease);
+      &:active:not(:disabled) {
+        scale: 0.97;
+      }
       @media (hover: hover) {
         &:hover:not(:disabled) {
           background-color: var(--button-background-hover);
@@ -201,6 +208,7 @@ const named = {
         --button-text-hover: var(--link-text-hover);
         --button-border-hover: var(--link-border);
 
+        gap: 0.75em;
         padding: 0.4em 0;
         border: 0;
         border-bottom: var(--border-width) solid var(--button-border);
@@ -217,10 +225,16 @@ const named = {
           background-size calc(var(--hover-duration) * 2) var(--hover-ease),
           color var(--hover-duration) var(--hover-ease),
           border-color var(--hover-duration) var(--hover-ease);
+        & .button_arrow {
+          transition: translate var(--hover-duration) var(--hover-ease);
+        }
         @media (hover: hover) {
           &:hover:not(:disabled) {
             background-position: 0 100%;
             background-size: 100% var(--border-width);
+            & .button_arrow {
+              translate: 0.25em 0;
+            }
           }
         }
       }

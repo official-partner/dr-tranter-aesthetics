@@ -9,6 +9,7 @@
   display: grid;
   grid-template-columns: repeat(var(--site-columns), minmax(0, 1fr));
   column-gap: var(--site-gutter);
+  row-gap: var(--space-6);
 }
 
 /* A section's label and heading: columns 1 to 4 of 12 (the full width on a phone). */
@@ -28,4 +29,79 @@
   inline-size: var(--marker-size);
   block-size: var(--marker-size);
   background-color: currentcolor;
+}
+
+/* A picture's frame: a fixed shape, the picture filling it, a quiet tint where the photo is still to come. */
+.media-frame {
+  position: relative;
+  overflow: clip;
+  aspect-ratio: var(--media-ratio);
+  background-color: var(--background-2);
+  border-radius: var(--radius-main);
+  & > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* What a picture frame says while its photo is still to come: a short label, centred, in the quiet text. */
+.media-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  color: var(--text-2);
+  font-size: var(--text-small);
+  line-height: var(--text-small-line-height);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* A number or a date set in square brackets: a real sequence, drawn by the style so the words stay clean. */
+.bracketed::before {
+  content: "[";
+}
+.bracketed::after {
+  content: "]";
+}
+
+/* The pill shape for what is chosen or shown, not clicked as an action: outlined in the ink, label capitals. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em 1em;
+  border: var(--border-width) solid currentcolor;
+  border-radius: var(--radius-round);
+  font-family: var(--label-font-family);
+  font-size: var(--label);
+  font-weight: var(--label-font-weight);
+  line-height: var(--label-line-height);
+  letter-spacing: var(--label-letter-spacing);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* A row of cards swiped sideways on a phone and a tablet, each snapping to the side margin; its own layout takes over
+   from a computer up. */
+.swipe-row {
+  @media (width < 64rem) {
+    display: flex;
+    gap: var(--site-gutter);
+    margin-inline: calc(var(--site-margin) * -1);
+    padding-inline: var(--site-margin);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--site-margin);
+    scrollbar-width: none;
+    & > * {
+      flex: 0 0 var(--swipe-item, 78%);
+      scroll-snap-align: start;
+    }
+  }
 }

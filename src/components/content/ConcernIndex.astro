@@ -1,0 +1,261 @@
+---
+import Img from "@/components/media/Img.astro";
+import { getItems, img } from "@/utils/content";
+import { concernHref } from "@/data/site.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+
+const concerns = await getItems("concerns");
+const groups = (["Structure", "Surface"] as const).map((name) => ({
+  name,
+  items: concerns.filter(({ data }) => data.group === name),
+}));
+---
+
+{
+  render && concerns.length > 0 && (
+    <div class="concern-index_wrap">
+      {groups.map(({ name, items }) => (
+        <div class="concern-index_group">
+          <h3 class="concern-index_title text-style-label">{name}</h3>
+          <ul
+            class="concern-index_list"
+            data-op-list={`concerns-${name.toLowerCase()}`}
+            data-op-source="astro:concerns"
+          >
+            {items.map(({ id, data }) => (
+              <li class="concern-index_item" data-op-item={id}>
+                <a class="concern-index_link" href={concernHref(id)}>
+                  <span class="concern-index_name text-style-display">
+                    {data.name}
+                  </span>
+                  <span class="concern-index_tag" aria-hidden="true">
+                    <span class="marker" />
+                    <span class="text-style-label">{data.group}</span>
+                  </span>
+                  <span class="concern-index_preview" aria-hidden="true">
+                    <span class="concern-index_photo media-frame">
+                      {data.photo ? (
+                        <Img
+                          {...img(data.photo)}
+                          alt=""
+                          variant="constrained"
+                          sizes="(min-width: 64rem) 25vw, 0px"
+                        />
+                      ) : (
+                        <span class="media-placeholder">Photo to supply</span>
+                      )}
+                      <span class="concern-index_more pill">Learn more</span>
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+<script>
+  import { onPage } from "@/utils/page.ts";
+
+  onPage((signal) => {
+    for (const root of document.querySelectorAll<HTMLElement>(
+      ".concern-index_wrap",
+    )) {
+      /* job: the preview of the line pointed at stays inside the list, centred on its line as far as the list allows
+         (it is out of the flow, so nothing moves) */
+      const place = (event: Event) => {
+        const link = (event.target as Element).closest<HTMLElement>(
+          ".concern-index_link",
+        );
+        const preview = link?.querySelector<HTMLElement>(
+          ".concern-index_preview",
+        );
+        if (!link || !preview) return;
+        const area = root.getBoundingClientRect();
+        const line = link.getBoundingClientRect();
+        const height = preview.offsetHeight;
+        const centred = line.top - area.top + line.height / 2 - height / 2;
+        const top = Math.min(Math.max(centred, 0), area.height - height);
+        preview.style.setProperty(
+          "--preview-top",
+          `${top - (line.top - area.top)}px`,
+        );
+      };
+      root.addEventListener("pointerover", place, { signal });
+      root.addEventListener("focusin", place, { signal });
+    }
+  });
+</script>
+
+<style is:global>
+  @layer components {
+    /* The list's own width is the unit of the preview: one column of the 8 it spans, and its gutter. */
+    .concern-index_wrap {
+      --_column: calc((100cqw + var(--site-gutter)) / 8);
+      container-type: inline-size;
+      position: relative;
+    }
+
+    .concern-index_title {
+      margin: var(--space-5) 0 var(--space-2);
+      color: var(--text-2);
+      /* The list reads as one on a computer: the group names are there for a phone and for readers of the page */
+      @media (width >= 64rem) {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+      }
+    }
+
+    .concern-index_group:first-child .concern-index_title {
+      margin-top: 0;
+    }
+
+    .concern-index_list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .concern-index_item {
+      position: relative;
+    }
+
+    .concern-index_link {
+      display: block;
+      padding-block: var(--space-2);
+      color: var(--text-3);
+      transition: color var(--duration-faster) var(--hover-ease);
+
+      /* Tablet and phone: a plain list, tapped straight to the concern */
+      @media (width >= 64rem) {
+        padding-block: 0.3em;
+      }
+    }
+
+    .concern-index_name {
+      position: relative;
+      z-index: 2;
+      display: block;
+      margin: 0;
+      transition: translate var(--duration-faster) var(--hover-ease);
+    }
+
+    .concern-index_tag,
+    .concern-index_preview {
+      display: none;
+    }
+
+    /* A computer with a pointer, or the keyboard: the line pointed at goes dark, steps in by a column and shows its
+       photo with its group and a Learn more pill, fading in on the fast curve; none of it moves the layout. */
+    @media (width >= 64rem) {
+      .concern-index_tag {
+        position: absolute;
+        top: 50%;
+        left: calc(var(--_column) * -4);
+      }
+
+      .concern-index_tag,
+      .concern-index_preview {
+        display: flex;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity var(--duration-faster) var(--hover-ease),
+          visibility 0s linear var(--duration-faster);
+      }
+
+      .concern-index_tag {
+        align-items: center;
+        gap: var(--space-2);
+        translate: 0 -50%;
+        color: var(--text);
+      }
+
+      .concern-index_preview {
+        position: absolute;
+        top: var(--preview-top, 0);
+        inset-inline-end: 0;
+        z-index: 1;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+        inline-size: calc(var(--_column) * 2 - var(--site-gutter));
+        pointer-events: none;
+        color: var(--text);
+      }
+
+      .concern-index_more {
+        position: absolute;
+        inset-inline-start: var(--space-3);
+        inset-block-end: var(--space-3);
+        background-color: var(--background);
+      }
+
+      .concern-index_photo {
+        display: block;
+        inline-size: 100%;
+        translate: 0 1rem;
+        transition: translate var(--duration-faster) var(--hover-ease);
+      }
+    }
+
+    @media (width >= 64rem) and (hover: hover) and (pointer: fine) {
+      .concern-index_link:hover {
+        color: var(--text);
+        & .concern-index_name {
+          translate: var(--_column) 0;
+        }
+        & :is(.concern-index_tag, .concern-index_preview) {
+          opacity: 1;
+          visibility: visible;
+          transition:
+            opacity var(--hover-duration) var(--hover-ease),
+            visibility 0s;
+        }
+        & .concern-index_photo {
+          translate: 0 0;
+          transition: translate var(--hover-duration) var(--hover-ease);
+        }
+      }
+    }
+
+    @media (width >= 64rem) {
+      .concern-index_link:focus-visible {
+        color: var(--text);
+        & .concern-index_name {
+          translate: var(--_column) 0;
+        }
+        & :is(.concern-index_tag, .concern-index_preview) {
+          opacity: 1;
+          visibility: visible;
+          transition:
+            opacity var(--hover-duration) var(--hover-ease),
+            visibility 0s;
+        }
+        & .concern-index_photo {
+          translate: 0 0;
+          transition: translate var(--hover-duration) var(--hover-ease);
+        }
+      }
+    }
+
+    /* A phone's finger leaves the colour of a touch on the line it taps */
+    @media (hover: none) {
+      .concern-index_link:active {
+        color: var(--text);
+      }
+    }
+  }
+</style>
