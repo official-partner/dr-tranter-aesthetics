@@ -136,3 +136,6 @@ One line per decision: the date, who asked, what was decided and why. The newest
 
 ## 2026-11-09, setup (asked by Samuel Charpentier)
 - op.config.json: id dr-tranter-aesthetics, name and client Dr Tranter Aesthetics. src/consts.ts: SITE_NAME, SITE_DESCRIPTION (a plain placeholder: the Brief holds no description yet), SITE_LOCALE en. Worker name in wrangler.jsonc kept: dr-tranter-aesthetics.
+
+## 2026-11-10, comment 13 (asked by Samuel Charpentier)
+- CardRow: on phones (under 48rem, landscape included) every card spans 3 of the 4 columns, odd cards left, even cards right; the third card is no longer full width. The products on the concerns pages and the journal cards on the home follow.
