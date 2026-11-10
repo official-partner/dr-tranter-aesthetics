@@ -8,10 +8,10 @@ const { render = true } = Astro.props;
 
 {
   render && (
-    <section class="hero-home_wrap image-band theme-dark" data-figma-band="hero" data-band-top="0">
+    <section class="hero-home_wrap section-padding theme-dark" data-figma-band="hero" data-band-top="0">
       <div class="hero-home_layout site-grid">
         <span class="marker hero-home_marker" data-figma="1:75" />
-        <h1 class="hero-home_title text-style-h2" data-figma="1:74">
+        <h1 class="hero-home_title lead-marker text-style-h2" data-figma="1:74">
           We look beyond isolated treatments to consider <em>structure, surface</em> and facial <em>cohesion</em> as a
           whole.
         </h1>
@@ -38,9 +38,9 @@ const { render = true } = Astro.props;
       display: flex;
       flex-direction: column;
       min-height: var(--band-hero);
-      padding-top: calc(var(--band-padding) + var(--space-10));
+      padding-top: calc(var(--site-margin) + var(--space-10));
       @media (width >= 64rem) {
-        padding-top: var(--band-padding);
+        padding-top: var(--section-padding);
       }
     }
     .hero-home_layout {
@@ -138,6 +138,11 @@ const { render = true } = Astro.props;
       .hero-home_phone {
         order: 3;
         margin-top: var(--space-2);
+      }
+    }
+    @media (width < 48rem) {
+      .hero-home_title {
+        --_lead-marker: inline-block;
       }
     }
   }

@@ -2,6 +2,11 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-10, Sam (12:54): the small section padding (the side margin) everywhere; only the closing invitation and the
+  journal end wide (64 at 1728), on purpose; (12:58) on a phone the section padding is the large one (48). Replaces the
+  two-value rule of 12:47. (12:56, comment 12) the small square
+  marker is kept on tablet and phone: where the grid has no column for it, it leads the text it marks (`lead-marker`).
+
 - 2026-11-10, Sam (12:47): smooth scroll on (Lenis, preset light, op.config.json). Section padding made uniform:
   two values, `.image-band` (the side margin) and `.text-section` (`section-space-medium`), in place of five chosen
   section by section from the Figma; the hero's top under the nav and the footer are the two exceptions (DESIGN.md).

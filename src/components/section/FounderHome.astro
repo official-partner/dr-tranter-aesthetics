@@ -1,13 +1,13 @@
 ---
 ---
 
-<section class="founder-home_wrap image-band theme-dark-sand" data-figma-band="founder" data-band-top="4997.06">
+<section class="founder-home_wrap section-padding theme-dark-sand" data-figma-band="founder" data-band-top="4997.06">
   <div class="founder-home_layout site-grid">
     <h2 class="founder-home_title text-style-h2" data-figma="1:131">Meet the <em>founder</em>.</h2>
     <div class="founder-home_id">
       <span class="marker" data-figma="1:133" />
       <div class="founder-home_names stack">
-        <p class="text-style-label" data-figma="1:132">Dr Sarah Tranter</p>
+        <p class="founder-home_label lead-marker text-style-label" data-figma="1:132">Dr Sarah Tranter</p>
         <p class="founder-home_role text-style-serif" data-figma="1:134">Founder &amp; Cosmetic Physician · 15+ years in practice</p>
       </div>
     </div>
@@ -86,6 +86,11 @@
       }
       .founder-home_media {
         grid-column: half / end;
+      }
+    }
+    @media (width < 48rem) {
+      .founder-home_label {
+        --_lead-marker: inline-block;
       }
     }
   }

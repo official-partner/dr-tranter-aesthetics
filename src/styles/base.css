@@ -205,8 +205,8 @@
   /* Role tokens: one job each, pointing at a step of the scale (change the step, every use follows) */
   --space-media: var(--space-3);
   --space-stack: var(--space-10);
-  --band-padding: var(--site-margin);
-  --section-padding: var(--section-space-medium);
+  --section-padding: var(--site-margin);
+  --section-padding-wide: var(--section-space-medium);
 
   /* Floors: reading text stops shrinking here (applied with max() in the text-style rules) */
   --text-main-floor: 0.812rem;
@@ -367,6 +367,12 @@
   --site-width: calc(100% - var(--site-margin) * 2);
   /* The layout grid's columns: phone here, tablet and computer in the media blocks */
   --site-columns: 4;
+}
+/* Phone: role tokens that point at another step below the tablet */
+@media (width < 48rem) {
+  :root {
+    --section-padding: var(--section-space-medium);
+  }
 }
 /* Tablet: 8 columns (Lumos Grid breakpoint 48rem) */
 @media (width >= 48rem) {

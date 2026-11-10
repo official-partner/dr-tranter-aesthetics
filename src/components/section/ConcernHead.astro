@@ -25,11 +25,11 @@ const { render = true, name, statement, facts, image } = Astro.props;
 
 {
   render && (
-    <section class="concern-head_wrap image-band" data-figma-band="top" data-band-top="0">
+    <section class="concern-head_wrap section-padding" data-figma-band="top" data-band-top="0">
       <div class="concern-head_layout site-grid">
         <a class="concern-head_back text-style-action inset-optical" href="/concerns" data-figma="1:450"><span class="concern-head_arrow" aria-hidden="true">→</span>Back</a>
         <span class="marker concern-head_marker" data-figma="1:358" />
-        <h1 class="concern-head_name text-style-h2" data-op-field="name" data-figma="1:434">{name}</h1>
+        <h1 class="concern-head_name lead-marker text-style-h2" data-op-field="name" data-figma="1:434">{name}</h1>
         <p class="concern-head_crumb text-style-action" data-figma="1:453">Concerns / <span class="concern-head_current">{name}</span></p>
         <p class="concern-head_statement text-style-h2" data-op-field="statement" data-figma="1:357" set:html={statement} />
         {image && (
@@ -166,6 +166,11 @@ const { render = true, name, statement, facts, image } = Astro.props;
     @media (width < 48rem) {
       .concern-head_media {
         grid-column: margin / span 3;
+      }
+    }
+    @media (width < 48rem) {
+      .concern-head_name {
+        --_lead-marker: inline-block;
       }
     }
   }

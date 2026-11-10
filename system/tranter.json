@@ -240,13 +240,14 @@
       "ref": "space-10",
       "job": "entre deux blocs empilés (cartes, résultats) en tablette et en téléphone, partout (Sam, 10 nov : faire respirer)"
     },
-    "band-padding": {
-      "ref": "site-margin",
-      "job": "haut et bas d'une bande dont l'image touche le bord : la marge latérale (Sam, 10 nov)"
-    },
     "section-padding": {
+      "ref": "site-margin",
+      "job": "haut et bas de toutes les sections : le petit padding (la marge latérale) ; le large sur téléphone (Sam, 10 nov, 12:54 et 12:58)",
+      "phone": "section-space-medium"
+    },
+    "section-padding-wide": {
       "ref": "section-space-medium",
-      "job": "haut et bas de toute section de texte, et de chaque bloc entre deux filets (Sam, 10 nov : un seul padding de section)"
+      "job": "l'exception : le bas volontairement large de l'invitation de fin et du journal (Sam, 10 nov, 12:54)"
     }
   },
   "floors": {

@@ -47,6 +47,12 @@ for n, t in S['text'].items():
     w(f"  --{n}-line-height: {t['lh']};\n  --{n}-letter-spacing: {t['ls']};\n  --{n}-text-transform: {t['tt']};\n  --{n}-font-family: var(--season);\n  --{n}-font-weight: {t['weight']};\n  --{n}-font-variation: \"SERF\" {t['axis']};\n  --{n}-font-feature: {t['ff']};\n  --{n}-margin-top: 0rem;\n  --{n}-margin-bottom: 0rem;\n  --{n}-text-wrap: {'nowrap' if n in ('text-action','text-label','text-index','text-index-caps','text-date') else 'pretty'};")
 w("\n  /* Site layout */\n  --site-width: calc(100% - var(--site-margin) * 2);\n  /* The layout grid's columns: phone here, tablet and computer in the media blocks */\n  --site-columns: 4;")
 w("}")
+phone_roles = {n: r['phone'] for n, r in S.get('roles', {}).items() if r.get('phone')}
+if phone_roles:
+    w("/* Phone: role tokens that point at another step below the tablet */\n@media (width < 48rem) {\n  :root {")
+    for n, ref in phone_roles.items():
+        w(f"    --{n}: var(--{ref});")
+    w("  }\n}")
 w("/* Tablet: 8 columns (Lumos Grid breakpoint 48rem) */\n@media (width >= 48rem) {\n  :root {\n    --site-columns: 8;\n  }\n}")
 w(f"/* Computer, 1024 to {R}: everything scales with the grid. Each -min is -max x {DMIN} / {R}. */")
 w("@media (width >= 64rem) {\n  :root {\n    --site-columns: 12;")

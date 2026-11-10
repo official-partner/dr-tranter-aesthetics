@@ -19,7 +19,7 @@ const posts = (await getItems("articles")).slice(0, 3).map(({ id, data }, i) => 
 }));
 ---
 
-<section class="journal-home_wrap text-section" data-figma-band="journal" data-band-top="5872.82">
+<section class="journal-home_wrap section-padding" data-figma-band="journal" data-band-top="5872.82">
   <div class="journal-home_layout site-grid">
     <h2 class="journal-home_title text-style-h2" data-figma="1:138">Our journal: notes on <em>skin</em>, <em>structure</em> and <em>care</em></h2>
     <div class="at-end journal-home_action"><Button element="link" href="/journal" data-figma="1:136">View all articles</Button></div>
@@ -38,6 +38,10 @@ const posts = (await getItems("articles")).slice(0, 3).map(({ id, data }, i) => 
 
 <style is:global>
   @layer components {
+    /* the journal ends wide on purpose (Sam, Nov 10) */
+    .journal-home_wrap {
+      padding-bottom: var(--section-padding-wide);
+    }
     .journal-home_layout {
       row-gap: var(--space-11);
       @media (width < 48rem) {

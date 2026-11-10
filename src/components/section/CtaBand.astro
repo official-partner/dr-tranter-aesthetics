@@ -18,9 +18,9 @@ const {
 
 {
   render && (
-    <section class="cta-band_wrap text-section theme-stone" id="consultation" data-figma-band="cta" data-band-top={figma.top}>
+    <section class="cta-band_wrap section-padding theme-stone" id="consultation" data-figma-band="cta" data-band-top={figma.top}>
       <div class="cta-band_layout site-grid">
-        <p class="cta-band_label text-style-label inset-optical" data-figma={figma.label}>Where to start?</p>
+        <p class="cta-band_label lead-marker text-style-label inset-optical" data-figma={figma.label}>Where to start?</p>
         <span class="marker cta-band_marker" data-figma={figma.marker} />
         <h2 class="cta-band_title text-style-h2" data-figma={figma.title} set:html={title} />
         <div class="at-end cta-band_action">
@@ -33,6 +33,10 @@ const {
 
 <style is:global>
   @layer components {
+    /* the closing invitation ends wide on purpose (Sam, Nov 10) */
+    .cta-band_wrap {
+      padding-bottom: var(--section-padding-wide);
+    }
     .cta-band_layout {
       align-items: start;
       row-gap: var(--space-5);
@@ -83,6 +87,11 @@ const {
       }
       .cta-band_action {
         grid-column: main / end;
+      }
+    }
+    @media (width < 64rem) {
+      .cta-band_label {
+        --_lead-marker: inline-block;
       }
     }
   }

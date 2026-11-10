@@ -51,6 +51,19 @@
   background-color: var(--marker-color);
 }
 
+/* Where the grid has no column for the marker (a tablet or a phone), it leads the text it marks: the same square on
+   the text's first line, centred on its capitals, the text after it. Off by default; a component turns it on where
+   its own marker is hidden (--_lead-marker: inline-block). Sam, Nov 10: the marker is kept at every width. */
+.lead-marker::before {
+  content: "";
+  display: var(--_lead-marker, none);
+  width: var(--marker);
+  height: var(--marker);
+  margin-inline-end: var(--space-3);
+  vertical-align: calc((0.721em - var(--marker)) / 2);
+  background-color: var(--marker-color);
+}
+
 /* Small texts set at the margin sit 3.5 design pixels inside it (Figma, 9 times; question 9 for Simon) */
 .inset-optical {
   padding-left: var(--inset-optical);
@@ -90,15 +103,9 @@
   }
 }
 
-/* A band whose image touches its edge (hero, approach, results, founder, a concern's opening): its top and bottom
-   padding is the side margin, so the image sits in the same frame on three sides (Sam, Nov 10) */
-.image-band {
-  padding-top: var(--band-padding);
-  padding-bottom: var(--band-padding);
-}
-
-/* A text section, or a block between two rules: one padding, the same at the top and the bottom (Sam, Nov 10) */
-.text-section {
+/* Every section's padding, the same at the top and the bottom: the small one, the side margin (Sam, Nov 10, 12:54).
+   The exception is a component's own: a bottom made wide on purpose (--section-padding-wide). */
+.section-padding {
   padding-top: var(--section-padding);
   padding-bottom: var(--section-padding);
 }

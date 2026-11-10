@@ -25,7 +25,7 @@ const { render = true, title = "Products we would recommend", products } = Astro
 
 {
   render && products?.length > 0 && (
-    <section class="products-section_wrap text-section theme-mist" data-figma-band="mist" data-band-top="3101">
+    <section class="products-section_wrap section-padding theme-mist" data-figma-band="mist" data-band-top="3101">
       <div class="products-section_layout site-grid">
         <h2 class="products-section_title text-style-h2" data-figma="1:436">{title}</h2>
         <CardRow data-op-list="products" data-op-source="astro:products">
