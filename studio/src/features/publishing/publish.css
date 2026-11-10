@@ -1,0 +1,5 @@
+/* Publish progress is the shared popup in the vendored publishing.css; this only places the control. */
+.publish-control {
+  position: relative;
+  flex-shrink: 0;
+}
