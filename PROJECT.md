@@ -96,10 +96,30 @@ One line per decision: the date, who asked, what was decided and why. The newest
 - 2026-10-17, Sam: the site starts from OP's starter `official-partner/op-astro` (Lumos for Astro 1.0.0). `main` is
   the live site, `review` the one OP System shows; content in files until a CMS is decided.
 
+## 2026-11-10, the Web System (start, session system, asked by Samuel Charpentier)
+
+- base.css rewritten from the design (DESIGN.md, The Web System): scale model A (390 to 1728, content capped at 1728),
+  grid 4 / 8 / 12 with the design's margin 24 and gutter 18, spacing from the design's own steps, four themes (Stone,
+  Sand, Mist, Burgundy) with Lumos's light, dark and brand kept as aliases, no accent colour.
+- Card c-scale (yes): fluid sizes in rem tokens. Card c-contrast (yes): Taupe `#654f45` and Taupe light `#7d695d` replace
+  the design's `#847165` and `#a8998a`, same hue (checked by script on Sand, Mist and Stone); small print on Burgundy
+  uses Dust. Card c-font (adjust, the team's note: the trial font is fine for the staging site): the trial file is still
+  not committed, the files are not in the repository, so the site wears system stand-ins (`--primary-family`,
+  `--serif-family`) and the licensed file replaces them with no other change.
+- Card c-motion (yes): op.config.json `transition` fade, `smoothScroll` light, loader off; durations and eases named in
+  base.css. `brandColor` #2C0F0A and the favicon regenerated (the initial on Burgundy) until the logo arrives.
+- Decided: provisional values (h4 to h6, text-large, label tracking, nav height 4.5rem, marker 0.5rem, tablet column
+  split, hover of the pill) are marked in base.css and DESIGN.md. Radii are 0 except the pill.
+- Global classes added: `.site-grid`, `.column-head`, `.column-body`, `.marker` (the marker was already decided as one
+  shared class, d-marker).
+- Types: a `Theme` type (src/types.ts) for Section, Card and the layout.
+
 ## 2026-11-09, setup (asked by Samuel Charpentier)
+
 - op.config.json: id dr-tranter-aesthetics, name and client Dr Tranter Aesthetics. src/consts.ts: SITE_NAME, SITE_DESCRIPTION (a plain placeholder: the Brief holds no description yet), SITE_LOCALE en. Worker name in wrangler.jsonc kept: dr-tranter-aesthetics.
 
 ## 2026-11-09, reading of the design (start, asked by Samuel Charpentier)
+
 - Way: from scratch. Read the design in Marque (Home.pdf at 1728 px, images of the menu, Concerns, Melasma, Treatments,
   Morpheus8) and the font file. Measures, direction and motion in DESIGN.md; the decision cards, problems, improvements
   and supplies in OP System (« Lire et proposer »); the brand (provisional) and the wireframes of the 5 drawn pages in

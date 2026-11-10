@@ -1,5 +1,6 @@
 ---
 import type { HTMLAttributes } from "astro/types";
+import type { Theme } from "@/types.ts";
 import { slotContent } from "@/utils/slots.ts";
 
 type SectionSpace =
@@ -23,7 +24,7 @@ interface Props extends HTMLAttributes<"section"> {
   /** Set to `false` to omit the component. */
   render?: boolean;
   /** Color theme of element and its children. */
-  theme?: "inherit" | "light" | "dark" | "brand";
+  theme?: Theme;
   /** Top padding. */
   paddingTop?: SectionSpace;
   /** Bottom padding. */

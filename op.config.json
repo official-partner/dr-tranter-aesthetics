@@ -8,11 +8,12 @@
   "domain": "",
   "live": false,
   "loader": false,
-  "transition": false,
-  "smoothScroll": false,
-  "brandColor": "#141413",
+  "transition": "fade",
+  "smoothScroll": "light",
+  "brandColor": "#2C0F0A",
   "systemPages": [
     "composantes",
     "test-contenu"
-  ]
+  ],
+  "designWidth": 1728
 }

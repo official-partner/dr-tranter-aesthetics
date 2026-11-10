@@ -1,5 +1,6 @@
 ---
 import type { HTMLAttributes } from "astro/types";
+import type { Theme } from "@/types.ts";
 import Eyebrow from "@/components/typography/Eyebrow.astro";
 import Heading from "@/components/typography/Heading.astro";
 import Paragraph from "@/components/typography/Paragraph.astro";
@@ -28,7 +29,7 @@ type Base = HTMLAttributes<"div"> & {
   /** Card layout. */
   variant?: "default" | "cover" | "stacked";
   /** Color theme of element and its children. */
-  theme?: "inherit" | "light" | "dark" | "brand" | "invert";
+  theme?: Theme | "invert";
 };
 
 type Props = Base &

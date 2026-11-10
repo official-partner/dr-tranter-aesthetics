@@ -3,3 +3,29 @@
    has a one-line comment above it that says its job: OP System's Web System shows that line under Classes. Values from
    the tokens of base.css only; no px, no raw colour. Lumos's patterns.css and utilities.css are never edited for a
    project. Empty in the starter. */
+
+/* The page's grid: 12, 8 or 4 columns by screen, with the site's gutter. Every section lays its content on it. */
+.site-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--site-columns), minmax(0, 1fr));
+  column-gap: var(--site-gutter);
+}
+
+/* A section's label and heading: columns 1 to 4 of 12 (the full width on a phone). */
+.column-head {
+  grid-column: 1 / span var(--head-span);
+}
+
+/* A section's content: from column 5 of 12 to the edge (the full width on a phone, below the heading). */
+.column-body {
+  grid-column: var(--body-start) / -1;
+}
+
+/* The small square beside a section label and the concern the pointer is on: one size, the ink of its theme. */
+.marker {
+  display: inline-block;
+  flex: none;
+  inline-size: var(--marker-size);
+  block-size: var(--marker-size);
+  background-color: currentcolor;
+}

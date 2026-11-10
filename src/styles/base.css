@@ -1,28 +1,38 @@
-/* Design tokens */
+/* Design tokens.
+   Scale model: faithful to the design (OP's model A). The design is drawn at 1728 px, so every fluid token reaches
+   its design value there (its -max) and holds its phone value (its -min) from 390 px down; the content stops at 1728.
+   Values marked "provisional" were not drawn (no phone frame, no state): they are derived and waiting for the team. */
 :root {
-  /* Swatches */
-  --canvas: #efefec;
-  --sunken: #f4f4f1;
-  --surface: #ffffff;
-  --ink: #141413;
-  --ink-2: #1c1c1a;
-  --ink-3: #252523;
-  --grey-dark: #5c5c55;
-  --grey-light: #a3a39d;
-  --accent: #2e44ff;
-  --accent-light: #8f97ff;
-  --accent-text: var(--surface);
+  /* Swatches: the four grounds, the ink and text colours of the client's design (Home.pdf, 2026-11-09) */
+  --burgundy: #2c0f0a;
+  --sand: #ded5c2;
+  --mist: #c2d3d7;
+  --stone: #e8e7e2;
+  --cream: #e1dcbc;
+  /* The design's greys, darkened one step on the light grounds so they read (AA): #847165 and #a8998a were 3.2 and
+     1.9 to 1 on Sand. Same hue. Taupe is 4.9 to 1 or better on Sand, Mist and Stone, Taupe light 3.4 to 1 (24 px and up). */
+  --taupe: #654f45;
+  --taupe-light: #7d695d;
+  /* Footer lists and small print on Burgundy: 6.0 to 1 (the design's small print was 4.0) */
+  --dust: #a1947d;
 
-  /* Typography primitives */
+  /* Typography primitives: the stand-ins until Season Collection's web licence arrives (s-font). When it does, both
+     families become "Season Collection" and the two variation tokens below pick the sans (SERF 0) and the serif
+     (SERF 100) out of the one variable file: nothing else changes. */
   --primary-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --serif-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --primary-variation: normal;
+  --serif-variation: normal;
   --mono-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --primary-light: 300;
   --primary-regular: 400;
-  --primary-medium: 500;
+  --primary-medium: 550;
   --primary-bold: 700;
 
   /* Letter spacing */
   --letter-spacing-tight: -0.02em;
   --letter-spacing-normal: 0em;
+  --letter-spacing-label: 0.05em; /* provisional: the capitals' tracking was not measured */
 
   /* Line height */
   --line-height-small: 1;
@@ -36,129 +46,136 @@
   --focus-offset: 0.1827rem;
   --focus-offset-inner: calc(var(--focus-width) * -1);
 
-  /* Hover motion */
-  --hover-duration: 140ms;
-  --hover-ease: var(--ease-smooth);
+  /* Durations: OP's five named steps. Productive (what answers the pointer): faster, fast, medium. Expressive (what is
+     watched): base and slow. */
+  --duration-faster: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 450ms;
+  --duration-base: 800ms;
+  --duration-slow: 1200ms;
 
-  /* Opening motion */
-  --open-duration: 240ms;
-  --open-ease: var(--ease-smooth);
-
-  /* Page motion: the loading screen leaving, a page leaving and the next one arriving */
-  --loader-duration: 600ms;
-  --loader-ease: var(--ease-osmo);
-  --page-leave-duration: 320ms;
-  --page-leave-ease: var(--ease-smooth);
-  --page-arrive-duration: 560ms;
-  --page-arrive-ease: var(--ease-osmo);
-
-  /* Eases */
+  /* Eases: out answers the pointer, osmo is the arrive curve of everything watched, leave is for what leaves */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-osmo: cubic-bezier(0.625, 0.05, 0, 1);
-  --ease-rebound: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-leave: cubic-bezier(0.5, 0, 0.75, 0);
 
-  /* Radius */
-  --radius-small: 0.625rem;
-  --radius-main: 0.875rem;
+  /* Hover motion: the concern index's photo, the pills */
+  --hover-duration: var(--duration-fast);
+  --hover-ease: var(--ease-out);
+
+  /* Opening motion: the menu panel */
+  --open-duration: var(--duration-medium);
+  --open-ease: var(--ease-out);
+
+  /* Page motion (cards c-motion: no loader, a short fade between pages): the loading screen leaving, a page leaving
+     and the next one arriving. A page leaves in about 55 % of the time the next takes to arrive. */
+  --loader-duration: var(--duration-base);
+  --loader-ease: var(--ease-osmo);
+  --page-leave-duration: var(--duration-fast);
+  --page-leave-ease: var(--ease-leave);
+  --page-arrive-duration: var(--duration-medium);
+  --page-arrive-ease: var(--ease-osmo);
+
+  /* Radius: pills are round, pictures and panels are square (one radius per level: there is no other) */
+  --radius-small: 0;
+  --radius-main: 0;
   --radius-round: 100vw;
 
-  /* Fluid scale range */
-  --viewport-min: 320;
-  --viewport-max: 1440;
+  /* Fluid scale range: from the phone's 390 to the design's 1728 */
+  --viewport-min: 390;
+  --viewport-max: 1728;
 
-  /* Max width */
+  /* Max width: the content stops at the design's width and sits centred, the grounds run edge to edge */
   --max-width-small: 70rem;
   --max-width-main: calc(var(--viewport-max) / 16 * 1rem);
   --max-width-full: 100%;
 
-  /* Nav */
-  --nav-height: 3.5rem;
+  /* Nav: provisional (the bar's height was not measured) */
+  --nav-height: 4.5rem;
 
-  /* Typography styles */
+  /* The small square beside a section label and the concern the pointer is on */
+  --marker-size: 0.5rem; /* provisional */
+
+  /* Typography styles. Sizes at 1728 are the design's, at 390 they are proposed (the design has no phone frame). Body
+     text never goes under 16. */
   --display: clamp(var(--display-min) / 16 * 1rem, ((var(--display-min) - ((var(--display-max) - var(--display-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--display-max) - var(--display-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--display-max) / 16 * 1rem);
-  --display-min: 64;
-  --display-max: 112;
-  --display-line-height: var(--line-height-small);
+  --display-min: 28;
+  --display-max: 59;
+  --display-line-height: var(--line-height-medium);
   --display-letter-spacing: var(--letter-spacing-tight);
   --display-text-transform: none;
   --display-margin-top: var(--space-7);
   --display-margin-bottom: var(--space-6);
   --display-font-family: var(--primary-family);
-  --display-font-weight: var(--primary-regular);
+  --display-font-weight: var(--primary-light);
   --display-text-wrap: balance;
-
   --h1: clamp(var(--h1-min) / 16 * 1rem, ((var(--h1-min) - ((var(--h1-max) - var(--h1-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h1-max) - var(--h1-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h1-max) / 16 * 1rem);
-  --h1-min: 48;
-  --h1-max: 80;
+  --h1-min: 28;
+  --h1-max: 44;
   --h1-line-height: var(--line-height-small);
   --h1-letter-spacing: var(--letter-spacing-tight);
   --h1-text-transform: none;
   --h1-margin-top: var(--space-7);
   --h1-margin-bottom: var(--space-6);
   --h1-font-family: var(--primary-family);
-  --h1-font-weight: var(--primary-regular);
+  --h1-font-weight: var(--primary-light);
   --h1-text-wrap: balance;
-
   --h2: clamp(var(--h2-min) / 16 * 1rem, ((var(--h2-min) - ((var(--h2-max) - var(--h2-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h2-max) - var(--h2-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h2-max) / 16 * 1rem);
-  --h2-min: 40;
-  --h2-max: 64;
+  --h2-min: 28;
+  --h2-max: 44;
   --h2-line-height: var(--line-height-small);
   --h2-letter-spacing: var(--letter-spacing-tight);
   --h2-text-transform: none;
   --h2-margin-top: var(--space-7);
   --h2-margin-bottom: var(--space-5);
   --h2-font-family: var(--primary-family);
-  --h2-font-weight: var(--primary-regular);
+  --h2-font-weight: var(--primary-light);
   --h2-text-wrap: balance;
-
   --h3: clamp(var(--h3-min) / 16 * 1rem, ((var(--h3-min) - ((var(--h3-max) - var(--h3-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h3-max) - var(--h3-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h3-max) / 16 * 1rem);
-  --h3-min: 36;
-  --h3-max: 48;
-  --h3-line-height: var(--line-height-medium);
+  --h3-min: 22;
+  --h3-max: 32;
+  --h3-line-height: var(--line-height-small);
   --h3-letter-spacing: var(--letter-spacing-tight);
   --h3-text-transform: none;
   --h3-margin-top: var(--space-6);
-  --h3-margin-bottom: var(--space-5);
+  --h3-margin-bottom: var(--space-4);
   --h3-font-family: var(--primary-family);
-  --h3-font-weight: var(--primary-regular);
+  --h3-font-weight: var(--primary-light);
   --h3-text-wrap: balance;
-
   --h4: clamp(var(--h4-min) / 16 * 1rem, ((var(--h4-min) - ((var(--h4-max) - var(--h4-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h4-max) - var(--h4-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h4-max) / 16 * 1rem);
-  --h4-min: 28;
-  --h4-max: 32;
-  --h4-line-height: var(--line-height-medium);
-  --h4-letter-spacing: var(--letter-spacing-tight);
+  --h4-min: 20;
+  --h4-max: 24;
+  --h4-line-height: 1.2;
+  --h4-letter-spacing: var(--letter-spacing-normal);
   --h4-text-transform: none;
   --h4-margin-top: var(--space-6);
-  --h4-margin-bottom: var(--space-4);
+  --h4-margin-bottom: var(--space-3);
   --h4-font-family: var(--primary-family);
-  --h4-font-weight: var(--primary-regular);
+  --h4-font-weight: var(--primary-light);
   --h4-text-wrap: balance;
-
   --h5: clamp(var(--h5-min) / 16 * 1rem, ((var(--h5-min) - ((var(--h5-max) - var(--h5-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h5-max) - var(--h5-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h5-max) / 16 * 1rem);
-  --h5-min: 22;
-  --h5-max: 24;
-  --h5-line-height: var(--line-height-medium);
-  --h5-letter-spacing: var(--letter-spacing-tight);
+  --h5-min: 18;
+  --h5-max: 20;
+  --h5-line-height: 1.2;
+  --h5-letter-spacing: var(--letter-spacing-normal);
   --h5-text-transform: none;
   --h5-margin-top: var(--space-5);
-  --h5-margin-bottom: var(--space-4);
+  --h5-margin-bottom: var(--space-3);
   --h5-font-family: var(--primary-family);
   --h5-font-weight: var(--primary-regular);
   --h5-text-wrap: balance;
-
   --h6: clamp(var(--h6-min) / 16 * 1rem, ((var(--h6-min) - ((var(--h6-max) - var(--h6-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h6-max) - var(--h6-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h6-max) / 16 * 1rem);
   --h6-min: 16;
-  --h6-max: 18;
-  --h6-line-height: var(--line-height-medium);
-  --h6-letter-spacing: var(--letter-spacing-tight);
+  --h6-max: 16;
+  --h6-line-height: 1.2;
+  --h6-letter-spacing: var(--letter-spacing-normal);
   --h6-text-transform: none;
   --h6-margin-top: var(--space-5);
-  --h6-margin-bottom: var(--space-3);
+  --h6-margin-bottom: var(--space-2);
   --h6-font-family: var(--primary-family);
-  --h6-font-weight: var(--primary-regular);
+  --h6-font-weight: var(--primary-medium);
   --h6-text-wrap: balance;
-
   --text-large: clamp(var(--text-large-min) / 16 * 1rem, ((var(--text-large-min) - ((var(--text-large-max) - var(--text-large-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-large-max) - var(--text-large-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-large-max) / 16 * 1rem);
   --text-large-min: 18;
   --text-large-max: 20;
@@ -167,211 +184,213 @@
   --text-large-text-transform: none;
   --text-large-margin-top: var(--space-4);
   --text-large-margin-bottom: var(--space-4);
-  --text-large-font-family: var(--primary-family);
+  --text-large-font-family: var(--serif-family);
   --text-large-font-weight: var(--primary-regular);
   --text-large-text-wrap: pretty;
-
   --text-main: clamp(var(--text-main-min) / 16 * 1rem, ((var(--text-main-min) - ((var(--text-main-max) - var(--text-main-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-main-max) - var(--text-main-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-main-max) / 16 * 1rem);
   --text-main-min: 16;
-  --text-main-max: 18;
-  --text-main-line-height: var(--line-height-huge);
+  --text-main-max: 16;
+  --text-main-line-height: 1.375;
   --text-main-letter-spacing: var(--letter-spacing-normal);
   --text-main-text-transform: none;
   --text-main-margin-top: var(--space-4);
   --text-main-margin-bottom: var(--space-4);
-  --text-main-font-family: var(--primary-family);
+  --text-main-font-family: var(--serif-family);
   --text-main-font-weight: var(--primary-regular);
   --text-main-text-wrap: pretty;
-
   --text-small: clamp(var(--text-small-min) / 16 * 1rem, ((var(--text-small-min) - ((var(--text-small-max) - var(--text-small-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-small-max) - var(--text-small-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-small-max) / 16 * 1rem);
   --text-small-min: 14;
-  --text-small-max: 16;
-  --text-small-line-height: var(--line-height-huge);
+  --text-small-max: 15;
+  --text-small-line-height: 1.4;
   --text-small-letter-spacing: var(--letter-spacing-normal);
   --text-small-text-transform: none;
-  --text-small-margin-top: var(--space-4);
-  --text-small-margin-bottom: var(--space-4);
-  --text-small-font-family: var(--primary-family);
+  --text-small-margin-top: var(--space-3);
+  --text-small-margin-bottom: var(--space-3);
+  --text-small-font-family: var(--serif-family);
   --text-small-font-weight: var(--primary-regular);
   --text-small-text-wrap: pretty;
+  --label: clamp(var(--label-min) / 16 * 1rem, ((var(--label-min) - ((var(--label-max) - var(--label-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--label-max) - var(--label-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--label-max) / 16 * 1rem);
+  --label-min: 14;
+  --label-max: 15;
+  --label-line-height: 1.2;
+  --label-letter-spacing: var(--letter-spacing-label);
+  --label-text-transform: uppercase;
+  --label-margin-top: var(--space-3);
+  --label-margin-bottom: var(--space-3);
+  --label-font-family: var(--primary-family);
+  --label-font-weight: var(--primary-regular);
+  --label-text-wrap: balance;
 
-  /* Site layout */
+  /* Site layout: 12, 8 and 4 columns (Lumos's breakpoints), measured on the design: 12 columns of 123.5 px, margin 24,
+     gutter 18 at 1728 */
   --site-margin: clamp(var(--site-margin-min) / 16 * 1rem, ((var(--site-margin-min) - ((var(--site-margin-max) - var(--site-margin-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--site-margin-max) - var(--site-margin-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--site-margin-max) / 16 * 1rem);
   --site-margin-min: 16;
-  --site-margin-max: 48;
-
+  --site-margin-max: 24;
   --site-gutter: clamp(var(--site-gutter-min) / 16 * 1rem, ((var(--site-gutter-min) - ((var(--site-gutter-max) - var(--site-gutter-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--site-gutter-max) - var(--site-gutter-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--site-gutter-max) / 16 * 1rem);
-  --site-gutter-min: 16;
-  --site-gutter-max: 32;
-
+  --site-gutter-min: 12;
+  --site-gutter-max: 18;
   --site-width: calc(100% - var(--site-margin) * 2);
 
   /* The layout grid's columns, one value per screen: a phone here, a tablet and a computer in the media blocks below.
      The grid's only name: OP System's « Grille » draws it, a page's grid uses it (repeat(var(--site-columns), …)). */
   --site-columns: 4;
 
-  /* Spacing */
+  /* Where a section's label and heading end and its content begins (the design: columns 1 to 4, content from column 5
+     at 12 columns). On a phone both take the full width and stack. Tablet is provisional. */
+  --head-span: 4;
+  --body-start: 1;
+
+  /* Spacing: the design's own steps. 18 is its gutter, 24 its margin, 40 the space above a section's first text. */
   --space-1: clamp(var(--space-1-min) / 16 * 1rem, ((var(--space-1-min) - ((var(--space-1-max) - var(--space-1-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--space-1-max) - var(--space-1-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--space-1-max) / 16 * 1rem);
-  --space-1-min: 6;
-  --space-1-max: 8;
+  --space-1-min: 4;
+  --space-1-max: 4;
   --space-2: clamp(var(--space-2-min) / 16 * 1rem, ((var(--space-2-min) - ((var(--space-2-max) - var(--space-2-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--space-2-max) - var(--space-2-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--space-2-max) / 16 * 1rem);
-  --space-2-min: 10;
-  --space-2-max: 12;
+  --space-2-min: 8;
+  --space-2-max: 8;
   --space-3: clamp(var(--space-3-min) / 16 * 1rem, ((var(--space-3-min) - ((var(--space-3-max) - var(--space-3-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--space-3-max) - var(--space-3-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--space-3-max) / 16 * 1rem);
-  --space-3-min: 14;
-  --space-3-max: 16;
+  --space-3-min: 12;
+  --space-3-max: 12;
   --space-4: clamp(var(--space-4-min) / 16 * 1rem, ((var(--space-4-min) - ((var(--space-4-max) - var(--space-4-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--space-4-max) - var(--space-4-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--space-4-max) / 16 * 1rem);
-  --space-4-min: 20;
-  --space-4-max: 24;
+  --space-4-min: 12;
+  --space-4-max: 18;
   --space-5: clamp(var(--space-5-min) / 16 * 1rem, ((var(--space-5-min) - ((var(--space-5-max) - var(--space-5-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--space-5-max) - var(--space-5-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--space-5-max) / 16 * 1rem);
-  --space-5-min: 28;
-  --space-5-max: 32;
+  --space-5-min: 16;
+  --space-5-max: 24;
   --space-6: clamp(var(--space-6-min) / 16 * 1rem, ((var(--space-6-min) - ((var(--space-6-max) - var(--space-6-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--space-6-max) - var(--space-6-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--space-6-max) / 16 * 1rem);
-  --space-6-min: 32;
+  --space-6-min: 24;
   --space-6-max: 40;
   --space-7: clamp(var(--space-7-min) / 16 * 1rem, ((var(--space-7-min) - ((var(--space-7-max) - var(--space-7-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--space-7-max) - var(--space-7-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--space-7-max) / 16 * 1rem);
-  --space-7-min: 36;
-  --space-7-max: 48;
+  --space-7-min: 40;
+  --space-7-max: 64;
   --space-8: clamp(var(--space-8-min) / 16 * 1rem, ((var(--space-8-min) - ((var(--space-8-max) - var(--space-8-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--space-8-max) - var(--space-8-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--space-8-max) / 16 * 1rem);
-  --space-8-min: 40;
-  --space-8-max: 64;
-
+  --space-8-min: 56;
+  --space-8-max: 96;
   --section-space-small: clamp(var(--section-space-small-min) / 16 * 1rem, ((var(--section-space-small-min) - ((var(--section-space-small-max) - var(--section-space-small-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--section-space-small-max) - var(--section-space-small-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--section-space-small-max) / 16 * 1rem);
-  --section-space-small-min: 48;
-  --section-space-small-max: 80;
+  --section-space-small-min: 24;
+  --section-space-small-max: 40;
   --section-space-medium: clamp(var(--section-space-medium-min) / 16 * 1rem, ((var(--section-space-medium-min) - ((var(--section-space-medium-max) - var(--section-space-medium-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--section-space-medium-max) - var(--section-space-medium-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--section-space-medium-max) / 16 * 1rem);
-  --section-space-medium-min: 64;
-  --section-space-medium-max: 112;
+  --section-space-medium-min: 56;
+  --section-space-medium-max: 96;
   --section-space-large: clamp(var(--section-space-large-min) / 16 * 1rem, ((var(--section-space-large-min) - ((var(--section-space-large-max) - var(--section-space-large-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--section-space-large-max) - var(--section-space-large-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--section-space-large-max) / 16 * 1rem);
   --section-space-large-min: 88;
   --section-space-large-max: 160;
   --section-space-nav-overlap: clamp(var(--section-space-nav-overlap-min) / 16 * 1rem, ((var(--section-space-nav-overlap-min) - ((var(--section-space-nav-overlap-max) - var(--section-space-nav-overlap-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--section-space-nav-overlap-max) - var(--section-space-nav-overlap-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--section-space-nav-overlap-max) / 16 * 1rem);
-  --section-space-nav-overlap-min: 160;
-  --section-space-nav-overlap-max: 224;
+  --section-space-nav-overlap-min: 80;
+  --section-space-nav-overlap-max: 112;
 }
 
 /* The grid's columns on a tablet (from 48rem) and a computer (from 64rem): Lumos's Grid breakpoints */
 @media (width >= 48rem) {
   :root {
     --site-columns: 8;
+    --head-span: 3;
+    --body-start: 4;
   }
 }
 
 @media (width >= 64rem) {
   :root {
     --site-columns: 12;
+    --head-span: 4;
+    --body-start: 5;
   }
 }
 
-/* Color themes */
+/* Color themes: the four grounds. Stone is the base; Sand and Mist change only their grounds; Burgundy is the dark
+   one. Lumos's own names stay as aliases (light = Stone, dark and brand = Burgundy) so its components keep working.
+   Roles: text is the ink; text-2 is the quiet text (4.5 to 1 at least); text-3 is for the concern index at rest and
+   only at 24 px and up (3 to 1 at least). There is no accent colour: the outlined pill is the action. */
 :root,
+.theme-stone,
 .theme-light,
 .theme-dark .theme-invert,
 .theme-brand .theme-invert {
   color-scheme: light;
 
-  --background: var(--canvas);
-  --background-2: var(--sunken);
-  --background-3: var(--surface);
+  --background: var(--stone);
+  --background-2: var(--sand);
+  --background-3: var(--mist);
   --background-skeleton: color-mix(in lab, currentcolor 6%, transparent);
-  --text: var(--ink);
-  --text-2: var(--grey-dark);
-  --border: color-mix(in lab, var(--text) 9%, transparent);
-  --heading-accent: var(--accent);
-  --focus: var(--accent);
+  --text: var(--burgundy);
+  --text-2: var(--taupe);
+  --text-3: var(--taupe-light);
+  --border: color-mix(in lab, var(--text) 24%, transparent);
+  --heading-accent: var(--text);
+  --focus: var(--burgundy);
 
-  --selection-background: color-mix(in lab, var(--accent) 16%, transparent);
+  --selection-background: color-mix(in lab, var(--burgundy) 16%, transparent);
   --selection-text: var(--text);
 
-  --button-background: var(--ink);
-  --button-border: var(--button-background);
-  --button-text: var(--surface);
-  --button-background-hover: color-mix(in lab, var(--ink) 86%, var(--background));
-  --button-border-hover: var(--button-background-hover);
-  --button-text-hover: var(--button-text);
+  /* The outlined pill is the main button; the filled one is its selected and pressed state (hover is not drawn:
+     provisional, the pill fills) */
+  --button-background: transparent;
+  --button-border: var(--text);
+  --button-text: var(--text);
+  --button-background-hover: var(--text);
+  --button-border-hover: var(--text);
+  --button-text-hover: var(--background);
 
-  --button-2-background: var(--surface);
-  --button-2-border: var(--border);
-  --button-2-text: var(--text);
-  --button-2-background-hover: var(--sunken);
-  --button-2-border-hover: var(--button-2-border);
+  --button-2-background: var(--text);
+  --button-2-border: var(--text);
+  --button-2-text: var(--background);
+  --button-2-background-hover: transparent;
+  --button-2-border-hover: var(--text);
   --button-2-text-hover: var(--text);
 
-  --link-text: var(--text);
-  --link-border: color-mix(in lab, var(--text) 17%, transparent);
+  --link-text: var(--text-2);
+  --link-border: color-mix(in lab, var(--text-2) 40%, transparent);
   --link-text-hover: var(--text);
   --link-border-hover: var(--text);
 }
 
+.theme-sand {
+  --background: var(--sand);
+  --background-2: var(--stone);
+  --background-3: var(--mist);
+}
+
+.theme-mist {
+  --background: var(--mist);
+  --background-2: var(--stone);
+  --background-3: var(--sand);
+}
+
+.theme-burgundy,
 .theme-dark,
+.theme-brand,
 .theme-light .theme-invert {
   color-scheme: dark;
 
-  --background: var(--ink);
-  --background-2: var(--ink-2);
-  --background-3: var(--ink-3);
+  --background: var(--burgundy);
+  --background-2: color-mix(in lab, var(--burgundy) 90%, var(--cream));
+  --background-3: color-mix(in lab, var(--burgundy) 80%, var(--cream));
   --background-skeleton: color-mix(in lab, currentcolor 8%, transparent);
-  --text: var(--canvas);
-  --text-2: var(--grey-light);
-  --border: color-mix(in lab, var(--text) 10%, transparent);
-  --heading-accent: var(--accent-light);
-  --focus: var(--accent-light);
-
-  --selection-background: color-mix(in lab, var(--accent-light) 28%, transparent);
-  --selection-text: var(--text);
-
-  --button-background: var(--canvas);
-  --button-border: var(--button-background);
-  --button-text: var(--ink);
-  --button-background-hover: color-mix(in lab, var(--canvas) 86%, var(--background));
-  --button-border-hover: var(--button-background-hover);
-  --button-text-hover: var(--button-text);
-
-  --button-2-background: var(--ink-2);
-  --button-2-border: var(--border);
-  --button-2-text: var(--text);
-  --button-2-background-hover: var(--ink-3);
-  --button-2-border-hover: var(--button-2-border);
-  --button-2-text-hover: var(--text);
-
-  --link-text: var(--text);
-  --link-border: color-mix(in lab, var(--text) 18%, transparent);
-  --link-text-hover: var(--text);
-  --link-border-hover: var(--text);
-}
-
-.theme-brand {
-  color-scheme: dark;
-
-  --background: var(--accent);
-  --background-2: color-mix(in lab, var(--background) 90%, var(--text));
-  --background-3: color-mix(in lab, var(--background) 80%, var(--text));
-  --background-skeleton: color-mix(in lab, currentcolor 10%, transparent);
-  --text: var(--accent-text);
-  --text-2: color-mix(in lab, var(--text) 84%, transparent);
+  --text: var(--cream);
+  --text-2: var(--dust);
+  --text-3: var(--dust);
   --border: color-mix(in lab, var(--text) 24%, transparent);
   --heading-accent: var(--text);
-  --focus: var(--text);
+  --focus: var(--cream);
 
-  --selection-background: var(--text);
-  --selection-text: var(--background);
+  --selection-background: color-mix(in lab, var(--cream) 24%, transparent);
+  --selection-text: var(--text);
 
-  --button-background: var(--accent-text);
-  --button-border: var(--button-background);
-  --button-text: var(--accent);
-  --button-background-hover: color-mix(in lab, var(--accent-text) 88%, var(--background));
-  --button-border-hover: var(--button-background-hover);
-  --button-text-hover: var(--button-text);
+  --button-background: transparent;
+  --button-border: var(--text);
+  --button-text: var(--text);
+  --button-background-hover: var(--text);
+  --button-border-hover: var(--text);
+  --button-text-hover: var(--background);
 
-  --button-2-background: transparent;
-  --button-2-border: var(--border);
-  --button-2-text: var(--text);
-  --button-2-background-hover: color-mix(in lab, var(--text) 12%, transparent);
-  --button-2-border-hover: var(--button-2-border);
+  --button-2-background: var(--text);
+  --button-2-border: var(--text);
+  --button-2-text: var(--background);
+  --button-2-background-hover: transparent;
+  --button-2-border-hover: var(--text);
   --button-2-text-hover: var(--text);
 
-  --link-text: var(--text);
-  --link-border: var(--border);
+  --link-text: var(--text-2);
+  --link-border: color-mix(in lab, var(--text-2) 40%, transparent);
   --link-text-hover: var(--text);
   --link-border-hover: var(--text);
 }
@@ -555,6 +574,18 @@ body,
   --_margin-bottom: var(--text-large-margin-bottom);
 }
 
+.text-style-label {
+  font-family: var(--label-font-family);
+  font-size: var(--label);
+  font-weight: var(--label-font-weight);
+  line-height: var(--label-line-height);
+  letter-spacing: var(--label-letter-spacing);
+  text-transform: var(--label-text-transform);
+  text-wrap: var(--label-text-wrap);
+  --_margin-top: var(--label-margin-top);
+  --_margin-bottom: var(--label-margin-bottom);
+}
+
 .text-style-display {
   font-family: var(--display-font-family);
   font-size: var(--display);
@@ -643,6 +674,16 @@ h6,
   text-wrap: var(--h6-text-wrap);
   --_margin-top: var(--h6-margin-top);
   --_margin-bottom: var(--h6-margin-bottom);
+}
+
+/* The two voices of the one variable family: the sans names and points, the serif is read. With the stand-in fonts
+   both are "normal" (base.css, --primary-variation and --serif-variation). */
+:is(h1, h2, h3, h4, h5, h6, .text-style-display, .text-style-h1, .text-style-h2, .text-style-h3, .text-style-h4, .text-style-h5, .text-style-h6, .text-style-label) {
+  font-variation-settings: var(--primary-variation);
+}
+
+:is(body, .text-style-main, .text-style-small, .text-style-large) {
+  font-variation-settings: var(--serif-variation);
 }
 
 /* Text trim */
