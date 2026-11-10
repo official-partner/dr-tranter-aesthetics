@@ -139,3 +139,7 @@ One line per decision: the date, who asked, what was decided and why. The newest
 
 ## 2026-11-10, comment 13 (asked by Samuel Charpentier)
 - CardRow: on phones (under 48rem, landscape included) every card spans 3 of the 4 columns, odd cards left, even cards right; the third card is no longer full width. The products on the concerns pages and the journal cards on the home follow.
+
+## 2026-11-10, comments 14 and 15 (asked by Samuel Charpentier)
+- Footer: on every phone width the groups go two by two (the threshold at 30rem removed), the small print last.
+- CtaBand (closing invitation, every page): its bottom is `--section-space-large`, twice the wide end on a computer (64 px instead of 48 on a phone).

@@ -93,13 +93,13 @@ const legal = ["Risks and complications", "Privacy policy", "Terms", "Complaints
       text-box: none;
       margin-block: -0.3395em;
     }
-    /* phone: the small print is the last line; the groups go two by two once two columns hold the longest link */
+    /* phone: the small print is the last line; the groups go two by two (Sam, Nov 10) */
     @media (width < 48rem) {
       .footer_legal {
         order: 1;
       }
     }
-    @media (30rem <= width < 48rem) {
+    @media (width < 48rem) {
       .footer_group {
         grid-column: span 2;
       }
