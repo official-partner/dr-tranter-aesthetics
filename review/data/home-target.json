@@ -567,5 +567,33 @@
    8
   ],
   "why": "Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +8"
+ },
+ "1:131": {
+  "d": [
+   0,
+   -24
+  ],
+  "why": "Sam, 10 nov 18:07 (commentaire 22) : le titre de la fondatrice part du haut de la section, -24"
+ },
+ "1:133": {
+  "d": [
+   0,
+   -24
+  ],
+  "why": "Sam, 10 nov 18:07 (commentaire 22) : le titre de la fondatrice part du haut de la section, -24"
+ },
+ "1:132": {
+  "d": [
+   0,
+   -24
+  ],
+  "why": "Sam, 10 nov 18:07 (commentaire 22) : le titre de la fondatrice part du haut de la section, -24"
+ },
+ "1:134": {
+  "d": [
+   0,
+   -24
+  ],
+  "why": "Sam, 10 nov 18:07 (commentaire 22) : le titre de la fondatrice part du haut de la section, -24"
  }
 }

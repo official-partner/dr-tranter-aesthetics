@@ -206,7 +206,7 @@
   --space-media: var(--space-3);
   --space-stack: var(--space-10);
   --section-padding: var(--site-margin);
-  --section-padding-wide: var(--section-space-medium);
+  --section-padding-wide: var(--section-space-large);
 
   /* Floors: reading text stops shrinking here (applied with max() in the text-style rules) */
   --text-main-floor: 0.812rem;

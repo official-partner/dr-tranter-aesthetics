@@ -2,6 +2,11 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-10, Sam (13:10): the wide bottom is twice as large and the same everywhere: `--section-padding-wide` points
+  at `section-space-large` (128 at 1728, 64 on tablet and phone); the closing invitation uses the role again instead
+  of its own value. Every section that ends wide follows: the closing invitation, the journal, the products, the
+  concern body's blocks.
+
 - 2026-11-10, Sam (18:07, comment 22): the founder's title no longer adds the side margin above it on the computer
   and tablet; it starts at the section's own top padding, level with the photo.
 - 2026-11-10, Sam (18:06, comments 18 to 21, melasma page): every block of the concern body and the products section
