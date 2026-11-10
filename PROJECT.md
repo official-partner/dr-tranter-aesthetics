@@ -2,6 +2,10 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-10, Sam (18:06, comments 18 and 19, melasma page): the three treatment blocks of the concern body
+  (recommended, also considered, often considered alongside) end wide on purpose (`--section-padding-wide`); on a phone
+  their label's square sits on column 1 and the label on column 2 (in place of the lead marker).
+
 - 2026-11-10, Sam (12:54): the small section padding (the side margin) everywhere; only the closing invitation and the
   journal end wide (64 at 1728), on purpose; (12:58) on a phone the section padding is the large one (48). Replaces the
   two-value rule of 12:47. (12:56, comment 12) the small square
