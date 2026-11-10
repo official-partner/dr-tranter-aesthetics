@@ -144,3 +144,4 @@ One line per decision: the date, who asked, what was decided and why. The newest
 - Footer: on every phone width the groups go two by two (the threshold at 30rem removed), the small print last.
 - CtaBand (closing invitation, every page): its bottom is `--section-space-large`, twice the wide end on a computer (64 px instead of 48 on a phone).
 - IndexList (comment 16): on phones the number sits on the first column and the text on the three others (a subgrid, as on a computer); the tablet keeps its plain column. The steps and the "What is happening" factors of the concerns pages follow.
+- StepsSection (comment 17): on phones the picture starts on the second column, under the steps' text.

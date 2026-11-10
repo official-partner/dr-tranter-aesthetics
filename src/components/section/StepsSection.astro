@@ -98,9 +98,10 @@ const { render = true, title, steps, image, actions, theme = "inherit", tall = f
         grid-row: 4;
       }
     }
+    /* phone: the picture starts on the second column, with the steps' text (Sam, Nov 10) */
     @media (width < 48rem) {
       .steps-section_media {
-        grid-column: margin / span 3;
+        grid-column: span 3 / end;
       }
     }
   }
