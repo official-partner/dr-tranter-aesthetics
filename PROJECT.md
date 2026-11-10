@@ -2,6 +2,11 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-10, Sam (comments 23 to 25, done in a conversation: the app's session stopped at its monthly ceiling, comment
+  23 settled without its change): on a phone the opening's photo is centred in its room and against the right edge;
+  one space between a card's text and its action link (`--space-action`); hovers slower (400 ms) and the arrow of a
+  link leaves and comes back on hover.
+
 - 2026-11-10, Sam (13:13): the home's opening fills the screen (100svh) at every width; its photo scales down from its
   bottom-left corner when the screen is short, so the whole opening shows. `band-hero` is no longer used by it. The
   measure of the Home now runs in a 1728 × 928 window (`--height 928`), the Figma's opening.

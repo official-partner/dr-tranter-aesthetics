@@ -78,11 +78,17 @@ against the right edge), `marker` (the small square), `inset-optical` (the optic
 `section-padding` (every section's padding), `lead-marker` (the marker leading a text where the grid has no column
 for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 
+## Motion
+- Hover fades last 400 ms (`--hover-duration`, Sam, Nov 10: slower). A written button or link that ends with an arrow
+  gives it a box of its own: on hover the arrow leaves to the right and comes back from the left (600 ms,
+  `--arrow-duration`); nothing moves under reduced motion. Smooth scroll: Lenis, light.
+
 ## Responsive
 - The home's opening fills the screen (`min-height: 100svh`, Sam, Nov 10, 13:13): its photo takes the room left and
   scales down when it lacks some (a size container: width = min(its columns, the room's height × 5/6)), its
   bottom-left corner fixed on its column; it never grows past its columns. Floor 12rem tall; below that the opening
-  grows. The Figma's band (928 at 1728) is a 1728 × 928 screen: the Home is measured in that window.
+  grows. The Figma's band (928 at 1728) is a 1728 × 928 screen: the Home is measured in that window. On a phone
+  the photo sits in the middle of the room left and against the right edge (Sam, comment 23).
 - Tablet keeps the computer's composition on the 8-column rails, with the fewest changes: no image wider than 6 of
   8 columns, lists beside their image, the results scattered as on the computer. A list sits on the main rail (c3)
   like the concerns; the approach is title | list (c3, 3 columns) | image (3 columns at the right edge).

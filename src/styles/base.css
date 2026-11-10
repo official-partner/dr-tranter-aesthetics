@@ -37,7 +37,8 @@
   --focus-offset-inner: calc(var(--focus-width) * -1);
 
   /* Hover motion (no other motion before Sam's brief) */
-  --hover-duration: 140ms;
+  --hover-duration: 400ms;
+  --arrow-duration: 600ms;
   --hover-ease: var(--ease-smooth);
   --open-duration: 240ms;
   --open-ease: var(--ease-smooth);
@@ -207,6 +208,7 @@
   --space-stack: var(--space-10);
   --section-padding: var(--site-margin);
   --section-padding-wide: var(--section-space-large);
+  --space-action: var(--space-5);
 
   /* Floors: reading text stops shrinking here (applied with max() in the text-style rules) */
   --text-main-floor: 0.812rem;

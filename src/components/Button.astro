@@ -114,7 +114,9 @@ const tagAttrs = isLink
 const marks = { play, close, arrow };
 /* main and link are written, the rest are marks with a label. */
 const isWritten = variant === "main" || variant === "link";
-const content = isWritten ? await slotContent(Astro.slots) : "";
+const written = isWritten ? await slotContent(Astro.slots) : "";
+/* a closing arrow gets a box of its own: on hover it leaves to the right and comes back from the left */
+const content = written.replace(/\s*→\s*$/, ' <span class="button_arrow" aria-hidden="true"><span class="button_arrow-in">→</span></span>');
 
 const named = {
   play: pressed ? "Pause" : "Play",
@@ -161,6 +163,33 @@ const named = {
 
 <style is:global>
   @layer components {
+    .button_arrow {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: top;
+    }
+    .button_arrow-in {
+      display: inline-block;
+    }
+    @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+      .button_wrap:hover .button_arrow-in {
+        animation: button-arrow var(--arrow-duration) var(--hover-ease);
+      }
+    }
+    @keyframes button-arrow {
+      0% {
+        transform: translateX(0);
+      }
+      45% {
+        transform: translateX(110%);
+      }
+      45.01% {
+        transform: translateX(-110%);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
     .button_wrap {
       display: inline-flex;
       justify-content: center;

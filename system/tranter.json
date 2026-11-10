@@ -248,6 +248,10 @@
     "section-padding-wide": {
       "ref": "section-space-large",
       "job": "le bas large, volontaire, d'une section qui doit respirer : 128 à 1728, deux fois l'ancien 64, le même partout (Sam, 10 nov, 13:10)"
+    },
+    "space-action": {
+      "ref": "space-5",
+      "job": "entre le texte d'une carte et son lien d'action, partout (Sam, 10 nov, commentaire 24)"
     }
   },
   "floors": {
