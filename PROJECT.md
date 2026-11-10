@@ -2,8 +2,10 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
-- 2026-11-10, Sam (18:06, comments 18 and 19, melasma page): the three treatment blocks of the concern body
-  (recommended, also considered, often considered alongside) end wide on purpose (`--section-padding-wide`); on a phone
+- 2026-11-10, Sam (18:07, comment 22): the founder's title no longer adds the side margin above it on the computer
+  and tablet; it starts at the section's own top padding, level with the photo.
+- 2026-11-10, Sam (18:06, comments 18 to 21, melasma page): every block of the concern body and the products section
+  end wide on purpose (`--section-padding-wide`); on a phone
   their label's square sits on column 1 and the label on column 2 (in place of the lead marker).
 
 - 2026-11-10, Sam (12:54): the small section padding (the side margin) everywhere; only the closing invitation and the

@@ -41,7 +41,7 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
         </div>
       )}
       {recommended && (
-      <div class="concern-body_block section-padding is-wide-end">
+      <div class="concern-body_block section-padding">
         <div class="concern-body_layout site-grid">
           <h2 class="concern-body_title text-style-h2" data-figma="1:365">What we would consider</h2>
           <p class="concern-body_label lead-marker text-style-label inset-optical" data-figma="1:392">Recommended starting point</p>
@@ -58,7 +58,7 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
       </div>
       )}
       {also.length > 0 && (
-      <div class="concern-body_block section-padding is-wide-end">
+      <div class="concern-body_block section-padding">
         <div class="concern-body_layout site-grid">
           <p class="concern-body_label lead-marker text-style-label inset-optical" data-figma="1:393">Also considered</p>
           <span class="marker concern-body_marker" data-figma="1:390" />
@@ -74,7 +74,7 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
       </div>
       )}
       {alongside.length > 0 && (
-      <div class="concern-body_block section-padding is-wide-end">
+      <div class="concern-body_block section-padding">
         <div class="concern-body_layout site-grid">
           <p class="concern-body_label lead-marker text-style-label inset-optical" data-figma="1:394">Often considered alongside</p>
           <span class="marker concern-body_marker" data-figma="1:391" />
@@ -94,14 +94,12 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
 
 <style is:global>
   @layer components {
+    /* Every block ends wide, on purpose (Sam, Nov 10, comments 19 and 21) */
     .concern-body_block {
+      padding-bottom: var(--section-padding-wide);
       border-top: var(--border-width) solid var(--text-3);
       &:first-child {
         border-top: 0;
-      }
-      /* The three treatment blocks end wide, on purpose (Sam, Nov 10, comment 19) */
-      &.is-wide-end {
-        padding-bottom: var(--section-padding-wide);
       }
     }
     .concern-body_layout {

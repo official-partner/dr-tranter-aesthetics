@@ -68,7 +68,7 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
 - Section padding (Sam, Nov 10, 12:54): the small one everywhere, the same at the top and the bottom: `.section-padding`
   (`--section-padding` = the side margin, 24 at 1728, 16 on a tablet; on a phone the large step, 48, Sam 12:58: a role
   token may point at another step below 48rem, `phone` in the JSON). The exception, on purpose: the closing
-  invitation and the journal end wide (`--section-padding-wide` = `section-space-medium`, 64 at 1728, 48 on tablet and
+  invitation, the journal, the products and the concern body's blocks end wide (`--section-padding-wide` = `section-space-medium`, 64 at 1728, 48 on tablet and
   phone). The hero's top on a tablet and a phone also clears the nav. Before: five values chosen section by section.
 
 ## Global classes (`src/styles/project.css`)

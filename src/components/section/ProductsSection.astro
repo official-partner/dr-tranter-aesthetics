@@ -44,6 +44,10 @@ const { render = true, title = "Products we would recommend", products } = Astro
 
 <style is:global>
   @layer components {
+    /* the products end wide on purpose (Sam, Nov 10, comment 20) */
+    .products-section_wrap {
+      padding-bottom: var(--section-padding-wide);
+    }
     .products-section_layout {
       row-gap: calc(55 * var(--u));
     }
