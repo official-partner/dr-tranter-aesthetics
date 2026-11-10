@@ -1,0 +1,529 @@
+{
+ "_note": "Expected deviations of the build from the raw Figma, at 1728, section-relative (dx, dy in px). Each one comes from a listed correction or a system rule. Residual = measured - expected must stay within 2 px (positions).",
+ "1:65": {
+  "abs": [
+   24,
+   24
+  ],
+  "why": "logo SVG: box at the margin, cap top at 24"
+ },
+ "1:76": {
+  "d": [
+   -0.5,
+   1.75
+  ],
+  "why": "C14 image 4 columns 5:6, band height kept: image top +7.75 ; Sam, 10 nov : bas de section = marge latérale (24), -6"
+ },
+ "1:77": {
+  "d": [
+   0,
+   -3.9
+  ],
+  "why": "bottom row baseline aligned with the image bottom (910) ; Sam, 10 nov : bas de section = marge latérale (24), -6"
+ },
+ "1:78": {
+  "d": [
+   0,
+   -3.9
+  ],
+  "why": "bottom row baseline aligned with the image bottom (910) ; Sam, 10 nov : bas de section = marge latérale (24), -6"
+ },
+ "1:79": {
+  "d": [
+   4,
+   -6
+  ],
+  "why": "C5 phone on column 3 ; Sam, 10 nov : bas de section = marge latérale (24), -6"
+ },
+ "1:81": {
+  "abs_x": 24,
+  "d": [
+   0,
+   -5.47
+  ],
+  "why": "rule: caps aligned with the heading, list rail is a subgrid from the margin"
+ },
+ "1:84": {
+  "d": [
+   0,
+   -8.6
+  ],
+  "why": "list -5.47 and hover item on its line -3.12 (C12)"
+ },
+ "1:82": {
+  "d": [
+   0,
+   -8.6
+  ],
+  "why": "same row as the hover item"
+ },
+ "1:88": {
+  "d": [
+   0,
+   -8.6
+  ],
+  "why": "same row as the hover item"
+ },
+ "1:83": {
+  "d": [
+   0,
+   -8.6
+  ],
+  "why": "list -5.47 and hover item on its line -3.12"
+ },
+ "1:188": {
+  "d": [
+   19.8,
+   -10.1
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés)"
+ },
+ "1:90": {
+  "d": [
+   0.0,
+   -0.3
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés)"
+ },
+ "1:92": {
+  "d": [
+   35.4,
+   -2.3
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés)"
+ },
+ "1:95": {
+  "d": [
+   0,
+   -4.95
+  ],
+  "why": "C7 heading cap at the image top (24)"
+ },
+ "1:94": {
+  "d": [
+   -2.5,
+   1.66
+  ],
+  "why": "C6 image on column 10, top 24, 3 columns 4:5"
+ },
+ "1:109": {
+  "d": [
+   0.0,
+   -1.9
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : bas de section = marge latérale (24), -6"
+ },
+ "1:111": {
+  "d": [
+   12.9,
+   -6.4
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : bas de section = marge latérale (24), -6"
+ },
+ "1:114": {
+  "d": [
+   0,
+   -12.14
+  ],
+  "why": "C7 heading cap 24"
+ },
+ "1:113": {
+  "d": [
+   0.5,
+   -6.33
+  ],
+  "why": "C7 image top 24"
+ },
+ "1:116": {
+  "d": [
+   0.3,
+   -0.6
+  ],
+  "why": "follows image 02 (top -6.33, height 16:10 +2.1) ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +3.5"
+ },
+ "1:117": {
+  "d": [
+   1.9,
+   -0.6
+  ],
+  "why": "C3 one gap after the index; follows image 02 ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +3.5"
+ },
+ "1:193": {
+  "d": [
+   8.2,
+   -3.5
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +3.5"
+ },
+ "1:115": {
+  "d": [
+   0,
+   1.3
+  ],
+  "why": "image 01 top on caption 02 cap top ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +3.5"
+ },
+ "1:121": {
+  "d": [
+   0,
+   -3.8
+  ],
+  "why": "image 01 7:10 (-6.2), gap 16 (+1.2), follows image 01 top ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:122": {
+  "d": [
+   -2.6,
+   -3.8
+  ],
+  "why": "C3; as [01] ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:192": {
+  "d": [
+   9.2,
+   -0.7
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:118": {
+  "d": [
+   -0.5,
+   -1.5
+  ],
+  "why": "image 03 bottom on image 01 bottom ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +3.5"
+ },
+ "1:120": {
+  "d": [
+   -0.5,
+   3.2
+  ],
+  "why": "captions 01 and 03 on one row ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:119": {
+  "d": [
+   -5.1,
+   2.1
+  ],
+  "why": "C3; captions on one row ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:191": {
+  "d": [
+   10.2,
+   3.3
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:123": {
+  "d": [
+   -0.5,
+   -3.9
+  ],
+  "why": "follows the captions row ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:124": {
+  "d": [
+   -8.1,
+   -5.9
+  ],
+  "why": "C3; follows the captions row ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:190": {
+  "d": [
+   12.2,
+   -11.1
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:125": {
+  "d": [
+   -0.5,
+   -5.5
+  ],
+  "why": "follows; caption to image 16 ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:127": {
+  "d": [
+   5.3,
+   0.9
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : image vers premier texte à 16 partout (space-media), +7 (deux écarts au-dessus)"
+ },
+ "1:135": {
+  "d": [
+   -0.5,
+   10.5
+  ],
+  "why": "bio last baseline on the image bottom"
+ },
+ "1:138": {
+  "d": [
+   0,
+   -5.32
+  ],
+  "why": "C2 journal heading 48"
+ },
+ "1:136": {
+  "d": [
+   10.8,
+   0.8
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés)"
+ },
+ "1:145": {
+  "d": [
+   -3.6,
+   -2.0
+  ],
+  "why": "C1 card 2 on column 5"
+ },
+ "1:149": {
+  "d": [
+   -6.5,
+   -8.0
+  ],
+  "why": "C1 card 2 on column 5, same top"
+ },
+ "1:152": {
+  "d": [
+   -6.5,
+   -5.7
+  ],
+  "why": "C1; date to title 24"
+ },
+ "1:155": {
+  "d": [
+   -6.5,
+   -4.7
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés)"
+ },
+ "1:151": {
+  "d": [
+   -0.5,
+   1.8
+  ],
+  "why": "date to title 24 (Figma 21.7)"
+ },
+ "1:150": {
+  "d": [
+   -1.5,
+   2.8
+  ],
+  "why": "date to title 24"
+ },
+ "1:153": {
+  "d": [
+   0.0,
+   3.0
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés)"
+ },
+ "1:154": {
+  "d": [
+   -1.7,
+   3.0
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés)"
+ },
+ "1:161": {
+  "d": [
+   0,
+   -2.93
+  ],
+  "why": "CTA row: caps at 24"
+ },
+ "1:162": {
+  "d": [
+   -0.5,
+   -6.9
+  ],
+  "why": "marker centred on the label caps"
+ },
+ "1:160": {
+  "d": [
+   -0.5,
+   -6.98
+  ],
+  "why": "CTA row: caps at 24"
+ },
+ "1:158": {
+  "d": [
+   16.2,
+   3.0
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés)"
+ },
+ "1:167": {
+  "abs": [
+   24,
+   39.7
+  ],
+  "why": "logo on the labels' baseline"
+ },
+ "1:169": {
+  "d": [
+   0,
+   4.41
+  ],
+  "why": "footer labels cap 48"
+ },
+ "1:170": {
+  "d": [
+   -2.1,
+   4.41
+  ],
+  "why": "footer labels cap 48"
+ },
+ "1:171": {
+  "d": [
+   1.3,
+   4.41
+  ],
+  "why": "footer labels cap 48"
+ },
+ "1:174": {
+  "d": [
+   0,
+   -0.7
+  ],
+  "why": "label to list 24 (Figma 29.1)"
+ },
+ "1:175": {
+  "d": [
+   -2.1,
+   -0.7
+  ],
+  "why": "label to list 24"
+ },
+ "1:179": {
+  "d": [
+   0.5,
+   -0.7
+  ],
+  "why": "label to list 24"
+ },
+ "1:182": {
+  "d": [
+   -2,
+   0.6
+  ],
+  "why": "inset like the other small texts at the margin"
+ },
+ "1:184": {
+  "d": [
+   0,
+   5.2
+  ],
+  "why": "footer rhythm 24"
+ },
+ "1:186": {
+  "d": [
+   0,
+   0.7
+  ],
+  "why": "footer rhythm 24"
+ },
+ "1:185": {
+  "d": [
+   -2.7,
+   -1.8
+  ],
+  "why": "on the column; bottoms aligned"
+ },
+ "1:173": {
+  "d": [
+   -2.5,
+   5.0
+  ],
+  "why": "footer rhythm 24, bottoms aligned"
+ },
+ "1:181": {
+  "d": [
+   -2.0,
+   4.9
+  ],
+  "why": "footer rhythm 24, bottoms aligned"
+ },
+ "1:172": {
+  "d": [
+   0,
+   -2.0
+  ],
+  "why": "bottoms aligned"
+ },
+ "1:180": {
+  "d": [
+   -1.1,
+   0
+  ],
+  "why": "bottoms aligned"
+ },
+ "1:97": {
+  "d": [
+   -9,
+   0
+  ],
+  "why": "approach texts on column 6, like the same list on Melasma (question 8 answered by the second page)"
+ },
+ "1:98": {
+  "d": [
+   -9,
+   0
+  ],
+  "why": "approach texts on column 6, like the same list on Melasma (question 8 answered by the second page)"
+ },
+ "1:100": {
+  "d": [
+   -9,
+   0
+  ],
+  "why": "approach texts on column 6, like the same list on Melasma (question 8 answered by the second page)"
+ },
+ "1:101": {
+  "d": [
+   -9,
+   0
+  ],
+  "why": "approach texts on column 6, like the same list on Melasma (question 8 answered by the second page)"
+ },
+ "1:103": {
+  "d": [
+   -9,
+   0
+  ],
+  "why": "approach texts on column 6, like the same list on Melasma (question 8 answered by the second page)"
+ },
+ "1:104": {
+  "d": [
+   -9,
+   0
+  ],
+  "why": "approach texts on column 6, like the same list on Melasma (question 8 answered by the second page)"
+ },
+ "1:106": {
+  "d": [
+   -9,
+   0
+  ],
+  "why": "approach texts on column 6, like the same list on Melasma (question 8 answered by the second page)"
+ },
+ "1:107": {
+  "d": [
+   -9,
+   0
+  ],
+  "why": "approach texts on column 6, like the same list on Melasma (question 8 answered by the second page)"
+ },
+ "1:67": {
+  "d": [
+   15.5,
+   0.0
+  ],
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés)"
+ },
+ "1:69": {
+  "d": [
+   0.5,
+   -2.3
+  ],
+  "why": "burger centré sur la pastille du header, plus basse depuis le 10 nov"
+ }
+}

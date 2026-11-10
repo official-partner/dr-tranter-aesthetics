@@ -1,0 +1,7 @@
+{
+  "_note": "Team decisions that override a Figma text style. type_check.py applies them to the expected values and counts them apart.",
+  "decisions": [
+    {"figma": "Mix SemiBold|16", "set": {"axis": 0, "weight": 550}, "why": "Sam, 10 nov : index et noms de traitement en Sans Medium, pas en Mix SemiBold"},
+    {"figma": "Sans Medium|15", "set": {"size": 14, "lh": 16.26}, "why": "Sam, 10 nov : texte des boutons et liens à 14"}
+  ]
+}

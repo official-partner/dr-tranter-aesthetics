@@ -1,0 +1,96 @@
+---
+---
+
+<section class="founder-home_wrap theme-dark-sand" data-figma-band="founder" data-band-top="4997.06">
+  <div class="founder-home_layout site-grid">
+    <h2 class="founder-home_title text-style-h2" data-figma="1:131">Meet the <em>founder</em>.</h2>
+    <div class="founder-home_id">
+      <span class="marker" data-figma="1:133" />
+      <div class="founder-home_names stack">
+        <p class="text-style-label" data-figma="1:132">Dr Sarah Tranter</p>
+        <p class="founder-home_role text-style-serif" data-figma="1:134">Founder &amp; Cosmetic Physician · 15+ years in practice</p>
+      </div>
+    </div>
+    <p class="founder-home_bio text-style-main" data-figma="1:135">
+      Dr Sarah Tranter founded the clinic on a simple premise: that treatment should follow judgement, not the other way around. Her approach considers the face as one system of structure and surface, not a list of isolated concerns. Every protocol at the clinic reflects standards she has set personally, whether or not she is the one delivering care.
+    </p>
+    <div class="founder-home_media media ratio-5-6" data-figma="1:130">
+      <img src="/img/founder.jpg" alt="Dr Sarah Tranter, standing, arms folded" width="687" height="822" loading="lazy" />
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  @layer components {
+    .founder-home_wrap {
+      padding-top: var(--site-margin);
+      padding-bottom: var(--site-margin);
+    }
+    .founder-home_layout {
+      row-gap: var(--space-7);
+    }
+    .founder-home_title,
+    .founder-home_id,
+    .founder-home_bio,
+    .founder-home_media {
+      grid-column: margin / end;
+    }
+    .founder-home_id {
+      display: grid;
+      grid-template-columns: subgrid;
+      & .marker {
+        display: none;
+      }
+    }
+    .founder-home_names {
+      grid-column: margin / end;
+    }
+    .founder-home_role {
+      max-width: 22.8ch;
+    }
+    .founder-home_bio {
+      max-width: 53.5ch;
+    }
+    @media (width >= 48rem) {
+      .founder-home_layout {
+        row-gap: 0;
+        grid-template-rows: auto auto 1fr;
+      }
+      .founder-home_title {
+        grid-row: 1;
+        margin-top: var(--site-margin);
+      }
+      .founder-home_id {
+        grid-row: 2;
+        margin-top: calc(297 * var(--u));
+        & .marker {
+          display: block;
+          margin-top: calc((max(var(--text-label-floor), var(--text-label)) * 0.721 - var(--marker)) / 2);
+        }
+      }
+      .founder-home_names {
+        grid-column: main / span 3;
+      }
+      .founder-home_bio {
+        grid-row: 3;
+        grid-column: marker / span 4;
+        align-self: end;
+      }
+      .founder-home_media {
+        grid-row: 1 / span 3;
+        grid-column: half / span 5;
+      }
+    }
+    @media (48rem <= width < 64rem) {
+      .founder-home_names {
+        grid-column: main / span 2;
+      }
+      .founder-home_bio {
+        grid-column: marker / span 3;
+      }
+      .founder-home_media {
+        grid-column: half / end;
+      }
+    }
+  }
+</style>

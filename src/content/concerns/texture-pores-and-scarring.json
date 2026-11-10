@@ -1,6 +1,5 @@
 {
   "name": "Texture, pores and scarring",
   "group": "Surface",
-  "summary": "Surface irregularity changes how light reads across the skin, which is why texture and scarring can often look far more pronounced under certain lighting.",
   "order": 10
 }

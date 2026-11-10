@@ -1,0 +1,35 @@
+---
+import LogoSvg from "@/assets/logo/logo.svg";
+import { SITE_NAME } from "@/consts.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  class?: string;
+  [key: `data-${string}`]: string | undefined;
+}
+const { render = true, class: className, ...rest } = Astro.props;
+---
+
+{
+  render && (
+    <a class:list={["logo_wrap", className]} href="/" aria-label={SITE_NAME} {...rest}>
+      <LogoSvg />
+    </a>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .logo_wrap {
+      display: block;
+      width: var(--logo);
+      color: var(--text);
+      & svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
+</style>

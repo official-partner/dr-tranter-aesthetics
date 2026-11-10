@@ -1,0 +1,174 @@
+---
+import Button from "@/components/Button.astro";
+import Img from "@/components/media/Img.astro";
+import { pic, type Pic } from "@/utils/media";
+
+interface Fact {
+  label: string;
+  value: string;
+  ids?: string[];
+}
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** The concern's name. */
+  name: string;
+  /** The opening statement; emphasis with <em>. */
+  statement: string;
+  /** Consultation facts: label and value. */
+  facts: Fact[];
+  /** The concern's picture. */
+  image?: { src: Pic; alt?: string };
+}
+const { render = true, name, statement, facts, image } = Astro.props;
+---
+
+{
+  render && (
+    <section class="concern-head_wrap" data-figma-band="top" data-band-top="0">
+      <div class="concern-head_layout site-grid">
+        <a class="concern-head_back text-style-action inset-optical" href="/concerns" data-figma="1:450"><span class="concern-head_arrow" aria-hidden="true">→</span>Back</a>
+        <span class="marker concern-head_marker" data-figma="1:358" />
+        <h1 class="concern-head_name text-style-h2" data-op-field="name" data-figma="1:434">{name}</h1>
+        <p class="concern-head_crumb text-style-action" data-figma="1:453">Concerns / <span class="concern-head_current">{name}</span></p>
+        <p class="concern-head_statement text-style-h2" data-op-field="statement" data-figma="1:357" set:html={statement} />
+        {image && (
+          <div class="concern-head_media media ratio-5-6" data-op-field="image" data-figma="1:359">
+            <Img {...pic(image.src)} alt={image.alt ?? ""} loading="eager" fetchPriority="high" variant="constrained" sizes="(width >= 48rem) 25vw, 75vw" />
+          </div>
+        )}
+        <dl class="concern-head_facts">
+          {facts.map((f) => (
+            <div class="concern-head_fact stack">
+              <dt class="text-style-label" data-figma={f.ids?.[0]}>{f.label}</dt>
+              <dd class="text-style-serif" data-figma={f.ids?.[1]}>{f.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <Button element="link" variant="link" href="#consultation" class="at-end concern-head_action" data-figma="1:452">Book a consultation →</Button>
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .concern-head_wrap {
+      display: flex;
+      flex-direction: column;
+      min-height: var(--band-concern);
+      padding-top: var(--site-margin);
+      padding-bottom: var(--site-margin);
+    }
+    .concern-head_layout {
+      flex: 1;
+      row-gap: var(--space-7);
+      align-items: start;
+    }
+    .concern-head_back {
+      grid-column: margin / end;
+      display: inline-flex;
+      gap: var(--space-3);
+      color: var(--text-2);
+    }
+    .concern-head_arrow {
+      display: inline-block;
+      rotate: 180deg;
+    }
+    .concern-head_marker {
+      display: none;
+    }
+    .concern-head_name,
+    .concern-head_crumb,
+    .concern-head_statement,
+    .concern-head_media,
+    .concern-head_facts {
+      grid-column: margin / end;
+    }
+    .concern-head_current {
+      color: var(--text-2);
+    }
+    .concern-head_statement {
+      max-width: 24ch;
+    }
+    .concern-head_facts {
+      display: flex;
+      gap: var(--space-8);
+    }
+    @media (width >= 48rem) {
+      .concern-head_layout {
+        row-gap: 0;
+        grid-template-rows: auto auto 1fr;
+      }
+      .concern-head_back,
+      .concern-head_marker,
+      .concern-head_name,
+      .concern-head_crumb {
+        grid-row: 1;
+      }
+      .concern-head_back {
+        grid-column: margin / span 2;
+      }
+      .concern-head_marker {
+        display: block;
+        margin-top: calc((max(var(--text-action-floor), var(--text-action)) * 0.721 - var(--marker)) / 2);
+      }
+      .concern-head_name {
+        grid-column: main / span 3;
+      }
+      .concern-head_crumb {
+        grid-column: half / span 3;
+        align-self: end;
+      }
+      .concern-head_statement {
+        grid-row: 2;
+        grid-column: main / span 6;
+        margin-top: calc(131.4 * var(--u));
+      }
+      .concern-head_media {
+        grid-row: 2 / span 2;
+        grid-column: margin / span 2;
+        align-self: end;
+      }
+      .concern-head_facts,
+      .concern-head_action {
+        grid-row: 3;
+        align-self: end;
+      }
+      .concern-head_facts {
+        grid-column: main / span 5;
+        display: grid;
+        grid-template-columns: calc(206 * var(--u)) auto;
+        gap: 0;
+      }
+    }
+    @media (48rem <= width < 64rem) {
+      .concern-head_back {
+        grid-column: margin;
+      }
+      .concern-head_name {
+        grid-column: main / span 2;
+      }
+      .concern-head_crumb {
+        grid-column: half / end;
+      }
+      .concern-head_statement {
+        grid-column: main / end;
+        margin-top: var(--space-9);
+      }
+      .concern-head_media {
+        margin-top: var(--space-9);
+      }
+      .concern-head_facts {
+        grid-column: main / half;
+        grid-template-columns: repeat(2, max-content);
+        column-gap: var(--space-8);
+      }
+    }
+    @media (width < 48rem) {
+      .concern-head_media {
+        grid-column: margin / span 3;
+      }
+    }
+  }
+</style>

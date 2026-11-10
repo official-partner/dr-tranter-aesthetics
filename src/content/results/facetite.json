@@ -1,4 +1,6 @@
 {
-  "treatment": "FaceTite",
+  "name": "FaceTite",
+  "image": "../../assets/content/results/facetite.jpg",
+  "imageAlt": "Skin texture, after treatment",
   "order": 1
 }

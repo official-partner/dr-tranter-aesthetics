@@ -1,6 +1,61 @@
 {
   "name": "Melasma",
   "group": "Surface",
-  "summary": "Melasma is a distinct, hormonally influenced form of pigmentation that responds differently to standard pigment treatment.",
-  "order": 13
+  "order": 13,
+  "image": "../../assets/content/concerns/melasma.jpg",
+  "imageAlt": "Pigmentation on the cheek, close-up",
+  "statement": "Melasma is a distinct, <em>hormonally influenced form of pigmentation</em> that responds differently to standard pigment treatment.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "Melasma is a specific pattern of pigmentation influenced by hormonal factors and sun exposure, and it behaves differently from general sun damage, including a higher chance of recurrence and a lower tolerance for heat-based treatment. Because of this, treatment is usually more conservative and staged than for other pigmentation.",
+  "factors": [
+    {
+      "title": "Cumulative exposure",
+      "text": "Melasma usually reflects cumulative exposure and skin behaviour over years, not a single recent cause."
+    },
+    {
+      "title": "Barrier and turnover",
+      "text": "Changes to the skin barrier and cell turnover rate influence how visible melasma becomes over time."
+    },
+    {
+      "title": "Individual variation",
+      "text": "How melasma presents and responds to treatment varies meaningfully between skin types."
+    }
+  ],
+  "recommended": "medical-grade-peels",
+  "recommendedText": "Considered as a first-line, course-based approach to melasma, given its lower risk of aggravating pigment compared to heat-based devices.",
+  "also": [
+    "pico-laser",
+    "cosmelan-dermamelan"
+  ],
+  "alongside": [
+    "pigmentation-and-sun-damage",
+    "texture-pores-and-scarring"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "title": "Assessment first",
+      "text": "We confirm melasma rather than assume it, since it is often confused with other pigmentation and responds poorly to the wrong treatment."
+    },
+    {
+      "title": "Conservative, staged treatment",
+      "text": "Lower-heat, course-based options are used first, with intensity increased only if needed and tolerated."
+    },
+    {
+      "title": "Strict sun protection throughout",
+      "text": "Daily broad-spectrum SPF is non-negotiable during treatment, since UV exposure can undo progress quickly."
+    },
+    {
+      "title": "Ongoing monitoring",
+      "text": "Melasma can recur, so we review and adjust the plan over time rather than treating it as a one-off."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "vitamin-c-antioxidant-serum",
+    "retinal-renewal-serum",
+    "daily-mineral-spf-50"
+  ]
 }

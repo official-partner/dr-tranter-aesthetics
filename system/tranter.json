@@ -1,0 +1,377 @@
+{
+  "note": "Tranter system spec. Desktop values are Figma values at 1728; phone at 390, tablet at 1023. Generated into src/styles/base.css by system/gen.py. Edit here, never in base.css. u is the design unit (1 px at 1728, proportional): only for one-off composition values, each listed.",
+  "viewport": {
+    "phone": 390,
+    "tabletMax": 1023,
+    "desktopMin": 1024,
+    "reference": 1728
+  },
+  "fonts": {
+    "season": "\"Season\", ui-sans-serif, system-ui, sans-serif"
+  },
+  "fluid": {
+    "display": [
+      30,
+      34,
+      59
+    ],
+    "h1": [
+      26,
+      28,
+      44
+    ],
+    "h2": [
+      26,
+      28,
+      44
+    ],
+    "h3": [
+      20,
+      20,
+      32
+    ],
+    "text-main": [
+      15,
+      15,
+      16
+    ],
+    "text-serif": [
+      15,
+      15,
+      16
+    ],
+    "text-index": [
+      15,
+      15,
+      16
+    ],
+    "text-list": [
+      15,
+      15,
+      16
+    ],
+    "text-tight": [
+      15,
+      15,
+      16
+    ],
+    "text-label": [
+      12,
+      12,
+      16
+    ],
+    "text-action": [
+      12,
+      12,
+      14
+    ],
+    "site-margin": [
+      16,
+      16,
+      24
+    ],
+    "site-gutter": [
+      12,
+      12,
+      18
+    ],
+    "marker": [
+      5,
+      5,
+      6
+    ],
+    "pill-x": [
+      10,
+      10,
+      12.5
+    ],
+    "pill-y": [
+      7,
+      7,
+      10.5
+    ],
+    "space-1": [
+      6,
+      6,
+      8
+    ],
+    "space-2": [
+      8,
+      8,
+      12.5
+    ],
+    "space-3": [
+      12,
+      12,
+      16
+    ],
+    "space-4": [
+      16,
+      16,
+      24
+    ],
+    "space-5": [
+      24,
+      24,
+      32
+    ],
+    "space-6": [
+      28,
+      28,
+      42.25
+    ],
+    "space-7": [
+      32,
+      32,
+      48
+    ],
+    "space-8": [
+      40,
+      40,
+      64
+    ],
+    "space-9": [
+      56,
+      56,
+      100
+    ],
+    "space-10": [
+      64,
+      64,
+      128
+    ],
+    "space-11": [
+      72,
+      72,
+      156
+    ],
+    "section-space-small": [
+      32,
+      32,
+      48
+    ],
+    "section-space-medium": [
+      48,
+      48,
+      64
+    ],
+    "section-space-large": [
+      64,
+      64,
+      128
+    ],
+    "section-space-nav-overlap": [
+      64,
+      64,
+      128
+    ],
+    "inset-optical": [
+      3.5,
+      3.5,
+      3.53
+    ],
+    "band-hero": [
+      560,
+      640,
+      928
+    ],
+    "band-approach": [
+      0,
+      0,
+      870
+    ],
+    "band-cta": [
+      180,
+      200,
+      239
+    ],
+    "logo": [
+      150,
+      160,
+      223.3
+    ],
+    "burger": [
+      17,
+      17,
+      18.53
+    ],
+    "u": [
+      0.5,
+      0.6,
+      1
+    ],
+    "band-footer": [
+      0,
+      0,
+      731
+    ],
+    "band-concern": [
+      0,
+      0,
+      538
+    ],
+    "text-note": [
+      15,
+      15,
+      16
+    ],
+    "text-index-caps": [
+      15,
+      15,
+      16
+    ],
+    "index-slot": [
+      36,
+      36,
+      55
+    ],
+    "text-date": [
+      15,
+      15,
+      16
+    ]
+  },
+  "roles": {
+    "space-media": {
+      "ref": "space-3",
+      "job": "image vers premier texte (titre, légende, date), partout (Sam, 10 nov)"
+    }
+  },
+  "floors": {
+    "text-main": 13,
+    "text-serif": 13,
+    "text-index": 13,
+    "text-list": 13,
+    "text-tight": 13,
+    "text-label": 12,
+    "text-action": 12,
+    "marker": 4,
+    "text-note": 13,
+    "text-index-caps": 13,
+    "text-date": 13
+  },
+  "text": {
+    "display": {
+      "axis": 50,
+      "weight": 420,
+      "lh": "1.1",
+      "ls": "0em",
+      "tt": "none",
+      "ff": "normal"
+    },
+    "h1": {
+      "axis": 0,
+      "weight": 550,
+      "lh": "1",
+      "ls": "0em",
+      "tt": "none",
+      "ff": "normal",
+      "em": [
+        50,
+        420
+      ]
+    },
+    "h2": {
+      "axis": 0,
+      "weight": 550,
+      "lh": "1",
+      "ls": "0em",
+      "tt": "none",
+      "ff": "normal",
+      "em": [
+        50,
+        420
+      ]
+    },
+    "h3": {
+      "axis": 50,
+      "weight": 420,
+      "lh": "1",
+      "ls": "0em",
+      "tt": "none",
+      "ff": "normal"
+    },
+    "text-main": {
+      "axis": 50,
+      "weight": 420,
+      "lh": "1.0888",
+      "ls": "0.03em",
+      "tt": "none",
+      "ff": "normal"
+    },
+    "text-serif": {
+      "axis": 100,
+      "weight": 470,
+      "lh": "1",
+      "ls": "0em",
+      "tt": "none",
+      "ff": "normal"
+    },
+    "text-index": {
+      "axis": 0,
+      "weight": 550,
+      "lh": "0.9515",
+      "ls": "0em",
+      "tt": "none",
+      "ff": "normal",
+      "decision": "Sam, 10 nov : Sans Medium, pas Mix SemiBold (Figma)"
+    },
+    "text-list": {
+      "axis": 0,
+      "weight": 400,
+      "lh": "1.4",
+      "ls": "0.02em",
+      "tt": "none",
+      "ff": "normal"
+    },
+    "text-tight": {
+      "axis": 50,
+      "weight": 420,
+      "lh": "1",
+      "ls": "0em",
+      "tt": "none",
+      "ff": "normal"
+    },
+    "text-label": {
+      "axis": 0,
+      "weight": 550,
+      "lh": "0.94",
+      "ls": "0.02em",
+      "tt": "uppercase",
+      "ff": "normal"
+    },
+    "text-action": {
+      "axis": 0,
+      "weight": 550,
+      "lh": "1.1614",
+      "ls": "0.04em",
+      "tt": "uppercase",
+      "ff": "normal"
+    },
+    "text-note": {
+      "axis": 0,
+      "weight": 550,
+      "lh": "1.0888",
+      "ls": "0em",
+      "tt": "none",
+      "ff": "normal"
+    },
+    "text-index-caps": {
+      "axis": 0,
+      "weight": 550,
+      "lh": "0.9515",
+      "ls": "0em",
+      "tt": "uppercase",
+      "ff": "normal",
+      "decision": "Sam, 10 nov : Sans Medium, pas Mix SemiBold (Figma)"
+    },
+    "text-date": {
+      "axis": 0,
+      "weight": 550,
+      "lh": "0.9515",
+      "ls": "0em",
+      "tt": "none",
+      "ff": "normal"
+    }
+  }
+}

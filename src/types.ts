@@ -13,7 +13,3 @@ export interface SeoProps {
   /** Override `NOINDEX_ROUTES` for this page's robots tag. */
   noindex?: boolean;
 }
-
-/** The site's themes (src/styles/base.css): the four grounds, and Lumos's names (light is Stone, dark and brand are
- * Burgundy). `inherit` leaves the surrounding theme in place. */
-export type Theme = "inherit" | "stone" | "sand" | "mist" | "burgundy" | "light" | "dark" | "brand";

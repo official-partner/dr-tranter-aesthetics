@@ -1,0 +1,71 @@
+---
+import Img from "@/components/media/Img.astro";
+import { pic, type Pic } from "@/utils/media";
+import CardRow from "@/components/content/CardRow.astro";
+
+interface Product {
+  /** The product's id in the collection. */
+  id?: string;
+  name: string;
+  text?: string;
+  image?: Pic;
+  imageAlt?: string;
+  ids?: string[];
+}
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Section title. */
+  title?: string;
+  /** The products, three in the design. */
+  products: Product[];
+}
+const { render = true, title = "Products we would recommend", products } = Astro.props;
+---
+
+{
+  render && products?.length > 0 && (
+    <section class="products-section_wrap theme-mist" data-figma-band="mist" data-band-top="3101">
+      <div class="products-section_layout site-grid">
+        <h2 class="products-section_title text-style-h2" data-figma="1:436">{title}</h2>
+        <CardRow data-op-list="products" data-op-source="astro:products">
+          {products.map((p) => (
+            <li class="products-section_item" data-op-item={p.id}>
+              {p.image && <div class="media ratio-145" data-figma={p.ids?.[0]}><Img {...pic(p.image)} alt={p.imageAlt ?? ""} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" /></div>}
+              <h3 class="products-section_name text-style-h3" data-op-field="name" data-figma={p.ids?.[1]}>{p.name}</h3>
+              {p.text && <p class="products-section_text text-style-note" data-op-field="text" data-figma={p.ids?.[2]}>{p.text}</p>}
+            </li>
+          ))}
+        </CardRow>
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .products-section_wrap {
+      padding-top: var(--section-space-medium);
+      padding-bottom: var(--section-space-medium);
+    }
+    .products-section_layout {
+      row-gap: calc(55 * var(--u));
+    }
+    .products-section_title {
+      grid-column: margin / end;
+      max-width: 15ch;
+    }
+    .products-section_item {
+      display: flex;
+      flex-direction: column;
+    }
+    .products-section_name {
+      margin-top: var(--space-media);
+    }
+    .products-section_text {
+      margin-top: var(--space-4);
+      max-width: 34ch;
+      color: var(--text-2);
+    }
+  }
+</style>

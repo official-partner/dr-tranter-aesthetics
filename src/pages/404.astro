@@ -1,28 +1,8 @@
 ---
 import Layout from "@/layouts/BaseLayout.astro";
-import Section from "@/components/wrapper/Section.astro";
-import Heading from "@/components/typography/Heading.astro";
-import Paragraph from "@/components/typography/Paragraph.astro";
-import ButtonWrapper from "@/components/wrapper/ButtonWrapper.astro";
-import Button from "@/components/Button.astro";
-import ContentWrapper from "@/components/wrapper/ContentWrapper.astro";
+import NotFound from "@/components/section/NotFound.astro";
 ---
 
-<Layout
-  title="Page not found"
-  description="This page does not exist."
->
-  <Section paddingTop="large" paddingBottom="large" class="flex-grow">
-    <ContentWrapper>
-      <Heading variant="h3" tag="h1" maxWidth={17}
-        >This page does not exist</Heading
-      >
-      <Paragraph variant="large" maxWidth={44} class="color-faded"
-        >It may have moved, or the link that brought you here is out of date.</Paragraph
-      >
-      <ButtonWrapper>
-        <Button element="link" href="/">Back to home</Button>
-      </ButtonWrapper>
-    </ContentWrapper>
-  </Section>
+<Layout title="Page not found" description="This page does not exist." overlap={true}>
+  <NotFound />
 </Layout>

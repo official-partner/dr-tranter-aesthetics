@@ -1,0 +1,59 @@
+---
+import ActionRow from "@/components/content/ActionRow.astro";
+import ConcernIndex from "@/components/content/ConcernIndex.astro";
+
+import { getItems } from "@/utils/content";
+
+/* the concerns of the collection, in their order; a concern links to its page once it has one */
+const items = (await getItems("concerns")).map(({ id, data }) => ({
+  id,
+  label: data.name,
+  category: data.group,
+  href: data.statement ? `/concerns/${id}` : "/concerns",
+  image: data.image,
+}));
+---
+
+<section class="concerns-home_wrap" data-figma-band="concerns" data-band-top="927.89">
+  <div class="concerns-home_layout site-grid">
+    <h2 class="concerns-home_title text-style-h2" data-figma="1:80">Where would you like to <em>start?</em></h2>
+    <ConcernIndex items={items} />
+    <ActionRow class="concerns-home_actions" pill={{ label: "View all concerns", href: "/concerns", figma: "1:90" }} link={{ label: "Already know what you're looking for? Browse treatments →", href: "/treatments", figma: "1:92" }} />
+  </div>
+</section>
+
+<style is:global>
+  @layer components {
+    .concerns-home_wrap {
+      padding-top: var(--section-space-small);
+      padding-bottom: var(--section-space-small);
+    }
+    .concerns-home_layout {
+      row-gap: var(--space-7);
+    }
+    .concerns-home_title {
+      grid-column: margin / end;
+      max-width: 12.2ch;
+    }
+    @media (width >= 64rem) {
+      .concerns-home_title {
+        grid-row: 1;
+      }
+      .concerns-home_layout > .concern-index_list {
+        grid-row: 1;
+      }
+      .concerns-home_actions {
+        margin-top: calc(144 * var(--u) - var(--space-7));
+      }
+    }
+    @media (48rem <= width < 64rem) {
+      .concerns-home_title {
+        grid-row: 1;
+        grid-column: margin / main;
+      }
+      .concerns-home_layout > .concern-index_list {
+        grid-row: 1;
+      }
+    }
+  }
+</style>

@@ -1,0 +1,130 @@
+---
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+const { render = true } = Astro.props;
+---
+
+{
+  render && (
+    <section class="hero-home_wrap theme-dark" data-figma-band="hero" data-band-top="0">
+      <div class="hero-home_layout site-grid">
+        <span class="marker hero-home_marker" data-figma="1:75" />
+        <h1 class="hero-home_title text-style-h2" data-figma="1:74">
+          We look beyond isolated treatments to consider <em>structure, surface</em> and facial <em>cohesion</em> as a
+          whole.
+        </h1>
+        <div class="hero-home_visit stack inset-optical">
+          <p class="text-style-label" data-figma="1:77">Byron Bay</p>
+          <p class="hero-home_address text-style-serif" data-figma="1:78">
+            1/54 Jonson Street,
+            <br />
+            Byron Bay NSW 2481
+          </p>
+        </div>
+        <p class="hero-home_phone text-style-serif" data-figma="1:79">(02) 6680 7819</p>
+        <div class="hero-home_media media ratio-5-6" data-figma="1:76">
+          <img src="/img/hero.jpg" alt="A consultation at the clinic, two women seated at a small table by the window" width="550" height="663" />
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .hero-home_wrap {
+      display: flex;
+      flex-direction: column;
+      min-height: var(--band-hero);
+      padding-top: calc(var(--site-margin) + var(--space-10));
+      @media (width >= 64rem) {
+        padding-top: var(--site-margin);
+      }
+      padding-bottom: var(--site-margin);
+    }
+    .hero-home_layout {
+      flex: 1;
+      grid-template-rows: auto 1fr;
+      row-gap: var(--space-9);
+    }
+    .hero-home_marker {
+      display: none;
+    }
+    .hero-home_title {
+      grid-column: margin / end;
+      max-width: 26.25ch;
+    }
+    .hero-home_media {
+      grid-column: margin / end;
+    }
+    .hero-home_visit {
+      grid-column: margin / end;
+    }
+    .hero-home_phone {
+      grid-column: margin / end;
+      text-wrap: nowrap;
+    }
+    @media (width >= 64rem) {
+      .hero-home_marker {
+        display: block;
+        grid-row: 1;
+      }
+      .hero-home_title {
+        grid-row: 1;
+        grid-column: main / end;
+      }
+      .hero-home_visit,
+      .hero-home_phone,
+      .hero-home_media {
+        grid-row: 2;
+        align-self: end;
+      }
+      .hero-home_visit {
+        grid-column: margin / inset;
+      }
+      .hero-home_phone {
+        grid-column: inset / marker;
+      }
+      .hero-home_media {
+        grid-column: main / span 4;
+      }
+    }
+    @media (48rem <= width < 64rem) {
+      .hero-home_layout {
+        grid-template-rows: auto 1fr auto;
+        row-gap: 0;
+      }
+      .hero-home_marker {
+        display: block;
+        grid-row: 1;
+      }
+      .hero-home_title {
+        grid-row: 1;
+        grid-column: main / end;
+      }
+      .hero-home_media {
+        grid-row: 2 / span 2;
+        grid-column: main / span 4;
+        align-self: end;
+        margin-top: var(--space-9);
+      }
+      .hero-home_visit {
+        grid-row: 2;
+        grid-column: margin / main;
+        align-self: end;
+      }
+      .hero-home_phone {
+        grid-row: 3;
+        grid-column: margin / main;
+        margin-top: var(--space-5);
+      }
+    }
+    @media (width < 48rem) {
+      .hero-home_media {
+        grid-column: span 3 / end;
+      }
+    }
+  }
+</style>

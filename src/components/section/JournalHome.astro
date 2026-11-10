@@ -1,0 +1,82 @@
+---
+import Button from "@/components/Button.astro";
+import CardRow from "@/components/content/CardRow.astro";
+import Img from "@/components/media/Img.astro";
+import { getItems } from "@/utils/content";
+import { pic } from "@/utils/media";
+
+/* the three latest articles of the journal; the date as the design writes it, [MM.DD.YY] */
+const ids = [["1:139", "1:148", "1:151", "1:153"], ["1:145", "1:149", "1:152", "1:155"], ["1:140", "1:147", "1:150", "1:154"]];
+const two = (n: number) => String(n).padStart(2, "0");
+const posts = (await getItems("articles")).slice(0, 3).map(({ id, data }, i) => ({
+  id,
+  title: data.title,
+  image: data.image,
+  alt: data.imageAlt ?? "",
+  date: data.date,
+  label: data.date ? `[${two(data.date.getUTCMonth() + 1)}.${two(data.date.getUTCDate())}.${two(data.date.getUTCFullYear() % 100)}]` : "",
+  ids: ids[i] ?? [],
+}));
+---
+
+<section class="journal-home_wrap" data-figma-band="journal" data-band-top="5872.82">
+  <div class="journal-home_layout site-grid">
+    <h2 class="journal-home_title text-style-h2" data-figma="1:138">Our journal: notes on <em>skin</em>, <em>structure</em> and <em>care</em></h2>
+    <div class="at-end journal-home_action"><Button element="link" href="/journal" data-figma="1:136">View all articles</Button></div>
+    <CardRow data-op-list="articles" data-op-source="astro:articles">
+      {posts.map((p) => (
+        <li class="journal-home_card" data-op-item={p.id}>
+          {p.image && <div class="media ratio-9-7" data-figma={p.ids[0]}><Img {...pic(p.image)} alt={p.alt} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" /></div>}
+          {p.date && <p class="journal-home_date text-style-date" data-op-field="date" data-figma={p.ids[1]}><time datetime={p.date.toISOString().slice(0, 10)}>{p.label}</time></p>}
+          <h3 class="journal-home_card-title text-style-h3" data-op-field="title" data-figma={p.ids[2]}>{p.title}</h3>
+          <Button element="link" variant="link" href="/journal" data-figma={p.ids[3]}>Read the article →</Button>
+        </li>
+      ))}
+    </CardRow>
+  </div>
+</section>
+
+<style is:global>
+  @layer components {
+    .journal-home_wrap {
+      padding-top: var(--section-space-small);
+      padding-bottom: var(--section-space-medium);
+    }
+    .journal-home_layout {
+      row-gap: var(--space-11);
+    }
+    .journal-home_title {
+      grid-column: margin / end;
+      max-width: 19.7ch;
+    }
+    .journal-home_card {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      & > .media {
+        align-self: stretch;
+      }
+    }
+    .journal-home_date {
+      margin-top: var(--space-media);
+    }
+    .journal-home_card-title {
+      margin-top: var(--space-4);
+      width: 26ch;
+      max-width: 100%;
+      @media (width >= 64rem) {
+        max-width: none;
+      }
+    }
+    .journal-home_card > .button_wrap {
+      margin-top: var(--space-5);
+    }
+    @media (width >= 48rem) {
+      .journal-home_title,
+      .journal-home_action {
+        grid-row: 1;
+        align-self: start;
+      }
+    }
+  }
+</style>

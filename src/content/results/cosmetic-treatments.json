@@ -1,4 +1,6 @@
 {
-  "treatment": "Cosmetic treatments",
+  "name": "Cosmetic Treatments",
+  "image": "../../assets/content/results/cosmetic-treatments.jpg",
+  "imageAlt": "Skin on the neck, after treatment",
   "order": 3
 }

@@ -1,0 +1,69 @@
+---
+import Logo from "@/components/content/Logo.astro";
+import Button from "@/components/Button.astro";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Fix the nav over the page. */
+  overlap?: boolean;
+}
+
+const { render = true } = Astro.props;
+---
+
+{
+  render && (
+    <header class="nav_wrap theme-dark" data-figma-band="header">
+      <div class="nav_inner site-grid">
+        <Logo class="nav_logo" data-figma="1:65" />
+        <div class="nav_actions at-end">
+          <Button element="link" href="#consultation" data-figma="1:67">
+            Book a consultation
+          </Button>
+          <button class="nav_toggle" type="button" aria-label="Menu" aria-expanded="false" data-figma="1:69">
+            <span class="nav_toggle_line" />
+            <span class="nav_toggle_line" />
+            <span class="nav_toggle_line" />
+          </button>
+        </div>
+      </div>
+    </header>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .nav_wrap {
+      position: absolute;
+      inset: 0 0 auto;
+      z-index: 10;
+      padding-top: var(--site-margin);
+      background-color: transparent;
+    }
+    .nav_inner {
+      align-items: start;
+    }
+    .nav_logo {
+      grid-column: margin / span 2;
+    }
+    .nav_actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .nav_toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: var(--burger);
+      aspect-ratio: 18.53 / 11.77;
+      color: var(--text);
+    }
+    .nav_toggle_line {
+      display: block;
+      height: var(--border-width);
+      background-color: currentcolor;
+    }
+  }
+</style>

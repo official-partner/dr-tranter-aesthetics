@@ -1,0 +1,62 @@
+---
+import Button from "@/components/Button.astro";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+const { render = true } = Astro.props;
+---
+
+{
+  render && (
+    <section class="not-found_wrap theme-dark">
+      <div class="not-found_layout site-grid">
+        <span class="marker not-found_marker" />
+        <h1 class="not-found_title text-style-h2">This page <em>does not exist</em></h1>
+        <p class="not-found_text text-style-main">It may have moved, or the link that brought you here is out of date.</p>
+        <div class="not-found_action"><Button element="link" href="/">Back to the home page</Button></div>
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .not-found_wrap {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      min-height: var(--band-cta);
+      padding-top: calc(var(--site-margin) + var(--space-10));
+      padding-bottom: var(--section-space-medium);
+    }
+    .not-found_layout {
+      align-content: start;
+      row-gap: var(--space-5);
+    }
+    .not-found_marker {
+      display: none;
+    }
+    .not-found_title,
+    .not-found_text,
+    .not-found_action {
+      grid-column: margin / end;
+    }
+    .not-found_text {
+      max-width: 34ch;
+      color: var(--text-2);
+    }
+    @media (width >= 48rem) {
+      .not-found_marker {
+        display: block;
+        grid-row: 1;
+      }
+      .not-found_title,
+      .not-found_text,
+      .not-found_action {
+        grid-column: main / end;
+      }
+    }
+  }
+</style>

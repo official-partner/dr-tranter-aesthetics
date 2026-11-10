@@ -1,0 +1,85 @@
+---
+interface Step {
+  title: string;
+  text: string;
+  /** Figma node ids for the build review: index, title, text. */
+  ids?: string[];
+}
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** The steps, in order. */
+  steps: Step[];
+  /** Where the list sits: index on main and text on detail, or index on aside and text on aside-text. */
+  variant?: "main" | "aside";
+  /** A list written in the page: its name for OP System's Modifier (items duplicated, removed, moved on the canvas). */
+  list?: string;
+  class?: string;
+}
+const { render = true, steps, variant = "main", list, class: className } = Astro.props;
+---
+
+{
+  render && steps?.length > 0 && (
+    <ol class:list={["index-list_wrap", variant !== "main" && variant, className]} data-op-list={list} data-op-source={list && "page"}>
+      {steps.map((s, i) => (
+        <li class="index-list_item" data-op-item={list && String(i)}>
+          <span class="index-list_index text-style-index" data-figma={s.ids?.[0]}>[0{i + 1}]</span>
+          <div class="index-list_body stack">
+            <h3 class="text-style-index" data-figma={s.ids?.[1]}>{s.title}</h3>
+            <p class="index-list_text text-style-main" data-figma={s.ids?.[2]} set:html={s.text} />
+          </div>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .index-list_wrap {
+      grid-column: margin / end;
+      display: grid;
+      grid-template-columns: subgrid;
+      row-gap: var(--space-6);
+      /* below the computer the list is a plain column, so it can sit on any rail */
+      @media (width < 64rem) {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+    .index-list_item {
+      grid-column: margin / end;
+      display: flex;
+      gap: var(--space-4);
+      align-items: start;
+      @media (width >= 64rem) {
+        display: grid;
+        grid-template-columns: subgrid;
+        gap: normal;
+      }
+    }
+    .index-list_text {
+      max-width: 24.7ch;
+    }
+    @media (width >= 64rem) {
+      .index-list_index {
+        grid-column: main;
+      }
+      .index-list_body {
+        grid-column: detail / span 3;
+      }
+      .index-list_wrap.aside {
+        & .index-list_index {
+          grid-column: aside;
+        }
+        & .index-list_body {
+          grid-column: aside-text / end;
+        }
+        & .index-list_text {
+          max-width: 22ch;
+        }
+      }
+    }
+  }
+</style>

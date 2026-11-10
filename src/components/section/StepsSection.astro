@@ -1,0 +1,106 @@
+---
+import Img from "@/components/media/Img.astro";
+import { pic, type Pic } from "@/utils/media";
+import ActionRow from "@/components/content/ActionRow.astro";
+import IndexList from "@/components/content/IndexList.astro";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Section title; emphasis with <em>. */
+  title: string;
+  /** The steps, in order. */
+  steps: { title: string; text: string; ids?: string[] }[];
+  /** The picture beside the steps. */
+  image?: { src: Pic; alt?: string };
+  /** Optional row of actions at the foot of the band. */
+  actions?: { pill: { label: string; href: string; figma?: string }; link?: { label: string; href: string; figma?: string } };
+  /** Color theme. */
+  theme?: "inherit" | "mist";
+  /** Keep the band at the design's full height (the Home's approach). */
+  tall?: boolean;
+  /** A list written in the page: its name for OP System's Modifier. */
+  list?: string;
+  /** Figma ids for the build review: band name, band top, title, image. */
+  figma?: { band: string; top: string; title: string; image: string };
+}
+const { render = true, title, steps, image, actions, theme = "inherit", tall = false, list, figma } = Astro.props;
+---
+
+{
+  render && steps?.length > 0 && (
+    <section class:list={["steps-section_wrap", theme !== "inherit" && `theme-${theme}`, tall && "is-tall"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
+      <div class="steps-section_layout site-grid">
+        <h2 class="steps-section_title text-style-h2" data-figma={figma?.title} set:html={title} />
+        <IndexList steps={steps} list={list} />
+        {image && (
+          <div class="steps-section_media media" data-figma={figma?.image}>
+            <Img {...pic(image.src)} alt={image.alt ?? ""} variant="constrained" sizes="(width >= 48rem) 40vw, 75vw" />
+          </div>
+        )}
+        {actions && <ActionRow class="steps-section_actions" pill={actions.pill} link={actions.link} tabletRail="margin" />}
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .steps-section_wrap {
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--site-margin);
+      padding-bottom: var(--section-space-medium);
+      &.is-tall {
+        min-height: var(--band-approach);
+        padding-bottom: var(--site-margin);
+      }
+    }
+    .steps-section_layout {
+      flex: 1;
+      row-gap: var(--space-7);
+      grid-template-rows: auto auto 1fr auto;
+    }
+    .steps-section_title {
+      grid-column: margin / end;
+      max-width: 15.2ch;
+    }
+    .steps-section_media {
+      grid-column: margin / end;
+    }
+    @media (width >= 64rem) {
+      .steps-section_title,
+      .steps-section_layout > .index-list_wrap,
+      .steps-section_media {
+        grid-row: 1;
+        align-self: start;
+      }
+      .steps-section_media {
+        grid-column: aside / span 3;
+      }
+      .steps-section_actions {
+        grid-row: 4;
+      }
+    }
+    @media (48rem <= width < 64rem) {
+      .steps-section_layout > .index-list_wrap {
+        grid-row: 2;
+        grid-column: margin / half;
+        align-self: start;
+      }
+      .steps-section_media {
+        grid-row: 2;
+        grid-column: half / end;
+        align-self: start;
+      }
+      .steps-section_actions {
+        grid-row: 4;
+      }
+    }
+    @media (width < 48rem) {
+      .steps-section_media {
+        grid-column: margin / span 3;
+      }
+    }
+  }
+</style>

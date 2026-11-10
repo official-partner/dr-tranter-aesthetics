@@ -1,7 +1,7 @@
 /** Site name. Appended to every page title and used as `og:site_name`. */
 export const SITE_NAME = "Dr Tranter Aesthetics";
 /** Fallback meta description for pages that don't set their own. */
-export const SITE_DESCRIPTION = "The website of Dr Tranter Aesthetics.";
+export const SITE_DESCRIPTION = "Doctor-led cosmetic medicine in Byron Bay, planned around the whole face.";
 import config from "../op.config.json";
 
 /** Canonical origin. Resolves canonical URLs, social images, and the sitemap. The client's domain: op.config.json's
@@ -10,4 +10,4 @@ export const SITE_URL = config.domain ? `https://${config.domain}` : "https://ex
 /** BCP 47 locale tag: the pages' `lang`, and how dates and numbers are written. */
 export const SITE_LOCALE = "en";
 /** Routes excluded from search and the sitemap. Surrounding slashes are ignored. */
-export const NOINDEX_ROUTES: string[] = ["/404", "/composantes", "/test-contenu"];
+export const NOINDEX_ROUTES: string[] = ["/404", "/composantes", "/style-sheet"];

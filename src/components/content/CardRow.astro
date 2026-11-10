@@ -1,0 +1,60 @@
+---
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  class?: string;
+  [attribute: string]: unknown;
+}
+const { render = true, class: className, ...rest } = Astro.props;
+---
+
+{
+  render && (
+    <ul class:list={["card-row_wrap", className]} {...rest}>
+      <slot />
+    </ul>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .card-row_wrap {
+      grid-column: margin / end;
+      display: grid;
+      grid-template-columns: subgrid;
+      row-gap: var(--space-8);
+      & > li {
+        grid-column: margin / end;
+        @media (width < 48rem) {
+          &:nth-child(3n + 1) {
+            grid-column: margin / span 3;
+          }
+          &:nth-child(3n + 2) {
+            grid-column: span 3 / end;
+          }
+        }
+        @media (48rem <= width < 64rem) {
+          grid-column: margin / span 4;
+          &:nth-child(3n + 2) {
+            grid-column: half / end;
+          }
+          &:nth-child(3n) {
+            grid-column: main / span 4;
+          }
+        }
+        @media (width >= 64rem) {
+          grid-column: span 3;
+          &:nth-child(1) {
+            grid-column: margin / span 3;
+          }
+          &:nth-child(2) {
+            grid-column: main / span 3;
+          }
+          &:nth-child(3) {
+            grid-column: third / span 3;
+          }
+        }
+      }
+    }
+  }
+</style>

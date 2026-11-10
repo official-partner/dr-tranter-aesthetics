@@ -1,0 +1,102 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import ConcernHead from "@/components/section/ConcernHead.astro";
+import ConcernBody from "@/components/section/ConcernBody.astro";
+import StepsSection from "@/components/section/StepsSection.astro";
+import ProductsSection from "@/components/section/ProductsSection.astro";
+import CtaBand from "@/components/section/CtaBand.astro";
+import { getItems, getItem } from "@/utils/content";
+
+/* One page per concern (the template drawn for Melasma). A concern has its page once its opening statement is filled
+   in Contenu; the others are listed (home, footer) and wait for their copy. */
+export async function getStaticPaths() {
+  const concerns = await getItems("concerns");
+  return concerns.filter((c) => c.data.statement).map((c) => ({ params: { slug: c.id } }));
+}
+
+const { slug } = Astro.params;
+const concern = slug ? await getItem("concerns", slug) : undefined;
+if (!concern || !concern.data.statement) return Astro.rewrite("/404");
+const d = concern.data;
+
+const [treatments, concerns, products] = await Promise.all([getItems("treatments"), getItems("concerns"), getItems("products")]);
+const find = <T extends { id: string }>(list: T[], ref?: { id: string }) => (ref ? list.find((i) => i.id === ref.id) : undefined);
+
+/* Figma node ids of the Melasma frame, for the build's review tools only (measure, type check) */
+const F = slug === "melasma";
+const fid = (ids: string[]) => (F ? ids : undefined);
+
+const recommendedItem = find(treatments, d.recommended);
+const recommended = recommendedItem && {
+  title: recommendedItem.data.name,
+  text: d.recommendedText ?? "",
+  href: `/treatments/${recommendedItem.id}`,
+  link: "View treatment →",
+  image: recommendedItem.data.image && { src: recommendedItem.data.image, alt: recommendedItem.data.imageAlt },
+  ids: fid(["1:386", "1:376", "1:381", "1:395"]),
+};
+const alsoIds = [["1:387", "1:377", "1:382", "1:396"], ["1:388", "1:379", "1:384", "1:398"]];
+const also = (d.also ?? [])
+  .map((r) => find(treatments, r))
+  .filter((t) => t !== undefined)
+  .map((t, i) => ({
+    title: t.data.name,
+    text: t.data.summary ?? "",
+    href: `/treatments/${t.id}`,
+    link: "View treatment →",
+    image: t.data.image && { src: t.data.image, alt: t.data.imageAlt },
+    ids: fid(alsoIds[i] ?? []),
+  }));
+const alongsideIds = [["", "1:378", "1:383", "1:397"], ["", "1:380", "1:385", "1:399"]];
+const alongside = (d.alongside ?? [])
+  .map((r) => find(concerns, r))
+  .filter((c) => c !== undefined)
+  .map((c, i) => ({
+    title: c.data.name,
+    text: d.alongsideText ?? "",
+    href: c.data.statement ? `/concerns/${c.id}` : "/concerns",
+    link: "View concern →",
+    ids: fid(alongsideIds[i] ?? []),
+  }));
+const factorIds = [["1:367", "1:370", "1:373"], ["1:368", "1:371", "1:374"], ["1:369", "1:372", "1:375"]];
+const stepIds = [["1:413", "1:414", "1:415"], ["1:416", "1:419", "1:422"], ["1:417", "1:420", "1:423"], ["1:418", "1:421", "1:424"]];
+const productIds = [["1:445", "1:442", "1:446"], ["1:437", "1:444", "1:447"], ["1:439", "1:443", "1:448"]];
+const productItems = (d.products ?? [])
+  .map((r) => find(products, r))
+  .filter((p) => p !== undefined)
+  .map((p, i) => ({ id: p.id, name: p.data.name, text: p.data.text, image: p.data.image, imageAlt: p.data.imageAlt, ids: fid(productIds[i] ?? []) }));
+const facts = [
+  d.consultation && { label: "Consultation", value: d.consultation, ids: fid(["1:360", "1:362"]) },
+  d.assessedBy && { label: "Assessed by", value: d.assessedBy, ids: fid(["1:361", "1:363"]) },
+].filter((f) => !!f);
+---
+
+<Layout title={d.name} nav={false}>
+  <div data-op-item={concern.id} data-op-source="astro:concerns">
+    {/* Head */}
+    <ConcernHead name={d.name} statement={d.statement ?? ""} facts={facts} image={d.image && { src: d.image, alt: d.imageAlt }} />
+    {/* What is happening, what we would consider */}
+    <ConcernBody
+      happening={{ text: d.happening, steps: d.factors?.map((f, i) => ({ ...f, ids: fid(factorIds[i] ?? []) })) }}
+      recommended={recommended}
+      also={also}
+      alongside={alongside}
+    />
+    {/* How we treat */}
+    {d.steps && d.steps.length > 0 && (
+      <StepsSection
+        title={`How we treat ${d.name}`}
+        steps={d.steps.map((s, i) => ({ ...s, ids: fid(stepIds[i] ?? []) }))}
+        image={d.stepsImage && { src: d.stepsImage, alt: d.stepsImageAlt }}
+        figma={F ? { band: "how", top: "2510", title: "1:412", image: "1:425" } : undefined}
+      />
+    )}
+    {/* Products */}
+    <ProductsSection products={productItems} />
+  </div>
+  {/* Consultation */}
+  <CtaBand
+    title={`<em>Ready to talk</em><br /><em>about</em> ${d.name}?`}
+    figma={F ? { top: "3745", label: "1:432", marker: "1:428", title: "1:427", pill: "1:430" } : undefined}
+  />
+</Layout>

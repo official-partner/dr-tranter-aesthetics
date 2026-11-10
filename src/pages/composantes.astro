@@ -2,207 +2,95 @@
 import Layout from "@/layouts/BaseLayout.astro";
 import ComponentList from "@/components/system/ComponentList.astro";
 import ComponentSample from "@/components/system/ComponentSample.astro";
-import Section from "@/components/wrapper/Section.astro";
-import Grid from "@/components/wrapper/Grid.astro";
-import Button from "@/components/Button.astro";
-import CardTeam from "@/components/content/CardTeam.astro";
-import ClosingInvitation from "@/components/content/ClosingInvitation.astro";
+import ActionRow from "@/components/content/ActionRow.astro";
+import CardRow from "@/components/content/CardRow.astro";
 import ConcernIndex from "@/components/content/ConcernIndex.astro";
-import JournalCards from "@/components/content/JournalCards.astro";
-import ResultsScatter from "@/components/content/ResultsScatter.astro";
-import SectionHead from "@/components/content/SectionHead.astro";
-import Statement from "@/components/content/Statement.astro";
-import StepList from "@/components/content/StepList.astro";
-import Wordmark from "@/components/content/Wordmark.astro";
-import photo from "@/assets/content/team/lea-photo.webp";
+import IndexList from "@/components/content/IndexList.astro";
+import Logo from "@/components/content/Logo.astro";
+import ResultCaption from "@/components/content/ResultCaption.astro";
+import HeroHome from "@/components/section/HeroHome.astro";
+import ConcernsHome from "@/components/section/ConcernsHome.astro";
+import StepsSection from "@/components/section/StepsSection.astro";
+import ResultsHome from "@/components/section/ResultsHome.astro";
+import FounderHome from "@/components/section/FounderHome.astro";
+import JournalHome from "@/components/section/JournalHome.astro";
+import CtaBand from "@/components/section/CtaBand.astro";
+import ConcernHead from "@/components/section/ConcernHead.astro";
+import ConcernBody from "@/components/section/ConcernBody.astro";
+import ProductsSection from "@/components/section/ProductsSection.astro";
+import NotFound from "@/components/section/NotFound.astro";
+import { getItems, getItem } from "@/utils/content";
+
+/* the samples show the client's own copy: Melasma and the collections as they are */
+const melasma = await getItem("concerns", "melasma");
+const d = melasma?.data;
+const treatments = await getItems("treatments");
+const products = await getItems("products");
+const steps = [
+  { title: "Consultation", text: "Understanding your concerns, your priorities and your face." },
+  { title: "Assessment", text: "A structured read of what is happening beneath the surface." },
+];
 ---
 
-<Layout
-  title="Composantes"
-  description="Les composantes faites pour ce site, chacune avec un exemple."
->
+<Layout title="Composantes" description="Les composantes faites pour ce site, chacune avec un exemple.">
   <ComponentList>
-    <ComponentSample
-      file="Button.astro"
-      note="Le bouton de la maison : la pastille à contour (Book a consultation), la pastille pleine (choisie ou pressée), le lien avec flèche. Au survol et au clavier la pastille se remplit ; pressée, elle rentre d’un cran ; désactivée, elle s’éteint."
-    >
-      <Section theme="stone" paddingTop="small" paddingBottom="small">
-        <div class="flex-horizontal-wrap gap-4">
-          <Button element="link" href="/book">Book a consultation</Button>
-          <Button element="link" href="/concerns" emphasis="secondary"
-            >View all concerns</Button
-          >
-          <Button disabled>Book a consultation</Button>
-          <Button element="link" variant="link" href="/journal"
-            >Read the article</Button
-          >
-        </div>
-      </Section>
-      <Section theme="burgundy" paddingTop="small" paddingBottom="small">
-        <div class="flex-horizontal-wrap gap-4">
-          <Button element="link" href="/book">Book a consultation</Button>
-          <Button element="link" href="/concerns" emphasis="secondary"
-            >View all concerns</Button
-          >
-          <Button disabled>Book a consultation</Button>
-          <Button element="link" variant="link" href="/journal"
-            >Read the article</Button
-          >
-        </div>
-      </Section>
+    <ComponentSample file="content/Logo.astro" note="Le logo du site, dans la couleur du texte de son thème.">
+      <div class="site-grid"><Logo /></div>
     </ComponentSample>
-    <ComponentSample
-      file="content/Wordmark.astro"
-      note="Le nom en lettres, « Dr » plus petit, jusqu’à l’arrivée du logo en SVG (src/assets/logo/logo.svg)."
-    >
-      <Section theme="burgundy" paddingTop="small" paddingBottom="small">
-        <Wordmark />
-      </Section>
-    </ComponentSample>
-    <ComponentSample
-      file="content/SiteHeader.astro"
-      note="La barre du haut de cette page : le nom, la pastille Book a consultation (Book sur un téléphone) et le bouton du menu. Elle reste en haut quand on défile."
-    >
-      <Section theme="stone" paddingTop="small" paddingBottom="small">
-        <p>Voir la barre en haut de cette page, et ouvrir le menu.</p>
-      </Section>
-    </ComponentSample>
-    <ComponentSample
-      file="content/SiteMenu.astro"
-      note="Le menu s’ouvre depuis la barre : panneau Mist avec quatre listes et une photo sur ordinateur, quatre groupes sur un téléphone, avec Book a consultation fixé en bas. Échap ou un clic à côté le ferme et rend le focus au bouton."
-    >
-      <Section theme="stone" paddingTop="small" paddingBottom="small">
-        <p>Ouvrir le menu de la barre en haut de cette page.</p>
-      </Section>
-    </ComponentSample>
-    <ComponentSample
-      file="content/SiteFooter.astro"
-      note="Le pied de page de cette page : trois colonnes de listes, la visite, Connect et les mentions légales ; sur un téléphone, les listes se replient en groupes."
-    >
-      <Section theme="stone" paddingTop="small" paddingBottom="small">
-        <p>Voir le pied de page en bas de cette page.</p>
-      </Section>
-    </ComponentSample>
-    <ComponentSample
-      file="content/Statement.astro"
-      note="L’ouverture d’une page : les lignes montent de leur masque une fois. Le mélange des deux graisses de l’exemple est un choix d’essai."
-    >
-      <Section theme="burgundy" paddingTop="small" paddingBottom="large">
-        <div class="site-grid">
-          <div class="column-body">
-            <Statement
-              lines={[
-                "We look beyond isolated treatments",
-                '<span class="weight-regular">to consider structure, surface and facial cohesion as a whole.</span>',
-              ]}
-            />
-          </div>
-        </div>
-      </Section>
-    </ComponentSample>
-    <ComponentSample
-      file="content/SectionHead.astro"
-      note="Le titre d’une partie, avec ou sans son petit repère, dans les colonnes 1 à 4."
-    >
-      <Section theme="sand" paddingTop="small" paddingBottom="medium">
-        <div class="site-grid">
-          <SectionHead label="Journal">
-            Our journal: notes on skin, structure and care
-          </SectionHead>
-        </div>
-      </Section>
-    </ComponentSample>
-    <ComponentSample
-      file="content/ConcernIndex.astro"
-      note="La grande liste des préoccupations. Ordinateur avec souris : la ligne pointée devient sombre, avance d’une colonne et montre sa photo, son groupe et Learn more. Clavier : pareil au focus. Téléphone : une liste qui mène droit à la préoccupation, par groupe."
-    >
-      <Section theme="sand" paddingTop="small" paddingBottom="large">
-        <div class="site-grid">
-          <SectionHead>Where would you like to start?</SectionHead>
-          <div class="column-body">
-            <ConcernIndex />
-          </div>
-        </div>
-      </Section>
-    </ComponentSample>
-    <ComponentSample
-      file="content/StepList.astro"
-      note="Une suite d’étapes numérotées (l’approche, « How we treat »). La numérotation suit l’ordre de la liste."
-    >
-      <Section theme="mist" paddingTop="small" paddingBottom="large">
-        <div class="site-grid">
-          <SectionHead>The Dr Tranter Aesthetics approach</SectionHead>
-          <div class="column-body">
-            <StepList
-              name="approach"
-              items={[
-                {
-                  title: "Consultation",
-                  text: "Understanding your concerns, your priorities and your face.",
-                },
-                {
-                  title: "Assessment",
-                  text: "A structured read of what is happening beneath the surface.",
-                },
-                {
-                  title: "Planning",
-                  text: "A plan built around your goals, not a standard protocol.",
-                },
-                {
-                  title: "Ongoing care",
-                  text: "Continuity, so your care evolves as you do.",
-                },
-              ]}
-            />
-          </div>
-        </div>
-      </Section>
-    </ComponentSample>
-    <ComponentSample
-      file="content/ResultsScatter.astro"
-      note="Les cas avant / après. Ordinateur : quatre cas éparpillés à des tailles et des hauteurs différentes. Téléphone : une rangée qu’on fait glisser. L’interrupteur Before / After montre l’autre photo, au toucher, à la souris et au clavier (After par défaut)."
-    >
-      <Section theme="stone" paddingTop="small" paddingBottom="large">
-        <div class="site-grid">
-          <SectionHead>Proof, not promises. Real results.</SectionHead>
-        </div>
-        <ResultsScatter />
-      </Section>
-    </ComponentSample>
-    <ComponentSample
-      file="content/JournalCards.astro"
-      note="Les trois derniers articles, la date écrite jour d’abord. Téléphone et tablette : une rangée qu’on fait glisser."
-    >
-      <Section theme="sand" paddingTop="small" paddingBottom="large">
-        <JournalCards limit={3} />
-      </Section>
-    </ComponentSample>
-    <ComponentSample
-      file="content/ClosingInvitation.astro"
-      note="L’invitation qui ferme chaque page : un repère, une phrase, la pastille de réservation."
-    >
-      <ClosingInvitation
-        heading="Every new patient begins with a consultation."
-      />
-    </ComponentSample>
-    <ComponentSample
-      file="content/CardTeam.astro"
-      note="Le modèle du démarrage, gardé tant que la page de l’équipe n’est pas faite."
-    >
-      <div class="container">
-        <Grid small={2} medium={3}>
-          <CardTeam
-            person={{
-              name: "Léa Tremblay",
-              role: "Direction",
-              bio: "Elle a fondé le studio en 2014 et suit chaque projet du premier appel jusqu’à la mise en ligne.",
-              photo,
-              specialties: ["Stratégie", "Identité", "Direction artistique"],
-            }}
-          />
-          <CardTeam person={{ name: "Sophie Roy" }} />
-        </Grid>
+    <ComponentSample file="content/ActionRow.astro" note="La rangée d'actions au pied d'une section : la pastille, puis le lien discret contre le bord droit.">
+      <div class="site-grid">
+        <ActionRow pill={{ label: "View all concerns", href: "/concerns" }} link={{ label: "Already know what you're looking for? Browse treatments →", href: "/treatments" }} />
       </div>
     </ComponentSample>
+    <ComponentSample file="content/IndexList.astro" note="Une liste numérotée : un index, un titre, un texte.">
+      <div class="site-grid"><IndexList steps={steps} /></div>
+    </ComponentSample>
+    <ComponentSample file="content/ConcernIndex.astro" note="La grande liste des préoccupations. Au survol, la ligne fonce et montre sa photo, son groupe et Learn more.">
+      <div class="site-grid">
+        <ConcernIndex items={[{ label: "Temple hollowing", category: "Structure", href: "/concerns" }, { label: "Melasma", category: "Surface", href: "/concerns/melasma", image: d?.image }]} />
+      </div>
+    </ComponentSample>
+    <ComponentSample file="content/ResultCaption.astro" note="La légende d'un résultat : index, traitement, Before / After.">
+      <div class="site-grid">
+        <CardRow><li><ResultCaption index="[02]" name="Morpheus8" /></li></CardRow>
+      </div>
+    </ComponentSample>
+    <ComponentSample file="content/CardRow.astro" note="Une rangée de cartes alignée sur la grille : trois colonnes sur ordinateur, une carte centrée en tablette, gauche, droite, pleine largeur en téléphone.">
+      <div class="site-grid">
+        <CardRow>
+          {products.map((p) => <li class="text-style-h3">{p.data.name}</li>)}
+        </CardRow>
+      </div>
+    </ComponentSample>
+    <ComponentSample file="section/HeroHome.astro" note="L'ouverture de l'accueil."><HeroHome /></ComponentSample>
+    <ComponentSample file="section/ConcernsHome.astro" note="Les préoccupations de l'accueil, lues dans la collection."><ConcernsHome /></ComponentSample>
+    <ComponentSample file="section/StepsSection.astro" note="Les étapes avec leur photo : l'approche de l'accueil, How we treat d'une préoccupation.">
+      <StepsSection title="The Dr Tranter Aesthetics <em>approach</em>" theme="mist" steps={steps} image={{ src: "/img/approach.jpg", alt: "" }} actions={{ pill: { label: "Learn more", href: "/our-approach" } }} />
+    </ComponentSample>
+    <ComponentSample file="section/ResultsHome.astro" note="Les résultats, lus dans la collection, dans la composition éparpillée du design."><ResultsHome /></ComponentSample>
+    <ComponentSample file="section/FounderHome.astro" note="La fondatrice."><FounderHome /></ComponentSample>
+    <ComponentSample file="section/JournalHome.astro" note="Les trois derniers articles du journal."><JournalHome /></ComponentSample>
+    <ComponentSample file="section/CtaBand.astro" note="L'invitation de fin, sur chaque page."><CtaBand /></ComponentSample>
+    {d?.statement && (
+      <ComponentSample file="section/ConcernHead.astro" note="L'ouverture d'une préoccupation (Melasma).">
+        <ConcernHead
+          name={d.name}
+          statement={d.statement}
+          facts={[{ label: "Consultation", value: d.consultation ?? "" }, { label: "Assessed by", value: d.assessedBy ?? "" }]}
+          image={d.image && { src: d.image, alt: d.imageAlt }}
+        />
+      </ComponentSample>
+    )}
+    <ComponentSample file="section/ConcernBody.astro" note="Le corps d'une préoccupation : ce qui se passe, ce qu'on considère, ce qu'on évalue en même temps.">
+      <ConcernBody
+        happening={{ text: d?.happening, steps: d?.factors }}
+        recommended={treatments[0] && { title: treatments[0].data.name, text: d?.recommendedText ?? "", href: "/treatments", link: "View treatment →", image: treatments[0].data.image && { src: treatments[0].data.image } }}
+        also={treatments.slice(1, 3).map((t) => ({ title: t.data.name, text: t.data.summary ?? "", href: "/treatments", link: "View treatment →", image: t.data.image && { src: t.data.image } }))}
+      />
+    </ComponentSample>
+    <ComponentSample file="section/ProductsSection.astro" note="Les produits recommandés, lus dans la collection.">
+      <ProductsSection products={products.map((p) => ({ id: p.id, name: p.data.name, text: p.data.text, image: p.data.image, imageAlt: p.data.imageAlt }))} />
+    </ComponentSample>
+    <ComponentSample file="section/NotFound.astro" note="La page introuvable."><NotFound /></ComponentSample>
   </ComponentList>
 </Layout>

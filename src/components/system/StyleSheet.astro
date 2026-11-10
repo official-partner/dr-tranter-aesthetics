@@ -1,0 +1,296 @@
+---
+import system from "../../../system/tranter.json";
+import Button from "@/components/Button.astro";
+
+const S = system as any;
+const R = S.viewport.reference;
+const fam = (axis: number, w: number) => `${axis === 0 ? "Sans" : axis === 50 ? "Mix" : "Serif"} ${w}`;
+const samples: Record<string, string> = {
+  display: "Temple hollowing",
+  h1: "Melasma is a distinct, <em>hormonally influenced</em> form",
+  h2: "Meet the <em>founder</em>.",
+  h3: "Why we assess before we recommend anything",
+  "text-main": "A structured read of what is happening beneath the surface.",
+  "text-serif": "Founder &amp; Cosmetic Physician · 15+ years in practice",
+  "text-index": "[02] Morpheus8",
+  "text-index-caps": "Pico Laser",
+  "text-list": "Skin laxity and sagging",
+  "text-tight": "Mon 9am to 3pm",
+  "text-label": "Byron Bay",
+  "text-action": "Book a consultation",
+  "text-note": "Supports tone and brightness between in-clinic treatments.",
+  "text-date": "[01.22.26]",
+};
+const order = ["display", "h1", "h2", "h3", "text-main", "text-serif", "text-index", "text-index-caps", "text-list", "text-tight", "text-label", "text-action", "text-note", "text-date"];
+const styles = order.filter((n) => S.text[n]).map((n) => {
+  const t = S.text[n];
+  const [ph, tb, dk] = S.fluid[n];
+  const floor = S.floors[n];
+  const at = (w: number) => Math.max(floor ?? 0, (dk * w) / R);
+  const cls = n.startsWith("text-") ? "text-style-" + n.slice(5) : "text-style-" + n;
+  return { n, cls, f: fam(t.axis, t.weight), size: dk, lh: t.lh, ls: t.ls, tt: t.tt, floor, s1440: at(1440), s1024: at(1024), ph, tb, sample: samples[n] ?? n };
+});
+const fmt = (v: number) => (Math.round(v * 10) / 10).toString().replace(".", ",");
+const swatches = [["ink", "#2c0f0a"], ["cream", "#e1dcbc"], ["sand", "#ded5c2"], ["stone", "#e8e7e2"], ["mist", "#c2d3d7"], ["khaki", "#cac3a5"]];
+const themes = [["light", "sable (défaut)"], ["stone", "pierre"], ["mist", "brume"], ["dark", "encre, texte crème"], ["dark-sand", "encre, texte sable"]];
+const spaces = Object.keys(S.fluid).filter((k) => /^space-\d+$/.test(k)).sort((a, b) => +a.split("-")[1] - +b.split("-")[1]);
+const rails = [["margin", "c1"], ["inset", "c3"], ["marker", "c4"], ["main", "c5"], ["detail", "c6"], ["half", "c8"], ["third", "c9"], ["aside", "c10"], ["aside-text", "c11"]];
+const ratios = [["ratio-5-6", "5:6"], ["", "4:5"], ["ratio-145", "1,45"], ["ratio-16-10", "16:10"], ["ratio-9-7", "9:7"], ["ratio-7-10", "7:10"], ["ratio-1-1", "1:1"]];
+---
+
+<section class="style-sheet_wrap" data-figma-band="style">
+  <div class="style-sheet_layout site-grid">
+    <header class="style-sheet_head">
+      <p class="text-style-label">Tranter · système Lumos for Astro</p>
+      <h1 class="text-style-h2">Style sheet</h1>
+      <p class="style-sheet_lede text-style-main">Généré du fichier <code>system/tranter.json</code>, comme <code>base.css</code> : ce que cette page montre est exactement ce que le site utilise. Valeurs à 1728 px ; tout rapetisse avec la grille jusqu'à 1024, puis tablette et téléphone ont leurs valeurs. Largeur actuelle : <b class="style-sheet_vw">…</b></p>
+    </header>
+
+    <h2 class="style-sheet_title text-style-label">Typographie</h2>
+    <div class="style-sheet_types">
+      {styles.map((s) => (
+        <div class="style-sheet_type">
+          <div class="style-sheet_meta">
+            <code>.{s.cls}</code>
+            <span>{s.f} · {fmt(s.size)} / {s.lh} · {s.ls}{s.tt !== "none" ? " · capitales" : ""}</span>
+            <span>1440 : {fmt(s.s1440)} · 1024 : {fmt(s.s1024)}{s.floor ? ` (plancher ${s.floor})` : ""} · tablette {s.tb} · téléphone {s.ph}</span>
+            <span class="style-sheet_live" data-style={s.cls}>maintenant : …</span>
+          </div>
+          <p class:list={["style-sheet_sample", s.cls]} set:html={s.sample} />
+        </div>
+      ))}
+    </div>
+
+    <h2 class="style-sheet_title text-style-label">Couleurs et thèmes</h2>
+    <div class="style-sheet_swatches">
+      {swatches.map(([n, v]) => (
+        <div class="style-sheet_swatch">
+          <span class="style-sheet_chip" style={`--_c: var(--${n})`} />
+          <code>--{n}</code>
+          <span>{v}</span>
+        </div>
+      ))}
+    </div>
+    <div class="style-sheet_themes">
+      {themes.map(([n, label]) => (
+        <div class:list={["style-sheet_theme", `theme-${n}`]}>
+          <p class="text-style-label">theme-{n}</p>
+          <p class="text-style-main">{label}</p>
+          <p class="text-style-main style-sheet_t2">texte 2 · 50 %</p>
+          <p class="text-style-main style-sheet_t3">texte 3 · 30 %</p>
+          <Button element="link" href="#">Pastille</Button>
+        </div>
+      ))}
+    </div>
+
+    <h2 class="style-sheet_title text-style-label">Grille et rails</h2>
+    <div class="style-sheet_grid">
+      {rails.map(([n, c]) => (
+        <span class="style-sheet_rail" style={`grid-column: ${n} / span 1`}>
+          <code>{n}</code>
+          <span>{c}</span>
+        </span>
+      ))}
+      <span class="style-sheet_rail is-end"><code>end</code></span>
+    </div>
+
+    <h2 class="style-sheet_title text-style-label">Espacements</h2>
+    <div class="style-sheet_spaces">
+      {spaces.map((k) => (
+        <div class="style-sheet_space">
+          <code>--{k}</code>
+          <span class="style-sheet_bar" style={`--_w: var(--${k})`} />
+          <span>{fmt(S.fluid[k][2])} à 1728</span>
+        </div>
+      ))}
+      {(Object.entries(S.roles ?? {}) as [string, { ref: string; job: string }][]).map(([k, r]) => (
+        <div class="style-sheet_space">
+          <code>--{k}</code>
+          <span class="style-sheet_bar" style={`--_w: var(--${k})`} />
+          <span>= {r.ref}, {fmt(S.fluid[r.ref][2])} à 1728 : {r.job}</span>
+        </div>
+      ))}
+    </div>
+
+    <h2 class="style-sheet_title text-style-label">Boutons, images, repères</h2>
+    <div class="style-sheet_parts">
+      <div class="style-sheet_buttons">
+        <Button element="link" href="#">Book a consultation</Button>
+        <Button element="link" href="#" emphasis="secondary">Book a consultation</Button>
+        <Button element="link" variant="link" href="#">Read the article →</Button>
+        <span class="marker style-sheet_marker" />
+      </div>
+      <div class="style-sheet_ratios">
+        {ratios.map(([cls, label]) => (
+          <figure class="style-sheet_ratio">
+            <div class:list={["media", cls]} />
+            <figcaption class="text-style-label">{label}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const show = () => {
+    const vw = document.querySelector(".style-sheet_vw");
+    if (vw) vw.textContent = document.documentElement.clientWidth + " px";
+    document.querySelectorAll<HTMLElement>(".style-sheet_live").forEach((el) => {
+      const probe = el.closest(".style-sheet_type")?.querySelector(".style-sheet_sample");
+      if (probe) el.textContent = "maintenant : " + parseFloat(getComputedStyle(probe).fontSize).toFixed(1).replace(".", ",") + " px";
+    });
+  };
+  show();
+  addEventListener("resize", show);
+</script>
+
+<style is:global>
+  @layer components {
+    .style-sheet_wrap {
+      padding-top: var(--section-space-small);
+      padding-bottom: var(--section-space-large);
+    }
+    .style-sheet_layout {
+      row-gap: var(--space-6);
+      align-items: start;
+    }
+    .style-sheet_head,
+    .style-sheet_title,
+    .style-sheet_types,
+    .style-sheet_swatches,
+    .style-sheet_themes,
+    .style-sheet_grid,
+    .style-sheet_spaces,
+    .style-sheet_parts {
+      grid-column: margin / end;
+    }
+    .style-sheet_head {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .style-sheet_lede {
+      max-width: 60ch;
+    }
+    .style-sheet_title {
+      padding-top: var(--space-4);
+      border-top: var(--border-width) solid var(--text-3);
+    }
+    .style-sheet_types {
+      display: grid;
+      grid-template-columns: subgrid;
+      row-gap: var(--space-5);
+    }
+    .style-sheet_type {
+      grid-column: margin / end;
+      display: grid;
+      grid-template-columns: subgrid;
+      align-items: baseline;
+    }
+    .style-sheet_meta {
+      grid-column: margin / span 4;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      color: var(--text-2);
+    }
+    .style-sheet_sample {
+      grid-column: main / end;
+    }
+    .style-sheet_swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+    .style-sheet_swatch {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+    .style-sheet_chip {
+      display: block;
+      width: var(--space-10);
+      aspect-ratio: 1;
+      background-color: var(--_c);
+      outline: var(--border-width) solid var(--text-3);
+    }
+    .style-sheet_themes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+      gap: var(--site-gutter);
+    }
+    .style-sheet_theme {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      gap: var(--space-3);
+      padding: var(--space-4);
+    }
+    .style-sheet_t2 {
+      color: var(--text-2);
+    }
+    .style-sheet_t3 {
+      color: var(--text-3);
+    }
+    .style-sheet_grid {
+      display: grid;
+      grid-template-columns: subgrid;
+      row-gap: var(--space-2);
+    }
+    .style-sheet_rail {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      padding-top: var(--space-2);
+      border-top: var(--border-width) solid var(--text);
+      &.is-end {
+        grid-column: aside-text / end;
+        justify-self: end;
+        text-align: end;
+      }
+    }
+    .style-sheet_spaces {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .style-sheet_space {
+      display: grid;
+      grid-template-columns: 10rem auto 1fr;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .style-sheet_bar {
+      display: block;
+      width: var(--_w);
+      height: var(--space-1);
+      background-color: var(--text);
+    }
+    .style-sheet_parts {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+    .style-sheet_buttons {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-5);
+    }
+    .style-sheet_marker {
+      display: block;
+    }
+    .style-sheet_ratios {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+      gap: var(--site-gutter);
+      align-items: end;
+    }
+    .style-sheet_ratio {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+  }
+</style>

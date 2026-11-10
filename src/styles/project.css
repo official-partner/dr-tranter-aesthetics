@@ -1,107 +1,88 @@
-/* The project's own global classes (OP's op-global-classes skill): a treatment several of this site's components share,
-   two declarations or more seen in three places, written once here and put beside a component's own class. Each class
-   has a one-line comment above it that says its job: OP System's Web System shows that line under Classes. Values from
-   the tokens of base.css only; no px, no raw colour. Lumos's patterns.css and utilities.css are never edited for a
-   project. Empty in the starter. */
+/* The project's own global classes (OP's op-global-classes skill). Each one is used three times or more, holds no
+   text style and no column number: rails are named lines of the site grid. Values from the tokens of base.css only. */
 
-/* The page's grid: 12, 8 or 4 columns by screen, with the site's gutter. Every section lays its content on it. */
+/* The site grid: the design's 12 columns, with a named line for every column start a component aligns to.
+   margin c1 · inset c3 · marker c4 · main c5 · detail c6 · half c8 · third c9 · aside c10 · aside-text c11 · end.
+   Tablet keeps the names on 8 columns; on a phone every rail starts at the margin. */
 .site-grid {
   display: grid;
-  grid-template-columns: repeat(var(--site-columns), minmax(0, 1fr));
+  width: var(--site-width);
+  max-width: var(--max-width-main);
+  margin-inline: auto;
+  grid-template-columns:
+    [margin inset marker main detail half third aside aside-text] repeat(4, minmax(0, 1fr))
+    [end];
   column-gap: var(--site-gutter);
-  row-gap: var(--space-6);
+  @media (width >= 48rem) {
+    grid-template-columns:
+      [margin] minmax(0, 1fr) [inset marker] minmax(0, 1fr) [main detail] repeat(2, minmax(0, 1fr))
+      [half third] repeat(2, minmax(0, 1fr)) [aside aside-text] repeat(2, minmax(0, 1fr)) [end];
+  }
+  @media (width >= 64rem) {
+    grid-template-columns:
+      [margin] repeat(2, minmax(0, 1fr)) [inset] minmax(0, 1fr) [marker] minmax(0, 1fr) [main] minmax(0, 1fr)
+      [detail] repeat(2, minmax(0, 1fr)) [half] minmax(0, 1fr) [third] minmax(0, 1fr) [aside] minmax(0, 1fr)
+      [aside-text] repeat(2, minmax(0, 1fr)) [end];
+  }
 }
 
-/* A section's label and heading: columns 1 to 4 of 12 (the full width on a phone). */
-.column-head {
-  grid-column: 1 / span var(--head-span);
+/* A vertical stack: a label, a picture or a title with what follows it. The gap is a space token (gap utilities in combo) */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_gap-size, var(--space-2));
 }
 
-/* A section's content: from column 5 of 12 to the edge (the full width on a phone, below the heading). */
-.column-body {
-  grid-column: var(--body-start) / -1;
+/* An action set against the right edge of the grid (pills and links at the end rail) */
+.at-end {
+  grid-column: half / end;
+  justify-self: end;
 }
 
-/* The small square beside a section label and the concern the pointer is on: one size, the ink of its theme. */
+/* The small square that marks a row, at the marker rail, level with the cap top of its row */
 .marker {
-  display: inline-block;
-  flex: none;
-  inline-size: var(--marker-size);
-  block-size: var(--marker-size);
-  background-color: currentcolor;
+  grid-column: marker;
+  align-self: start;
+  width: var(--marker);
+  height: var(--marker);
+  background-color: var(--marker-color);
 }
 
-/* A picture's frame: a fixed shape, the picture filling it, a quiet tint where the photo is still to come. */
-.media-frame {
+/* Small texts set at the margin sit 3.5 design pixels inside it (Figma, 9 times; question 9 for Simon) */
+.inset-optical {
+  padding-left: var(--inset-optical);
+}
+
+/* An image frame: the picture fills it, centred; the ratio is one of the system's families */
+.media {
   position: relative;
-  overflow: clip;
-  aspect-ratio: var(--media-ratio);
-  background-color: var(--background-2);
-  border-radius: var(--radius-main);
+  overflow: hidden;
+  aspect-ratio: var(--ratio, 4 / 5);
+  background-color: var(--background-skeleton);
   & > img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
   }
-}
-
-/* What a picture frame says while its photo is still to come: a short label, centred, in the quiet text. */
-.media-placeholder {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: var(--space-4);
-  color: var(--text-2);
-  font-size: var(--text-small);
-  line-height: var(--text-small-line-height);
-  text-align: center;
-  text-wrap: balance;
-}
-
-/* A number or a date set in square brackets: a real sequence, drawn by the style so the words stay clean. */
-.bracketed::before {
-  content: "[";
-}
-.bracketed::after {
-  content: "]";
-}
-
-/* The pill shape for what is chosen or shown, not clicked as an action: outlined in the ink, label capitals. */
-.pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5em 1em;
-  border: var(--border-width) solid currentcolor;
-  border-radius: var(--radius-round);
-  font-family: var(--label-font-family);
-  font-size: var(--label);
-  font-weight: var(--label-font-weight);
-  line-height: var(--label-line-height);
-  letter-spacing: var(--label-letter-spacing);
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-/* A row of cards swiped sideways on a phone and a tablet, each snapping to the side margin; its own layout takes over
-   from a computer up. */
-.swipe-row {
-  @media (width < 64rem) {
-    display: flex;
-    gap: var(--site-gutter);
-    margin-inline: calc(var(--site-margin) * -1);
-    padding-inline: var(--site-margin);
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--site-margin);
-    scrollbar-width: none;
-    & > * {
-      flex: 0 0 var(--swipe-item, 78%);
-      scroll-snap-align: start;
-    }
+  &.ratio-5-6 {
+    --ratio: 5 / 6;
+  }
+  &.ratio-145 {
+    --ratio: 1.45;
+  }
+  &.ratio-16-10 {
+    --ratio: 16 / 10;
+  }
+  &.ratio-9-7 {
+    --ratio: 9 / 7;
+  }
+  &.ratio-7-10 {
+    --ratio: 7 / 10;
+  }
+  &.ratio-1-1 {
+    --ratio: 1;
   }
 }

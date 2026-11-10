@@ -1,0 +1,179 @@
+---
+import Logo from "@/components/content/Logo.astro";
+import { getItems } from "@/utils/content";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+const { render = true } = Astro.props;
+const concerns = await getItems("concerns");
+const link = (c: (typeof concerns)[number]) => ({ id: c.id, name: c.data.name, href: c.data.statement ? `/concerns/${c.id}` : "/concerns" });
+const structure = concerns.filter((c) => c.data.group === "Structure").map(link);
+const surface = concerns.filter((c) => c.data.group === "Surface").map(link);
+const clinic = ["All treatments", "Our approach", "Results", "Our team", "The Clinic", "Journal"];
+const connect = ["Contact", "Careers", "Facebook", "Instagram"];
+const legal = ["Risks and complications", "Privacy policy", "Terms", "Complaints"];
+---
+
+{
+  render && (
+    <footer class="footer_wrap theme-dark" data-figma-band="footer" data-band-top="6919">
+      <div class="footer_layout site-grid">
+        <Logo class="footer_logo" data-figma="1:167" />
+        <div class="footer_group stack gap-4 is-structure">
+          <p class="text-style-label" data-figma="1:169">Structure</p>
+          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:174" data-op-list="concerns" data-op-source="astro:concerns">{structure.map((c) => <li data-op-item={c.id}><a class="footer_link" href={c.href} data-op-field="name">{c.name}</a></li>)}</ul>
+        </div>
+        <div class="footer_group stack gap-4 is-surface">
+          <p class="text-style-label" data-figma="1:170">Surface</p>
+          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:175" data-op-list="concerns" data-op-source="astro:concerns">{surface.map((c) => <li data-op-item={c.id}><a class="footer_link" href={c.href} data-op-field="name">{c.name}</a></li>)}</ul>
+        </div>
+        <div class="footer_group stack gap-4 is-clinic">
+          <p class="text-style-label" data-figma="1:171">The Clinic</p>
+          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:179">{clinic.map((l) => <li><a class="footer_link" href="/">{l}</a></li>)}</ul>
+        </div>
+        <p class="footer_legal text-style-list inset-optical" data-cap-offset="0.3395" data-figma="1:182">© Dr Tranter Aesthetics, {new Date().getFullYear()}<br />AHPRA registration MED0000000000</p>
+        <div class="footer_group stack gap-4 is-visit">
+          <p class="text-style-label" data-figma="1:168">Visit Us</p>
+          <p class="text-style-tight" data-figma="1:184">1/54 Jonson Street,<br />Byron Bay NSW 2481</p>
+          <p class="text-style-tight" data-figma="1:186">Mon 9am to 3pm<br />Tue to Fri 9am to 5pm (Thu until 6pm)<br />Sat 9am to 2pm</p>
+          <p class="text-style-tight" data-figma="1:185">(02) 6680 7819</p>
+        </div>
+        <div class="footer_group stack gap-4 is-connect is-muted">
+          <p class="text-style-label" data-figma="1:173">Connect</p>
+          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:181">{connect.map((l) => <li><a class="footer_link" href="/">{l}</a></li>)}</ul>
+        </div>
+        <div class="footer_group stack gap-4 is-legal is-muted">
+          <p class="text-style-label" data-figma="1:172">Legal</p>
+          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:180">{legal.map((l) => <li><a class="footer_link" href="/">{l}</a></li>)}</ul>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .footer_wrap {
+      display: flex;
+      flex-direction: column;
+      min-height: var(--band-footer);
+      padding-top: var(--section-space-small);
+      padding-bottom: var(--space-5);
+    }
+    .footer_layout {
+      flex: 1;
+      row-gap: var(--space-7);
+    }
+    .footer_logo {
+      grid-column: margin / end;
+    }
+    .footer_group {
+      grid-column: margin / end;
+      &.is-muted {
+        color: var(--text-2);
+      }
+    }
+    .footer_link {
+      color: inherit;
+      @media (hover: hover) {
+        &:hover {
+          color: var(--text);
+        }
+      }
+    }
+    .footer_list {
+      text-box: none;
+      margin-block: -0.3395em;
+    }
+    .footer_legal {
+      grid-column: margin / end;
+      color: var(--text-2);
+      text-box: none;
+      margin-block: -0.3395em;
+    }
+    @media (width >= 48rem) {
+      .footer_group {
+        grid-column: span 4;
+      }
+    }
+    @media (width >= 64rem) {
+      .footer_layout {
+        row-gap: 0;
+        grid-template-rows: auto 1fr auto;
+      }
+      .footer_logo {
+        grid-row: 1;
+        grid-column: margin / span 2;
+        align-self: start;
+        margin-top: calc(var(--text-label) * 0.721 - var(--logo) * 19.86 / 223.3);
+      }
+      .footer_group.is-structure,
+      .footer_group.is-surface,
+      .footer_group.is-clinic {
+        grid-row: 1;
+        align-self: start;
+      }
+      .footer_group.is-structure,
+      .footer_group.is-visit {
+        grid-column: main / span 3;
+      }
+      .footer_group.is-surface,
+      .footer_group.is-connect {
+        grid-column: half / span 3;
+      }
+      .footer_group.is-clinic,
+      .footer_group.is-legal {
+        grid-column: aside-text / span 2;
+      }
+      .footer_group.is-visit,
+      .footer_group.is-connect,
+      .footer_group.is-legal,
+      .footer_legal {
+        grid-row: 3;
+        align-self: end;
+      }
+      .footer_legal {
+        grid-column: margin / span 3;
+      }
+    }
+    @media (48rem <= width < 64rem) {
+      .footer_layout {
+        grid-template-rows: auto 1fr auto;
+        row-gap: var(--space-7);
+      }
+      .footer_logo {
+        grid-row: 1;
+        grid-column: margin / main;
+      }
+      .footer_group.is-structure,
+      .footer_group.is-surface,
+      .footer_group.is-clinic {
+        grid-row: 1;
+      }
+      .footer_group.is-structure,
+      .footer_group.is-visit {
+        grid-column: main / span 2;
+      }
+      .footer_group.is-surface,
+      .footer_group.is-connect {
+        grid-column: half / span 2;
+      }
+      .footer_group.is-clinic,
+      .footer_group.is-legal {
+        grid-column: aside-text / span 2;
+      }
+      .footer_group.is-visit,
+      .footer_group.is-connect,
+      .footer_group.is-legal,
+      .footer_legal {
+        grid-row: 3;
+        align-self: end;
+      }
+      .footer_legal {
+        grid-column: margin / main;
+      }
+    }
+  }
+</style>

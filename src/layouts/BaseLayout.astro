@@ -2,23 +2,30 @@
 import "@/styles/global.css";
 import BaseHead from "@/components/utility/BaseHead.astro";
 import SkipLink from "@/components/global/SkipLink.astro";
-import SiteHeader from "@/components/content/SiteHeader.astro";
-import SiteFooter from "@/components/content/SiteFooter.astro";
-import ClinicSchema from "@/components/system/ClinicSchema.astro";
+import Nav from "@/components/global/Nav.astro";
+import Footer from "@/components/global/Footer.astro";
 import Loader from "@/components/system/Loader.astro";
 import PageTransitions from "@/components/system/PageTransitions.astro";
 import SmoothScroll from "@/components/system/SmoothScroll.astro";
-import type { SeoProps, Theme } from "@/types.ts";
+import type { SeoProps } from "@/types.ts";
 import { SITE_LOCALE } from "@/consts.ts";
 import { finishes } from "@/utils/finishes.ts";
 import config from "../../op.config.json";
 
 type Props = SeoProps & {
   /** Theme for the whole page. `inherit` leaves the root defaults in place. */
-  theme?: Theme;
+  theme?: "inherit" | "light" | "dark" | "brand";
+  /**
+   * Fix the nav over the page rather than letting it stick in flow, so the
+   * first section starts underneath it. Give that section
+   * `paddingTop="navoverlap"` to clear the bar.
+   */
+  overlap?: boolean;
+  /** Set to `false` for a page with its own head (the concern pages). */
+  nav?: boolean;
 };
 
-const { theme = "inherit", ...seo } = Astro.props;
+const { theme = "inherit", overlap = false, nav = true, ...seo } = Astro.props;
 
 /* The finishing touches, each off until op.config.json turns it on (src/utils/finishes.ts): the loading screen, the
    transition between pages, the smooth scroll. A "custom" one without its file stands in as its first preset. */
@@ -61,12 +68,11 @@ const { smoothScroll } = finish;
   <body>
     {loader && <Loader part="cover" preset={loader} />}
     {transition && <PageTransitions part="body" preset={transition} />}
-    <SkipLink label="Skip to content" />
-    <SiteHeader />
+    <SkipLink />
+    <Nav overlap={overlap} render={nav} />
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <SiteFooter />
-    <ClinicSchema />
+    <Footer />
   </body>
 </html>

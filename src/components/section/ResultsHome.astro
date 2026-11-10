@@ -1,0 +1,144 @@
+---
+import Button from "@/components/Button.astro";
+import ResultCaption from "@/components/content/ResultCaption.astro";
+import Img from "@/components/media/Img.astro";
+import { getItems } from "@/utils/content";
+import { pic } from "@/utils/media";
+
+/* The four cases of the collection, in their order, set in the design's scattered composition: each place has its
+   own format (01 tall, 02 wide, 03 portrait, 04 landscape with its caption above). The page reads 02 first, as the
+   design does (title, then 02 at the top right). */
+const results = (await getItems("results")).slice(0, 4);
+const places = [
+  { n: 2, ratio: "ratio-16-10", ids: ["1:113", "1:116", "1:117", "1:193"], sizes: "(width >= 48rem) 25vw, 75vw" },
+  { n: 1, ratio: "ratio-7-10", ids: ["1:115", "1:121", "1:122", "1:192"], sizes: "(width >= 48rem) 35vw, 75vw" },
+  { n: 3, ratio: "", ids: ["1:118", "1:120", "1:119", "1:191"], sizes: "(width >= 48rem) 25vw, 75vw" },
+  { n: 4, ratio: "ratio-145", ids: ["1:125", "1:123", "1:124", "1:190"], sizes: "(width >= 48rem) 45vw, 100vw" },
+]
+  .filter((p) => results[p.n - 1])
+  .map((p) => ({ ...p, item: results[p.n - 1], index: `[${String(p.n).padStart(2, "0")}]` }));
+---
+
+<section class="results-home_wrap theme-stone" data-figma-band="results" data-band-top="3026">
+  <div class="results-home_layout site-grid" data-op-list="results" data-op-source="astro:results">
+    <h2 class="results-home_title text-style-h2" data-figma="1:114">Proof, not promises. <em>Real results</em>.</h2>
+    {places.map((p) => {
+      const media = p.item.data.image && (
+        <div class:list={["media", p.ratio]} data-figma={p.ids[0]}>
+          <Img {...pic(p.item.data.image)} alt={p.item.data.imageAlt ?? ""} variant="constrained" sizes={p.sizes} />
+        </div>
+      );
+      const caption = <ResultCaption index={p.index} name={p.item.data.name} ids={p.ids.slice(1)} />;
+      return (
+        <figure class={`results-home_item stack is-0${p.n}`} data-op-item={p.item.id}>
+          {p.n === 4 ? caption : media}
+          {p.n === 4 ? media : caption}
+        </figure>
+      );
+    })}
+    <div class="results-home_action at-end"><Button element="link" href="/results" data-figma="1:127">View all results</Button></div>
+  </div>
+</section>
+
+<style is:global>
+  @layer components {
+    .results-home_wrap {
+      padding-top: var(--site-margin);
+      padding-bottom: var(--site-margin);
+    }
+    .results-home_layout {
+      row-gap: var(--space-7);
+    }
+    .results-home_title {
+      grid-column: margin / end;
+      max-width: 16.7ch;
+    }
+    .results-home_item {
+      grid-column: margin / end;
+      --_gap-size: var(--space-media);
+      &.is-04 {
+        & > .result-caption_wrap {
+          align-self: stretch;
+        }
+      }
+    }
+    @media (width >= 48rem) {
+      .results-home_item > .result-caption_wrap {
+        align-self: start;
+      }
+      .results-home_layout {
+        row-gap: 0;
+        grid-template-rows: auto auto auto auto auto auto;
+      }
+      .results-home_title {
+        grid-row: 1;
+      }
+      .results-home_item.is-02 {
+        grid-row: 1 / span 2;
+        grid-column: aside / span 3;
+        display: grid;
+        grid-template-rows: subgrid;
+        row-gap: 0;
+        & > .result-caption_wrap {
+          margin-top: var(--space-media);
+        }
+      }
+      .results-home_item.is-01 {
+        grid-row: 2 / span 3;
+        grid-column: margin / span 4;
+        display: grid;
+        grid-template-rows: subgrid;
+        row-gap: 0;
+        & > .media {
+          grid-row: 1 / span 2;
+          margin-top: var(--space-media);
+        }
+        & > .result-caption_wrap {
+          grid-row: 3;
+          margin-top: var(--space-media);
+        }
+      }
+      .results-home_item.is-03 {
+        grid-row: 3 / span 2;
+        grid-column: half / span 3;
+        display: grid;
+        grid-template-rows: subgrid;
+        row-gap: 0;
+        & > .media {
+          grid-row: 1;
+          align-self: end;
+        }
+        & > .result-caption_wrap {
+          grid-row: 2;
+          margin-top: var(--space-media);
+        }
+      }
+      .results-home_item.is-04 {
+        grid-row: 5 / span 2;
+        grid-column: marker / span 5;
+        margin-top: calc(340 * var(--u));
+      }
+      .results-home_action {
+        grid-row: 6;
+        align-self: end;
+      }
+    }
+    @media (48rem <= width < 64rem) {
+      .results-home_item.is-02 {
+        grid-column: half / end;
+      }
+      .results-home_item.is-04 {
+        grid-column: inset / span 5;
+        margin-top: var(--section-space-medium);
+      }
+    }
+    @media (width < 48rem) {
+      .results-home_item.is-01 {
+        grid-column: margin / span 3;
+      }
+      .results-home_item:is(.is-02, .is-03) {
+        grid-column: span 3 / end;
+      }
+    }
+  }
+</style>

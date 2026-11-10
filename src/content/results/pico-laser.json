@@ -1,4 +1,6 @@
 {
-  "treatment": "Pico laser",
+  "name": "Pico Laser",
+  "image": "../../assets/content/results/pico-laser.jpg",
+  "imageAlt": "Pigmentation around the eye, after treatment",
   "order": 4
 }

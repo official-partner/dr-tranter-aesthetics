@@ -1,4 +1,6 @@
 {
-  "treatment": "Morpheus8",
+  "name": "Morpheus8",
+  "image": "../../assets/content/results/morpheus8.jpg",
+  "imageAlt": "Skin around the eye, after treatment",
   "order": 2
 }

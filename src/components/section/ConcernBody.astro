@@ -1,0 +1,244 @@
+---
+import Button from "@/components/Button.astro";
+import Img from "@/components/media/Img.astro";
+import { pic, type Pic } from "@/utils/media";
+import IndexList from "@/components/content/IndexList.astro";
+
+interface Card {
+  title: string;
+  text: string;
+  href: string;
+  link: string;
+  image?: { src: Pic; alt?: string };
+  ids?: string[];
+}
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** What is happening: the explanation and its three factors. */
+  happening?: { text?: string; steps?: { title: string; text: string; ids?: string[] }[] };
+  /** The recommended starting point. */
+  recommended?: Card;
+  /** Treatments also considered. */
+  also?: Card[];
+  /** Concerns often considered alongside. */
+  alongside?: Card[];
+}
+const { render = true, happening, recommended, also = [], alongside = [] } = Astro.props;
+const any = !!happening?.text || !!recommended || also.length > 0 || alongside.length > 0;
+---
+
+{
+  render && any && (
+    <section class="concern-body_wrap theme-stone" data-figma-band="stone" data-band-top="538">
+      {happening?.text && (
+        <div class="concern-body_block">
+          <div class="concern-body_layout site-grid">
+            <h2 class="concern-body_title text-style-h2" data-figma="1:364">What is happening</h2>
+            <p class="concern-body_text text-style-main" data-op-field="happening" data-figma="1:366">{happening.text}</p>
+            {happening.steps && <IndexList steps={happening.steps} variant="aside" class="concern-body_factors" />}
+          </div>
+        </div>
+      )}
+      {recommended && (
+      <div class="concern-body_block">
+        <div class="concern-body_layout site-grid">
+          <h2 class="concern-body_title text-style-h2" data-figma="1:365">What we would consider</h2>
+          <p class="concern-body_label text-style-label inset-optical" data-figma="1:392">Recommended starting point</p>
+          <span class="marker concern-body_marker" data-figma="1:389" />
+          <article class="concern-body_card is-wide">
+            {recommended.image && <div class="media ratio-145" data-figma={recommended.ids?.[0]}><Img {...pic(recommended.image.src)} alt={recommended.image.alt ?? ""} variant="constrained" sizes="(width >= 48rem) 45vw, 100vw" /></div>}
+            <div class="concern-body_caption">
+              <h3 class="text-style-index" data-figma={recommended.ids?.[1]}>{recommended.title}</h3>
+              <Button element="link" variant="link" href={recommended.href} data-figma={recommended.ids?.[3]}>{recommended.link}</Button>
+            </div>
+            {recommended.text && <p class="concern-body_card-text text-style-main" data-op-field="recommendedText" data-figma={recommended.ids?.[2]}>{recommended.text}</p>}
+          </article>
+        </div>
+      </div>
+      )}
+      {also.length > 0 && (
+      <div class="concern-body_block">
+        <div class="concern-body_layout site-grid">
+          <p class="concern-body_label text-style-label inset-optical" data-figma="1:393">Also considered</p>
+          <span class="marker concern-body_marker" data-figma="1:390" />
+          {also.map((c) => (
+            <article class="concern-body_card">
+              {c.image && <div class="media ratio-145" data-figma={c.ids?.[0]}><Img {...pic(c.image.src)} alt={c.image.alt ?? ""} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" /></div>}
+              <h3 class="text-style-index-caps" data-figma={c.ids?.[1]}>{c.title}</h3>
+              <p class="text-style-main" data-figma={c.ids?.[2]}>{c.text}</p>
+              <Button element="link" variant="link" href={c.href} data-figma={c.ids?.[3]}>{c.link}</Button>
+            </article>
+          ))}
+        </div>
+      </div>
+      )}
+      {alongside.length > 0 && (
+      <div class="concern-body_block">
+        <div class="concern-body_layout site-grid">
+          <p class="concern-body_label text-style-label inset-optical" data-figma="1:394">Often considered alongside</p>
+          <span class="marker concern-body_marker" data-figma="1:391" />
+          {alongside.map((c) => (
+            <article class="concern-body_card is-text">
+              <h3 class="text-style-index-caps" data-figma={c.ids?.[1]}>{c.title}</h3>
+              <p class="text-style-main" data-figma={c.ids?.[2]}>{c.text}</p>
+              <Button element="link" variant="link" href={c.href} data-figma={c.ids?.[3]}>{c.link}</Button>
+            </article>
+          ))}
+        </div>
+      </div>
+      )}
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .concern-body_block {
+      padding-top: var(--space-6);
+      padding-bottom: var(--space-10);
+      border-top: var(--border-width) solid var(--text-3);
+      &:first-child {
+        padding-top: var(--site-margin);
+        border-top: 0;
+      }
+    }
+    .concern-body_layout {
+      row-gap: var(--space-7);
+    }
+    .concern-body_title,
+    .concern-body_text,
+    .concern-body_label,
+    .concern-body_card {
+      grid-column: margin / end;
+    }
+    .concern-body_title {
+      max-width: 11ch;
+    }
+    .concern-body_marker {
+      display: none;
+    }
+    .concern-body_card {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 4;
+      row-gap: 0;
+      align-items: start;
+      & > :nth-child(2) {
+        margin-top: var(--space-media);
+      }
+      & > :nth-child(3) {
+        margin-top: var(--space-3);
+      }
+      & > :nth-child(4) {
+        margin-top: var(--space-4);
+      }
+      &.is-wide {
+        grid-row: span 3;
+      }
+      &.is-text {
+        grid-row: span 3;
+        & > :nth-child(2) {
+          margin-top: var(--space-3);
+        }
+        & > :nth-child(3) {
+          margin-top: var(--space-4);
+        }
+      }
+    }
+    .concern-body_caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .concern-body_card-text {
+      max-width: 44ch;
+    }
+    @media (width >= 48rem) {
+      .concern-body_layout {
+        row-gap: 0;
+      }
+      .concern-body_text {
+        grid-row: 1;
+        grid-column: main / span 4;
+      }
+      .concern-body_title {
+        grid-row: 1;
+        grid-column: margin / span 3;
+      }
+      .concern-body_factors {
+        grid-row: 1;
+      }
+      .concern-body_card {
+        grid-row: 1 / span 4;
+        grid-column: main / span 3;
+        &:nth-of-type(2) {
+          grid-column: third / span 3;
+        }
+        &.is-wide {
+          grid-row: 1 / span 3;
+          grid-column: main / span 5;
+        }
+        &.is-text {
+          grid-row: 1 / span 3;
+        }
+      }
+      .concern-body_label,
+      .concern-body_marker {
+        grid-row: 2;
+        align-self: start;
+        --_offset: var(--space-media);
+      }
+      .concern-body_label {
+        margin-top: var(--_offset);
+      }
+      .concern-body_block:has(.is-text) :is(.concern-body_label, .concern-body_marker) {
+        grid-row: 1;
+        --_offset: 0rem;
+      }
+      .concern-body_label {
+        grid-column: margin / marker;
+      }
+      .concern-body_marker {
+        display: block;
+        margin-top: calc(var(--_offset) + (max(var(--text-label-floor), var(--text-label)) * 0.721 - var(--marker)) / 2);
+      }
+    }
+    @media (48rem <= width < 64rem) {
+      .concern-body_title {
+        grid-column: margin / main;
+      }
+      .concern-body_text {
+        grid-column: main / end;
+      }
+      .concern-body_layout > .concern-body_factors {
+        grid-row: 2;
+        grid-column: main / end;
+        margin-top: var(--space-7);
+      }
+      .concern-body_label {
+        grid-column: margin / main;
+        text-wrap: wrap;
+      }
+      .concern-body_marker {
+        display: none;
+      }
+      .concern-body_card {
+        &:nth-of-type(2) {
+          grid-column: span 3 / end;
+        }
+        &.is-wide {
+          grid-column: main / span 4;
+        }
+      }
+    }
+    @media (width < 48rem) {
+      .concern-body_card:not(.is-wide, .is-text) {
+        grid-column: margin / span 3;
+        &:nth-of-type(2) {
+          grid-column: span 3 / end;
+        }
+      }
+    }
+  }
+</style>

@@ -1,0 +1,49 @@
+---
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Index, as written: [01]. */
+  index: string;
+  /** Treatment name. */
+  name: string;
+  /** Figma node ids for the build review: index, name, before / after. */
+  ids?: string[];
+  class?: string;
+}
+const { render = true, index, name, ids = [], class: className } = Astro.props;
+---
+
+{
+  render && (
+    <p class:list={["result-caption_wrap", className]}>
+      <span class="text-style-index" data-figma={ids[0]}>{index}</span>
+      <span class="result-caption_name text-style-index" data-op-field="name" data-figma={ids[1]}>{name}</span>
+      <span class="result-caption_toggle text-style-action" data-figma={ids[2]}>
+        Before <span class="result-caption_after">/ After</span>
+      </span>
+    </p>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .result-caption_wrap {
+      display: grid;
+      grid-template-columns: var(--index-slot) minmax(0, 1fr) auto;
+      align-items: center;
+      align-self: stretch;
+      column-gap: 0;
+      text-box: none;
+    }
+    .result-caption_name {
+      text-wrap: wrap;
+      padding-right: var(--space-2);
+    }
+    .result-caption_toggle {
+      justify-self: end;
+    }
+    .result-caption_after {
+      color: var(--text-2);
+    }
+  }
+</style>

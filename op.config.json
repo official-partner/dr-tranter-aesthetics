@@ -3,17 +3,17 @@
   "name": "Dr Tranter Aesthetics",
   "client": "Dr Tranter Aesthetics",
   "studio": "Official Partner",
-  "description": "The website of Dr Tranter Aesthetics.",
+  "description": "The website of Dr Tranter Aesthetics, a doctor-led cosmetic clinic in Byron Bay.",
   "staging": "",
   "domain": "",
   "live": false,
   "loader": false,
-  "transition": "fade",
-  "smoothScroll": "light",
+  "transition": false,
+  "smoothScroll": false,
   "brandColor": "#2C0F0A",
   "systemPages": [
     "composantes",
-    "test-contenu"
+    "style-sheet"
   ],
   "designWidth": 1728
 }

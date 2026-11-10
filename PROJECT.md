@@ -2,6 +2,29 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-10, Sam (12:04, « garde rien de ce qui a été fait hier… mets ta nouvelle version dedans »): the site is
+  rebuilt from scratch from the precision build test of Nov 9 to 10. The first build (Web System, components, home,
+  collections, wireframes and brand of Nov 9) is archived on the branch `archive/v1-premier-build` and nothing of it
+  is used. The base is the starter and its setup (commit 16a62e2). The system: DESIGN.md.
+- 2026-11-10, Sam: the CMS from scratch, five collections, each with a reason (CLAUDE.md, Content): `concerns` (a page
+  each, `/concerns/<slug>`, and listed on the home and in the footer; a concern gets its page once its opening
+  statement is filled, Melasma today), `treatments` (pages to come, named by the concern pages), `products` (listed on
+  several concern pages), `articles` (pages to come, the three latest on the home), `results` (the home and the
+  results page to come). The home's other lists are blocks of the page (the approach steps, marked for Modifier).
+  The concern page's factors and steps are lists inside the item: Contenu shows them read only, Claude edits them.
+- 2026-11-10, Sam: decisions over the Figma, logged in DESIGN.md and review/data: buttons tighter and their text at
+  14; index and treatment names in Sans Medium; one gap between an image and its text (`--space-media`, 16 at 1728);
+  image bands padded top and bottom like the side margin; Products padded the same top and bottom; tablet and phone
+  layouts on the grid (tablet keeps the computer's composition, phone alternates the images).
+- 2026-11-10, Claude: the footer's year is the current year (the Figma said 2027); the page-not-found is the site's
+  own, in English; the trial Season file is served on the review site, as agreed for OP's internal builds (licence
+  before launch). The site's description is a stand-in to confirm with the clinic: « Doctor-led cosmetic medicine in
+  Byron Bay, planned around the whole face. »
+- 2026-11-10, Claude: to supply, as before: the logo as SVG (the one in src/assets/logo is taken from the Figma),
+  final photos and their rights, real before and after pairs, the AHPRA number (MED0000000000 is a placeholder), the
+  booking tool, social addresses, the articles' real dates and texts, the products' own photos (the Figma shows
+  another brand's packaging).
+
 - 2026-10-28, Sam (20:07 and 20:15: Contenu v2, every change a draft): the staging reads what OP publishes;
   OP System's frame sends its draft proof (`x-op-draft`) with each page it asks for, the middleware renders the page
   within it (src/utils/draft.ts, AsyncLocalStorage, `nodejs_als` in wrangler.jsonc) and the loader hands it on to
@@ -96,91 +119,5 @@ One line per decision: the date, who asked, what was decided and why. The newest
 - 2026-10-17, Sam: the site starts from OP's starter `official-partner/op-astro` (Lumos for Astro 1.0.0). `main` is
   the live site, `review` the one OP System shows; content in files until a CMS is decided.
 
-## 2026-11-10, the home page (start, session home, asked by Samuel Charpentier)
-
-- `src/pages/index.astro` replaces the starter's first page (`StarterHome.astro` removed): opening (Burgundy), concerns
-  (Sand), approach (Mist), results (Stone), founder (Burgundy), journal (Sand), closing invitation (Stone), from wf-home
-  and Home.pdf, the copy word for word (« Alreay know what youre » corrected to « Already know what you're »).
-- Direction of the page: one job, help a visitor find their concern and book a consultation. The signature is the
-  concern index; the one orchestrated moment is the statement's lines rising. Everything else simply shows.
-- Photos: frames that say which photo goes there (opening, clinic, portrait, results, articles), supply s-photos and
-  s-before-after. Choosing the design's photos is not Claude's (the project's rules).
-- Font: the team's note on card c-font allows the trial font on the review site, but its file cannot be reached from
-  the session (the app's file address does not answer here): the system stand-ins stay, to replace in base.css.
-- Shared components touched: `ClosingInvitation` bottom space large to medium, `JournalCards` photos 4:3 to 3:2, both
-  to come closer to the design's section heights (every page that shows them follows).
-- Section heights at 1440 against Home.pdf scaled from 1728: opening +6 %, concerns -9 %, approach -8 %, results +8 %,
-  founder +4 %, journal +3 %, invitation -3 %, footer +5 %. A pixel comparison was not run: the design file is not
-  reachable from the session, the photos are placeholders and the font a stand-in, so it would measure those.
-- Title and description of the home written from the client's copy, to be validated by the team.
-- The two weights of the statement (first line light, the rest regular) are the components' trial split: to check
-  against the design.
-
-## 2026-11-10, the components (start, session components, asked by Samuel Charpentier)
-
-- Built from the Web System's tokens only, each with a sample on `composantes`: `Button` (restyled: outlined pill in the
-  round radius, label capitals, press feedback, the link variant with its arrow; card d-buttons), `Wordmark` (the name in
-  type until the logo SVG arrives), `SiteHeader` and `SiteMenu` (sticky Burgundy bar, Book pill shortening to « Book » on a
-  phone, menu panel in Mist with four lists and a photo, full screen on a phone with the Book pill fixed at the foot;
-  focus moves in, the page behind is inert, Escape and a click outside close it, focus returns to the button),
-  `SiteFooter` (3, 3 and 2 columns on a computer, the lists folded on a phone), `Statement` (the opening, CSS only: lines
-  rise from masks once; no GSAP needed, a loading screen would hold it), `SectionHead`, `ConcernIndex` (the signature:
-  a hover and focus preview, a tapped list on a phone and tablet; card c-concern-index), `StepList`, `ResultsScatter`
-  (scattered on a computer, a swipe row below; Before / After switch, After by default; cards c-before-after and
-  c-phone), `JournalCards` (dates day first; card c-dates), `ClosingInvitation`.
-- Layout: the starter's Nav and Footer are replaced by `SiteHeader` and `SiteFooter` (the old files are gone); the skip
-  link and the 404 are in English; `ClinicSchema` writes the MedicalClinic data from `src/data/site.ts`.
-- Collections (card c-collections): `concerns` (15, with their group and the design's summaries), `treatments` (19, with
-  their summaries, no category yet), `articles` (3, dated 22 January 2026), `results` (4). Labels in English, the
-  client's language. No photos yet: the frames say « Photo to supply ».
-- Global classes added: `.media-frame`, `.media-placeholder`, `.bracketed`, `.pill`, `.swipe-row` (and `.site-grid` got a
-  row gap, so a phone's stacked head and body do not touch). `.marker` is now used (section labels, the hovered concern).
-- Fix in the system: Sand and Mist now carry the light theme's roles (text, links, buttons); before, a Sand or Mist
-  block inside a Burgundy one (the menu panel under the header) kept the Burgundy roles.
-- Token added: `--logo-size` (22 to 27.5) and `--media-ratio`.
-- Decided: the concern preview photo is 2 columns wide, not the design's 3, and the hovered line is above it, so the
-  longest names are never covered; the photo is placed inside the list and centred on its line as far as it allows (a
-  small script, delegated, no layout shift). The Learn more pill sits on the photo's foot. The group label shows in
-  the left columns on the hovered line. The menu's lists are Structure, Surface, Clinic and Connect (the last two names
-  are ours). Concern pages are at /concerns/<slug>, other addresses are ours (src/data/site.ts): the pages are not
-  built, so those links lead to the 404 until they are. The footer keeps the design's AHPRA placeholder, flagged as
-  supply. The scatter's sizes and positions are ours: only the design's idea (four cases, four sizes) is kept.
-- Not built here: filter pills of the Treatments page and its empty state, the concern and treatment cards, form fields
-  beyond Lumos's (they follow the pages).
-
-## 2026-11-10, the Web System (start, session system, asked by Samuel Charpentier)
-
-- base.css rewritten from the design (DESIGN.md, The Web System): scale model A (390 to 1728, content capped at 1728),
-  grid 4 / 8 / 12 with the design's margin 24 and gutter 18, spacing from the design's own steps, four themes (Stone,
-  Sand, Mist, Burgundy) with Lumos's light, dark and brand kept as aliases, no accent colour.
-- Card c-scale (yes): fluid sizes in rem tokens. Card c-contrast (yes): Taupe `#654f45` and Taupe light `#7d695d` replace
-  the design's `#847165` and `#a8998a`, same hue (checked by script on Sand, Mist and Stone); small print on Burgundy
-  uses Dust. Card c-font (adjust, the team's note: the trial font is fine for the staging site): the trial file is still
-  not committed, the files are not in the repository, so the site wears system stand-ins (`--primary-family`,
-  `--serif-family`) and the licensed file replaces them with no other change.
-- Card c-motion (yes): op.config.json `transition` fade, `smoothScroll` light, loader off; durations and eases named in
-  base.css. `brandColor` #2C0F0A and the favicon regenerated (the initial on Burgundy) until the logo arrives.
-- Decided: provisional values (h4 to h6, text-large, label tracking, nav height 4.5rem, marker 0.5rem, tablet column
-  split, hover of the pill) are marked in base.css and DESIGN.md. Radii are 0 except the pill.
-- Global classes added: `.site-grid`, `.column-head`, `.column-body`, `.marker` (the marker was already decided as one
-  shared class, d-marker).
-- Types: a `Theme` type (src/types.ts) for Section, Card and the layout.
-
 ## 2026-11-09, setup (asked by Samuel Charpentier)
-
 - op.config.json: id dr-tranter-aesthetics, name and client Dr Tranter Aesthetics. src/consts.ts: SITE_NAME, SITE_DESCRIPTION (a plain placeholder: the Brief holds no description yet), SITE_LOCALE en. Worker name in wrangler.jsonc kept: dr-tranter-aesthetics.
-
-## 2026-11-09, reading of the design (start, asked by Samuel Charpentier)
-
-- Way: from scratch. Read the design in Marque (Home.pdf at 1728 px, images of the menu, Concerns, Melasma, Treatments,
-  Morpheus8) and the font file. Measures, direction and motion in DESIGN.md; the decision cards, problems, improvements
-  and supplies in OP System (« Lire et proposer »); the brand (provisional) and the wireframes of the 5 drawn pages in
-  OP System. Only the home page goes to the page list, as the team asked.
-- Font: SeasonCollectionVF-TRIAL.ttf (Displaay) forbids storage on a public server: it is never committed; the review
-  site uses a system stand-in until the licensed woff2 arrives.
-- Copy errors flagged, corrected at build: « Alreay know w hat youre lookin for? » (Already know what you're looking
-  for?), « Ready to talk about Morpheus8 ? » (no space), footer year 2027 (the build writes the current year), AHPRA
-  number MED0000000000 (placeholder, to supply).
-- Proposed (cards): fluid 390 to 1728 with the content capped at 1728; phone layouts drawn by the build; collections
-  concerns, treatments, articles, results; AA contrast for the secondary greys; no loader, fade transition, light smooth
-  scroll; a Before / After switch; /book as the one booking address; day-first dates.

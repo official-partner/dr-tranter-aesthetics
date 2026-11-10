@@ -128,7 +128,6 @@ const named = {
     <Tag
       class:list={[
         "button_wrap",
-        "text-style-label",
         emphasis !== "primary" && emphasis,
         variant !== "main" && variant,
         variant === "arrow" && direction === "back" && "back",
@@ -140,12 +139,9 @@ const named = {
       {...rest}
     >
       {isWritten && (
-        <span class="button_text text-style-trim">
+        <span class="button_text text-style-action">
           <Fragment set:html={content} />
         </span>
-      )}
-      {variant === "link" && (
-        <Icon class="button_mark button_arrow" src={arrow} variant="small" />
       )}
       {variant === "play" && (
         <Fragment>
@@ -170,21 +166,18 @@ const named = {
       justify-content: center;
       align-items: center;
       gap: 0.5em;
-      padding: 0.75em 1.5em;
+      padding: var(--pill-y) var(--pill-x);
       background-color: var(--button-background);
       color: var(--button-text);
       border: var(--border-width) solid var(--button-border);
       border-radius: var(--radius-round);
       text-decoration: none;
       text-align: center;
+      white-space: nowrap;
       transition:
         background-color var(--hover-duration) var(--hover-ease),
         color var(--hover-duration) var(--hover-ease),
-        border-color var(--hover-duration) var(--hover-ease),
-        scale var(--duration-faster) var(--hover-ease);
-      &:active:not(:disabled) {
-        scale: 0.97;
-      }
+        border-color var(--hover-duration) var(--hover-ease);
       @media (hover: hover) {
         &:hover:not(:disabled) {
           background-color: var(--button-background-hover);
@@ -203,39 +196,18 @@ const named = {
       &.link {
         --button-background: transparent;
         --button-text: var(--link-text);
-        --button-border: var(--link-border);
+        --button-border: transparent;
         --button-background-hover: transparent;
         --button-text-hover: var(--link-text-hover);
-        --button-border-hover: var(--link-border);
-
-        gap: 0.75em;
-        padding: 0.4em 0;
+        --button-border-hover: transparent;
+        padding: 0;
         border: 0;
-        border-bottom: var(--border-width) solid var(--button-border);
         border-radius: 0;
-        background-image: linear-gradient(
-          var(--link-border-hover),
-          var(--link-border-hover)
-        );
-        background-repeat: no-repeat;
-        background-origin: border-box;
-        background-position: 100% 100%;
-        background-size: 0 var(--border-width);
-        transition:
-          background-size calc(var(--hover-duration) * 2) var(--hover-ease),
-          color var(--hover-duration) var(--hover-ease),
-          border-color var(--hover-duration) var(--hover-ease);
-        & .button_arrow {
-          transition: translate var(--hover-duration) var(--hover-ease);
-        }
-        @media (hover: hover) {
-          &:hover:not(:disabled) {
-            background-position: 0 100%;
-            background-size: 100% var(--border-width);
-            & .button_arrow {
-              translate: 0.25em 0;
-            }
-          }
+        white-space: normal;
+        text-align: start;
+        justify-content: flex-start;
+        & > .button_text {
+          text-wrap: wrap;
         }
       }
       &:is(.play, .close, .arrow) {
