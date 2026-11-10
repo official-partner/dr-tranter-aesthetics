@@ -96,6 +96,26 @@ One line per decision: the date, who asked, what was decided and why. The newest
 - 2026-10-17, Sam: the site starts from OP's starter `official-partner/op-astro` (Lumos for Astro 1.0.0). `main` is
   the live site, `review` the one OP System shows; content in files until a CMS is decided.
 
+## 2026-11-10, the home page (start, session home, asked by Samuel Charpentier)
+
+- `src/pages/index.astro` replaces the starter's first page (`StarterHome.astro` removed): opening (Burgundy), concerns
+  (Sand), approach (Mist), results (Stone), founder (Burgundy), journal (Sand), closing invitation (Stone), from wf-home
+  and Home.pdf, the copy word for word (« Alreay know what youre » corrected to « Already know what you're »).
+- Direction of the page: one job, help a visitor find their concern and book a consultation. The signature is the
+  concern index; the one orchestrated moment is the statement's lines rising. Everything else simply shows.
+- Photos: frames that say which photo goes there (opening, clinic, portrait, results, articles), supply s-photos and
+  s-before-after. Choosing the design's photos is not Claude's (the project's rules).
+- Font: the team's note on card c-font allows the trial font on the review site, but its file cannot be reached from
+  the session (the app's file address does not answer here): the system stand-ins stay, to replace in base.css.
+- Shared components touched: `ClosingInvitation` bottom space large to medium, `JournalCards` photos 4:3 to 3:2, both
+  to come closer to the design's section heights (every page that shows them follows).
+- Section heights at 1440 against Home.pdf scaled from 1728: opening +6 %, concerns -9 %, approach -8 %, results +8 %,
+  founder +4 %, journal +3 %, invitation -3 %, footer +5 %. A pixel comparison was not run: the design file is not
+  reachable from the session, the photos are placeholders and the font a stand-in, so it would measure those.
+- Title and description of the home written from the client's copy, to be validated by the team.
+- The two weights of the statement (first line light, the rest regular) are the components' trial split: to check
+  against the design.
+
 ## 2026-11-10, the components (start, session components, asked by Samuel Charpentier)
 
 - Built from the Web System's tokens only, each with a sample on `composantes`: `Button` (restyled: outlined pill in the
