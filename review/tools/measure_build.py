@@ -7,6 +7,8 @@ args = sys.argv[3:]
 def opt(name, default=None):
     return args[args.index(name) + 1] if name in args else default
 hover, only, shot, width = opt('--hover'), opt('--only'), opt('--shot'), int(opt('--width', 1728))
+# the window's height: the home's opening fills the screen (100svh), so measure it in a window as tall as the Figma's band (928)
+height = int(opt('--height', 1000))
 target = json.load(open(opt('--target'))) if opt('--target') else {}
 d = json.load(open(fj)); keys = d['keys']
 def style(k):
@@ -37,7 +39,7 @@ JS = """() => {
 }"""
 with sync_playwright() as p:
     br = p.chromium.launch(executable_path='/usr/bin/google-chrome')
-    pg = br.new_page(viewport={'width': width, 'height': 1000})
+    pg = br.new_page(viewport={'width': width, 'height': height})
     pg.goto(url); pg.wait_for_timeout(600); pg.evaluate('document.fonts.ready')
     pg.evaluate("document.querySelectorAll('img[loading=lazy]').forEach(i => i.loading = 'eager')")
     pg.evaluate("window.scrollTo(0, document.body.scrollHeight)"); pg.wait_for_timeout(500); pg.evaluate("window.scrollTo(0, 0)"); pg.wait_for_timeout(300)

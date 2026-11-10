@@ -10,7 +10,7 @@ Then, against `http://127.0.0.1:4802`:
 
 | Check | Command | Expected |
 |---|---|---|
-| Positions against the Figma, Home, 1728 | `python3 review/tools/measure_build.py http://127.0.0.1:4802/ review/data/home-figma.json --target review/data/home-target.json --hover '[data-figma="1:83"]'` | 92 of 92 within 2 px of target |
+| Positions against the Figma, Home, 1728 | `python3 review/tools/measure_build.py http://127.0.0.1:4802/ review/data/home-figma.json --target review/data/home-target.json --hover '[data-figma="1:83"]' --height 928` (the opening fills the window: 928 is the Figma's) | 92 of 92 within 2 px of target |
 | The project's rules (no column numbers, no px, components) | `python3 review/tools/check_build.py .` | 0 failure |
 | Every grid on the site grid | `python3 review/tools/grid_check.py <url> 390,768,1023,1024,1440,1728` | 0 off the grid |
 | Rails proportional on the computer | `python3 review/tools/rail_check.py <url> 1024,1440` | 0 off proportion |

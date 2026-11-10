@@ -79,6 +79,10 @@ against the right edge), `marker` (the small square), `inset-optical` (the optic
 for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 
 ## Responsive
+- The home's opening fills the screen (`min-height: 100svh`, Sam, Nov 10, 13:13): its photo takes the room left and
+  scales down when it lacks some (a size container: width = min(its columns, the room's height × 5/6)), its
+  bottom-left corner fixed on its column; it never grows past its columns. Floor 12rem tall; below that the opening
+  grows. The Figma's band (928 at 1728) is a 1728 × 928 screen: the Home is measured in that window.
 - Tablet keeps the computer's composition on the 8-column rails, with the fewest changes: no image wider than 6 of
   8 columns, lists beside their image, the results scattered as on the computer. A list sits on the main rail (c3)
   like the concerns; the approach is title | list (c3, 3 columns) | image (3 columns at the right edge).

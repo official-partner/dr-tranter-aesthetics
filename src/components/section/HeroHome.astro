@@ -24,8 +24,10 @@ const { render = true } = Astro.props;
           </p>
         </div>
         <p class="hero-home_phone text-style-serif" data-figma="1:79">(02) 6680 7819</p>
-        <div class="hero-home_media media ratio-5-6" data-figma="1:76">
-          <img src="/img/hero.jpg" alt="A consultation at the clinic, two women seated at a small table by the window" width="550" height="663" />
+        <div class="hero-home_frame">
+          <div class="hero-home_media media ratio-5-6" data-figma="1:76">
+            <img src="/img/hero.jpg" alt="A consultation at the clinic, two women seated at a small table by the window" width="550" height="663" />
+          </div>
         </div>
       </div>
     </section>
@@ -34,10 +36,12 @@ const { render = true } = Astro.props;
 
 <style is:global>
   @layer components {
+    /* The home's opening fills the screen (100svh, Sam, Nov 10): the photo takes the room left and scales down when
+       it lacks some, its bottom-left corner fixed on its column. It never grows past its columns' width. */
     .hero-home_wrap {
       display: flex;
       flex-direction: column;
-      min-height: var(--band-hero);
+      min-height: 100svh;
       padding-top: calc(var(--site-margin) + var(--space-10));
       @media (width >= 64rem) {
         padding-top: var(--section-padding);
@@ -45,8 +49,17 @@ const { render = true } = Astro.props;
     }
     .hero-home_layout {
       flex: 1;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: auto minmax(0, 1fr);
       row-gap: var(--space-9);
+    }
+    .hero-home_frame {
+      container-type: size;
+      display: flex;
+      align-items: flex-end;
+      min-height: 12rem;
+    }
+    .hero-home_media {
+      width: min(100cqw, 100cqh * 5 / 6);
     }
     .hero-home_marker {
       display: none;
@@ -54,9 +67,6 @@ const { render = true } = Astro.props;
     .hero-home_title {
       grid-column: margin / end;
       max-width: 26.25ch;
-    }
-    .hero-home_media {
-      grid-column: margin / end;
     }
     .hero-home_visit {
       grid-column: margin / end;
@@ -75,10 +85,13 @@ const { render = true } = Astro.props;
         grid-column: main / end;
       }
       .hero-home_visit,
-      .hero-home_phone,
-      .hero-home_media {
+      .hero-home_phone {
         grid-row: 2;
         align-self: end;
+      }
+      .hero-home_frame {
+        grid-row: 2;
+        grid-column: main / span 4;
       }
       .hero-home_visit {
         grid-column: margin / inset;
@@ -86,13 +99,10 @@ const { render = true } = Astro.props;
       .hero-home_phone {
         grid-column: inset / marker;
       }
-      .hero-home_media {
-        grid-column: main / span 4;
-      }
     }
     @media (48rem <= width < 64rem) {
       .hero-home_layout {
-        grid-template-rows: auto 1fr auto;
+        grid-template-rows: auto minmax(0, 1fr) auto;
         row-gap: 0;
       }
       .hero-home_marker {
@@ -103,10 +113,9 @@ const { render = true } = Astro.props;
         grid-row: 1;
         grid-column: main / end;
       }
-      .hero-home_media {
+      .hero-home_frame {
         grid-row: 2 / span 2;
         grid-column: main / span 4;
-        align-self: end;
         margin-top: var(--space-9);
       }
       .hero-home_visit {
@@ -122,27 +131,25 @@ const { render = true } = Astro.props;
     }
     @media (width < 48rem) {
       .hero-home_layout {
-        grid-template-rows: none;
-        align-content: start;
+        grid-template-rows: auto minmax(0, 1fr) auto auto;
         row-gap: 0;
       }
-      .hero-home_media {
-        order: 1;
+      .hero-home_title {
+        grid-row: 1;
+        --_lead-marker: inline-block;
+      }
+      .hero-home_frame {
+        grid-row: 2;
         grid-column: span 3 / end;
         margin-top: var(--space-9);
       }
       .hero-home_visit {
-        order: 2;
+        grid-row: 3;
         margin-top: var(--space-9);
       }
       .hero-home_phone {
-        order: 3;
+        grid-row: 4;
         margin-top: var(--space-2);
-      }
-    }
-    @media (width < 48rem) {
-      .hero-home_title {
-        --_lead-marker: inline-block;
       }
     }
   }

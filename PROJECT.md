@@ -2,6 +2,10 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-10, Sam (13:13): the home's opening fills the screen (100svh) at every width; its photo scales down from its
+  bottom-left corner when the screen is short, so the whole opening shows. `band-hero` is no longer used by it. The
+  measure of the Home now runs in a 1728 × 928 window (`--height 928`), the Figma's opening.
+
 - 2026-11-10, Sam (13:10): the wide bottom is twice as large and the same everywhere: `--section-padding-wide` points
   at `section-space-large` (128 at 1728, 64 on tablet and phone); the closing invitation uses the role again instead
   of its own value. Every section that ends wide follows: the closing invitation, the journal, the products, the
