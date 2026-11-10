@@ -32,7 +32,7 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
   render && any && (
     <section class="concern-body_wrap theme-stone" data-figma-band="stone" data-band-top="538">
       {happening?.text && (
-        <div class="concern-body_block">
+        <div class="concern-body_block text-section">
           <div class="concern-body_layout site-grid">
             <h2 class="concern-body_title text-style-h2" data-figma="1:364">What is happening</h2>
             <p class="concern-body_text text-style-main" data-op-field="happening" data-figma="1:366">{happening.text}</p>
@@ -41,7 +41,7 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
         </div>
       )}
       {recommended && (
-      <div class="concern-body_block">
+      <div class="concern-body_block text-section">
         <div class="concern-body_layout site-grid">
           <h2 class="concern-body_title text-style-h2" data-figma="1:365">What we would consider</h2>
           <p class="concern-body_label text-style-label inset-optical" data-figma="1:392">Recommended starting point</p>
@@ -58,7 +58,7 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
       </div>
       )}
       {also.length > 0 && (
-      <div class="concern-body_block">
+      <div class="concern-body_block text-section">
         <div class="concern-body_layout site-grid">
           <p class="concern-body_label text-style-label inset-optical" data-figma="1:393">Also considered</p>
           <span class="marker concern-body_marker" data-figma="1:390" />
@@ -74,7 +74,7 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
       </div>
       )}
       {alongside.length > 0 && (
-      <div class="concern-body_block">
+      <div class="concern-body_block text-section">
         <div class="concern-body_layout site-grid">
           <p class="concern-body_label text-style-label inset-optical" data-figma="1:394">Often considered alongside</p>
           <span class="marker concern-body_marker" data-figma="1:391" />
@@ -95,11 +95,8 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
 <style is:global>
   @layer components {
     .concern-body_block {
-      padding-top: var(--space-6);
-      padding-bottom: var(--space-10);
       border-top: var(--border-width) solid var(--text-3);
       &:first-child {
-        padding-top: var(--site-margin);
         border-top: 0;
       }
     }

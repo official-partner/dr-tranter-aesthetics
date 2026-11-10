@@ -205,6 +205,8 @@
   /* Role tokens: one job each, pointing at a step of the scale (change the step, every use follows) */
   --space-media: var(--space-3);
   --space-stack: var(--space-10);
+  --band-padding: var(--site-margin);
+  --section-padding: var(--section-space-medium);
 
   /* Floors: reading text stops shrinking here (applied with max() in the text-style rules) */
   --text-main-floor: 0.812rem;

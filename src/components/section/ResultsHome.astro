@@ -19,7 +19,7 @@ const places = [
   .map((p) => ({ ...p, item: results[p.n - 1], index: `[${String(p.n).padStart(2, "0")}]` }));
 ---
 
-<section class="results-home_wrap theme-stone" data-figma-band="results" data-band-top="3026">
+<section class="results-home_wrap image-band theme-stone" data-figma-band="results" data-band-top="3026">
   <div class="results-home_layout site-grid" data-op-list="results" data-op-source="astro:results">
     <h2 class="results-home_title text-style-h2" data-figma="1:114">Proof, not promises. <em>Real results</em>.</h2>
     {places.map((p) => {
@@ -42,10 +42,6 @@ const places = [
 
 <style is:global>
   @layer components {
-    .results-home_wrap {
-      padding-top: var(--site-margin);
-      padding-bottom: var(--site-margin);
-    }
     .results-home_layout {
       row-gap: var(--space-stack);
     }

@@ -65,15 +65,24 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
 - Role tokens point at a step of the scale (`roles` in the JSON): `--space-media` = `space-3` (16 at 1728, 12 on
   tablet and phone) is the gap between an image and the first text of its card, everywhere (Sam, Nov 10). Change the
   step and every card follows.
-- A band whose image touches its edge has the same padding top and bottom as the side margin (Sam, Nov 10).
-- A section keeps the same padding top and bottom unless a reason is noted (Sam, Nov 10: Products).
+- Section padding, two values only (Sam, Nov 10: « uniformiser »), each a role token and a global class:
+  - `.image-band` (`--band-padding` = the side margin, 24 at 1728, 16 on tablet and phone): a band whose image
+    touches its edge. Hero, approach and How we treat, results, founder, a concern's opening.
+  - `.text-section` (`--section-padding` = `section-space-medium`, 64 at 1728, 48 on tablet and phone): every text
+    section and every block between two rules. Concerns, journal, products, the closing invitation, a concern's
+    body blocks.
+  - Two exceptions, both said where they are: the hero's top on a tablet and a phone clears the nav (margin plus
+    `space-10`); the footer opens like a text section and ends like an image band (its small print on the margin).
+  - Before: five values (24, 42, 48, 64, 128) chosen section by section from the Figma, whose section tops ranged
+    from 21 to 48 px. The Home's expected deviations from the Figma say it (review/data/home-target.json).
 - `--space-stack` = `space-10` (64 on tablet and phone) is the space between two stacked blocks: cards in a row
   once they stack, the results on a phone, the results' rows on a tablet (Sam, Nov 10: « faire respirer »).
 
 ## Global classes (`src/styles/project.css`)
 `site-grid` (the grid and its named lines), `stack` (a vertical stack, gap from a space token), `at-end` (an action
 against the right edge), `marker` (the small square), `inset-optical` (the optical indent of capitals),
-`media` (an image box: ratio class, the picture absolute, cover, centred; ratios 5:6, 1.45, 16:10, 9:7, 7:10, 1:1).
+`media` (an image box: ratio class, the picture absolute, cover, centred; ratios 5:6, 1.45, 16:10, 9:7, 7:10, 1:1),
+`image-band` and `text-section` (the two section paddings).
 
 ## Responsive
 - Tablet keeps the computer's composition on the 8-column rails, with the fewest changes: no image wider than 6 of

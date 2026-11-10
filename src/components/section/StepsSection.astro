@@ -29,7 +29,7 @@ const { render = true, title, steps, image, actions, theme = "inherit", tall = f
 
 {
   render && steps?.length > 0 && (
-    <section class:list={["steps-section_wrap", theme !== "inherit" && `theme-${theme}`, tall && "is-tall"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
+    <section class:list={["steps-section_wrap image-band", theme !== "inherit" && `theme-${theme}`, tall && "is-tall"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
       <div class="steps-section_layout site-grid">
         <h2 class="steps-section_title text-style-h2" data-figma={figma?.title} set:html={title} />
         <IndexList steps={steps} list={list} />
@@ -49,11 +49,8 @@ const { render = true, title, steps, image, actions, theme = "inherit", tall = f
     .steps-section_wrap {
       display: flex;
       flex-direction: column;
-      padding-top: var(--site-margin);
-      padding-bottom: var(--section-space-medium);
       &.is-tall {
         min-height: var(--band-approach);
-        padding-bottom: var(--site-margin);
       }
     }
     .steps-section_layout {

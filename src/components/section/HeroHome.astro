@@ -8,7 +8,7 @@ const { render = true } = Astro.props;
 
 {
   render && (
-    <section class="hero-home_wrap theme-dark" data-figma-band="hero" data-band-top="0">
+    <section class="hero-home_wrap image-band theme-dark" data-figma-band="hero" data-band-top="0">
       <div class="hero-home_layout site-grid">
         <span class="marker hero-home_marker" data-figma="1:75" />
         <h1 class="hero-home_title text-style-h2" data-figma="1:74">
@@ -38,11 +38,10 @@ const { render = true } = Astro.props;
       display: flex;
       flex-direction: column;
       min-height: var(--band-hero);
-      padding-top: calc(var(--site-margin) + var(--space-10));
+      padding-top: calc(var(--band-padding) + var(--space-10));
       @media (width >= 64rem) {
-        padding-top: var(--site-margin);
+        padding-top: var(--band-padding);
       }
-      padding-bottom: var(--site-margin);
     }
     .hero-home_layout {
       flex: 1;

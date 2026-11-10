@@ -25,7 +25,7 @@ const { render = true, name, statement, facts, image } = Astro.props;
 
 {
   render && (
-    <section class="concern-head_wrap" data-figma-band="top" data-band-top="0">
+    <section class="concern-head_wrap image-band" data-figma-band="top" data-band-top="0">
       <div class="concern-head_layout site-grid">
         <a class="concern-head_back text-style-action inset-optical" href="/concerns" data-figma="1:450"><span class="concern-head_arrow" aria-hidden="true">→</span>Back</a>
         <span class="marker concern-head_marker" data-figma="1:358" />
@@ -57,8 +57,6 @@ const { render = true, name, statement, facts, image } = Astro.props;
       display: flex;
       flex-direction: column;
       min-height: var(--band-concern);
-      padding-top: var(--site-margin);
-      padding-bottom: var(--site-margin);
     }
     .concern-head_layout {
       flex: 1;

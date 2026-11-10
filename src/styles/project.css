@@ -89,3 +89,16 @@
     --ratio: 1;
   }
 }
+
+/* A band whose image touches its edge (hero, approach, results, founder, a concern's opening): its top and bottom
+   padding is the side margin, so the image sits in the same frame on three sides (Sam, Nov 10) */
+.image-band {
+  padding-top: var(--band-padding);
+  padding-bottom: var(--band-padding);
+}
+
+/* A text section, or a block between two rules: one padding, the same at the top and the bottom (Sam, Nov 10) */
+.text-section {
+  padding-top: var(--section-padding);
+  padding-bottom: var(--section-padding);
+}

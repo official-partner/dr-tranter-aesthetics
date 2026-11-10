@@ -2,6 +2,10 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-10, Sam (12:47): smooth scroll on (Lenis, preset light, op.config.json). Section padding made uniform:
+  two values, `.image-band` (the side margin) and `.text-section` (`section-space-medium`), in place of five chosen
+  section by section from the Figma; the hero's top under the nav and the footer are the two exceptions (DESIGN.md).
+
 - 2026-11-10, Sam (11 comments in OP System, 12:31 to 12:36, tablet and phone): applied as rules of the system, not
   one-off fixes: `--space-stack` for stacked blocks; `at-end` at the left on a phone; action rows on one line below
   the computer; the approach on the main rail on a tablet with its image on 3 columns; results 03 at the right edge

@@ -18,7 +18,7 @@ const {
 
 {
   render && (
-    <section class="cta-band_wrap theme-stone" id="consultation" data-figma-band="cta" data-band-top={figma.top}>
+    <section class="cta-band_wrap text-section theme-stone" id="consultation" data-figma-band="cta" data-band-top={figma.top}>
       <div class="cta-band_layout site-grid">
         <p class="cta-band_label text-style-label inset-optical" data-figma={figma.label}>Where to start?</p>
         <span class="marker cta-band_marker" data-figma={figma.marker} />
@@ -33,11 +33,6 @@ const {
 
 <style is:global>
   @layer components {
-    .cta-band_wrap {
-      min-height: var(--band-cta);
-      padding-top: var(--site-margin);
-      padding-bottom: var(--section-space-small);
-    }
     .cta-band_layout {
       align-items: start;
       row-gap: var(--space-5);

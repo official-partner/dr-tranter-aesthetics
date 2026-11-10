@@ -25,7 +25,7 @@ const { render = true, title = "Products we would recommend", products } = Astro
 
 {
   render && products?.length > 0 && (
-    <section class="products-section_wrap theme-mist" data-figma-band="mist" data-band-top="3101">
+    <section class="products-section_wrap text-section theme-mist" data-figma-band="mist" data-band-top="3101">
       <div class="products-section_layout site-grid">
         <h2 class="products-section_title text-style-h2" data-figma="1:436">{title}</h2>
         <CardRow data-op-list="products" data-op-source="astro:products">
@@ -44,10 +44,6 @@ const { render = true, title = "Products we would recommend", products } = Astro
 
 <style is:global>
   @layer components {
-    .products-section_wrap {
-      padding-top: var(--section-space-medium);
-      padding-bottom: var(--section-space-medium);
-    }
     .products-section_layout {
       row-gap: calc(55 * var(--u));
     }

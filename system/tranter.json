@@ -239,6 +239,14 @@
     "space-stack": {
       "ref": "space-10",
       "job": "entre deux blocs empilés (cartes, résultats) en tablette et en téléphone, partout (Sam, 10 nov : faire respirer)"
+    },
+    "band-padding": {
+      "ref": "site-margin",
+      "job": "haut et bas d'une bande dont l'image touche le bord : la marge latérale (Sam, 10 nov)"
+    },
+    "section-padding": {
+      "ref": "section-space-medium",
+      "job": "haut et bas de toute section de texte, et de chaque bloc entre deux filets (Sam, 10 nov : un seul padding de section)"
     }
   },
   "floors": {

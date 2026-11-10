@@ -14,7 +14,7 @@ const items = (await getItems("concerns")).map(({ id, data }) => ({
 }));
 ---
 
-<section class="concerns-home_wrap" data-figma-band="concerns" data-band-top="927.89">
+<section class="concerns-home_wrap text-section" data-figma-band="concerns" data-band-top="927.89">
   <div class="concerns-home_layout site-grid">
     <h2 class="concerns-home_title text-style-h2" data-figma="1:80">Where would you like to <em>start?</em></h2>
     <ConcernIndex items={items} />
@@ -24,10 +24,6 @@ const items = (await getItems("concerns")).map(({ id, data }) => ({
 
 <style is:global>
   @layer components {
-    .concerns-home_wrap {
-      padding-top: var(--section-space-small);
-      padding-bottom: var(--section-space-small);
-    }
     .concerns-home_layout {
       row-gap: var(--space-7);
     }
