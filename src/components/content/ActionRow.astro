@@ -9,15 +9,13 @@ interface Props {
   /** The quiet link set against the right edge. */
   link?: { label: string; href: string; figma?: string };
   class?: string;
-  /** Tablet: start at the margin instead of the main rail (when the content above starts at the margin). */
-  tabletRail?: "main" | "margin";
 }
-const { render = true, pill, link, class: className, tabletRail = "main" } = Astro.props;
+const { render = true, pill, link, class: className } = Astro.props;
 ---
 
 {
   render && pill && (
-    <div class:list={["action-row_wrap", tabletRail === "margin" && "is-margin", className]}>
+    <div class:list={["action-row_wrap", className]}>
       <Button element="link" href={pill.href} data-figma={pill.figma}>{pill.label}</Button>
       {link && <Button element="link" variant="link" href={link.href} class="at-end" data-figma={link.figma}>{link.label}</Button>}
     </div>
@@ -28,37 +26,21 @@ const { render = true, pill, link, class: className, tabletRail = "main" } = Ast
   @layer components {
     .action-row_wrap {
       grid-column: margin / end;
-      display: grid;
-      grid-template-columns: subgrid;
+      display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      & > :first-child {
-        grid-column: margin / span 2;
-        justify-self: start;
-      }
-      @media (width < 64rem) {
-        row-gap: var(--space-4);
-        & > .at-end {
-          grid-row: 2;
-          justify-self: start;
-        }
+      column-gap: var(--space-5);
+      row-gap: var(--space-4);
+      @media (48rem <= width < 64rem) {
+        grid-column: main / end;
       }
       @media (width >= 64rem) {
+        display: grid;
+        grid-template-columns: subgrid;
+        column-gap: normal;
         & > :first-child {
           grid-column: main / span 2;
-        }
-      }
-    }
-    @media (48rem <= width < 64rem) {
-      .action-row_wrap.is-margin > .at-end {
-        grid-row: 1;
-        justify-self: end;
-      }
-      .action-row_wrap:not(.is-margin) {
-        & > :first-child {
-          grid-column: main / span 2;
-        }
-        & > .at-end {
-          grid-column: main / end;
+          justify-self: start;
         }
       }
     }

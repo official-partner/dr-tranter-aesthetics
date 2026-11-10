@@ -51,6 +51,11 @@ const { render = true } = Astro.props;
       display: flex;
       align-items: center;
       gap: var(--space-4);
+      @media (width < 48rem) {
+        grid-row: 1;
+        grid-column: span 2 / end;
+        justify-self: end;
+      }
     }
     .nav_toggle {
       display: flex;

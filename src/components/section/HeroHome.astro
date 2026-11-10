@@ -122,8 +122,23 @@ const { render = true } = Astro.props;
       }
     }
     @media (width < 48rem) {
+      .hero-home_layout {
+        grid-template-rows: none;
+        align-content: start;
+        row-gap: 0;
+      }
       .hero-home_media {
+        order: 1;
         grid-column: span 3 / end;
+        margin-top: var(--space-9);
+      }
+      .hero-home_visit {
+        order: 2;
+        margin-top: var(--space-9);
+      }
+      .hero-home_phone {
+        order: 3;
+        margin-top: var(--space-2);
       }
     }
   }

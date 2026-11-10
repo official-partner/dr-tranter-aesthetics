@@ -2,6 +2,12 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-10, Sam (11 comments in OP System, 12:31 to 12:36, tablet and phone): applied as rules of the system, not
+  one-off fixes: `--space-stack` for stacked blocks; `at-end` at the left on a phone; action rows on one line below
+  the computer; the approach on the main rail on a tablet with its image on 3 columns; results 03 at the right edge
+  on a tablet; the hero's photo after its title on a phone, the phone number close to the address; the nav's button
+  and menu on the logo's line; the footer's small print last and its groups two by two from 30rem. DESIGN.md says each.
+
 - 2026-11-10, Sam (12:04, « garde rien de ce qui a été fait hier… mets ta nouvelle version dedans »): the site is
   rebuilt from scratch from the precision build test of Nov 9 to 10. The first build (Web System, components, home,
   collections, wireframes and brand of Nov 9) is archived on the branch `archive/v1-premier-build` and nothing of it

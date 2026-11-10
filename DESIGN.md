@@ -67,6 +67,8 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
   step and every card follows.
 - A band whose image touches its edge has the same padding top and bottom as the side margin (Sam, Nov 10).
 - A section keeps the same padding top and bottom unless a reason is noted (Sam, Nov 10: Products).
+- `--space-stack` = `space-10` (64 on tablet and phone) is the space between two stacked blocks: cards in a row
+  once they stack, the results on a phone, the results' rows on a tablet (Sam, Nov 10: « faire respirer »).
 
 ## Global classes (`src/styles/project.css`)
 `site-grid` (the grid and its named lines), `stack` (a vertical stack, gap from a space token), `at-end` (an action
@@ -75,7 +77,15 @@ against the right edge), `marker` (the small square), `inset-optical` (the optic
 
 ## Responsive
 - Tablet keeps the computer's composition on the 8-column rails, with the fewest changes: no image wider than 6 of
-  8 columns, lists beside their image, the results scattered as on the computer.
+  8 columns, lists beside their image, the results scattered as on the computer. A list sits on the main rail (c3)
+  like the concerns; the approach is title | list (c3, 3 columns) | image (3 columns at the right edge).
+- Below the computer an action row is one line when it fits (the pill, then the link), on the main rail on a
+  tablet, at the margin on a phone; a long link wraps under.
+- On a phone an action set against the right edge (`at-end`) sits at the left, close under its title (Sam, Nov 10,
+  a rule for the whole site); the nav keeps its button and menu at the right, on the logo's line.
+- On a phone the hero shows its photo right after the title, then Byron Bay, the address and the phone close
+  together; the footer's small print is its last line, and its groups go two by two from 30rem (480 px), where two
+  columns hold the longest line.
 - Phone: text full width, images alternate (3 columns left, 3 columns right, the last of a group full width), as on
   manœuvre. Cards in a row (journal, products): tablet left, right, centred; phone left, right, full.
 

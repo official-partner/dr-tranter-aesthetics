@@ -44,6 +44,12 @@ const posts = (await getItems("articles")).slice(0, 3).map(({ id, data }, i) => 
     }
     .journal-home_layout {
       row-gap: var(--space-11);
+      @media (width < 48rem) {
+        row-gap: var(--space-5);
+        & > .card-row_wrap {
+          margin-top: calc(var(--space-11) - var(--space-5));
+        }
+      }
     }
     .journal-home_title {
       grid-column: margin / end;

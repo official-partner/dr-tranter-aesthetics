@@ -38,7 +38,7 @@ const { render = true, title, steps, image, actions, theme = "inherit", tall = f
             <Img {...pic(image.src)} alt={image.alt ?? ""} variant="constrained" sizes="(width >= 48rem) 40vw, 75vw" />
           </div>
         )}
-        {actions && <ActionRow class="steps-section_actions" pill={actions.pill} link={actions.link} tabletRail="margin" />}
+        {actions && <ActionRow class="steps-section_actions" pill={actions.pill} link={actions.link} />}
       </div>
     </section>
   )
@@ -83,14 +83,18 @@ const { render = true, title, steps, image, actions, theme = "inherit", tall = f
       }
     }
     @media (48rem <= width < 64rem) {
+      .steps-section_title {
+        grid-row: 1;
+        grid-column: margin / main;
+      }
       .steps-section_layout > .index-list_wrap {
-        grid-row: 2;
-        grid-column: margin / half;
+        grid-row: 1;
+        grid-column: main / span 3;
         align-self: start;
       }
       .steps-section_media {
-        grid-row: 2;
-        grid-column: half / end;
+        grid-row: 1;
+        grid-column: span 3 / end;
         align-self: start;
       }
       .steps-section_actions {

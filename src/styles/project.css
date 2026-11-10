@@ -37,6 +37,9 @@
 .at-end {
   grid-column: half / end;
   justify-self: end;
+  @media (width < 48rem) {
+    justify-self: start;
+  }
 }
 
 /* The small square that marks a row, at the marker rail, level with the cap top of its row */

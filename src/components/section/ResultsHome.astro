@@ -47,7 +47,7 @@ const places = [
       padding-bottom: var(--site-margin);
     }
     .results-home_layout {
-      row-gap: var(--space-7);
+      row-gap: var(--space-stack);
     }
     .results-home_title {
       grid-column: margin / end;
@@ -127,9 +127,15 @@ const places = [
       .results-home_item.is-02 {
         grid-column: half / end;
       }
+      .results-home_item.is-01 {
+        margin-top: var(--space-stack);
+      }
+      .results-home_item.is-03 {
+        grid-column: span 3 / end;
+      }
       .results-home_item.is-04 {
         grid-column: inset / span 5;
-        margin-top: var(--section-space-medium);
+        margin-top: var(--space-stack);
       }
     }
     @media (width < 48rem) {
