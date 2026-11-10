@@ -42,8 +42,8 @@ const { render = true, steps, variant = "main", list, class: className } = Astro
       display: grid;
       grid-template-columns: subgrid;
       row-gap: var(--space-6);
-      /* below the computer the list is a plain column, so it can sit on any rail */
-      @media (width < 64rem) {
+      /* on a tablet the list is a plain column, so it can sit on any rail */
+      @media (48rem <= width < 64rem) {
         display: flex;
         flex-direction: column;
       }
@@ -53,10 +53,19 @@ const { render = true, steps, variant = "main", list, class: className } = Astro
       display: flex;
       gap: var(--space-4);
       align-items: start;
-      @media (width >= 64rem) {
+      @media (width < 48rem) or (width >= 64rem) {
         display: grid;
         grid-template-columns: subgrid;
         gap: normal;
+      }
+    }
+    /* phone: the number on the first column, the text on the three others (Sam, Nov 10) */
+    @media (width < 48rem) {
+      .index-list_index {
+        grid-column: margin / span 1;
+      }
+      .index-list_body {
+        grid-column: span 3 / end;
       }
     }
     .index-list_text {
