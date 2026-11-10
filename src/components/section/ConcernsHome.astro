@@ -23,6 +23,7 @@ const items = (await getItems("concerns")).map(({ id, data }) => ({
 </section>
 
 <style is:global>
+  /* the list starts under the title (comment 26): a concern's group, shown on hover in the left column, never lands on the title */
   @layer components {
     .concerns-home_layout {
       row-gap: var(--space-7);
@@ -32,23 +33,13 @@ const items = (await getItems("concerns")).map(({ id, data }) => ({
       max-width: 12.2ch;
     }
     @media (width >= 64rem) {
-      .concerns-home_title {
-        grid-row: 1;
-      }
-      .concerns-home_layout > .concern-index_list {
-        grid-row: 1;
-      }
       .concerns-home_actions {
         margin-top: calc(144 * var(--u) - var(--space-7));
       }
     }
     @media (48rem <= width < 64rem) {
       .concerns-home_title {
-        grid-row: 1;
         grid-column: margin / main;
-      }
-      .concerns-home_layout > .concern-index_list {
-        grid-row: 1;
       }
     }
   }
