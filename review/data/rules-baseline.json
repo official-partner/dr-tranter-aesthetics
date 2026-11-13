@@ -1,0 +1,25 @@
+{
+  "note": "Failures of npm run rules the team accepts, each with its reason and its date. The list only shrinks: a build stops on a failure that is not here.",
+  "accepted": [
+    {
+      "key": "raw-value | src/components/global/Nav.astro | @layer components >> .nav_wrap | z-index: 10 (z-index)",
+      "why": "From before the rule (Nov 12): the nav's layer becomes a named token (--layer-nav) at the next change of the system file.",
+      "date": "2026-11-12"
+    },
+    {
+      "key": "text-style | src/components/system/ComponentSample.astro | @layer components >> .component-sample_bar | font-size, line-height",
+      "why": "The starter's own component, counted as Tranter's since one line of it changed (overflow-wrap): the text of the team's components page, not the site's.",
+      "date": "2026-11-12"
+    },
+    {
+      "key": "text-style | src/components/system/ComponentSample.astro | @layer components >> .component-sample_name | font-size, letter-spacing, text-transform",
+      "why": "The starter's own component, counted as Tranter's since one line of it changed (overflow-wrap): the text of the team's components page, not the site's.",
+      "date": "2026-11-12"
+    },
+    {
+      "key": "copied-block | src/components/system/StyleSheet.astro | @layer components >> .style-sheet_spaces | the same as @layer components >> .style-sheet_ratio",
+      "why": "The style sheet page's own layout (the team's tool): two lists drawn the same way.",
+      "date": "2026-11-12"
+    }
+  ]
+}

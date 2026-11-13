@@ -1,26 +1,96 @@
-# Precision checks
+# review/: what the checks read
 
-The checks that hold this site to its Figma, at every width. Python 3 with Playwright (`pip install playwright`) and
-a Chrome or Chromium (`/usr/bin/google-chrome` by default in the scripts). Build first (`npm run build`), then serve
-`dist/`:
+The files a site's checks read, written while the design is read and as the team decides (OP's skill op-web-system,
+The design as data and The target). They are the memory of a build: a session restarts from them, never from what it
+remembers. The pictures and the comparison a check produces stay out of git (`shots/`, `.compare/`).
 
-    python3 review/tools/serve.py dist 4802 &
+## review/data/<page>-figma.json: the design as data
 
-Then, against `http://127.0.0.1:4802`:
+One file per designed page, named as `npm run shot` names the page (`accueil`, `a-propos`, `concerns-melasma`; `home`
+is read for `accueil` too). Written by script from what the Figma connector gives, never typed: the frame's width and
+every text and shape with its box, in the frame's own pixels.
 
-| Check | Command | Expected |
-|---|---|---|
-| Positions against the Figma, Home, 1728 | `python3 review/tools/measure_build.py http://127.0.0.1:4802/ review/data/home-figma.json --target review/data/home-target.json --hover '[data-figma="1:83"]' --height 928` (the opening fills the window: 928 is the Figma's) | 92 of 92 within 2 px of target |
-| The project's rules (no column numbers, no px, components) | `python3 review/tools/check_build.py .` | 0 failure |
-| Every grid on the site grid | `python3 review/tools/grid_check.py <url> 390,768,1023,1024,1440,1728` | 0 off the grid |
-| Rails proportional on the computer | `python3 review/tools/rail_check.py <url> 1024,1440` | 0 off proportion |
-| Type against the Figma's styles | `python3 review/tools/type_check.py <url> review/data/home-figma.json` (or melasma-figma.json) | only the listed decisions |
-| Images start and end on a column | `python3 review/tools/media_rail.py <url> 390,820,1728` | 0 off the grid |
-| One gap between an image and its text | `python3 review/tools/media_gap.py <url> 390,820,1728` | one value per width |
-| Captures, three widths side by side | `python3 review/tools/shoot_responsive.py <out dir> 1728,820,390` | |
+```json
+{
+  "frame": "1:55",
+  "width": 1728,
+  "height": 7650,
+  "texts": [
+    {
+      "id": "1:64",
+      "x": 40,
+      "y": 22,
+      "w": 207,
+      "h": 24,
+      "size": 27.5,
+      "lineHeight": 23.7,
+      "align": "left",
+      "family": "Tranter Mix",
+      "weight": 420,
+      "letterSpacing": -0.28,
+      "text": "Tranter Aesthetics"
+    }
+  ],
+  "shapes": [
+    {
+      "id": "1:61",
+      "name": "band hero",
+      "x": 0,
+      "y": 0,
+      "w": 1728,
+      "h": 928,
+      "fill": "#2c0f0a",
+      "radius": 0
+    }
+  ]
+}
+```
 
-- `review/data/home-target.json`: each expected deviation from the raw Figma, with its reason (a correction of the
-  method, or a decision of the team with its date). A change of the design adds its line here, with its reason.
-- `review/data/type-decisions.json`: the team's decisions over a Figma text style; the type check applies them and
-  counts them apart.
-- `data-figma` attributes in the pages tie each element to its Figma node, for these checks only.
+`npm run measure` reads `id`, `x`, `y`, `w`, `h`, and for a text `size`, `lineHeight` (in px) and `align` (`left`,
+`right`, `center`); every other field is for the survey (families, weights, fills, radii). Tranter's first form (rows
+`T` and `S` with `T_fields`, `S_fields` and `keys`) is still read.
+
+## review/data/<page>-target.json: the design corrected by the system
+
+The corrections list and the target are one object: each expected difference between the build and the raw design,
+with its reason. A slip of the design brought back to the system, or a decision of the team with its date and who
+asked. An element that is not here is expected where the design has it.
+
+```json
+{
+  "_window": [1728, 928],
+  "1:76": {
+    "d": [-0.5, 1.75],
+    "why": "image on 4 columns at 5:6, band height kept"
+  },
+  "1:65": { "abs": [24, 24], "why": "logo as an SVG: its box at the margin" },
+  "1:90": { "size": 14, "why": "Sam, Nov 10: the buttons' text at 14" }
+}
+```
+
+- `d`: moved by `[dx, dy]` px from the design. `abs`: at `[x, y]` in its band. `abs_x`: its x only.
+- `size`: a text's size, when the team decided another than the design's.
+- `why`: always. `npm run measure` lists the entries without one.
+- `_window`: the window the page is measured in, when it matters (an opening that fills the screen).
+
+## In the page
+
+- `data-figma="<node id>"` on an element: it is that node of the design. Left in the built page: it weighs a few bytes
+  and it is what lets a correction be measured months later.
+- `data-figma-band="<name>"` and `data-band-top="<y in the frame>"` on a section: its elements are placed from its top,
+  so a section that grew does not move every section under it.
+
+## review/data/rules-baseline.json: the failures the team accepts
+
+Written by `npm run rules -- --accept` on a site that has debt, then by hand: each failure of `npm run rules` the team
+accepts, with its `why` and its date. A build stops on a failure that is not in it. The list only shrinks.
+
+## Tranter
+
+- The home: `npm run measure -- accueil --hover '[data-figma="1:83"]'` (the hovered row of the concerns list is part of
+  the design): 92 of 92 on the target, in a window 1728 by 928 (`_window`: the opening fills the screen, 928 is the
+  Figma's). `npm run widths -- accueil concerns-melasma`: 0 failure at the nine widths.
+- `review/tools/*.py` are the first form of these checks, written on Nov 10 (Python and Playwright): `npm run rules`,
+  `measure` and `widths` replace check_build, measure_build, grid_check, rail_check and media_rail. Two have no
+  command yet and are still run as they are: `type_check.py` (each text against its Figma style, with
+  `review/data/type-decisions.json`) and `media_gap.py` (one gap between an image and its text).

@@ -154,6 +154,20 @@ One line per decision: the date, who asked, what was decided and why. The newest
 - 2026-10-17, Sam: the site starts from OP's starter `official-partner/op-astro` (Lumos for Astro 1.0.0). `main` is
   the live site, `review` the one OP System shows; content in files until a CMS is decided.
 
+
+## 2026-11-12, the starter's checks (asked by Samuel Charpentier, « GO! lance ca! »)
+- The site takes the starter's four checks (`npm run rules`, `measure`, `widths`, `compare`), its shot script (it
+  waits for every image, whole) and the rule check in the build. Nothing of the site changes: compared before and
+  after, 5 pages of HTML, 10 pictures and 18 presses the same.
+- The home measures 92 of 92 on its target (`npm run measure -- accueil --hover '[data-figma="1:83"]'`). Comment 26
+  (the concerns list under its title) had moved 8 elements about 123 px off the target: the decision is now in
+  `review/data/home-target.json` with its date. The target also loses one entry of the first method (1:81: a text is
+  placed by its first letter now) and names its window (1728 by 928).
+- Four failures of the rules are accepted, each with its reason (`review/data/rules-baseline.json`): the nav's layer
+  written as a number, the team's two tool components.
+- Not done here: the system file in the starter's new form (system/tranter.json and gen.py stay as they are), the
+  short CLAUDE.md, the type and image-gap checks (still `review/tools/type_check.py` and `media_gap.py`).
+
 ## 2026-11-09, setup (asked by Samuel Charpentier)
 - op.config.json: id dr-tranter-aesthetics, name and client Dr Tranter Aesthetics. src/consts.ts: SITE_NAME, SITE_DESCRIPTION (a plain placeholder: the Brief holds no description yet), SITE_LOCALE en. Worker name in wrangler.jsonc kept: dr-tranter-aesthetics.
 

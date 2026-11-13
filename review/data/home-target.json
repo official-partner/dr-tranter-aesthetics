@@ -1,5 +1,9 @@
 {
  "_note": "Expected deviations of the build from the raw Figma, at 1728, section-relative (dx, dy in px). Each one comes from a listed correction or a system rule. Residual = measured - expected must stay within 2 px (positions).",
+ "_window": [
+  1728,
+  928
+ ],
  "1:65": {
   "abs": [
    24,
@@ -36,61 +40,60 @@
   "why": "C5 phone on column 3 ; Sam, 10 nov : bas de section = marge latérale (24), -6"
  },
  "1:81": {
-  "abs_x": 24,
   "d": [
    0,
-   -29.47
+   93.3
   ],
-  "why": "rule: caps aligned with the heading, list rail is a subgrid from the margin ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40"
+  "why": "rule: caps aligned with the heading (the list is a subgrid from the margin, its text starts on the main rail as drawn) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +122.8"
  },
  "1:84": {
   "d": [
    0,
-   -32.6
+   89.4
   ],
-  "why": "list -5.47 and hover item on its line -3.12 (C12) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40"
+  "why": "list -5.47 and hover item on its line -3.12 (C12) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +122.0"
  },
  "1:82": {
   "d": [
    0,
-   -32.6
+   91.0
   ],
-  "why": "same row as the hover item ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40"
+  "why": "same row as the hover item ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +123.6"
  },
  "1:88": {
   "d": [
    0,
-   -32.6
+   90.2
   ],
-  "why": "same row as the hover item ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40"
+  "why": "same row as the hover item ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +122.8"
  },
  "1:83": {
   "d": [
    0,
-   -32.6
+   90.2
   ],
-  "why": "list -5.47 and hover item on its line -3.12 ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40"
+  "why": "list -5.47 and hover item on its line -3.12 ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +122.8"
  },
  "1:188": {
   "d": [
    19.8,
-   -34.1
+   89.6
   ],
-  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40"
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +123.7"
  },
  "1:90": {
   "d": [
    0.0,
-   -24.3
+   99.4
   ],
-  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40"
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +123.7"
  },
  "1:92": {
   "d": [
    35.4,
-   -26.3
+   97.1
   ],
-  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40"
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +123.4"
  },
  "1:95": {
   "d": [

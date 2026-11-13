@@ -298,6 +298,41 @@ cover. How to build with Lumos: AGENTS.md, below.
   installed (`PLAYWRIGHT_BROWSERS_PATH`: /opt/pw-browsers in Claude's cloud sessions), else Google Chrome. Without any,
   it says what to install.
 
+## The checks
+- Four commands close a step (OP's skill op-web-system, Checks). Each prints what it found and exits 1 on a failure:
+  - `npm run rules`: the rules a site holds to stay one system, on its sources. No CSS in a page; no text style
+    outside the system; a place across the grid is a rail and a span, never a column number; no copied block; each
+    global class of project.css used in 3 places, 15 at most, none under a name Lumos uses; no raw px, hex, duration
+    or z-index; no `!important`; no fact (an email, a phone, a postal code, an outside link) written in two files;
+    every component with its sample. It reads project.css and the components made or changed for the site: the
+    starter's library as it came is not the site's to fix.
+  - `npm run measure -- <page>`: each element tied to the design (`data-figma="<node id>"`) against the design
+    corrected by the system, at the design's width: 2 px for a place, 1 px for a text's size. review/README.md says
+    the two files it reads and how a section is a band of the design.
+  - `npm run widths -- <page>`: at nine widths, nothing overflows from 320 px, every page grid (`.site-grid`) sits on
+    the site's margin and every image frame (`.media`) on its columns; on a two-segment scale (`--viewport-min` at
+    1024) every element keeps its place in proportion and the large headings break on the same words.
+  - `npm run compare -- save`, the change, then `npm run compare`: the HTML, the pictures and what every button and
+    link to a place does, before and after a change that must change nothing people see (a clean-up, an upgrade of
+    the starter). Its pictures of what differs are in `.compare/diff/`: look at them.
+- Which, by what changed: a component or a style, `rules`; a designed page or a correction on one, `measure` and
+  `widths`; a clean-up, `compare` around it. Say the numbers in the reply (« 92 sur 92 dans la cible, aucune règle
+  brisée ») and what was not run.
+- Every build runs the rules (integrations/op-system.mjs): on a machine it stops on a failure the team has not
+  accepted, so no session pushes without seeing it; on Cloudflare it warns and site.json carries the count
+  (`system.rules`), so the review is never blocked. `npm run shot` and the other checks build whatever the rules say;
+  `OP_RULES=warn npm run build` does too.
+- A failure the team accepts lives in `review/data/rules-baseline.json` with its reason and its date (`npm run rules --
+  --accept` writes today's failures there, on a site that has debt; then each gets its `why`). The list only shrinks:
+  never accept a failure a change just made, fix it in the system.
+- `OP_SITE=<folder> npm run widths -- accueil` looks at another site with this copy of the scripts (a site not brought
+  up to date yet). In op-astro only: after a change to a library component, `npm run rules -- --library`
+  (scripts/lib/library.json holds a fingerprint of every version of the library's files, which is how a site knows
+  the ones it changed).
+- A site prepares its pages before they are looked at in `scripts/site-page.mjs`, when it needs to: a consent choice
+  already made, a notice closed, so the pictures show the page. It exports `prepare(page, { name, width, args })`, run
+  by the shots and the checks before each page loads.
+
 ## Lumos
 - New CSS is the last resort (LUMOS.md, New style checklist).
 - A treatment several of the site's components share (two declarations or more seen in three places: the same gap
