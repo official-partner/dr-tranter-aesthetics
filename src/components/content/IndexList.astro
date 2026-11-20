@@ -55,8 +55,10 @@ const { render = true, steps, variant = "main", numbered = true, list, source, c
         flex-direction: column;
       }
     }
+    /* an item is as wide as what it shows, never the whole grid: in OP System's Edit its outline is its own, and the
+       title and text beside it stay reachable (Sam, Nov 20) */
     .index-list_item {
-      grid-column: margin / end;
+      grid-column: 1 / -1;
       display: flex;
       gap: var(--space-4);
       align-items: start;
@@ -91,6 +93,12 @@ const { render = true, steps, variant = "main", numbered = true, list, source, c
       grid-column: margin / end;
     }
     @media (width >= 64rem) {
+      .index-list_wrap {
+        grid-column: main / span 4;
+      }
+      .index-list_wrap.aside {
+        grid-column: aside / end;
+      }
       .index-list_index {
         grid-column: main;
       }

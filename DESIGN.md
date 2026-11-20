@@ -28,6 +28,8 @@ design slips corrected, never redesigned.
   aside-text c11, end. Tablet keeps the names on 8 columns (margin c1, inset and marker c2, main and detail c3, half
   and third c5, aside and aside-text c7); on a phone every name is at the margin.
 - Components place their parts on these names, never on column numbers (`review/tools/check_build.py` checks it).
+- An item of a list spans only its own columns, never the whole grid (Sam, Nov 20): OP System's Edit outlines the item,
+  and what sits beside it stays reachable.
 
 ## Type
 Season Collection, one variable file (`public/fonts/SeasonCollectionVF-TRIAL.ttf`), its SERF axis giving Sans (0),

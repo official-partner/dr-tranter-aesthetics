@@ -2,6 +2,13 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (« les items, quand je les édite, prennent la pleine largeur de l'écran »): an item of a list is as
+  wide as what it shows, never the whole grid. IndexList's items spanned the 12 columns (1680 at 1728) with their texts
+  placed on their own columns, so in Edit an item's outline covered the title and the text beside it and took their
+  clicks (the focus list, the steps of Our Approach and the home, a concern's factors and steps). The list now sits on
+  its own columns (main and the three after it; the aside to the end) and its items fill it. Measured the same (home
+  92 of 92, Our Approach 31 of 31), 0 failure at the nine widths.
+
 - 2026-11-20, Sam (« enchaîne avec approach »): Our Approach at `/approach` (Simon's path), from the Figma frame 59:828,
   measured 31 of 31 on its target (review/data/approach-figma.json, approach-target.json, each difference with its
   reason). The footer's « Our approach » and the home's « Learn more » go there.
