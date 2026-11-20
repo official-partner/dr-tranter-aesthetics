@@ -1,0 +1,157 @@
+---
+import { clinicLinks, connectLinks, concernLinks } from "@/utils/site-links";
+
+const { structure, surface } = await concernLinks();
+const groups = [
+  { name: "Structure", key: "structure", links: structure.map((c) => ({ label: c.name, href: c.href, id: c.id })), concerns: true },
+  { name: "Surface", key: "surface", links: surface.map((c) => ({ label: c.name, href: c.href, id: c.id })), concerns: true },
+  { name: "The Clinic", key: "clinic", links: clinicLinks },
+  { name: "Connect", key: "connect", links: connectLinks },
+];
+---
+
+{/* The menu (Figma 59:191, its note: « slides the menu down from the top of the screen, over the page you were on,
+    which dims behind it until the menu is closed »). Inside the nav's header, under its bar; opened by Nav's button. */}
+<div class="menu_scrim" data-menu-scrim aria-hidden="true"></div>
+<div class="menu_wrap theme-mist" id="site-menu" data-menu-panel hidden>
+  <div class="menu_layout site-grid">
+    <nav class="menu_groups" aria-label="Menu">
+      {groups.map((g) => (
+        <div class:list={["menu_group stack gap-4", `is-${g.key}`]}>
+          <p class="text-style-label">{g.name}</p>
+          <ul class="link-list text-style-list" data-op-list={g.concerns ? "concerns" : undefined} data-op-source={g.concerns ? "astro:concerns" : undefined}>
+            {g.links.map((l) => (
+              <li data-op-item={g.concerns ? (l as { id?: string }).id : undefined}>
+                <a href={l.href} data-op-field={g.concerns ? "name" : undefined}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </nav>
+    <div class="menu_media media">
+      <img src="/img/approach.jpg" alt="Two women talking in the clinic" width="402" height="498" loading="lazy" />
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  @layer components {
+    /* the page dims behind the open menu */
+    .menu_scrim {
+      position: fixed;
+      inset: 0;
+      background-color: color-mix(in srgb, var(--ink) var(--tone-faint), transparent);
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity var(--open-duration) var(--open-ease),
+        visibility 0s linear var(--open-duration);
+    }
+    /* the panel slides down from the top, under the nav's bar */
+    .menu_wrap {
+      position: fixed;
+      inset: 0 0 auto;
+      max-height: 100svh;
+      overflow-y: auto;
+      /* the first labels just under the nav's bar (the Figma's 92 at 1728) */
+      padding-top: calc(var(--site-margin) + var(--space-8));
+      /* as much below the last links as above the first labels; on a large screen the photo ends it, on the margin */
+      padding-bottom: calc(var(--site-margin) + var(--space-8));
+      @media (width >= 64rem) {
+        padding-bottom: var(--site-margin);
+      }
+      background-color: var(--background);
+      color: var(--text);
+      translate: 0 -100%;
+      transition: translate var(--open-duration) var(--open-ease);
+      &[hidden] {
+        display: block;
+        visibility: hidden;
+      }
+    }
+    html[data-menu="open"] {
+      overflow: hidden;
+      & .menu_wrap {
+        translate: 0 0;
+      }
+      & .menu_scrim {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity var(--open-duration) var(--open-ease);
+      }
+      & .nav_wrap {
+        position: fixed;
+      }
+    }
+    .menu_groups {
+      grid-column: margin / end;
+      display: grid;
+      grid-template-columns: subgrid;
+      row-gap: var(--space-8);
+    }
+    /* phone: the groups two by two, as the footer's */
+    .menu_group {
+      grid-column: margin / span 2;
+      @media (width < 48rem) {
+        &:nth-child(even) {
+          grid-column: span 2 / end;
+        }
+      }
+    }
+    .menu_media {
+      display: none;
+    }
+    /* tablet: the concerns on the content columns, the clinic's links on the last two */
+    @media (48rem <= width < 64rem) {
+      .menu_group {
+        grid-column: main / span 2;
+        &.is-surface {
+          grid-row: 2;
+        }
+        &.is-clinic,
+        &.is-connect {
+          grid-column: aside / end;
+        }
+        &.is-clinic {
+          grid-row: 1;
+        }
+        &.is-connect {
+          grid-row: 2;
+        }
+      }
+    }
+    /* computer: the concerns from the main rail, the clinic's links from the half rail, the photo on the aside */
+    @media (width >= 64rem) {
+      .menu_groups {
+        grid-column: margin / aside;
+        grid-row: 1;
+      }
+      .menu_group {
+        grid-column: main / span 3;
+        &.is-structure {
+          grid-row: 1;
+        }
+        &.is-surface {
+          grid-row: 2;
+        }
+        &.is-clinic,
+        &.is-connect {
+          grid-column: half / span 2;
+        }
+        &.is-clinic {
+          grid-row: 1;
+        }
+        &.is-connect {
+          grid-row: 2;
+        }
+      }
+      .menu_media {
+        display: block;
+        grid-row: 1;
+        grid-column: aside / end;
+        align-self: start;
+      }
+    }
+  }
+</style>

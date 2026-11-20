@@ -1,6 +1,7 @@
 ---
 import Logo from "@/components/content/Logo.astro";
 import Button from "@/components/Button.astro";
+import Menu from "@/components/global/Menu.astro";
 
 interface Props {
   /** Set to `false` to omit the component. */
@@ -16,14 +17,15 @@ const { render = true, theme = "dark" } = Astro.props;
 
 {
   render && (
-    <header class:list={["nav_wrap", `theme-${theme}`]} data-figma-band="header">
+    <header class:list={["nav_wrap", `theme-${theme}`]} data-figma-band="header" data-nav-theme={theme}>
+      <Menu />
       <div class="nav_inner site-grid">
         <Logo class="nav_logo" data-figma="1:65" />
         <div class="nav_actions at-end">
           <Button element="link" href="#consultation" data-figma="1:67">
             Book a consultation
           </Button>
-          <button class="nav_toggle" type="button" aria-label="Menu" aria-expanded="false" data-figma="1:69">
+          <button class="nav_toggle" type="button" aria-label="Open the menu" aria-expanded="false" aria-controls="site-menu" data-menu-toggle data-figma="1:69">
             <span class="nav_toggle_line" />
             <span class="nav_toggle_line" />
             <span class="nav_toggle_line" />
@@ -43,7 +45,9 @@ const { render = true, theme = "dark" } = Astro.props;
       padding-top: var(--site-margin);
       background-color: transparent;
     }
+    /* the bar over the open menu */
     .nav_inner {
+      position: relative;
       align-items: start;
     }
     .nav_logo {
@@ -71,6 +75,71 @@ const { render = true, theme = "dark" } = Astro.props;
       display: block;
       height: var(--border-width);
       background-color: currentcolor;
+      transform-origin: center;
+      transition:
+        translate var(--open-duration) var(--open-ease),
+        rotate var(--open-duration) var(--open-ease),
+        opacity var(--open-duration) var(--open-ease);
+    }
+    /* open: the three lines become the close cross (Figma 59:191) */
+    .nav_toggle[aria-expanded="true"] .nav_toggle_line {
+      &:nth-child(1) {
+        translate: 0 calc(var(--burger) * 11.77 / 18.53 / 2 - var(--border-width) / 2);
+        rotate: 45deg;
+      }
+      &:nth-child(2) {
+        opacity: 0;
+      }
+      &:nth-child(3) {
+        translate: 0 calc((var(--burger) * 11.77 / 18.53 / 2 - var(--border-width) / 2) * -1);
+        rotate: -45deg;
+      }
     }
   }
 </style>
+
+<script>
+  import { onPage } from "@/utils/page";
+  import { pageLenis } from "@/utils/smooth-scroll";
+
+  /* The menu: opened and closed by the nav's button, closed by Escape, the scrim or a link; the page behind it inert
+     and still; the nav's bar takes the menu's colours while it is open; focus goes in, then back to the button. */
+  onPage((signal) => {
+    const root = document.documentElement;
+    const nav = document.querySelector<HTMLElement>(".nav_wrap");
+    const menu = document.getElementById("site-menu");
+    const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+    const scrim = document.querySelector<HTMLElement>("[data-menu-scrim]");
+    if (!nav || !menu || !toggle) return;
+    const page = () => [...document.querySelectorAll<HTMLElement>("main, footer")];
+    const original = nav.dataset.navTheme ?? "dark";
+
+    const set = (open: boolean) => {
+      if (open) menu.hidden = false;
+      if (open) root.dataset.menu = "open";
+      else delete root.dataset.menu;
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Close the menu" : "Open the menu");
+      nav.classList.toggle(`theme-${original}`, !open);
+      nav.classList.toggle("theme-mist", open);
+      page().forEach((el) => (el.inert = open));
+      const lenis = pageLenis();
+      if (lenis) open ? lenis.stop() : lenis.start();
+      if (open) menu.querySelector<HTMLElement>("a")?.focus({ preventScroll: true });
+      else {
+        toggle.focus({ preventScroll: true });
+        /* hidden again once the panel is up, so it leaves the tab order */
+        const end = () => { if (root.dataset.menu !== "open") menu.hidden = true; };
+        const wait = parseFloat(getComputedStyle(menu).transitionDuration) * 1000 || 0;
+        window.setTimeout(end, wait + 50);
+      }
+    };
+
+    toggle.addEventListener("click", () => set(root.dataset.menu !== "open"), { signal });
+    scrim?.addEventListener("click", () => set(false), { signal });
+    menu.addEventListener("click", (e) => { if ((e.target as HTMLElement).closest("a")) set(false); }, { signal });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && root.dataset.menu === "open") set(false); }, { signal });
+    signal.addEventListener("abort", () => { if (root.dataset.menu === "open") set(false); });
+  });
+</script>
+

@@ -1,27 +1,14 @@
 ---
 import Logo from "@/components/content/Logo.astro";
-import { getItems } from "@/utils/content";
+import { clinicLinks, connectLinks, legalLinks, concernLinks } from "@/utils/site-links";
 
 interface Props {
   /** Set to `false` to omit the component. */
   render?: boolean;
 }
 const { render = true } = Astro.props;
-const concerns = await getItems("concerns");
-const link = (c: (typeof concerns)[number]) => ({ id: c.id, name: c.data.name, href: c.data.statement ? `/concerns/${c.id}` : "/concerns" });
-const structure = concerns.filter((c) => c.data.group === "Structure").map(link);
-const surface = concerns.filter((c) => c.data.group === "Surface").map(link);
-/* the clinic's pages: an address once the page is built (Simon's brief, Nov 19, A2), the home until then */
-const clinic = [
-  { label: "All treatments", href: "/" },
-  { label: "Our approach", href: "/approach" },
-  { label: "Results", href: "/" },
-  { label: "Our team", href: "/" },
-  { label: "The Clinic", href: "/" },
-  { label: "Journal", href: "/" },
-];
-const connect = ["Contact", "Careers", "Facebook", "Instagram"];
-const legal = ["Risks and complications", "Privacy policy", "Terms", "Complaints"];
+const { structure, surface } = await concernLinks();
+const connect = connectLinks.filter((l) => l.footer !== false);
 ---
 
 {
@@ -31,15 +18,15 @@ const legal = ["Risks and complications", "Privacy policy", "Terms", "Complaints
         <Logo class="footer_logo" data-figma="1:167" />
         <div class="footer_group stack gap-4 is-structure">
           <p class="text-style-label" data-figma="1:169">Structure</p>
-          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:174" data-op-list="concerns" data-op-source="astro:concerns">{structure.map((c) => <li data-op-item={c.id}><a class="footer_link" href={c.href} data-op-field="name">{c.name}</a></li>)}</ul>
+          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:174" data-op-list="concerns" data-op-source="astro:concerns">{structure.map((c) => <li data-op-item={c.id}><a href={c.href} data-op-field="name">{c.name}</a></li>)}</ul>
         </div>
         <div class="footer_group stack gap-4 is-surface">
           <p class="text-style-label" data-figma="1:170">Surface</p>
-          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:175" data-op-list="concerns" data-op-source="astro:concerns">{surface.map((c) => <li data-op-item={c.id}><a class="footer_link" href={c.href} data-op-field="name">{c.name}</a></li>)}</ul>
+          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:175" data-op-list="concerns" data-op-source="astro:concerns">{surface.map((c) => <li data-op-item={c.id}><a href={c.href} data-op-field="name">{c.name}</a></li>)}</ul>
         </div>
         <div class="footer_group stack gap-4 is-clinic">
           <p class="text-style-label" data-figma="1:171">The Clinic</p>
-          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:179">{clinic.map((l) => <li><a class="footer_link" href={l.href}>{l.label}</a></li>)}</ul>
+          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:179">{clinicLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
         </div>
         <p class="footer_legal text-style-list inset-optical" data-cap-offset="0.3395" data-figma="1:182">© Dr Tranter Aesthetics, {new Date().getFullYear()}<br />AHPRA registration MED0000000000</p>
         <div class="footer_group stack gap-4 is-visit">
@@ -50,11 +37,11 @@ const legal = ["Risks and complications", "Privacy policy", "Terms", "Complaints
         </div>
         <div class="footer_group stack gap-4 is-connect is-muted">
           <p class="text-style-label" data-figma="1:173">Connect</p>
-          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:181">{connect.map((l) => <li><a class="footer_link" href="/">{l}</a></li>)}</ul>
+          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:181">{connect.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
         </div>
         <div class="footer_group stack gap-4 is-legal is-muted">
           <p class="text-style-label" data-figma="1:172">Legal</p>
-          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:180">{legal.map((l) => <li><a class="footer_link" href="/">{l}</a></li>)}</ul>
+          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:180">{legalLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
         </div>
       </div>
     </footer>
@@ -82,18 +69,6 @@ const legal = ["Risks and complications", "Privacy policy", "Terms", "Complaints
       &.is-muted {
         color: var(--text-2);
       }
-    }
-    .footer_link {
-      color: inherit;
-      @media (hover: hover) {
-        &:hover {
-          color: var(--text);
-        }
-      }
-    }
-    .footer_list {
-      text-box: none;
-      margin-block: -0.3395em;
     }
     .footer_legal {
       grid-column: margin / end;

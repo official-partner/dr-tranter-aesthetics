@@ -2,6 +2,19 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (« vas-y avec prêt maintenant », step 2): the menu. The nav's button opens it on every page, from the
+  Figma frame « Menu nav » (59:191): a mist panel slides down under the bar, the bar takes its colours and the three
+  lines become a cross. Four groups: Structure and Surface (the concerns of the collection, in their order, each marked
+  for Edit), The Clinic and Connect; the approach photo on the right on a computer, none on a tablet or a phone (the
+  links need the room). It closes on the cross, Escape, the scrim or a link; the page behind is inert and still (Lenis
+  stopped), focus goes to the first link and back to the button.
+  - The links of the menu and the footer come from one file, `src/utils/site-links.ts` (a link written once), and share
+    the new global class `link-list` (no underline; on hover the link moves a little right and a small square shows
+    before it, as the Figma's hover).
+  - Not in the Figma, decided here: the panel's foot on a tablet and a phone mirrors its top (no photo ends it there).
+  - A link whose page is not built yet (All treatments, Results, Our team, The Clinic, Journal, Contact, Careers) and the
+    social links (no address given yet: Facebook, Instagram, LinkedIn) point to the home, as the footer did; each gets
+    its address with its page or its URL.
 - 2026-11-20, Sam (« vas-y avec prêt maintenant »): the Concerns page at `/concerns`, from the Figma frame 59:602,
   53 of 53 on its target (review/data/concerns-figma.json, concerns-target.json). Every concern by group, each card from
   its item: its photo, its name, its new field `summary` (the Figma's card text, kept word for word), a link only once

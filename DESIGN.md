@@ -78,7 +78,7 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
 against the right edge), `marker` (the small square), `inset-optical` (the optical indent of capitals),
 `media` (an image box: ratio class, the picture absolute, cover, centred; ratios 5:6, 1.45, 16:10, 9:7, 7:10, 1:1;
 a frame whose photo is still to come stays, empty, on `--background-skeleton`, so the composition holds: Nov 20),
-`section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
+`link-list` (a list of plain links: no underline, on hover the link slides `--space-2` right and a square 0.8 marker shows before it; the menu and the footer, Nov 20), `stacked-card` (a card's picture as wide as the card, its texts stacked: Card, the journal, the products), `section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
 for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 
 ## Motion
