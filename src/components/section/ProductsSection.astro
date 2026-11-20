@@ -31,7 +31,8 @@ const { render = true, title = "Products we would recommend", products } = Astro
         <CardRow data-op-list="products" data-op-source="astro:products">
           {products.map((p) => (
             <li class="products-section_item" data-op-item={p.id}>
-              {p.image && <div class="media ratio-145" data-figma={p.ids?.[0]}><Img {...pic(p.image)} alt={p.imageAlt ?? ""} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" /></div>}
+              {/* the frame stays, empty, while a product's photo is still to come (DESIGN.md, Global classes: media) */}
+              <div class="media ratio-145" data-figma={p.ids?.[0]}>{p.image && <Img {...pic(p.image)} alt={p.imageAlt ?? ""} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" />}</div>
               <h3 class="products-section_name text-style-h3" data-op-field="name" data-figma={p.ids?.[1]}>{p.name}</h3>
               {p.text && <p class="products-section_text text-style-note" data-op-field="text" data-figma={p.ids?.[2]}>{p.text}</p>}
             </li>

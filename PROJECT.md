@@ -2,6 +2,29 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (Simon's « CLOP master brief » of Nov 19 for the content, the method of Nov 10 for the build; the
+  new Figma file « Tranter (Client) », same design as the first one, other node ids): the site's pages are declined
+  one at a time, each shown to Sam before the next. First page: Volume loss and hollowing on the concern template.
+  - Slugs follow Simon's paths (`/concerns/volume-loss`, `jawline-and-chin`, `skin-laxity`, `expression-lines`,
+    `pigmentation`, `redness`, `texture-and-scarring`, `congestion`, `dullness`, `neck-chest-hands`,
+    `weight-management`; treatment `cosmelan`). Nothing was live: no redirect.
+  - Sam: the blocks Simon's brief leaves empty on a concern (the recommended starting point, « How we treat » in four
+    steps) get placeholder copy in the brand's tone, drawn from Simon's text: the first treatment he lists is the
+    starting point. Placeholders for Sarah to rewrite.
+  - Photos as the Figma places them, all stand-ins: a concern's opening photo is its card's on the Concerns overview
+    (the design repeats about six photos over fifteen concerns); a treatment's is its card's on the Home or a
+    treatment page (Cosmetic Treatments, FaceTite and EMFACE share one in the Figma); « How we treat » keeps the
+    template's photo. Exported at the design's size (the session's network does not reach figma.com: the Figma
+    connector's render). A product with no photo yet keeps its frame, empty (DESIGN.md, Global classes).
+  - Simon's copy corrected and listed: the statement takes the Concerns overview's version (« among the earliest
+    signs », not « one of the most treatable »: no superlative); the factors' grammar (« develop », « progress », « occur »,
+    the comma splices); « before the skin itself changes: the effect is structural ». Simon's tag (« Changes in facial
+    volume ») has no place in the design: not shown. Consultation length and « Assessed by » as on Melasma, to confirm.
+  - New: treatments Cosmetic Treatments, FaceTite, EMFACE (Simon's descriptors); products Peptide Firming Complex and
+    Barrier Repair Moisturiser (name only: no text, no photo). Treatments ordered as Simon lists them.
+  - Claude: inside a sentence a concern's name starts in lower case (« How we treat volume loss and hollowing »,
+    « Ready to talk about melasma? »); the Figma capitalised Melasma there.
+
 - 2026-11-10, Sam (comments 23 to 25, done in a conversation: the app's session stopped at its monthly ceiling, comment
   23 settled without its change): on a phone the opening's photo is centred in its room and against the right edge;
   one space between a card's text and its action link (`--space-action`); hovers slower (400 ms) and the arrow of a

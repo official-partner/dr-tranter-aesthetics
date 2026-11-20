@@ -18,6 +18,8 @@ const { slug } = Astro.params;
 const concern = slug ? await getItem("concerns", slug) : undefined;
 if (!concern || !concern.data.statement) return Astro.rewrite("/404");
 const d = concern.data;
+/* the name inside a sentence starts in lower case: « How we treat volume loss and hollowing » (Claude, Nov 20) */
+const inSentence = d.name.charAt(0).toLowerCase() + d.name.slice(1);
 
 const [treatments, concerns, products] = await Promise.all([getItems("treatments"), getItems("concerns"), getItems("products")]);
 const find = <T extends { id: string }>(list: T[], ref?: { id: string }) => (ref ? list.find((i) => i.id === ref.id) : undefined);
@@ -85,7 +87,7 @@ const facts = [
     {/* How we treat */}
     {d.steps && d.steps.length > 0 && (
       <StepsSection
-        title={`How we treat ${d.name}`}
+        title={`How we treat ${inSentence}`}
         steps={d.steps.map((s, i) => ({ ...s, ids: fid(stepIds[i] ?? []) }))}
         image={d.stepsImage && { src: d.stepsImage, alt: d.stepsImageAlt }}
         figma={F ? { band: "how", top: "2510", title: "1:412", image: "1:425" } : undefined}
@@ -96,7 +98,7 @@ const facts = [
   </div>
   {/* Consultation */}
   <CtaBand
-    title={`<em>Ready to talk</em><br /><em>about</em> ${d.name}?`}
+    title={`<em>Ready to talk</em><br /><em>about</em> ${inSentence}?`}
     figma={F ? { top: "3745", label: "1:432", marker: "1:428", title: "1:427", pill: "1:430" } : undefined}
   />
 </Layout>

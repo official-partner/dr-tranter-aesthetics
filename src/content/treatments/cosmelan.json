@@ -1,7 +1,7 @@
 {
   "name": "Cosmelan / Dermamelan",
   "summary": "Depigmentation mask protocol",
-  "image": "../../assets/content/treatments/cosmelan-dermamelan.jpg",
+  "image": "../../assets/content/treatments/cosmelan.jpg",
   "imageAlt": "Skin texture, close-up",
-  "order": 3
+  "order": 16
 }

@@ -74,7 +74,8 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
 ## Global classes (`src/styles/project.css`)
 `site-grid` (the grid and its named lines), `stack` (a vertical stack, gap from a space token), `at-end` (an action
 against the right edge), `marker` (the small square), `inset-optical` (the optical indent of capitals),
-`media` (an image box: ratio class, the picture absolute, cover, centred; ratios 5:6, 1.45, 16:10, 9:7, 7:10, 1:1),
+`media` (an image box: ratio class, the picture absolute, cover, centred; ratios 5:6, 1.45, 16:10, 9:7, 7:10, 1:1;
+a frame whose photo is still to come stays, empty, on `--background-skeleton`, so the composition holds: Nov 20),
 `section-padding` (every section's padding), `lead-marker` (the marker leading a text where the grid has no column
 for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 

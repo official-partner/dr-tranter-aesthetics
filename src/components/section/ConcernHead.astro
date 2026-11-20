@@ -32,11 +32,10 @@ const { render = true, name, statement, facts, image } = Astro.props;
         <h1 class="concern-head_name lead-marker text-style-h2" data-op-field="name" data-figma="1:434">{name}</h1>
         <p class="concern-head_crumb text-style-action" data-figma="1:453">Concerns / <span class="concern-head_current">{name}</span></p>
         <p class="concern-head_statement text-style-h2" data-op-field="statement" data-figma="1:357" set:html={statement} />
-        {image && (
-          <div class="concern-head_media media ratio-5-6" data-op-field="image" data-figma="1:359">
-            <Img {...pic(image.src)} alt={image.alt ?? ""} loading="eager" fetchPriority="high" variant="constrained" sizes="(width >= 48rem) 25vw, 75vw" />
-          </div>
-        )}
+        {/* the frame stays, empty, while the concern's photo is still to come (DESIGN.md, Global classes: media) */}
+        <div class="concern-head_media media ratio-5-6" data-op-field="image" data-figma="1:359">
+          {image && <Img {...pic(image.src)} alt={image.alt ?? ""} loading="eager" fetchPriority="high" variant="constrained" sizes="(width >= 48rem) 25vw, 75vw" />}
+        </div>
         <dl class="concern-head_facts">
           {facts.map((f) => (
             <div class="concern-head_fact stack">
