@@ -77,14 +77,16 @@
       }
     }
     @media (48rem <= width < 64rem) {
-      .founder-home_names {
-        grid-column: main / span 2;
-      }
+      .founder-home_names,
       .founder-home_bio {
-        grid-column: marker / span 3;
+        grid-column: main / aside;
       }
       .founder-home_media {
-        grid-column: half / end;
+        grid-column: aside / end;
+      }
+      /* the portrait on two columns leaves the grid no height to spare: the bio keeps its distance from the names */
+      .founder-home_bio {
+        margin-top: var(--space-7);
       }
     }
     @media (width < 48rem) {

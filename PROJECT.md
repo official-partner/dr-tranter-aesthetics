@@ -2,6 +2,18 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (11:06, « revoir les layouts de tablettes en général… le titre à gauche pourrait prendre 3 colonnes.
+  L'image… 2 colonnes à droite… que le texte respire »): one section rule on a tablet, made in the grid (DESIGN.md,
+  Responsive): the tablet's main rail moves from column 3 to 4, so every title placed « margin to main » takes three
+  columns and the content starts at column 4; a picture beside a text takes the last two (the steps of the home, Our
+  Approach and a concern; the founder's portrait); a concern's two cards sit on two columns each, the recommended one
+  on three, a long name wrapping (COSMELAN / DERMAMELAN at 768); the concern head's name on the content columns and
+  its crumb against the edge, its facts on the content; a page's opening on the content columns with its square on the
+  marker rail, as the home's. Kept where they were: the home's opening photo, the results, the card rows' centred
+  card (columns 3 to 6), the footer's groups (3, 5, 7). The founder's bio keeps space-7 from her name (the smaller
+  portrait left the grid no height to spare: the two touched). The computer is unchanged: home 92 of 92, Our Approach
+  31 of 31; 0 failure at the nine widths; looked at in 800 and 1000 on the home, Our Approach, Melasma, Volume loss.
+
 - 2026-11-20, Sam (« les items, quand je les édite, prennent la pleine largeur de l'écran »): an item of a list is as
   wide as what it shows, never the whole grid. IndexList's items spanned the 12 columns (1680 at 1728) with their texts
   placed on their own columns, so in Edit an item's outline covered the title and the text beside it and took their

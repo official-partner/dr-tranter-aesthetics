@@ -25,8 +25,8 @@ design slips corrected, never redesigned.
 ## Grid
 - 12 columns from 64rem (1024), 8 from 48rem (768), 4 below. Margin 24 / gutter 18 at 1728; 16 / 12 on phone.
 - Named lines (`.site-grid`): margin c1, inset c3, marker c4, main c5, detail c6, half c8, third c9, aside c10,
-  aside-text c11, end. Tablet keeps the names on 8 columns (margin c1, inset and marker c2, main and detail c3, half
-  and third c5, aside and aside-text c7); on a phone every name is at the margin.
+  aside-text c11, end. Tablet keeps the names on 8 columns (margin c1, inset and marker c2, main and detail c4, half
+  and third c5, aside and aside-text c7; main at c3 until Nov 20); on a phone every name is at the margin.
 - Components place their parts on these names, never on column numbers (`review/tools/check_build.py` checks it).
 - An item of a list spans only its own columns, never the whole grid (Sam, Nov 20): OP System's Edit outlines the item,
   and what sits beside it stays reachable.
@@ -92,9 +92,13 @@ for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
   bottom-left corner fixed on its column; it never grows past its columns. Floor 12rem tall; below that the opening
   grows. The Figma's band (928 at 1728) is a 1728 × 928 screen: the Home is measured in that window. On a phone
   the photo sits in the middle of the room left and against the right edge (Sam, comment 23).
-- Tablet keeps the computer's composition on the 8-column rails, with the fewest changes: no image wider than 6 of
-  8 columns, lists beside their image, the results scattered as on the computer. A list sits on the main rail (c3)
-  like the concerns; the approach is title | list (c3, 3 columns) | image (3 columns at the right edge).
+- Tablet: one section rule (Sam, Nov 20: « le titre à gauche pourrait prendre 3 colonnes… l'image à 2 colonnes à
+  droite, en général… que le texte respire »). A section's title or label on the first three columns (margin to
+  main); its content from column 4 (main): three columns when a picture sits beside it (main to aside), five
+  otherwise (main to end); a picture beside a text on the last two (aside to end): the steps, the founder. Two cards
+  side by side on two columns each (main, aside), the wide one on the three content columns; a card's name may wrap.
+  What composes the whole width keeps it: the home's opening photo (four columns from main), the results scattered as
+  on the computer, the card rows (left, right, centred), the footer's groups (columns 3, 5 and 7).
 - Below the computer an action row is one line when it fits (the pill, then the link), on the main rail on a
   tablet, at the margin on a phone; a long link wraps under.
 - On a phone an action set against the right edge (`at-end`) sits at the left, close under its title (Sam, Nov 10,

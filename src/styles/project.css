@@ -3,7 +3,9 @@
 
 /* The site grid: the design's 12 columns, with a named line for every column start a component aligns to.
    margin c1 · inset c3 · marker c4 · main c5 · detail c6 · half c8 · third c9 · aside c10 · aside-text c11 · end.
-   Tablet keeps the names on 8 columns; on a phone every rail starts at the margin. */
+   Tablet keeps the names on 8 columns: margin c1 · inset marker c2 · main detail c4 · half third c5 · aside aside-text c7
+   (Sam, Nov 20: a title on three columns, the content from column 4, a picture beside a text on the last two);
+   on a phone every rail starts at the margin. */
 .site-grid {
   display: grid;
   width: var(--site-width);
@@ -15,7 +17,7 @@
   column-gap: var(--site-gutter);
   @media (width >= 48rem) {
     grid-template-columns:
-      [margin] minmax(0, 1fr) [inset marker] minmax(0, 1fr) [main detail] repeat(2, minmax(0, 1fr))
+      [margin] minmax(0, 1fr) [inset marker] repeat(2, minmax(0, 1fr)) [main detail] minmax(0, 1fr)
       [half third] repeat(2, minmax(0, 1fr)) [aside aside-text] repeat(2, minmax(0, 1fr)) [end];
   }
   @media (width >= 64rem) {

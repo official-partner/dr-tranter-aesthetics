@@ -39,7 +39,7 @@ const { render = true, class: className, ...rest } = Astro.props;
             grid-column: half / end;
           }
           &:nth-child(3n) {
-            grid-column: main / span 4;
+            grid-column: span 4 / aside;
           }
         }
         @media (width >= 64rem) {

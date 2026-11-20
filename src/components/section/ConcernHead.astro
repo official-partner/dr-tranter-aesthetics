@@ -147,10 +147,12 @@ const { render = true, name, statement, facts, image } = Astro.props;
         grid-column: margin;
       }
       .concern-head_name {
-        grid-column: main / span 2;
+        grid-column: main / aside;
       }
       .concern-head_crumb {
-        grid-column: half / end;
+        grid-column: aside / end;
+        justify-self: end;
+        text-align: end;
       }
       .concern-head_statement {
         grid-column: main / end;
@@ -160,7 +162,7 @@ const { render = true, name, statement, facts, image } = Astro.props;
         margin-top: var(--space-9);
       }
       .concern-head_facts {
-        grid-column: main / half;
+        grid-column: main / end;
         grid-template-columns: repeat(2, max-content);
         column-gap: var(--space-8);
       }

@@ -220,11 +220,16 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
         display: none;
       }
       .concern-body_card {
+        grid-column: main / span 2;
+        /* on two columns a long name goes to the next line (COSMELAN / DERMAMELAN at 768) */
+        & > h3 {
+          text-wrap: pretty;
+        }
         &:nth-of-type(2) {
-          grid-column: span 3 / end;
+          grid-column: aside / end;
         }
         &.is-wide {
-          grid-column: main / span 4;
+          grid-column: main / aside;
         }
       }
     }
