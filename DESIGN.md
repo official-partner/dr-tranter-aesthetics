@@ -81,6 +81,11 @@ a frame whose photo is still to come stays, empty, on `--background-skeleton`, s
 `link-list` (a list of plain links: no underline, on hover the link slides `--space-2` right and a square 0.8 marker shows before it; the menu and the footer, Nov 20), `stacked-card` (a card's picture as wide as the card, its texts stacked: Card, the journal, the products), `section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
 for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 
+## Filters
+- A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside
+  (the Figma's 23 high at 1728), `--space-1` apart, a column under the group's name on a computer, a wrapping row on a
+  tablet and a phone. The chosen one is filled with the text's colour.
+
 ## Motion
 - Hover fades last 400 ms (`--hover-duration`, Sam, Nov 10: slower). A written button or link that ends with an arrow
   gives it a box of its own: on hover the arrow leaves to the right and comes back from the left (600 ms,

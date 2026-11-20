@@ -1,6 +1,8 @@
 {
   "name": "Pico Laser",
   "summary": "Pigment-targeting laser",
+  "intro": "Often considered for pigmentation and sun damage, working in very short pulses with minimal downtime afterwards.",
+  "category": "Laser & light",
   "image": "../../assets/content/treatments/pico-laser.jpg",
   "imageAlt": "Skin texture, close-up",
   "order": 8

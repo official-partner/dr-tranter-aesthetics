@@ -118,6 +118,12 @@
   --pill-y: clamp(var(--pill-y-min) / 16 * 1rem, ((var(--pill-y-min) - ((var(--pill-y-max) - var(--pill-y-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--pill-y-max) - var(--pill-y-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--pill-y-max) / 16 * 1rem);
   --pill-y-min: 7;
   --pill-y-max: 7;
+  --tag-x: clamp(var(--tag-x-min) / 16 * 1rem, ((var(--tag-x-min) - ((var(--tag-x-max) - var(--tag-x-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--tag-x-max) - var(--tag-x-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--tag-x-max) / 16 * 1rem);
+  --tag-x-min: 8;
+  --tag-x-max: 8;
+  --tag-y: clamp(var(--tag-y-min) / 16 * 1rem, ((var(--tag-y-min) - ((var(--tag-y-max) - var(--tag-y-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--tag-y-max) - var(--tag-y-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--tag-y-max) / 16 * 1rem);
+  --tag-y-min: 4;
+  --tag-y-max: 4;
   --space-1: clamp(var(--space-1-min) / 16 * 1rem, ((var(--space-1-min) - ((var(--space-1-max) - var(--space-1-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--space-1-max) - var(--space-1-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--space-1-max) / 16 * 1rem);
   --space-1-min: 6;
   --space-1-max: 6;
@@ -420,6 +426,10 @@
     --pill-x-max: 12.5;
     --pill-y-min: 6.222;
     --pill-y-max: 10.5;
+    --tag-x-min: 5.926;
+    --tag-x-max: 10;
+    --tag-y-min: 2.667;
+    --tag-y-max: 4.5;
     --space-1-min: 4.741;
     --space-1-max: 8;
     --space-2-min: 7.407;

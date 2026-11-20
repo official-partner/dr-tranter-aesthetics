@@ -1,6 +1,9 @@
 {
   "name": "FaceTite",
   "summary": "Doctor-led device tightening",
+  "intro": "Our flagship treatment for skin laxity, tightening tissue beneath the surface without surgery.",
+  "category": "RF treatments",
+  "featured": true,
   "image": "../../assets/content/treatments/facetite.jpg",
   "imageAlt": "Treatment handpiece above the brow, close-up",
   "order": 4

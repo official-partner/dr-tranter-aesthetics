@@ -1,6 +1,8 @@
 {
   "name": "Medical-Grade Peels",
+  "intro": "A course-based option for pigmentation, texture and congestion, with the strength adjusted to suit your skin.",
+  "category": "Facials & peels",
   "image": "../../assets/content/treatments/medical-grade-peels.jpg",
   "imageAlt": "Pigmentation around the eye",
-  "order": 11
+  "order": 13
 }

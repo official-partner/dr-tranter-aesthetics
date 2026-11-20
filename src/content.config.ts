@@ -52,6 +52,12 @@ const treatments = defineCollection({
       .object({
         name: z.string().describe("Name"),
         summary: z.string().optional().describe("In a few words (Pigment-targeting laser)"),
+        intro: z.string().optional().describe("Description (its card on the Treatments page)"),
+        category: z
+          .enum(["Injectables", "RF treatments", "Laser & light", "Facials & peels"])
+          .optional()
+          .describe("Category (the Treatments page's filters)"),
+        featured: z.boolean().default(false).describe("Featured (at the top of the Treatments page)"),
         image: image().optional().describe("Photo"),
         imageAlt: z.string().optional().describe("Photo description"),
         visible: z.boolean().default(true).describe("Visible on the site"),

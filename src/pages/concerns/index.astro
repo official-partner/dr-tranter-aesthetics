@@ -1,7 +1,7 @@
 ---
 import Layout from "@/layouts/BaseLayout.astro";
 import PageHead from "@/components/section/PageHead.astro";
-import ConcernGroup from "@/components/section/ConcernGroup.astro";
+import CardGroup from "@/components/section/CardGroup.astro";
 import { getItems } from "@/utils/content";
 
 /* The Concerns page (Figma « Tranter (Client) », frame 59:602): every concern, by group, each card from its item in the
@@ -45,7 +45,7 @@ const surface = concerns.filter((c) => c.data.group !== "Structure").map(item);
     figma={{ top: "0", marker: "59:609", title: "59:611" }}
   />
   {/* Structure */}
-  <ConcernGroup label="Structure" theme="light" items={structure} figma={{ band: "structure", top: "253", label: "59:626", marker: "59:624" }} />
+  <CardGroup label="Structure" theme="light" collection="concerns" noun="Concern" link="View concern →" items={structure} figma={{ band: "structure", top: "253", label: "59:626", marker: "59:624" }} />
   {/* Surface */}
-  <ConcernGroup label="Surface" theme="stone" items={surface} figma={{ band: "surface", top: "2389", label: "59:627", marker: "59:625" }} />
+  <CardGroup label="Surface" theme="stone" collection="concerns" noun="Concern" link="View concern →" items={surface} figma={{ band: "surface", top: "2389", label: "59:627", marker: "59:625" }} />
 </Layout>

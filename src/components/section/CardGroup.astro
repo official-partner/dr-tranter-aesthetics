@@ -1,0 +1,226 @@
+---
+import Card from "@/components/content/Card.astro";
+import type { Pic } from "@/utils/media";
+
+interface Item {
+  id: string;
+  name: string;
+  summary?: string;
+  href?: string;
+  image?: { src: Pic; alt?: string };
+  /** Its filter (a category's name), when the group has filters. */
+  category?: string;
+  /** Hidden while no filter is chosen (it shows in a group above). */
+  aside?: boolean;
+  /** Figma node ids for the build review: image, name, text, link. */
+  ids?: string[];
+}
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** The group's name (Structure, Surface, Featured treatments, Filter by). */
+  label: string;
+  /** Its ground. */
+  theme?: "light" | "stone" | "mist";
+  /** The collection the cards show, for OP System's Contenu and Edit. */
+  collection: string;
+  /** What one item is called in OP System (Concern, Treatment). */
+  noun: string;
+  /** The field the card's line comes from. */
+  textField?: string;
+  /** The words of a card's link. */
+  link?: string;
+  /** The cards, two to a row. */
+  items: Item[];
+  /** Filters under the name: one pill per category, after « All »; a pill shows only its cards. */
+  filters?: { all: string; values: string[]; ids?: string[] };
+  /** The list's name for OP System, when a page has two groups of the same collection. */
+  list?: string;
+  /** Figma ids for the build review: band name, band top, label, marker. */
+  figma?: { band: string; top: string; label: string; marker: string };
+}
+const { render = true, label, theme = "light", collection, noun, textField = "summary", link = "View →", items, filters, list, figma } = Astro.props;
+const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+---
+
+{/* A group of cards (the Concerns page, the Treatments page): its name at the margin with the square, its cards two to a
+    row from the main rail (Figma 59:602, 59:983, Nov 20). With filters, a pill per category under the name. */}
+{
+  render && items.length > 0 && (
+    <section class:list={["card-group_wrap section-padding", `theme-${theme}`]} data-figma-band={figma?.band} data-band-top={figma?.top}>
+      <div class="card-group_layout site-grid">
+        <div class="card-group_head">
+          <p class="card-group_label lead-marker text-style-label inset-optical" data-figma={figma?.label}>{label}</p>
+          {filters && (
+            <div class="card-group_filters" role="group" aria-label={label} data-card-filters>
+              {[filters.all, ...filters.values].map((v, i) => (
+                <button type="button" class="card-group_filter text-style-action" aria-pressed={i === 0 ? "true" : "false"} data-filter={i === 0 ? "" : slug(v)} data-figma={filters.ids?.[i]}>{v}</button>
+              ))}
+            </div>
+          )}
+        </div>
+        <span class="marker card-group_marker" data-figma={figma?.marker} />
+        <ul class="card-group_list" data-op-list={list ?? collection} data-op-source={`astro:${collection}`} data-op-noun={noun}>
+          {items.map((c) => (
+            <li class="card-group_item" data-op-item={c.id} data-category={c.category && slug(c.category)} data-aside={c.aside ? "" : undefined} hidden={c.aside && filters ? true : undefined}>
+              <Card title={c.name} text={c.summary} href={c.href} link={link} image={c.image} item={{ collection, id: c.id, textField }} ids={c.ids} />
+            </li>
+          ))}
+        </ul>
+        {filters && <p class="sr-only" aria-live="polite" data-card-count />}
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* a group ends wide, on purpose, as every section that breathes (Sam, Nov 10, 13:10) */
+    .card-group_wrap {
+      padding-bottom: var(--section-padding-wide);
+    }
+    .card-group_layout {
+      row-gap: var(--space-7);
+    }
+    .card-group_head,
+    .card-group_list {
+      grid-column: margin / end;
+    }
+    .card-group_filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+      margin-top: var(--space-4);
+      @media (width >= 64rem) {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+    .card-group_filter {
+      padding: var(--tag-y) var(--tag-x);
+      border: var(--border-width) solid var(--button-border);
+      border-radius: var(--radius-round);
+      color: var(--button-text);
+      transition:
+        background-color var(--hover-duration) var(--hover-ease),
+        color var(--hover-duration) var(--hover-ease),
+        border-color var(--hover-duration) var(--hover-ease);
+      @media (hover: hover) {
+        &:hover {
+          border-color: var(--pill-border-solid);
+        }
+      }
+      /* the chosen filter: filled with the text's colour */
+      &[aria-pressed="true"] {
+        background-color: var(--text);
+        border-color: var(--text);
+        color: var(--background);
+      }
+    }
+    .card-group_marker {
+      display: none;
+    }
+    .card-group_list {
+      display: grid;
+      grid-template-columns: subgrid;
+      row-gap: var(--space-stack);
+      /* two cards to a row: every row as tall as the tallest, so a card with no link yet keeps the rhythm */
+      @media (width >= 48rem) {
+        grid-auto-rows: 1fr;
+      }
+    }
+    /* phone: the cards on three columns of four, left then right, as every row of cards */
+    .card-group_item {
+      grid-column: margin / span 3;
+      &:nth-child(even) {
+        grid-column: span 3 / end;
+      }
+    }
+    @media (width < 48rem) {
+      .card-group_layout {
+        grid-auto-flow: row dense;
+      }
+      .card-group_head {
+        grid-column: span 3 / end;
+      }
+      .card-group_marker {
+        display: block;
+        grid-column: margin;
+        margin-top: calc((max(var(--text-label-floor), var(--text-label)) * 0.721 - var(--marker)) / 2);
+      }
+    }
+    @media (width >= 48rem) {
+      .card-group_layout {
+        row-gap: 0;
+      }
+      .card-group_head,
+      .card-group_marker,
+      .card-group_list {
+        grid-row: 1;
+        align-self: start;
+      }
+      .card-group_list {
+        grid-column: main / end;
+      }
+    }
+    /* tablet: the name on the first three columns, the cards on two columns each (main, aside) */
+    @media (48rem <= width < 64rem) {
+      .card-group_head {
+        grid-column: margin / main;
+      }
+      .card-group_label {
+        --_lead-marker: inline-block;
+      }
+      .card-group_item {
+        grid-column: main / span 2;
+        &:nth-child(even) {
+          grid-column: aside / end;
+        }
+      }
+    }
+    @media (width >= 64rem) {
+      .card-group_head {
+        grid-column: margin / marker;
+      }
+      .card-group_marker {
+        display: block;
+        margin-top: calc((max(var(--text-label-floor), var(--text-label)) * 0.721 - var(--marker)) / 2);
+      }
+      .card-group_list {
+        row-gap: var(--space-8);
+      }
+      .card-group_item {
+        grid-column: main / span 3;
+        &:nth-child(even) {
+          grid-column: third / span 3;
+        }
+      }
+    }
+  }
+</style>
+
+<script>
+  import { onPage } from "@/utils/page";
+
+  /* A group's filters: a pill shows only its category's cards; « All » shows the group as it came (the cards featured
+     above stay there). The count is said to screen readers. */
+  onPage((signal) => {
+    document.querySelectorAll<HTMLElement>("[data-card-filters]").forEach((pills) => {
+      const group = pills.closest(".card-group_layout");
+      const items = [...(group?.querySelectorAll<HTMLElement>(".card-group_item") ?? [])];
+      const count = group?.querySelector<HTMLElement>("[data-card-count]");
+      pills.addEventListener("click", (e) => {
+        const pill = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-filter]");
+        if (!pill) return;
+        const value = pill.dataset.filter;
+        pills.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === pill)));
+        let shown = 0;
+        items.forEach((li) => {
+          li.hidden = value ? li.dataset.category !== value : li.hasAttribute("data-aside");
+          if (!li.hidden) shown++;
+        });
+        if (count) count.textContent = `${shown} shown`;
+      }, { signal });
+    });
+  });
+</script>

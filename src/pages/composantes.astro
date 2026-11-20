@@ -21,7 +21,7 @@ import ProductsSection from "@/components/section/ProductsSection.astro";
 import NotFound from "@/components/section/NotFound.astro";
 import PageHead from "@/components/section/PageHead.astro";
 import TextSection from "@/components/section/TextSection.astro";
-import ConcernGroup from "@/components/section/ConcernGroup.astro";
+import CardGroup from "@/components/section/CardGroup.astro";
 import Card from "@/components/content/Card.astro";
 import { getItems, getItem } from "@/utils/content";
 
@@ -105,8 +105,8 @@ const steps = [
     <ComponentSample file="content/Card.astro" note="Une carte : la photo à 1,45, le nom en capitales, une ligne, le lien. Le cadre reste vide tant que la photo n'est pas là.">
       <Card title="Volume loss and hollowing" text="The cheeks, temples and jawline often lose definition before the skin itself shows visible change." href="/concerns/volume-loss" link="View concern →" />
     </ComponentSample>
-    <ComponentSample file="section/ConcernGroup.astro" note="Un groupe de la page Concerns : son nom à la marge avec le carré, ses cartes deux par rangée.">
-      <ConcernGroup label="Structure" items={[{ id: "volume-loss", name: "Volume loss and hollowing", summary: "The cheeks, temples and jawline often lose definition before the skin itself shows visible change.", href: "/concerns/volume-loss" }, { id: "jawline-and-chin", name: "Jawline and chin definition", summary: "Definition through the jawline often softens gradually over time." }]} />
+    <ComponentSample file="section/CardGroup.astro" note="Un groupe de cartes (pages Concerns et Treatments) : son nom à la marge avec le carré, ses cartes deux par rangée, des filtres sous le nom au besoin.">
+      <CardGroup label="Filter by" collection="concerns" noun="Concern" link="View concern →" filters={{ all: "All concerns", values: ["Structure"] }} items={[{ id: "volume-loss", name: "Volume loss and hollowing", summary: "The cheeks, temples and jawline often lose definition before the skin itself shows visible change.", href: "/concerns/volume-loss", category: "Structure" }, { id: "jawline-and-chin", name: "Jawline and chin definition", summary: "Definition through the jawline often softens gradually over time." }]} />
     </ComponentSample>
     <ComponentSample file="section/NotFound.astro" note="La page introuvable."><NotFound /></ComponentSample>
   </ComponentList>

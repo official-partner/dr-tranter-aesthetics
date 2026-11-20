@@ -6,7 +6,7 @@ import { getItems } from "@/utils/content";
 export type SiteLink = { label: string; href: string; footer?: boolean };
 
 export const clinicLinks: SiteLink[] = [
-  { label: "All treatments", href: "/" },
+  { label: "All treatments", href: "/treatments" },
   { label: "Our approach", href: "/approach" },
   { label: "Results", href: "/" },
   { label: "Our team", href: "/" },

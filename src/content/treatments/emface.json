@@ -1,6 +1,8 @@
 {
   "name": "EMFACE",
   "summary": "Muscle toning device",
+  "intro": "Non-invasive support for facial muscle tone and underlying structure, with no downtime and no recovery period.",
+  "category": "RF treatments",
   "image": "../../assets/content/treatments/emface.jpg",
   "imageAlt": "Treatment handpiece above the brow, close-up",
   "order": 6

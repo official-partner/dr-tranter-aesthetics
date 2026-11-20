@@ -1,0 +1,78 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import PageHead from "@/components/section/PageHead.astro";
+import CardGroup from "@/components/section/CardGroup.astro";
+import CtaBand from "@/components/section/CtaBand.astro";
+import { getItems } from "@/utils/content";
+
+/* The Treatments page (Figma « Tranter (Client) », frame 59:983): the featured treatments first, then every treatment
+   with a filter per category, each card from its item in the collection (its photo, its name, its description). A card
+   links to the treatment's page once it has one. */
+const treatments = await getItems("treatments");
+const categories = ["Injectables", "RF treatments", "Laser & light", "Facials & peels"];
+/* Figma node ids of each card (image, name, text, link), for the build's review tools only */
+const ids: Record<string, string[]> = {
+  "weight-loss-consultation": ["118:357", "59:994", "59:1013", "59:1032"],
+  "cosmetic-treatments": ["118:359", "59:1004", "59:1023", "59:1042"],
+  "biostimulators": ["118:361", "59:998", "59:1017", "59:1036"],
+  "facetite": ["118:363", "59:1008", "59:1027", "59:1046"],
+  "morpheus8": ["118:365", "59:996", "59:1015", "59:1034"],
+  "emface": ["118:367", "59:1006", "59:1025", "59:1044"],
+  "co2-laser-resurfacing": ["118:369", "59:1000", "59:1019", "59:1038"],
+  "pico-laser": ["118:371", "59:1010", "59:1029", "59:1048"],
+  "cosmelan": ["118:381", "59:995", "59:1014", "59:1033"],
+  "forma-rf": ["118:383", "59:1005", "59:1024", "59:1043"],
+  "lumecca-ipl": ["118:385", "59:999", "59:1018", "59:1037"],
+  "microneedling": ["118:387", "59:1009", "59:1028", "59:1047"],
+  "medical-grade-peels": ["118:389", "59:997", "59:1016", "59:1035"],
+  "signature-facial": ["118:391", "59:1007", "59:1026", "59:1045"],
+  "biorepeel": ["118:393", "59:1001", "59:1020", "59:1039"],
+  "hydrafacial": ["118:395", "59:1011", "59:1030", "59:1049"],
+  "rf-facial": ["118:397", "59:1002", "59:1021", "59:1040"],
+  "excel-v-plus": ["118:399", "59:1012", "59:1031", "59:1050"],
+  "ultraclear-laser": ["118:401", "59:1003", "59:1022", "59:1041"],
+};
+const item = (t: (typeof treatments)[number], inList = false) => ({
+  id: t.id,
+  name: t.data.name,
+  summary: t.data.intro,
+  href: undefined,
+  image: t.data.image && { src: t.data.image, alt: t.data.imageAlt },
+  category: t.data.category,
+  aside: inList && t.data.featured,
+  /* a featured treatment's ids go with its card above, never twice */
+  ids: inList && t.data.featured ? undefined : ids[t.id],
+});
+const featured = treatments.filter((t) => t.data.featured).map((t) => item(t));
+const all = treatments.map((t) => item(t, true));
+---
+
+<Layout title="Treatments" overlap navTheme="light">
+  {/* Opening */}
+  <PageHead
+    theme="mist"
+    title="<em>Treatments</em> here are planned around a doctor-led assessment of the whole face, not a single concern in isolation."
+    figma={{ top: "0", marker: "59:989", title: "59:991" }}
+  />
+  {/* Featured */}
+  <CardGroup label="Featured treatments" theme="light" collection="treatments" noun="Treatment" textField="intro" link="View treatment →" list="featured-treatments" items={featured} figma={{ band: "featured", top: "314", label: "59:1052", marker: "59:992" }} />
+  {/* Every treatment, by category */}
+  <CardGroup
+    label="Filter by"
+    theme="mist"
+    collection="treatments"
+    noun="Treatment"
+    textField="intro"
+    link="View treatment →"
+    items={all}
+    filters={{ all: "All treatments", values: categories, ids: ["118:673", "118:682", "118:679", "118:685", "118:688"] }}
+    figma={{ band: "treatments", top: "1274", label: "118:672", marker: "118:671" }}
+  />
+  {/* Closing */}
+  <CtaBand
+    title="Not sure where to start?<br /><em>Browse by concern</em> instead"
+    label="Concerns"
+    action={{ label: "All concerns", href: "/concerns" }}
+    figma={{ top: "5271", label: "59:1059", marker: "59:1055", title: "59:1054", pill: "59:1056" }}
+  />
+</Layout>

@@ -5,7 +5,7 @@ interface Props {
   /** The page's opening statement, its h1; emphasis with <em> (the lighter cut). */
   title: string;
   /** Its ground: the light sand (Our Approach) or stone (the Concerns page). */
-  theme?: "light" | "stone";
+  theme?: "light" | "stone" | "mist";
   /** Figma ids for the build review: band top, marker, title. */
   figma?: { top: string; marker: string; title: string };
 }
@@ -60,8 +60,8 @@ const { render = true, title, theme = "light", figma } = Astro.props;
     @media (width >= 64rem) {
       .page-head_title {
         grid-column: main / span 5;
-        /* the Figma's box, 567 at 1728: its line breaks (Every treatment here follows / the same four stages: / …) */
-        max-width: 13em;
+        /* five columns, the lines balanced: the Figma's boxes differ by page (567, 600, 637 at 1728), the system keeps one */
+        text-wrap: balance;
       }
     }
   }

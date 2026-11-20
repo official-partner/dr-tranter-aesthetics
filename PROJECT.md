@@ -2,6 +2,32 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (« vas-y avec prêt maintenant », step 3): the Treatments page at `/treatments`, from the Figma frame
+  59:983 as it is in the file today (photos, a featured block, the filters), measured 72 of 72 on its target
+  (review/data/treatments-figma.json, treatments-target.json). The bank's « Treatments - Overview page.png » is an
+  earlier state (no photos, no featured block); Simon's brief confirms the updated Figma has both, so the file wins.
+  - The collection holds the 19 treatments of Simon's brief (his paths as slugs: Medical Facials is
+    `signature-facial`), in the Figma's order (Weight Loss Consultation first), each with three new fields: `intro`
+    (its card on this page, the Figma's text word for word), `category` (the filters: Injectables, RF treatments,
+    Laser & light, Facials & peels, from Simon's table) and `featured` (the block at the top).
+  - Featured: Weight Loss Consultation, Cosmetic Treatments, Biostimulators and FaceTite, as the Figma shows them.
+    Simon's brief still asks which ones (« Featured treatments: which treatments, on the home and on the overview? »):
+    one tick per item in Contenu changes it.
+  - « All treatments » shows the treatments not featured above (the Figma's 15); a category shows all of its own,
+    featured or not, so Injectables is never empty. The chosen pill is filled with the text's colour (the Figma draws
+    no chosen state); the count is said to screen readers.
+  - No card links yet: no treatment has its page (the template comes later), the rule of the Concerns page. Each row is
+    about 41 shorter than the Figma's until the links come.
+  - Not in the Figma, decided here: the featured block on the light sand (the Figma's band has no colour the connector
+    gives; the page itself is mist, as in the bank's picture). One prop to change if the Figma says otherwise.
+  - Copy corrected: FaceTite's « for dramatic, visible non-surgical change » promised a result; now « tightening tissue
+    beneath the surface without surgery ». Question for Simon if he wants other words.
+  - `ConcernGroup` became `CardGroup` (any collection, with filters when asked); the Concerns page uses it as before.
+    `CtaBand` takes its label and its pill. `PageHead` takes the mist ground, and its title is now five columns with
+    balanced lines (the Figma's boxes were 567, 600 and 637 wide on three pages; the Concerns title had a fourth line
+    the Figma does not have, now three as drawn).
+  - Three treatments share one stand-in photo (Cosmetic Treatments, FaceTite, EMFACE), placed with the Volume loss page;
+    the others wait on an empty frame. Photos are the team's to choose.
 - 2026-11-20, Sam (« vas-y avec prêt maintenant », step 2): the menu. The nav's button opens it on every page, from the
   Figma frame « Menu nav » (59:191): a mist panel slides down under the bar, the bar takes its colours and the three
   lines become a cross. Four groups: Structure and Surface (the concerns of the collection, in their order, each marked
@@ -12,7 +38,7 @@ One line per decision: the date, who asked, what was decided and why. The newest
     the new global class `link-list` (no underline; on hover the link moves a little right and a small square shows
     before it, as the Figma's hover).
   - Not in the Figma, decided here: the panel's foot on a tablet and a phone mirrors its top (no photo ends it there).
-  - A link whose page is not built yet (All treatments, Results, Our team, The Clinic, Journal, Contact, Careers) and the
+  - A link whose page is not built yet (Results, Our team, The Clinic, Journal, Contact, Careers) and the
     social links (no address given yet: Facebook, Instagram, LinkedIn) point to the home, as the footer did; each gets
     its address with its page or its URL.
 - 2026-11-20, Sam (« vas-y avec prêt maintenant »): the Concerns page at `/concerns`, from the Figma frame 59:602,
