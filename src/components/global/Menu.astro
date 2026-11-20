@@ -16,13 +16,13 @@ const groups = [
 <div class="menu_wrap theme-mist" id="site-menu" data-menu-panel hidden>
   <div class="menu_layout site-grid">
     <nav class="menu_groups" aria-label="Menu">
-      {groups.map((g) => (
-        <div class:list={["menu_group stack gap-4", `is-${g.key}`]}>
-          <p class="text-style-label">{g.name}</p>
+      {groups.map((g, gi) => (
+        <div class:list={["menu_group stack gap-4", `is-${g.key}`]} style={`--g: ${gi}`}>
+          <p class="text-style-label"><span class="menu_mask"><span class="menu_rise" style="--i: 0">{g.name}</span></span></p>
           <ul class="link-list text-style-list" data-op-list={g.concerns ? "concerns" : undefined} data-op-source={g.concerns ? "astro:concerns" : undefined}>
-            {g.links.map((l) => (
+            {g.links.map((l, i) => (
               <li data-op-item={g.concerns ? (l as { id?: string }).id : undefined}>
-                <a href={l.href} data-op-field={g.concerns ? "name" : undefined}>{l.label}</a>
+                <a href={l.href}><span class="menu_mask"><span class="menu_rise" style={`--i: ${i + 1}`} data-op-field={g.concerns ? "name" : undefined}>{l.label}</span></span></a>
               </li>
             ))}
           </ul>
@@ -30,13 +30,22 @@ const groups = [
       ))}
     </nav>
     <div class="menu_media media">
-      <img src="/img/approach.jpg" alt="Two women talking in the clinic" width="402" height="498" loading="lazy" />
+      <img class="menu_image" src="/img/approach.jpg" alt="Two women talking in the clinic" width="402" height="498" loading="lazy" />
     </div>
   </div>
 </div>
 
 <style is:global>
   @layer components {
+    /* The menu's motion (Sam, Nov 20: « un clip masque, un peu plus lent, premium »). Its job: show where the menu
+       comes from and let its links arrive in reading order. One thing at a time:
+       1. the click answers at once: the cross forms (Nav, --open-duration on the out curve);
+       2. a curtain uncovers the panel from the top (a clip, --menu-open-duration on the arrive curve), its content
+          drifting down into place under it and the photo settling from a slight zoom; the page dims behind;
+       3. once the curtain is well down, each group's name and links rise from their masks, group by group, in order.
+       Closing is quicker: the links fade first, then the curtain lifts (--menu-close-duration). Every value is a token
+       of base.css (--menu-*). Reduced motion: no travel, it opens and closes at once. */
+
     /* the page dims behind the open menu */
     .menu_scrim {
       position: fixed;
@@ -45,8 +54,8 @@ const groups = [
       opacity: 0;
       visibility: hidden;
       transition:
-        opacity var(--open-duration) var(--open-ease),
-        visibility 0s linear var(--open-duration);
+        opacity var(--menu-close-duration) var(--menu-close-ease),
+        visibility 0s linear var(--menu-close-duration);
     }
     /* the panel slides down from the top, under the nav's bar */
     .menu_wrap {
@@ -63,25 +72,95 @@ const groups = [
       }
       background-color: var(--background);
       color: var(--text);
-      translate: 0 -100%;
-      transition: translate var(--open-duration) var(--open-ease);
+      /* the curtain: closed at its top edge, the panel itself never moves */
+      clip-path: inset(0 0 100% 0);
+      transition: clip-path var(--menu-close-duration) var(--menu-close-ease) calc(var(--menu-close-duration) * 0.12);
       &[hidden] {
         display: block;
         visibility: hidden;
       }
     }
+    /* its content drifts down into place under the curtain */
+    .menu_layout {
+      translate: 0 var(--menu-shift);
+      transition: translate var(--menu-close-duration) var(--menu-close-ease);
+    }
+    .menu_image {
+      scale: var(--menu-image-scale);
+      transition: scale var(--menu-close-duration) var(--menu-close-ease);
+    }
+    /* a name or a link rises from its mask (a little room below for the descenders) */
+    .menu_mask {
+      display: block;
+      overflow: clip;
+      padding-bottom: 0.15em;
+      margin-bottom: -0.15em;
+    }
+    .menu_rise {
+      display: block;
+      translate: 0 110%;
+      opacity: 0;
+      /* closing: they fade first, and drop back under their masks once the curtain is up */
+      transition:
+        opacity var(--open-duration) var(--open-ease),
+        translate 0s linear var(--menu-close-duration);
+    }
     html[data-menu="open"] {
       overflow: hidden;
       & .menu_wrap {
+        clip-path: inset(0 0 0 0);
+        transition: clip-path var(--menu-open-duration) var(--menu-open-ease);
+      }
+      & .menu_layout {
         translate: 0 0;
+        transition: translate var(--menu-open-duration) var(--menu-open-ease);
+      }
+      & .menu_image {
+        scale: 1;
+        transition: scale var(--menu-image-duration) var(--menu-line-ease);
+      }
+      & .menu_rise {
+        translate: 0 0;
+        opacity: 1;
+        transition:
+          translate var(--menu-line-duration) var(--menu-line-ease) var(--_rise-delay),
+          opacity 0s linear var(--_rise-delay);
+        --_rise-delay: calc(var(--menu-line-delay) + var(--g, 0) * var(--menu-group-stagger) + var(--i, 0) * var(--menu-stagger));
       }
       & .menu_scrim {
         opacity: 1;
         visibility: visible;
-        transition: opacity var(--open-duration) var(--open-ease);
+        transition: opacity var(--menu-open-duration) var(--menu-line-ease);
       }
       & .nav_wrap {
         position: fixed;
+      }
+    }
+    /* the menu still covers the page while its curtain lifts */
+    html[data-menu="closing"] .nav_wrap {
+      position: fixed;
+    }
+    /* reduced motion: no curtain, no rise, no drift; it shows and goes at once */
+    @media (prefers-reduced-motion: reduce) {
+      .menu_wrap,
+      html[data-menu="open"] .menu_wrap {
+        clip-path: none;
+        opacity: 0;
+        transition: none;
+      }
+      html[data-menu="open"] .menu_wrap {
+        opacity: 1;
+      }
+      .menu_layout,
+      .menu_image,
+      .menu_rise {
+        translate: none;
+        scale: none;
+      }
+      .menu_rise,
+      html[data-menu="open"] .menu_rise {
+        opacity: 1;
+        transition: none;
       }
     }
     .menu_groups {

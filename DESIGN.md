@@ -81,6 +81,14 @@ a frame whose photo is still to come stays, empty, on `--background-skeleton`, s
 `link-list` (a list of plain links: no underline, on hover the link slides `--space-2` right and a square 0.8 marker shows before it; the menu and the footer, Nov 20), `stacked-card` (a card's picture as wide as the card, its texts stacked: Card, the journal, the products), `section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
 for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 
+## The menu's motion (Nov 20)
+- One thing at a time: the cross forms (`--hover-duration`, out curve); a curtain clips the panel open from the top
+  (`--menu-open-duration` 1000 ms, `--menu-open-ease` the arrive curve) with its content drifting from `--menu-shift`
+  and the photo from `--menu-image-scale`; the names and links rise from masks (`--menu-line-duration`,
+  `--menu-line-delay`, `--menu-stagger`, `--menu-group-stagger`, `--menu-line-ease` smooth). Closing is quicker:
+  links fade, the curtain lifts on `--menu-close-duration` 650 ms, `--menu-close-ease` travel. The bar's colours
+  follow the curtain (`--menu-bar-delay`).
+
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside
   (the Figma's 23 high at 1728), `--space-1` apart, a column under the group's name on a computer, a wrapping row on a

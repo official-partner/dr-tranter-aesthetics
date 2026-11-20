@@ -50,6 +50,17 @@ const { render = true, theme = "dark" } = Astro.props;
       position: relative;
       align-items: start;
     }
+    /* the bar takes the menu's colours as the curtain passes under it, and its own back as it lifts (the theme class is
+       swapped by the script below; the colours follow it here) */
+    html:is([data-menu="open"], [data-menu="closing"]) :is(.nav_inner, .nav_inner *) {
+      transition:
+        color var(--hover-duration) var(--hover-ease) var(--_bar-delay, 0s),
+        border-color var(--hover-duration) var(--hover-ease) var(--_bar-delay, 0s),
+        background-color var(--hover-duration) var(--hover-ease) var(--_bar-delay, 0s);
+    }
+    html[data-menu="open"] :is(.nav_inner, .nav_inner *) {
+      --_bar-delay: var(--menu-bar-delay);
+    }
     .nav_logo {
       grid-column: margin / span 2;
     }
@@ -77,8 +88,8 @@ const { render = true, theme = "dark" } = Astro.props;
       background-color: currentcolor;
       transform-origin: center;
       transition:
-        translate var(--open-duration) var(--open-ease),
-        rotate var(--open-duration) var(--open-ease),
+        translate var(--hover-duration) var(--open-ease),
+        rotate var(--hover-duration) var(--open-ease),
         opacity var(--open-duration) var(--open-ease);
     }
     /* open: the three lines become the close cross (Figma 59:191) */
@@ -114,32 +125,57 @@ const { render = true, theme = "dark" } = Astro.props;
     const page = () => [...document.querySelectorAll<HTMLElement>("main, footer")];
     const original = nav.dataset.navTheme ?? "dark";
 
+    /* a duration token in ms, whether it is written 650ms or .65s */
+    const ms = (name: string) => {
+      const v = getComputedStyle(root).getPropertyValue(name).trim();
+      return (parseFloat(v) || 0) * (v.endsWith("ms") ? 1 : v.endsWith("s") ? 1000 : 1);
+    };
+    let timers: number[] = [];
+    const clear = () => { timers.forEach((t) => window.clearTimeout(t)); timers = []; };
+    const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const theme = (menuColours: boolean) => {
+      nav.classList.toggle(`theme-${original}`, !menuColours);
+      nav.classList.toggle("theme-mist", menuColours);
+    };
+
     const set = (open: boolean) => {
-      if (open) menu.hidden = false;
-      if (open) root.dataset.menu = "open";
-      else delete root.dataset.menu;
+      clear();
       toggle.setAttribute("aria-expanded", String(open));
       toggle.setAttribute("aria-label", open ? "Close the menu" : "Open the menu");
-      nav.classList.toggle(`theme-${original}`, !open);
-      nav.classList.toggle("theme-mist", open);
       page().forEach((el) => (el.inert = open));
       const lenis = pageLenis();
       if (lenis) open ? lenis.stop() : lenis.start();
-      if (open) menu.querySelector<HTMLElement>("a")?.focus({ preventScroll: true });
-      else {
+      if (open) {
+        menu.hidden = false;
+        /* one frame with the panel shown and closed, so its curtain runs from the top */
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          if (toggle.getAttribute("aria-expanded") !== "true") return;
+          root.dataset.menu = "open";
+          theme(true);
+        }));
+        menu.querySelector<HTMLElement>("a")?.focus({ preventScroll: true });
+      } else {
+        if (root.dataset.menu !== "open") { menu.hidden = true; delete root.dataset.menu; theme(false); return; }
         toggle.focus({ preventScroll: true });
-        /* hidden again once the panel is up, so it leaves the tab order */
-        const end = () => { if (root.dataset.menu !== "open") menu.hidden = true; };
-        const wait = parseFloat(getComputedStyle(menu).transitionDuration) * 1000 || 0;
-        window.setTimeout(end, wait + 50);
+        const close = reduced() ? 0 : ms("--menu-close-duration");
+        root.dataset.menu = "closing";
+        /* the bar gets its colours back as the curtain lifts past it, then the panel leaves the tab order */
+        timers.push(window.setTimeout(() => theme(false), close * 0.7));
+        timers.push(window.setTimeout(() => {
+          delete root.dataset.menu;
+          menu.hidden = true;
+        }, close * 1.15 + 20));
       }
     };
 
-    toggle.addEventListener("click", () => set(root.dataset.menu !== "open"), { signal });
+    /* the menu's photo loads as soon as the button is approached, so it is there when the curtain uncovers it */
+    const warm = () => menu.querySelectorAll<HTMLImageElement>("img[loading='lazy']").forEach((img) => (img.loading = "eager"));
+    ["pointerenter", "focusin", "touchstart"].forEach((t) => toggle.addEventListener(t, warm, { signal, once: true, passive: true }));
+    toggle.addEventListener("click", () => set(toggle.getAttribute("aria-expanded") !== "true"), { signal });
     scrim?.addEventListener("click", () => set(false), { signal });
     menu.addEventListener("click", (e) => { if ((e.target as HTMLElement).closest("a")) set(false); }, { signal });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && root.dataset.menu === "open") set(false); }, { signal });
-    signal.addEventListener("abort", () => { if (root.dataset.menu === "open") set(false); });
+    signal.addEventListener("abort", () => { clear(); if (root.dataset.menu) { delete root.dataset.menu; menu.hidden = true; theme(false); page().forEach((el) => (el.inert = false)); pageLenis()?.start(); } });
   });
 </script>
 

@@ -2,6 +2,14 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (12:00, « un clip masque et un peu plus lent… un look premium, pas cheap et rapide »): the menu's
+  motion redone. A curtain uncovers the panel from the top (a clip, 1000 ms on the arrive curve) while its content
+  drifts down into place and the photo settles from a 1.12 zoom (1600 ms); once the curtain is well down, each group's
+  name and links rise from their masks in reading order (1000 ms each, 32 ms apart, groups 70 ms apart, from 380 ms).
+  The cross forms at once (the click's answer) and the bar takes the menu's colours as the curtain passes under it.
+  Closing: the links fade first, then the curtain lifts (650 ms), the bar's colours back as it passes. Every value is
+  a `--menu-*` token (system/gen.py). Reduced motion: it shows and goes at once. The photo loads as soon as the button
+  is approached. Before: the panel slid down whole in 240 ms.
 - 2026-11-20, Sam (« vas-y avec prêt maintenant », step 3): the Treatments page at `/treatments`, from the Figma frame
   59:983 as it is in the file today (photos, a featured block, the filters), measured 72 of 72 on its target
   (review/data/treatments-figma.json, treatments-target.json). The bank's « Treatments - Overview page.png » is an
