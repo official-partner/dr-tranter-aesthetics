@@ -2,6 +2,13 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (12:14, « les transitions entre les pages, style Barba, smooth, simple, seamless »): the page change
+  is on, the starter's slide (op.config.json `"transition": "slide"`, Astro's router, never Barba). The page fades
+  and lifts a little (400 ms, smooth curve); the next one waits until it has left (`--page-arrive-delay` 220 ms, the
+  site's own addition: never the two pages at once) and rises into place (800 ms, the arrive curve). The bar holds
+  still when it is on screen; scrolled down, or with the menu open, it leaves with its page and the next page's bar
+  fades in at the top. A link of the open menu: the menu leaves with the page it covers, no closing first. Back and
+  forward mirror the slide; reduced motion crossfades.
 - 2026-11-20, Sam (12:00, « un clip masque et un peu plus lent… un look premium, pas cheap et rapide »): the menu's
   motion redone. A curtain uncovers the panel from the top (a clip, 1000 ms on the arrive curve) while its content
   drifts down into place and the photo settles from a 1.12 zoom (1600 ms); once the curtain is well down, each group's

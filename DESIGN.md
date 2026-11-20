@@ -89,6 +89,11 @@ for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
   links fade, the curtain lifts on `--menu-close-duration` 650 ms, `--menu-close-ease` travel. The bar's colours
   follow the curtain (`--menu-bar-delay`).
 
+## The page change (Nov 20)
+- The starter's slide: the page leaves on `--page-leave-duration` 400 ms (`--page-leave-ease` smooth), the next waits
+  `--page-arrive-delay` 220 ms and arrives on `--page-arrive-duration` 800 ms (`--page-arrive-ease` osmo). The bar is
+  `view-transition-name: site-nav` and holds still when it is on screen and the menu is closed.
+
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside
   (the Figma's 23 high at 1728), `--space-1` apart, a column under the group's name on a computer, a wrapping row on a
