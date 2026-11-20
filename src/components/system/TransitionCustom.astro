@@ -1,0 +1,100 @@
+---
+/* Tranter's page change, « le rideau » (Sam, Nov 20: « quelque chose de plus unique à Tranter… clip mask… elevated »;
+   his pick of three). Its job: carry the visitor from one page to the next in the menu's own gesture.
+   - A link followed: the next page is uncovered from the top by a curtain (a clip, --page-arrive-duration on
+     --page-arrive-ease), over the page being left, which drifts down a little (--page-shift) and dims (--page-dim).
+     No coloured panel between the two. The bar is part of its page: its colours change as the curtain's edge passes.
+   - From the open menu: the same curtain runs under the menu and shows below it first; then the menu lifts off the
+     next page as it does when it closes (--menu-close-duration, after --page-menu-delay), its bar going with it.
+   - Reduced motion, or a browser without view transitions: a short crossfade, nothing travels.
+   Every value is a token of base.css (system/gen.py). */
+---
+
+<style is:global>
+  @layer components {
+    html[data-page-transition="custom"][data-astro-transition]::view-transition {
+      background-color: var(--ink);
+    }
+    /* the open menu, the dimmed page behind it and its bar leave as pieces of their own */
+    html[data-page-transition="custom"][data-menu="open"] {
+      & .menu_scrim {
+        view-transition-name: site-scrim;
+      }
+      & .menu_wrap {
+        view-transition-name: site-menu;
+      }
+      & .nav_inner {
+        view-transition-name: site-bar;
+      }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      html[data-page-transition="custom"][data-astro-transition]::view-transition-old(root) {
+        mix-blend-mode: normal;
+        animation: tranter-page-leave var(--page-leave-duration) var(--page-leave-ease) both;
+      }
+      html[data-page-transition="custom"][data-astro-transition]::view-transition-new(root) {
+        mix-blend-mode: normal;
+        animation: tranter-page-curtain var(--page-arrive-duration) var(--page-arrive-ease) both;
+      }
+      html[data-page-transition="custom"][data-astro-transition]::view-transition-old(site-scrim) {
+        animation: tranter-page-fade var(--page-arrive-duration) var(--page-arrive-ease) both;
+      }
+      html[data-page-transition="custom"][data-astro-transition]::view-transition-old(site-menu) {
+        animation: tranter-menu-lift var(--menu-close-duration) var(--menu-close-ease) var(--page-menu-delay) both;
+      }
+      /* the menu's bar goes as the lift reaches it, uncovering the next page's own */
+      html[data-page-transition="custom"][data-astro-transition]::view-transition-old(site-bar) {
+        animation: tranter-page-fade var(--open-duration) var(--open-ease)
+          calc(var(--page-menu-delay) + var(--menu-close-duration) * 0.6) both;
+      }
+      /* browsers without view transitions: Astro's fallback, a fade of the page's content */
+      html[data-page-transition="custom"][data-astro-transition-fallback="old"] body > :is(main, footer) {
+        animation: tranter-page-fade var(--hover-duration) var(--hover-ease) both;
+      }
+      html[data-page-transition="custom"][data-astro-transition-fallback="new"] body > :is(main, footer) {
+        animation: tranter-page-fade var(--hover-duration) var(--hover-ease) reverse both;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html[data-page-transition="custom"][data-astro-transition]::view-transition-group(*) {
+        animation: none;
+      }
+      html[data-page-transition="custom"][data-astro-transition]::view-transition-old(*) {
+        animation: tranter-page-fade var(--hover-duration) linear both;
+      }
+      html[data-page-transition="custom"][data-astro-transition]::view-transition-new(*) {
+        animation: tranter-page-fade var(--hover-duration) linear reverse both;
+      }
+    }
+
+    @keyframes tranter-page-curtain {
+      from {
+        clip-path: inset(0 0 100% 0);
+      }
+      to {
+        clip-path: inset(0 0 0 0);
+      }
+    }
+    @keyframes tranter-page-leave {
+      to {
+        translate: 0 var(--page-shift);
+        opacity: var(--page-dim);
+      }
+    }
+    @keyframes tranter-menu-lift {
+      from {
+        clip-path: inset(0 0 0 0);
+      }
+      to {
+        clip-path: inset(0 0 100% 0);
+      }
+    }
+    @keyframes tranter-page-fade {
+      to {
+        opacity: 0;
+      }
+    }
+  }
+</style>

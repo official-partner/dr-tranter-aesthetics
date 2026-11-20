@@ -42,8 +42,6 @@ const { render = true, theme = "dark" } = Astro.props;
       position: absolute;
       inset: 0 0 auto;
       z-index: 10;
-      /* a page change: the bar holds still while the page under it changes (PageTransitions, the slide) */
-      view-transition-name: site-nav;
       padding-top: var(--site-margin);
       background-color: transparent;
     }
@@ -62,14 +60,6 @@ const { render = true, theme = "dark" } = Astro.props;
     }
     html[data-menu="open"] :is(.nav_inner, .nav_inner *) {
       --_bar-delay: var(--menu-bar-delay);
-    }
-    /* The page change's arrival waits --page-arrive-delay (Sam, Nov 20: « smooth, simple, seamless »): the page has
-       left before the next one shows, never the two at once. The slide itself is the starter's (PageTransitions). */
-    @media (prefers-reduced-motion: no-preference) {
-      html:root[data-page-transition="slide"][data-astro-transition]::view-transition-new(root),
-      html:root[data-page-transition="slide"][data-astro-transition-fallback="new"] body > :is(main, footer) {
-        animation-delay: var(--page-arrive-delay);
-      }
     }
     .nav_logo {
       grid-column: margin / span 2;
@@ -183,7 +173,7 @@ const { render = true, theme = "dark" } = Astro.props;
     ["pointerenter", "focusin", "touchstart"].forEach((t) => toggle.addEventListener(t, warm, { signal, once: true, passive: true }));
     toggle.addEventListener("click", () => set(toggle.getAttribute("aria-expanded") !== "true"), { signal });
     scrim?.addEventListener("click", () => set(false), { signal });
-    /* a link of the menu: the page change carries the open menu away with the page it covers (the router's slide);
+    /* a link of the menu: the page change lifts the open menu off the next page (TransitionCustom, the curtain);
        without the router (a new tab, a link it does not follow) it closes as usual */
     menu.addEventListener("click", (e) => {
       const a = (e.target as HTMLElement).closest("a");
@@ -191,12 +181,6 @@ const { render = true, theme = "dark" } = Astro.props;
       const routed = root.dataset.pageTransition && a.origin === location.origin && !a.target && !a.hasAttribute("download") && !a.hasAttribute("data-astro-reload");
       if (routed && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) return;
       set(false);
-    }, { signal });
-    /* the bar holds still only when it is on screen and the menu is closed; otherwise it leaves with its page and the
-       next page's bar fades in at the top */
-    document.addEventListener("astro:before-preparation", () => {
-      const onScreen = nav.getBoundingClientRect().bottom > 0;
-      nav.style.viewTransitionName = onScreen && !root.dataset.menu ? "" : "none";
     }, { signal });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && root.dataset.menu === "open") set(false); }, { signal });
     signal.addEventListener("abort", () => { clear(); if (root.dataset.menu) { delete root.dataset.menu; menu.hidden = true; theme(false); page().forEach((el) => (el.inert = false)); pageLenis()?.start(); } });

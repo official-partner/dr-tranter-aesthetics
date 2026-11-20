@@ -2,6 +2,14 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (12:33, his pick of three proposals: « 1. Le rideau… pense aussi à la transition avec le menu
+  ouvert »): the page change is the site's own (op.config.json `"transition": "custom"`,
+  src/components/system/TransitionCustom.astro), in place of the starter's slide. The next page is uncovered from the
+  top by a curtain (a clip, 1000 ms, the arrive curve) over the page left, which drifts down `--page-shift` and dims to
+  `--page-dim`; no coloured panel between. The bar is part of its page (no longer held still): its colours change as
+  the curtain's edge passes. From the open menu: the curtain runs under the menu and shows below it first, then the
+  menu lifts off the next page (`--menu-close-duration` after `--page-menu-delay` 420 ms), its bar fading as the lift
+  reaches it. Reduced motion or no view transitions: a short crossfade. `--page-arrive-delay` is gone with the slide.
 - 2026-11-20, Sam (12:14, « les transitions entre les pages, style Barba, smooth, simple, seamless »): the page change
   is on, the starter's slide (op.config.json `"transition": "slide"`, Astro's router, never Barba). The page fades
   and lifts a little (400 ms, smooth curve); the next one waits until it has left (`--page-arrive-delay` 220 ms, the

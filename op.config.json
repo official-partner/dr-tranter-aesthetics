@@ -8,7 +8,7 @@
   "domain": "",
   "live": false,
   "loader": false,
-  "transition": "slide",
+  "transition": "custom",
   "smoothScroll": "light",
   "brandColor": "#2C0F0A",
   "systemPages": [

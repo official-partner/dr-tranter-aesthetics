@@ -44,11 +44,13 @@
   --open-ease: var(--ease-smooth);
   --loader-duration: 600ms;
   --loader-ease: var(--ease-osmo);
-  --page-leave-duration: 400ms;
-  --page-leave-ease: var(--ease-smooth);
-  --page-arrive-duration: 800ms;
+  --page-leave-duration: 1000ms;
+  --page-leave-ease: var(--ease-osmo);
+  --page-arrive-duration: 1000ms;
   --page-arrive-ease: var(--ease-osmo);
-  --page-arrive-delay: 220ms;
+  --page-shift: var(--space-8);
+  --page-dim: 0.55;
+  --page-menu-delay: 420ms;
   --menu-open-duration: 1000ms;
   --menu-open-ease: var(--ease-osmo);
   --menu-close-duration: 650ms;
