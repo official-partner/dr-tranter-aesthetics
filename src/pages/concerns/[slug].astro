@@ -35,6 +35,7 @@ const recommended = recommendedItem && {
   href: `/treatments/${recommendedItem.id}`,
   link: "View treatment →",
   image: recommendedItem.data.image && { src: recommendedItem.data.image, alt: recommendedItem.data.imageAlt },
+  item: { collection: "treatments", id: recommendedItem.id },
   ids: fid(["1:386", "1:376", "1:381", "1:395"]),
 };
 const alsoIds = [["1:387", "1:377", "1:382", "1:396"], ["1:388", "1:379", "1:384", "1:398"]];
@@ -47,6 +48,7 @@ const also = (d.also ?? [])
     href: `/treatments/${t.id}`,
     link: "View treatment →",
     image: t.data.image && { src: t.data.image, alt: t.data.imageAlt },
+    item: { collection: "treatments", id: t.id },
     ids: fid(alsoIds[i] ?? []),
   }));
 const alongsideIds = [["", "1:378", "1:383", "1:397"], ["", "1:380", "1:385", "1:399"]];
@@ -68,8 +70,8 @@ const productItems = (d.products ?? [])
   .filter((p) => p !== undefined)
   .map((p, i) => ({ id: p.id, name: p.data.name, text: p.data.text, image: p.data.image, imageAlt: p.data.imageAlt, ids: fid(productIds[i] ?? []) }));
 const facts = [
-  d.consultation && { label: "Consultation", value: d.consultation, ids: fid(["1:360", "1:362"]) },
-  d.assessedBy && { label: "Assessed by", value: d.assessedBy, ids: fid(["1:361", "1:363"]) },
+  d.consultation && { label: "Consultation", value: d.consultation, field: "consultation", ids: fid(["1:360", "1:362"]) },
+  d.assessedBy && { label: "Assessed by", value: d.assessedBy, field: "assessedBy", ids: fid(["1:361", "1:363"]) },
 ].filter((f) => !!f);
 ---
 
@@ -79,7 +81,7 @@ const facts = [
     <ConcernHead name={d.name} statement={d.statement ?? ""} facts={facts} image={d.image && { src: d.image, alt: d.imageAlt }} />
     {/* What is happening, what we would consider */}
     <ConcernBody
-      happening={{ text: d.happening, steps: d.factors?.map((f, i) => ({ ...f, ids: fid(factorIds[i] ?? []) })) }}
+      happening={{ text: d.happening, steps: d.factors?.map((f, i) => ({ ...f, ids: fid(factorIds[i] ?? []) })), source: `astro:concerns/${concern.id}#factors` }}
       recommended={recommended}
       also={also}
       alongside={alongside}
@@ -89,6 +91,9 @@ const facts = [
       <StepsSection
         title={`How we treat ${inSentence}`}
         steps={d.steps.map((s, i) => ({ ...s, ids: fid(stepIds[i] ?? []) }))}
+        list="steps"
+        source={`astro:concerns/${concern.id}#steps`}
+        imageField="stepsImage"
         image={d.stepsImage && { src: d.stepsImage, alt: d.stepsImageAlt }}
         figma={F ? { band: "how", top: "2510", title: "1:412", image: "1:425" } : undefined}
       />

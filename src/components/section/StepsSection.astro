@@ -10,7 +10,7 @@ interface Props {
   /** Section title; emphasis with <em>. */
   title: string;
   /** The steps, in order. */
-  steps: { title: string; text: string; ids?: string[] }[];
+  steps: { id?: string; title: string; text: string; ids?: string[] }[];
   /** The picture beside the steps. */
   image?: { src: Pic; alt?: string };
   /** Optional row of actions at the foot of the band. */
@@ -21,10 +21,14 @@ interface Props {
   tall?: boolean;
   /** A list written in the page: its name for OP System's Modifier. */
   list?: string;
+  /** Where the steps live when they are rows of a collection's item: `astro:<collection>/<item>#<field>`. */
+  source?: string;
+  /** The item's field that holds the picture, when the steps come from a collection's item. */
+  imageField?: string;
   /** Figma ids for the build review: band name, band top, title, image. */
   figma?: { band: string; top: string; title: string; image: string };
 }
-const { render = true, title, steps, image, actions, theme = "inherit", tall = false, list, figma } = Astro.props;
+const { render = true, title, steps, image, actions, theme = "inherit", tall = false, list, source, imageField, figma } = Astro.props;
 ---
 
 {
@@ -32,9 +36,9 @@ const { render = true, title, steps, image, actions, theme = "inherit", tall = f
     <section class:list={["steps-section_wrap section-padding", theme !== "inherit" && `theme-${theme}`, tall && "is-tall"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
       <div class="steps-section_layout site-grid">
         <h2 class="steps-section_title text-style-h2" data-figma={figma?.title} set:html={title} />
-        <IndexList steps={steps} list={list} />
+        <IndexList steps={steps} list={list} source={source} />
         {image && (
-          <div class="steps-section_media media" data-figma={figma?.image}>
+          <div class="steps-section_media media" data-op-field={imageField} data-figma={figma?.image}>
             <Img {...pic(image.src)} alt={image.alt ?? ""} variant="constrained" sizes="(width >= 48rem) 40vw, 75vw" />
           </div>
         )}

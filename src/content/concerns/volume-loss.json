@@ -10,14 +10,17 @@
   "happening": "Facial volume sits in defined fat compartments across the cheeks, temples and jawline. As these compartments lose volume with age, the face loses its underlying support before the skin itself changes: the effect is structural, not superficial. Bone density and skin elasticity decline alongside this, compounding the change gradually rather than suddenly.",
   "factors": [
     {
+      "id": "gradual-structural-change",
       "title": "Gradual structural change",
       "text": "Volume loss and hollowing typically develop gradually beneath the surface, which is why they are often noticed later than they began."
     },
     {
+      "id": "individual-rate-of-change",
       "title": "Individual rate of change",
       "text": "The pace at which volume loss and hollowing progress varies between patients, shaped by genetics, lifestyle and skin type."
     },
     {
+      "id": "compounding-factors",
       "title": "Compounding factors",
       "text": "Volume loss and hollowing rarely occur in isolation, and are usually assessed alongside related structural changes nearby."
     }
@@ -35,18 +38,22 @@
   "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
   "steps": [
     {
+      "id": "assessment-first",
       "title": "Assessment first",
       "text": "We look at the cheeks, temples and jawline together, since a change in one area alters how the others read."
     },
     {
+      "id": "support-before-surface",
       "title": "Support before surface",
       "text": "Where the support beneath the skin has changed, that is usually considered before any surface concern."
     },
     {
+      "id": "a-conservative-approach",
       "title": "A conservative approach",
       "text": "Volume is restored in small steps, so the face keeps its own balance rather than changing all at once."
     },
     {
+      "id": "ongoing-review",
       "title": "Ongoing review",
       "text": "Facial volume keeps changing with time, so the plan is reviewed at follow-up and adjusted as needed."
     }

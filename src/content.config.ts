@@ -5,7 +5,7 @@ import { z } from "astro/zod";
 /* The site's collections, edited in OP System's « Contenu » (which also writes this file when the team adds a
    collection or a field): one file per item in src/content/<collection>/, named by its slug. Names are code
    (English camelCase); each .describe() is the label people see, in the client's language. Every field is optional
-   but the name; `visible` hides an item everywhere, `order` sorts them (src/utils/content.ts). Keep this form: one
+   but the name; `visible` hides an item everywhere, `draft` keeps it on the staging only, `order` sorts them (src/utils/content.ts). Keep this form: one
    defineCollection per collection, a glob() loader, its z.object(); nothing else goes here (CLAUDE.md, Content). */
 
 const concerns = defineCollection({
@@ -22,7 +22,7 @@ const concerns = defineCollection({
         assessedBy: z.string().optional().describe("Assessed by"),
         happening: z.string().optional().describe("What is happening"),
         factors: z
-          .array(z.object({ title: z.string(), text: z.string() }))
+          .array(z.object({ id: z.string(), title: z.string().describe("Title"), text: z.string().describe("Text") }))
           .optional()
           .describe("What is happening: the factors"),
         recommended: reference("treatments").optional().describe("Recommended starting point"),
@@ -31,13 +31,14 @@ const concerns = defineCollection({
         alongside: z.array(reference("concerns")).optional().describe("Often considered alongside"),
         alongsideText: z.string().optional().describe("Often considered alongside: the line under each"),
         steps: z
-          .array(z.object({ title: z.string(), text: z.string() }))
+          .array(z.object({ id: z.string(), title: z.string().describe("Title"), text: z.string().describe("Text") }))
           .optional()
           .describe("How we treat: the steps"),
         stepsImage: image().optional().describe("How we treat: the photo"),
         stepsImageAlt: z.string().optional().describe("How we treat: photo description"),
         products: z.array(reference("products")).optional().describe("Products we would recommend"),
         visible: z.boolean().default(true).describe("Visible on the site"),
+        draft: z.boolean().default(false).describe("Draft"),
         order: z.number().optional().describe("Order"),
       })
       .describe("Concerns"),

@@ -15,5 +15,8 @@
     "composantes",
     "style-sheet"
   ],
-  "designWidth": 1728
+  "designWidth": 1728,
+  "templates": {
+    "concerns": "Concern"
+  }
 }

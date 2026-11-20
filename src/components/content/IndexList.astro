@@ -1,5 +1,7 @@
 ---
 interface Step {
+  /** The row's own id when the steps are rows of a collection's item (its key in Edit). */
+  id?: string;
   title: string;
   text: string;
   /** Figma node ids for the build review: index, title, text. */
@@ -14,20 +16,23 @@ interface Props {
   variant?: "main" | "aside";
   /** A list written in the page: its name for OP System's Modifier (items duplicated, removed, moved on the canvas). */
   list?: string;
+  /** Where the steps live when they are rows of a collection's item, not written in the page:
+      `astro:<collection>/<item>#<field>` (each step then needs its `id`). */
+  source?: string;
   class?: string;
 }
-const { render = true, steps, variant = "main", list, class: className } = Astro.props;
+const { render = true, steps, variant = "main", list, source, class: className } = Astro.props;
 ---
 
 {
   render && steps?.length > 0 && (
-    <ol class:list={["index-list_wrap", variant !== "main" && variant, className]} data-op-list={list} data-op-source={list && "page"}>
+    <ol class:list={["index-list_wrap", variant !== "main" && variant, className]} data-op-list={list} data-op-source={list && (source ?? "page")}>
       {steps.map((s, i) => (
-        <li class="index-list_item" data-op-item={list && String(i)}>
+        <li class="index-list_item" data-op-item={list && (s.id ?? String(i))}>
           <span class="index-list_index text-style-index" data-figma={s.ids?.[0]}>[0{i + 1}]</span>
           <div class="index-list_body stack">
-            <h3 class="text-style-index" data-figma={s.ids?.[1]}>{s.title}</h3>
-            <p class="index-list_text text-style-main" data-figma={s.ids?.[2]} set:html={s.text} />
+            <h3 class="text-style-index" data-op-field={source && "title"} data-figma={s.ids?.[1]}>{s.title}</h3>
+            <p class="index-list_text text-style-main" data-op-field={source && "text"} data-figma={s.ids?.[2]} set:html={s.text} />
           </div>
         </li>
       ))}

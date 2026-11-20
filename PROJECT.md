@@ -2,6 +2,23 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (« ces pages-là, c'est des pages de template CMS… voir qu'est-ce qui manquerait »): the concern
+  pages tied to OP System as a CMS template, before more of them are built. Static pages come next; the other concern
+  and treatment pages wait for the app's Contenu and Edit passes.
+  - The build says its templates (site.json `collection` and `item` on each page made from a collection, `templates`
+    from op.config.json: `concerns` is « Concern »), as on Curveball, Amélie Haeck and Sani since Nov 18
+    (`templateRoutes`, taken from Curveball's integration).
+  - The factors and the steps are Contenu's « Rows » (Nov 20): each row has an `id` and its cells a label; Melasma's
+    and Volume loss's rows got theirs. Before, they were lists Contenu showed read only.
+  - OP System's « Draft » (the starter's, Nov 12): `draft` on the concerns, `STAGING` in src/utils/content.ts, site.json
+    `content.drafts`. A draft shows on the staging only; the live build leaves it out, its page with it.
+  - Marked for Contenu and Edit (23 fields where there were 5): the facts, the factors and steps as rows of the item
+    (`astro:concerns/<id>#factors`, `#steps`, the starter's Sections form), the steps' photo, the line under the
+    related concerns, and the treatment cards as the treatments' own items (their name, summary, photo).
+  - Not done: the opening statement still holds `<em>` in a plain text, which Contenu shows as tags (to try with the
+    kind « Texte mis en forme »); the app's Edit writing into a collection's rows from the page is step 11 of its
+    plan, not built yet, so those marks wait for it.
+
 - 2026-11-20, Sam (Simon's « CLOP master brief » of Nov 19 for the content, the method of Nov 10 for the build; the
   new Figma file « Tranter (Client) », same design as the first one, other node ids): the site's pages are declined
   one at a time, each shown to Sam before the next. First page: Volume loss and hollowing on the concern template.

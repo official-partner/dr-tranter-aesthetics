@@ -7,6 +7,8 @@ interface Fact {
   label: string;
   value: string;
   ids?: string[];
+  /** The item's field that holds the value, for OP System's Contenu and Edit. */
+  field?: string;
 }
 interface Props {
   /** Set to `false` to omit the component. */
@@ -40,7 +42,7 @@ const { render = true, name, statement, facts, image } = Astro.props;
           {facts.map((f) => (
             <div class="concern-head_fact stack">
               <dt class="text-style-label" data-figma={f.ids?.[0]}>{f.label}</dt>
-              <dd class="text-style-serif" data-figma={f.ids?.[1]}>{f.value}</dd>
+              <dd class="text-style-serif" data-op-field={f.field} data-figma={f.ids?.[1]}>{f.value}</dd>
             </div>
           ))}
         </dl>
