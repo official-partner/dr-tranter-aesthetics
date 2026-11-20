@@ -25,7 +25,7 @@ const posts = (await getItems("articles")).slice(0, 3).map(({ id, data }, i) => 
     <div class="at-end journal-home_action"><Button element="link" href="/journal" data-figma="1:136">View all articles</Button></div>
     <CardRow data-op-list="articles" data-op-source="astro:articles">
       {posts.map((p) => (
-        <li class="journal-home_card" data-op-item={p.id}>
+        <li class="journal-home_card stacked-card" data-op-item={p.id}>
           {p.image && <div class="media ratio-9-7" data-figma={p.ids[0]}><Img {...pic(p.image)} alt={p.alt} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" /></div>}
           {p.date && <p class="journal-home_date text-style-date" data-op-field="date" data-figma={p.ids[1]}><time datetime={p.date.toISOString().slice(0, 10)}>{p.label}</time></p>}
           <h3 class="journal-home_card-title text-style-h3" data-op-field="title" data-figma={p.ids[2]}>{p.title}</h3>
@@ -54,14 +54,6 @@ const posts = (await getItems("articles")).slice(0, 3).map(({ id, data }, i) => 
     .journal-home_title {
       grid-column: margin / end;
       max-width: 19.7ch;
-    }
-    .journal-home_card {
-      display: flex;
-      flex-direction: column;
-      align-items: start;
-      & > .media {
-        align-self: stretch;
-      }
     }
     .journal-home_date {
       margin-top: var(--space-media);

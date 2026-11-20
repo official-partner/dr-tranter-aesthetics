@@ -2,6 +2,7 @@
   "name": "Melasma",
   "group": "Surface",
   "order": 13,
+  "summary": "Melasma is a distinct, hormonally influenced form of pigmentation that responds differently to standard pigment treatment.",
   "image": "../../assets/content/concerns/melasma.jpg",
   "imageAlt": "Pigmentation on the cheek, close-up",
   "statement": "Melasma is a distinct, *hormonally influenced form of pigmentation* that responds differently to standard pigment treatment.",

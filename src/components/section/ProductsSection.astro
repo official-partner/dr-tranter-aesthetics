@@ -30,7 +30,7 @@ const { render = true, title = "Products we would recommend", products } = Astro
         <h2 class="products-section_title text-style-h2" data-figma="1:436">{title}</h2>
         <CardRow data-op-list="products" data-op-source="astro:products">
           {products.map((p) => (
-            <li class="products-section_item" data-op-item={p.id}>
+            <li class="products-section_item stacked-card" data-op-item={p.id}>
               {/* the frame stays, empty, while a product's photo is still to come (DESIGN.md, Global classes: media) */}
               <div class="media ratio-145" data-figma={p.ids?.[0]}>{p.image && <Img {...pic(p.image)} alt={p.imageAlt ?? ""} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" />}</div>
               <h3 class="products-section_name text-style-h3" data-op-field="name" data-figma={p.ids?.[1]}>{p.name}</h3>
@@ -55,10 +55,6 @@ const { render = true, title = "Products we would recommend", products } = Astro
     .products-section_title {
       grid-column: margin / end;
       max-width: 15ch;
-    }
-    .products-section_item {
-      display: flex;
-      flex-direction: column;
     }
     .products-section_name {
       margin-top: var(--space-media);

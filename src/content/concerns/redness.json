@@ -1,5 +1,8 @@
 {
   "name": "Redness and visible vessels",
   "group": "Surface",
-  "order": 9
+  "order": 9,
+  "summary": "Visible vessels and persistent redness often reflect a sensitivity built up over many years, and they tend to become steadily more noticeable with age.",
+  "image": "../../assets/content/concerns/redness.jpg",
+  "imageAlt": "Skin with a pale line, close-up"
 }

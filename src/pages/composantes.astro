@@ -21,6 +21,8 @@ import ProductsSection from "@/components/section/ProductsSection.astro";
 import NotFound from "@/components/section/NotFound.astro";
 import PageHead from "@/components/section/PageHead.astro";
 import TextSection from "@/components/section/TextSection.astro";
+import ConcernGroup from "@/components/section/ConcernGroup.astro";
+import Card from "@/components/content/Card.astro";
 import { getItems, getItem } from "@/utils/content";
 
 /* the samples show the client's own copy: Melasma and the collections as they are */
@@ -99,6 +101,12 @@ const steps = [
     <ComponentSample file="section/TextSection.astro" note="Un titre, son texte sur le rail principal, et une courte liste sans numéros ou un lien à droite (Our Approach).">
       <TextSection theme="stone" title="Where we <em>focus</em>" text="Our focus is deliberately narrow: the lower face, and how it ages." list={[{ title: "Lower-face tightening", text: "The concern we are most focused on." }, { title: "Skin rejuvenation", text: "Tone, texture and quality of the surface." }]} />
       <TextSection theme="mist" title="Structure, Surface and Cohesion" text="We consider the face in three parts." action={{ label: "Browse Structure and Surface concerns →", href: "/concerns" }} />
+    </ComponentSample>
+    <ComponentSample file="content/Card.astro" note="Une carte : la photo à 1,45, le nom en capitales, une ligne, le lien. Le cadre reste vide tant que la photo n'est pas là.">
+      <Card title="Volume loss and hollowing" text="The cheeks, temples and jawline often lose definition before the skin itself shows visible change." href="/concerns/volume-loss" link="View concern →" />
+    </ComponentSample>
+    <ComponentSample file="section/ConcernGroup.astro" note="Un groupe de la page Concerns : son nom à la marge avec le carré, ses cartes deux par rangée.">
+      <ConcernGroup label="Structure" items={[{ id: "volume-loss", name: "Volume loss and hollowing", summary: "The cheeks, temples and jawline often lose definition before the skin itself shows visible change.", href: "/concerns/volume-loss" }, { id: "jawline-and-chin", name: "Jawline and chin definition", summary: "Definition through the jawline often softens gradually over time." }]} />
     </ComponentSample>
     <ComponentSample file="section/NotFound.astro" note="La page introuvable."><NotFound /></ComponentSample>
   </ComponentList>

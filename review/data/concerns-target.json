@@ -1,0 +1,369 @@
+{
+ "_note": "The Concerns page, Figma Tranter (Client) 59:602: the design corrected by the system (review/README.md). Nov 20, Claude, from Sam's go for the pages ready to build.",
+ "59:611": {
+  "d": [
+   -2,
+   -2.3
+  ],
+  "why": "caps at the section padding (24), as every opening"
+ },
+ "59:626": {
+  "d": [
+   -0.3,
+   -14
+  ],
+  "why": "the group's top at the section padding (24): the Figma starts both groups 36 down; the name and its square on the label's cap line"
+ },
+ "59:624": {
+  "d": [
+   -0.8,
+   -9.2
+  ],
+  "why": "the group's top at the section padding (24): the Figma starts both groups 36 down; the name and its square on the label's cap line"
+ },
+ "59:612": {
+  "d": [
+   -0.3,
+   -12
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:635": {
+  "d": [
+   0,
+   -18.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:650": {
+  "d": [
+   0,
+   -20.3
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:665": {
+  "d": [
+   0,
+   -5.5
+  ],
+  "why": "as a card's link: space-action under its line; Sam, Nov 10: the links' text at 14; the rows' rhythm as the cards'",
+  "size": 14
+ },
+ "59:618": {
+  "d": [
+   -0.3,
+   -12
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:643": {
+  "d": [
+   -1,
+   -18.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:658": {
+  "d": [
+   -1,
+   -20.3
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:616": {
+  "d": [
+   -0.3,
+   -21.4
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:637": {
+  "d": [
+   0,
+   -28.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:652": {
+  "d": [
+   0,
+   -29.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:620": {
+  "d": [
+   -0.3,
+   -21.4
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:645": {
+  "d": [
+   -1,
+   -28.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:660": {
+  "d": [
+   -1,
+   -29.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:628": {
+  "d": [
+   -1,
+   -30.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:639": {
+  "d": [
+   0,
+   -38.5
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:654": {
+  "d": [
+   0,
+   -40.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:632": {
+  "d": [
+   0,
+   -30.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:647": {
+  "d": [
+   -1,
+   -38.5
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:662": {
+  "d": [
+   -1,
+   -40.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:629": {
+  "d": [
+   -1,
+   -44.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:640": {
+  "d": [
+   0,
+   -51.9
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:655": {
+  "d": [
+   0,
+   -53.4
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:627": {
+  "d": [
+   -34.3,
+   -17
+  ],
+  "why": "at the margin and on the marker rail, as Structure's (the Figma's Surface and its square are 34 to the right); the group's top at the section padding (24)"
+ },
+ "59:625": {
+  "d": [
+   -34.8,
+   -12.2
+  ],
+  "why": "at the margin and on the marker rail, as Structure's (the Figma's Surface and its square are 34 to the right); the group's top at the section padding (24)"
+ },
+ "59:614": {
+  "d": [
+   -0.3,
+   -15
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:636": {
+  "d": [
+   0,
+   -21.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:651": {
+  "d": [
+   0,
+   -23.3
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:619": {
+  "d": [
+   -0.3,
+   -15
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:644": {
+  "d": [
+   -1,
+   -21.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:659": {
+  "d": [
+   -1,
+   -23.3
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:617": {
+  "d": [
+   -0.3,
+   -24.4
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:638": {
+  "d": [
+   0,
+   -31.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:653": {
+  "d": [
+   0,
+   -32.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:622": {
+  "d": [
+   -0.3,
+   -24.4
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:646": {
+  "d": [
+   -1,
+   -31.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:661": {
+  "d": [
+   -1,
+   -32.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:630": {
+  "d": [
+   -1,
+   -33.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:641": {
+  "d": [
+   0,
+   -41.5
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:656": {
+  "d": [
+   0,
+   -43.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:633": {
+  "d": [
+   0,
+   -33.7
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:648": {
+  "d": [
+   -1,
+   -41.5
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:663": {
+  "d": [
+   -1,
+   -43.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:678": {
+  "d": [
+   -1,
+   -31.2
+  ],
+  "why": "as a card's link: space-action under its line; Sam, Nov 10: the links' text at 14; the rows' rhythm as the cards'",
+  "size": 14
+ },
+ "59:631": {
+  "d": [
+   -1,
+   -47.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:642": {
+  "d": [
+   0,
+   -54.9
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:657": {
+  "d": [
+   0,
+   -56.4
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:634": {
+  "d": [
+   0,
+   -47.1
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:649": {
+  "d": [
+   -1,
+   -54.9
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ },
+ "59:664": {
+  "d": [
+   -1,
+   -56.4
+  ],
+  "why": "the group's top at the section padding (24, the Figma 36); a card's name space-media under its photo, its line space-3 under the name (the Figma 22 and 29); rows space-8 apart, each as tall as the tallest (the Figma 79 between a link and the next photo: no step of the system), so the gap grows by 9 a row"
+ }
+}

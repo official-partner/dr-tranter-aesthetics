@@ -4,17 +4,19 @@ interface Props {
   render?: boolean;
   /** The page's opening statement, its h1; emphasis with <em> (the lighter cut). */
   title: string;
+  /** Its ground: the light sand (Our Approach) or stone (the Concerns page). */
+  theme?: "light" | "stone";
   /** Figma ids for the build review: band top, marker, title. */
   figma?: { top: string; marker: string; title: string };
 }
-const { render = true, title, figma } = Astro.props;
+const { render = true, title, theme = "light", figma } = Astro.props;
 ---
 
 {/* A page's opening under the nav: the small square, then the statement on the main rail, on the sand ground (Our Approach,
-    Nov 20). The band keeps the design's height on a computer (--band-page), its content's below. */}
+    Nov 20). It ends wide, the same on every page (--section-padding-wide): the Figma draws 375 and 253. */}
 {
   render && (
-    <section class="page-head_wrap section-padding" data-figma-band="head" data-band-top={figma?.top}>
+    <section class:list={["page-head_wrap section-padding", `theme-${theme}`]} data-figma-band="head" data-band-top={figma?.top}>
       <div class="page-head_layout site-grid">
         <span class="marker page-head_marker" data-figma={figma?.marker} />
         <h1 class="page-head_title lead-marker text-style-h2" data-figma={figma?.title} set:html={title} />
@@ -27,7 +29,7 @@ const { render = true, title, figma } = Astro.props;
   @layer components {
     /* the top clears the nav on a tablet and a phone, as the home's opening does (DESIGN.md, Spacing) */
     .page-head_wrap {
-      min-height: var(--band-page);
+      padding-bottom: var(--section-padding-wide);
       padding-top: calc(var(--site-margin) + var(--space-10));
       @media (width >= 64rem) {
         padding-top: var(--section-padding);

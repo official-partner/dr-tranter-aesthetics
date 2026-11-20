@@ -1,0 +1,51 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import PageHead from "@/components/section/PageHead.astro";
+import ConcernGroup from "@/components/section/ConcernGroup.astro";
+import { getItems } from "@/utils/content";
+
+/* The Concerns page (Figma « Tranter (Client) », frame 59:602): every concern, by group, each card from its item in the
+   collection (its photo, its name, its summary). A card links to the concern's page once it has one. */
+const concerns = await getItems("concerns");
+/* Figma node ids of each card (image, name, text, link), for the build's review tools only */
+const ids: Record<string, string[]> = {
+  "volume-loss": ["59:612", "59:635", "59:650", "59:665"],
+  "jawline-and-chin": ["59:618", "59:643", "59:658", "59:673"],
+  "skin-laxity": ["59:616", "59:637", "59:652", "59:667"],
+  "expression-lines": ["59:620", "59:645", "59:660", "59:675"],
+  "lip-enhancement": ["59:628", "59:639", "59:654", "59:669"],
+  "under-eye-hollowing": ["59:632", "59:647", "59:662", "59:677"],
+  "temple-hollowing": ["59:629", "59:640", "59:655", "59:670"],
+  "pigmentation": ["59:614", "59:636", "59:651", "59:666"],
+  "redness": ["59:619", "59:644", "59:659", "59:674"],
+  "texture-and-scarring": ["59:617", "59:638", "59:653", "59:668"],
+  "congestion": ["59:622", "59:646", "59:661", "59:676"],
+  "dullness": ["59:630", "59:641", "59:656", "59:671"],
+  "melasma": ["59:633", "59:648", "59:663", "59:678"],
+  "neck-chest-hands": ["59:631", "59:642", "59:657", "59:672"],
+  "weight-management": ["59:634", "59:649", "59:664", "59:679"],
+};
+const item = (c: (typeof concerns)[number]) => ({
+  id: c.id,
+  name: c.data.name,
+  summary: c.data.summary,
+  href: c.data.statement ? `/concerns/${c.id}` : undefined,
+  image: c.data.image && { src: c.data.image, alt: c.data.imageAlt },
+  ids: ids[c.id],
+});
+const structure = concerns.filter((c) => c.data.group === "Structure").map(item);
+const surface = concerns.filter((c) => c.data.group !== "Structure").map(item);
+---
+
+<Layout title="Concerns" overlap navTheme="light">
+  {/* Opening */}
+  <PageHead
+    theme="stone"
+    title="<em>Concerns</em> begin in one of two places: what <em>supports</em> the face, or what its <em>surface</em> shows."
+    figma={{ top: "0", marker: "59:609", title: "59:611" }}
+  />
+  {/* Structure */}
+  <ConcernGroup label="Structure" theme="light" items={structure} figma={{ band: "structure", top: "253", label: "59:626", marker: "59:624" }} />
+  {/* Surface */}
+  <ConcernGroup label="Surface" theme="stone" items={surface} figma={{ band: "surface", top: "2389", label: "59:627", marker: "59:625" }} />
+</Layout>

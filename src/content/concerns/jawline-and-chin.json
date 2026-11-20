@@ -1,5 +1,8 @@
 {
   "name": "Jawline and chin definition",
   "group": "Structure",
-  "order": 2
+  "order": 2,
+  "summary": "Definition through the jawline often softens gradually over time, and is one of the more visible changes people first notice in their own photographs.",
+  "image": "../../assets/content/concerns/jawline-and-chin.jpg",
+  "imageAlt": "Skin with a pale line, close-up"
 }

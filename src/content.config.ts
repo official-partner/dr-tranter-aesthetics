@@ -15,6 +15,7 @@ const concerns = defineCollection({
       .object({
         name: z.string().describe("Name"),
         group: z.enum(["Structure", "Surface"]).optional().describe("Group"),
+        summary: z.string().optional().describe("Summary (its card on the Concerns page)"),
         image: image().optional().describe("Photo (the page's opening and the home list's preview)"),
         imageAlt: z.string().optional().describe("Photo description"),
         statement: z.string().optional().describe("Opening statement (words in italics are set in the lighter cut). The page shows once this is filled"),

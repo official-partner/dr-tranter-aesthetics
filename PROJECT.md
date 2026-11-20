@@ -2,6 +2,23 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (« vas-y avec prêt maintenant »): the Concerns page at `/concerns`, from the Figma frame 59:602,
+  53 of 53 on its target (review/data/concerns-figma.json, concerns-target.json). Every concern by group, each card from
+  its item: its photo, its name, its new field `summary` (the Figma's card text, kept word for word), a link only once
+  the concern has its page (no link to an empty page; the rows keep one height so the rhythm holds).
+  - New: `Card` (a photo at 1.45, a name in capitals, a line, a link) and `ConcernGroup`; the global class
+    `stacked-card` (a card's picture as wide as the card, its texts stacked), now also the journal's and the products'
+    cards (the same rule was in two components); `PageHead theme` (stone here).
+  - A page's opening ends wide (--section-padding-wide), the same on every page, in place of `band-page` (the Figma
+    draws 375 on Our Approach and 253 here): Our Approach's opening is 51 shorter.
+  - Photos as the Figma's overview places them, where the site has them at the design's size (the forehead, the skin
+    with a pale line, the skin texture: six concerns); the other three photos of the overview (the green eye, the
+    neck, the freckled skin) wait for the frame's export, their frames empty. The bank's PNGs come to a session at
+    38 % and the session's network does not reach the app's files: an export placed in the repository, or the Figma
+    connector once its plan allows, gives them whole. Melasma keeps its own photo.
+  - The Figma's corrections: Surface's name and square 34 to the right of Structure's, brought to the margin and the
+    marker rail; both groups start 36 down, at the section padding (24) here; rows space-8 apart (the Figma 79).
+
 - 2026-11-20, Sam (11:06, « revoir les layouts de tablettes en général… le titre à gauche pourrait prendre 3 colonnes.
   L'image… 2 colonnes à droite… que le texte respire »): one section rule on a tablet, made in the grid (DESIGN.md,
   Responsive): the tablet's main rail moves from column 3 to 4, so every title placed « margin to main » takes three

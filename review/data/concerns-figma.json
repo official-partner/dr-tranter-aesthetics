@@ -1,0 +1,691 @@
+{
+ "frame": "59:602",
+ "file": "ckud0OVsXfdavh6x3urC7Y",
+ "width": 1728,
+ "height": 5266,
+ "_note": "Read by script from the Figma connector's layer listing (get_metadata, Nov 20). A text's size and line height are the system style its box holds (44 a title, 17.42 running text, 15.22 a name, 17.42 a link), the listing giving no type.",
+ "texts": [
+  {
+   "id": "59:611",
+   "x": 592.0,
+   "y": 20.0,
+   "w": 600.0,
+   "h": 132.0,
+   "size": 44,
+   "lineHeight": 44,
+   "align": "left",
+   "text": "Concerns begin in one of two places: what supports the face, or what its surface shows."
+  },
+  {
+   "id": "59:626",
+   "x": 27.83203125,
+   "y": 289.0,
+   "w": 294.43359375,
+   "h": 15.0,
+   "size": 16,
+   "lineHeight": 15.04,
+   "align": "left",
+   "text": "Structure"
+  },
+  {
+   "id": "59:627",
+   "x": 61.83203125,
+   "y": 2428.0,
+   "w": 294.43359375,
+   "h": 15.0,
+   "size": 16,
+   "lineHeight": 15.04,
+   "align": "left",
+   "text": "Surface"
+  },
+  {
+   "id": "59:635",
+   "x": 590.0,
+   "y": 590.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "VOLUME LOSS AND HOLLOWING"
+  },
+  {
+   "id": "59:636",
+   "x": 590.0,
+   "y": 2729.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Pigmentation and sun damage"
+  },
+  {
+   "id": "59:637",
+   "x": 590.0,
+   "y": 1083.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Skin laxity and sagging"
+  },
+  {
+   "id": "59:638",
+   "x": 590.0,
+   "y": 3222.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Texture, pores and scarring"
+  },
+  {
+   "id": "59:639",
+   "x": 590.0,
+   "y": 1577.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "LIP ENHANCEMENT"
+  },
+  {
+   "id": "59:640",
+   "x": 590.0,
+   "y": 2074.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "TEMPLE HOLLOWING"
+  },
+  {
+   "id": "59:641",
+   "x": 590.0,
+   "y": 3716.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Dullness and dehydration"
+  },
+  {
+   "id": "59:642",
+   "x": 590.0,
+   "y": 4213.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "NECK, CHEST AND HANDS"
+  },
+  {
+   "id": "59:643",
+   "x": 1157.0,
+   "y": 590.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Jawline and chin definition"
+  },
+  {
+   "id": "59:644",
+   "x": 1157.0,
+   "y": 2729.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Redness and visible vessels"
+  },
+  {
+   "id": "59:645",
+   "x": 1157.0,
+   "y": 1083.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Lines from facial movement"
+  },
+  {
+   "id": "59:646",
+   "x": 1157.0,
+   "y": 3222.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Congestion and breakouts"
+  },
+  {
+   "id": "59:647",
+   "x": 1157.0,
+   "y": 1577.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "UNDER-EYE HOLLOWING"
+  },
+  {
+   "id": "59:648",
+   "x": 1157.0,
+   "y": 3716.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Melasma"
+  },
+  {
+   "id": "59:649",
+   "x": 1157.0,
+   "y": 4213.0,
+   "w": 407.0,
+   "h": 16.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "WEIGHT AND BODY COMPOSITION"
+  },
+  {
+   "id": "59:650",
+   "x": 590.0,
+   "y": 618.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "The cheeks, temples and jawline often lose definition before the skin itself shows visible change. It is among the earliest signs of facial ageing."
+  },
+  {
+   "id": "59:651",
+   "x": 590.0,
+   "y": 2757.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Years of sun exposure surface gradually, often appearing long after the exposure itself, and typically across the face, chest and the back of hands."
+  },
+  {
+   "id": "59:652",
+   "x": 590.0,
+   "y": 1111.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Reduced elasticity means the skin no longer holds the same contours as closely as it once did, particularly through the cheeks, jawline and neck."
+  },
+  {
+   "id": "59:653",
+   "x": 590.0,
+   "y": 3250.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Surface irregularity changes how light reads across the skin, which is why texture and scarring can often look far more pronounced under certain lighting."
+  },
+  {
+   "id": "59:654",
+   "x": 590.0,
+   "y": 1605.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Lips lose volume and definition gradually, following the same structural changes as the rest of the face, with the border often softening first."
+  },
+  {
+   "id": "59:655",
+   "x": 590.0,
+   "y": 2102.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Temple volume loss slowly changes the underlying support structure for the whole upper face, often well before the change itself is ever consciously noticed."
+  },
+  {
+   "id": "59:656",
+   "x": 590.0,
+   "y": 3744.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Skin that looks tired often needs hydration and renewal rather than active treatment, and tends to respond well to a consistent, well-matched daily routine."
+  },
+  {
+   "id": "59:657",
+   "x": 590.0,
+   "y": 4241.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Skin on the neck, chest and hands often ages faster than the face, and is assessed and treated with the same rigour as any facial concern."
+  },
+  {
+   "id": "59:658",
+   "x": 1157.0,
+   "y": 618.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Definition through the jawline often softens gradually over time, and is one of the more visible changes people first notice in their own photographs."
+  },
+  {
+   "id": "59:659",
+   "x": 1157.0,
+   "y": 2757.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Visible vessels and persistent redness often reflect a sensitivity built up over many years, and they tend to become steadily more noticeable with age."
+  },
+  {
+   "id": "59:660",
+   "x": 1157.0,
+   "y": 1111.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Repeated muscle movement gradually etches lines into the skin that remain visible even at rest, long after the expression that made them has passed."
+  },
+  {
+   "id": "59:661",
+   "x": 1157.0,
+   "y": 3250.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Ongoing congestion is often a sign of an imbalanced routine or a compromised skin barrier, rather than a problem with the underlying skin itself."
+  },
+  {
+   "id": "59:662",
+   "x": 1157.0,
+   "y": 1605.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "The under-eye area often hollows earlier than the rest of the face, and the shadowing from that hollowing can compound the visible effect considerably."
+  },
+  {
+   "id": "59:663",
+   "x": 1157.0,
+   "y": 3744.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Melasma is a distinct, hormonally influenced form of pigmentation that responds differently to standard pigment treatment."
+  },
+  {
+   "id": "59:664",
+   "x": 1157.0,
+   "y": 4241.0,
+   "w": 407.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "For patients wanting to discuss weight and body composition as part of a broader plan, assessed individually through a doctor-led consultation."
+  },
+  {
+   "id": "59:665",
+   "x": 590.0,
+   "y": 685.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:666",
+   "x": 590.0,
+   "y": 2824.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:667",
+   "x": 590.0,
+   "y": 1178.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:668",
+   "x": 590.0,
+   "y": 3317.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:669",
+   "x": 590.0,
+   "y": 1675.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:670",
+   "x": 590.0,
+   "y": 2172.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:671",
+   "x": 590.0,
+   "y": 3814.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:672",
+   "x": 590.0,
+   "y": 4311.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:673",
+   "x": 1157.0,
+   "y": 685.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:674",
+   "x": 1157.0,
+   "y": 2824.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:675",
+   "x": 1157.0,
+   "y": 1178.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:676",
+   "x": 1157.0,
+   "y": 3317.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:677",
+   "x": 1157.0,
+   "y": 1675.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:678",
+   "x": 1157.0,
+   "y": 3814.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  },
+  {
+   "id": "59:679",
+   "x": 1157.0,
+   "y": 4311.0,
+   "w": 134.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "VIEW concern →"
+  }
+ ],
+ "shapes": [
+  {
+   "id": "59:603",
+   "name": "Rectangle 42748",
+   "x": 0.0,
+   "y": 253.0,
+   "w": 1728.0,
+   "h": 2136.0
+  },
+  {
+   "id": "59:609",
+   "name": "Rectangle 42723",
+   "x": 449.0,
+   "y": 35.8876953125,
+   "w": 6.0,
+   "h": 6.0
+  },
+  {
+   "id": "59:612",
+   "name": "Image",
+   "x": 590.30078125,
+   "y": 289.0,
+   "w": 407.0,
+   "h": 279.0
+  },
+  {
+   "id": "59:614",
+   "name": "Image",
+   "x": 590.30078125,
+   "y": 2428.0,
+   "w": 407.0,
+   "h": 279.0
+  },
+  {
+   "id": "59:616",
+   "name": "Image",
+   "x": 590.30078125,
+   "y": 782.0,
+   "w": 407.0,
+   "h": 279.0
+  },
+  {
+   "id": "59:617",
+   "name": "Image",
+   "x": 590.30078125,
+   "y": 2921.0,
+   "w": 407.0,
+   "h": 279.0
+  },
+  {
+   "id": "59:618",
+   "name": "Image",
+   "x": 1156.30078125,
+   "y": 289.0,
+   "w": 407.0,
+   "h": 279.0
+  },
+  {
+   "id": "59:619",
+   "name": "Image",
+   "x": 1156.30078125,
+   "y": 2428.0,
+   "w": 407.0,
+   "h": 279.0
+  },
+  {
+   "id": "59:620",
+   "name": "Image",
+   "x": 1156.30078125,
+   "y": 782.0,
+   "w": 407.0,
+   "h": 279.0
+  },
+  {
+   "id": "59:622",
+   "name": "Image",
+   "x": 1156.30078125,
+   "y": 2921.0,
+   "w": 407.0,
+   "h": 279.0
+  },
+  {
+   "id": "59:624",
+   "name": "Rectangle 42757",
+   "x": 449.30078125,
+   "y": 289.0,
+   "w": 6.0,
+   "h": 6.0
+  },
+  {
+   "id": "59:625",
+   "name": "Rectangle 42758",
+   "x": 483.30078125,
+   "y": 2428.0,
+   "w": 6.0,
+   "h": 6.0
+  },
+  {
+   "id": "59:628",
+   "name": "image 335",
+   "x": 591.0,
+   "y": 1275.0,
+   "w": 406.0,
+   "h": 280.0
+  },
+  {
+   "id": "59:629",
+   "name": "image 338",
+   "x": 591.0,
+   "y": 1772.0,
+   "w": 406.0,
+   "h": 280.0
+  },
+  {
+   "id": "59:630",
+   "name": "image 336",
+   "x": 591.0,
+   "y": 3414.0,
+   "w": 406.0,
+   "h": 280.0
+  },
+  {
+   "id": "59:631",
+   "name": "image 339",
+   "x": 591.0,
+   "y": 3911.0,
+   "w": 406.0,
+   "h": 280.0
+  },
+  {
+   "id": "59:632",
+   "name": "image 333",
+   "x": 1156.0,
+   "y": 1275.0,
+   "w": 407.0,
+   "h": 280.0
+  },
+  {
+   "id": "59:633",
+   "name": "image 337",
+   "x": 1156.0,
+   "y": 3414.0,
+   "w": 407.0,
+   "h": 280.0
+  },
+  {
+   "id": "59:634",
+   "name": "image 340",
+   "x": 1156.0,
+   "y": 3911.0,
+   "w": 407.0,
+   "h": 280.0
+  }
+ ]
+}

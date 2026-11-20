@@ -1,0 +1,53 @@
+---
+import Button from "@/components/Button.astro";
+import Img from "@/components/media/Img.astro";
+import { pic, type Pic } from "@/utils/media";
+
+interface Props {
+  /** The name, set in capitals by its style. */
+  title: string;
+  /** The line under it. */
+  text?: string;
+  /** Where the link goes; no link when there is no page yet. */
+  href?: string;
+  /** The link's words. */
+  link?: string;
+  /** The photo; the frame stays, empty, while it is still to come. */
+  image?: { src: Pic; alt?: string };
+  /** The collection item the card shows, for OP System's Contenu and Edit. */
+  item?: { collection: string; id: string; textField?: string };
+  /** Figma node ids for the build review: image, name, text, link. */
+  ids?: string[];
+}
+const { title, text, href, link = "View →", image, item, ids } = Astro.props;
+---
+
+{/* A card of the site: a photo at 1.45, its name in capitals, a line, a link (the Concerns page; Nov 20) */}
+<article class="card_wrap stacked-card" data-op-source={item && `astro:${item.collection}`} data-op-item={item?.id}>
+  <div class="media ratio-145" data-op-field={item && "image"} data-figma={ids?.[0]}>
+    {image && <Img {...pic(image.src)} alt={image.alt ?? ""} variant="constrained" sizes="(width >= 64rem) 25vw, (width >= 48rem) 25vw, 75vw" />}
+  </div>
+  <h3 class="card_title text-style-index-caps" data-op-field={item && "name"} data-figma={ids?.[1]}>{title}</h3>
+  {text && <p class="card_text text-style-main" data-op-field={item?.textField} data-figma={ids?.[2]}>{text}</p>}
+  {href && (
+    <div class="card_action">
+      <Button element="link" variant="link" href={href} data-figma={ids?.[3]}>{link}</Button>
+    </div>
+  )}
+</article>
+
+<style is:global>
+  @layer components {
+    .card_title {
+      margin-top: var(--space-media);
+      text-wrap: pretty;
+    }
+    .card_text {
+      margin-top: var(--space-3);
+      max-width: 44ch;
+    }
+    .card_action {
+      margin-top: var(--space-action);
+    }
+  }
+</style>

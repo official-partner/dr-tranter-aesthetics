@@ -1,5 +1,6 @@
 {
   "name": "Weight and body composition",
   "group": "Surface",
-  "order": 15
+  "order": 15,
+  "summary": "For patients wanting to discuss weight and body composition as part of a broader plan, assessed individually through a doctor-led consultation."
 }

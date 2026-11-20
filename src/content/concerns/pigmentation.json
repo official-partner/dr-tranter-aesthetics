@@ -1,5 +1,8 @@
 {
   "name": "Pigmentation and sun damage",
   "group": "Surface",
-  "order": 8
+  "order": 8,
+  "summary": "Years of sun exposure surface gradually, often appearing long after the exposure itself, and typically across the face, chest and the back of hands.",
+  "image": "../../assets/content/concerns/pigmentation.jpg",
+  "imageAlt": "Forehead and eyes, close-up"
 }

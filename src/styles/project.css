@@ -71,6 +71,16 @@
   padding-left: var(--inset-optical);
 }
 
+/* A card: its picture as wide as the card, its texts stacked under it at their own width (a concern, an article, a product) */
+.stacked-card {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  & > .media {
+    align-self: stretch;
+  }
+}
+
 /* An image frame: the picture fills it, centred; the ratio is one of the system's families */
 .media {
   position: relative;
