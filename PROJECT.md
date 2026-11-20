@@ -6,7 +6,10 @@ One line per decision: the date, who asked, what was decided and why. The newest
   wide as what it shows, never the whole grid. IndexList's items spanned the 12 columns (1680 at 1728) with their texts
   placed on their own columns, so in Edit an item's outline covered the title and the text beside it and took their
   clicks (the focus list, the steps of Our Approach and the home, a concern's factors and steps). The list now sits on
-  its own columns (main and the three after it; the aside to the end) and its items fill it. Measured the same (home
+  its own columns (the number on main, the text on the two after it, ending before the half rail where Our Approach's
+  wide photo starts: Sam, 10:54; the aside list to the end) and its items fill it. Checked by script: no item's box
+  over anything outside it on the home, Our Approach and Melasma at 1728, 1280, 1024, 900 and 390 (the home's hover
+  photos excepted: hidden at rest, over their neighbours only while shown, as drawn). Measured the same (home
   92 of 92, Our Approach 31 of 31), 0 failure at the nine widths.
 
 - 2026-11-20, Sam (« enchaîne avec approach »): Our Approach at `/approach` (Simon's path), from the Figma frame 59:828,

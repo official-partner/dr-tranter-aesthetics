@@ -93,8 +93,10 @@ const { render = true, steps, variant = "main", numbered = true, list, source, c
       grid-column: margin / end;
     }
     @media (width >= 64rem) {
+      /* the number on main, the text on the two columns after it: the list ends before the half rail, where a wide
+         photo starts (Our Approach) */
       .index-list_wrap {
-        grid-column: main / span 4;
+        grid-column: main / span 3;
       }
       .index-list_wrap.aside {
         grid-column: aside / end;
@@ -103,7 +105,7 @@ const { render = true, steps, variant = "main", numbered = true, list, source, c
         grid-column: main;
       }
       .index-list_body {
-        grid-column: detail / span 3;
+        grid-column: detail / span 2;
       }
       .index-list_wrap.aside {
         & .index-list_index {
