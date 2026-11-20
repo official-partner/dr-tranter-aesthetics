@@ -2,6 +2,19 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (13:17, three asks on the menu):
+  - « le texte du menu disparaît trop vite au close »: closing, the names and links now leave upward under their
+    masks, in the order they came (600 ms each, 14 ms apart), and the curtain lifts after them (220 ms later, 800 ms).
+    Before: a 240 ms fade. Opened from further down the page, the bar's logo and pill fade in and out with the menu.
+  - « rendre le bouton menu sticky au scroll, couleur selon la section »: the menu's button stays on screen at every
+    scroll, where the bar puts it (a stand-in keeps its place in the bar; the design's node 1:69 is measured on it). It
+    takes the theme of the section under it (the section's `theme-*` class, the light sand where there is none), so
+    it reads on light and dark grounds; the menu's colours while the menu is open. Only the button: the logo and the
+    pill still leave with the bar.
+  - « l'anim entre 3 lignes et X »: two steps. The outer lines meet on the middle one, which closes on its centre, then
+    they turn into the cross; closing runs it back (`--burger-duration` 380 ms a step, the second starting at 70 %).
+    A fault found on the way: while the menu opened or closed, a rule for the bar's colours replaced the lines' own
+    transition, so the cross snapped back to three lines. Fixed.
 - 2026-11-20, Sam (13:06, « mieux synchroniser la fermeture du menu… la nouvelle page et son overlay pourraient être
   par-dessus le menu »): from the open menu, the next page's curtain rises over the menu itself, which dims and drifts
   with the page it belongs to. No separate lift of the menu, so nothing to synchronise; `--page-menu-delay` is gone.

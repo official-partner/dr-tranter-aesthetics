@@ -43,7 +43,8 @@ const groups = [
        2. a curtain uncovers the panel from the top (a clip, --menu-open-duration on the arrive curve), its content
           drifting down into place under it and the photo settling from a slight zoom; the page dims behind;
        3. once the curtain is well down, each group's name and links rise from their masks, group by group, in order.
-       Closing is quicker: the links fade first, then the curtain lifts (--menu-close-duration). Every value is a token
+       Closing is a little quicker: the links leave upward under their masks, then the curtain lifts after them
+       (--menu-close-delay, --menu-close-duration). Every value is a token
        of base.css (--menu-*). Reduced motion: no travel, it opens and closes at once. */
 
     /* the page dims behind the open menu */
@@ -74,7 +75,7 @@ const groups = [
       color: var(--text);
       /* the curtain: closed at its top edge, the panel itself never moves */
       clip-path: inset(0 0 100% 0);
-      transition: clip-path var(--menu-close-duration) var(--menu-close-ease) calc(var(--menu-close-duration) * 0.12);
+      transition: clip-path var(--menu-close-duration) var(--menu-close-ease) var(--menu-close-delay);
       &[hidden] {
         display: block;
         visibility: hidden;
@@ -83,11 +84,11 @@ const groups = [
     /* its content drifts down into place under the curtain */
     .menu_layout {
       translate: 0 var(--menu-shift);
-      transition: translate var(--menu-close-duration) var(--menu-close-ease);
+      transition: translate var(--menu-close-duration) var(--menu-close-ease) var(--menu-close-delay);
     }
     .menu_image {
       scale: var(--menu-image-scale);
-      transition: scale var(--menu-close-duration) var(--menu-close-ease);
+      transition: scale var(--menu-close-duration) var(--menu-close-ease) var(--menu-close-delay);
     }
     /* a name or a link rises from its mask (a little room below for the descenders) */
     .menu_mask {
@@ -100,10 +101,16 @@ const groups = [
       display: block;
       translate: 0 110%;
       opacity: 0;
-      /* closing: they fade first, and drop back under their masks once the curtain is up */
-      transition:
-        opacity var(--open-duration) var(--open-ease),
-        translate 0s linear var(--menu-close-duration);
+      /* closed: back under its mask at once, ready to rise again (nothing shows: the curtain is up) */
+      transition: none;
+    }
+    /* closing (Sam, Nov 20, 13:17: « le texte disparaît trop vite au close »): the names and links leave upward under
+       their masks, in the order they came, as the curtain starts to lift after them */
+    html[data-menu="closing"] .menu_rise {
+      translate: 0 -110%;
+      opacity: 1;
+      transition: translate var(--menu-line-close-duration) var(--menu-close-ease)
+        calc((var(--g, 0) * 2 + var(--i, 0)) * var(--menu-close-stagger));
     }
     html[data-menu="open"] {
       overflow: hidden;

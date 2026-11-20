@@ -52,7 +52,11 @@
   --page-dim: 0.55;
   --menu-open-duration: 1000ms;
   --menu-open-ease: var(--ease-osmo);
-  --menu-close-duration: 650ms;
+  --menu-close-duration: 800ms;
+  --menu-close-delay: 220ms;
+  --menu-line-close-duration: 600ms;
+  --menu-close-stagger: 14ms;
+  --burger-duration: 380ms;
   --menu-close-ease: var(--ease-travel);
   --menu-line-duration: 1000ms;
   --menu-line-ease: var(--ease-smooth);

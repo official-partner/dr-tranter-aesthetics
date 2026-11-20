@@ -89,6 +89,13 @@ for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
   links fade, the curtain lifts on `--menu-close-duration` 650 ms, `--menu-close-ease` travel. The bar's colours
   follow the curtain (`--menu-bar-delay`).
 
+## The menu's button (Nov 20)
+- Fixed on screen, in the theme of the section under it (colour on `--hover-duration`). Three lines to a cross in two
+  steps of `--burger-duration` on the smooth curve: meet, then turn; back: unturn, then part. A larger hit area than
+  its lines (`--space-4` around).
+- The menu's closing: lines out under their masks on `--menu-line-close-duration`, `--menu-close-stagger` apart; the
+  curtain after `--menu-close-delay`.
+
 ## The page change (Nov 20): the curtain
 - The site's own (TransitionCustom.astro): the next page clipped open from the bottom up (Sam, 13:02) on `--page-arrive-duration` 1000 ms,
   `--page-arrive-ease` osmo; the page left drifts up `--page-shift` and dims to `--page-dim` on `--page-leave-*` (the same

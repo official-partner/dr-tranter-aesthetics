@@ -25,11 +25,12 @@ const { render = true, theme = "dark" } = Astro.props;
           <Button element="link" href="#consultation" data-figma="1:67">
             Book a consultation
           </Button>
-          <button class="nav_toggle" type="button" aria-label="Open the menu" aria-expanded="false" aria-controls="site-menu" data-menu-toggle data-figma="1:69">
+          <button class="nav_toggle" type="button" aria-label="Open the menu" aria-expanded="false" aria-controls="site-menu" data-menu-toggle>
             <span class="nav_toggle_line" />
             <span class="nav_toggle_line" />
             <span class="nav_toggle_line" />
           </button>
+          <span class="nav_toggle_space" aria-hidden="true" data-figma="1:69" />
         </div>
       </div>
     </header>
@@ -52,7 +53,7 @@ const { render = true, theme = "dark" } = Astro.props;
     }
     /* the bar takes the menu's colours as the curtain passes under it, and its own back as it lifts (the theme class is
        swapped by the script below; the colours follow it here) */
-    html:is([data-menu="open"], [data-menu="closing"]) :is(.nav_inner, .nav_inner *) {
+    html:is([data-menu="open"], [data-menu="closing"]) :is(.nav_inner, .nav_inner *):not(.nav_toggle_line) {
       transition:
         color var(--hover-duration) var(--hover-ease) var(--_bar-delay, 0s),
         border-color var(--hover-duration) var(--hover-ease) var(--_bar-delay, 0s),
@@ -60,6 +61,19 @@ const { render = true, theme = "dark" } = Astro.props;
     }
     html[data-menu="open"] :is(.nav_inner, .nav_inner *) {
       --_bar-delay: var(--menu-bar-delay);
+    }
+    /* opened from further down the page, where the bar is not on screen: its logo and its pill come in with the menu
+       and go with it, never popping in or out */
+    html[data-menu-away] :is(.nav_logo, .nav_actions > .button_wrap) {
+      opacity: 0;
+      transition: none;
+    }
+    html[data-menu-away][data-menu="closing"] :is(.nav_logo, .nav_actions > .button_wrap) {
+      transition: opacity var(--menu-line-close-duration) var(--menu-close-ease);
+    }
+    html[data-menu-away][data-menu="open"] :is(.nav_logo, .nav_actions > .button_wrap) {
+      opacity: 1;
+      transition: opacity var(--hover-duration) var(--hover-ease) var(--menu-bar-delay);
     }
     .nav_logo {
       grid-column: margin / span 2;
@@ -74,36 +88,77 @@ const { render = true, theme = "dark" } = Astro.props;
         justify-self: end;
       }
     }
+    /* The menu's button stays on screen as the page scrolls (Sam, Nov 20, 13:17), where the bar puts it: the script
+       below fixes it at the place its stand-in keeps in the bar, and gives it the theme of the section under it, so
+       it reads on a light ground and on a dark one. */
     .nav_toggle {
+      position: relative;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       width: var(--burger);
       aspect-ratio: 18.53 / 11.77;
       color: var(--text);
+      transition: color var(--hover-duration) var(--hover-ease);
+      /* a finger's room around three thin lines */
+      &::before {
+        content: "";
+        position: absolute;
+        inset: calc(var(--space-4) * -1);
+      }
+      &[data-fixed] {
+        position: fixed;
+        top: var(--_toggle-top);
+        right: var(--_toggle-right);
+      }
     }
+    .nav_toggle_space {
+      display: none;
+      width: var(--burger);
+      aspect-ratio: 18.53 / 11.77;
+      .nav_toggle[data-fixed] + & {
+        display: block;
+      }
+    }
+    /* Three lines to a cross, in two steps (Sam, 13:17). Its job: answer the click and say what the button now does.
+       Opening: the outer lines meet on the middle one, which closes on its centre, then they turn into the cross.
+       Closing runs it back: the cross unturns, then the lines part. Each step --burger-duration on the out curve, the
+       second starting as the first settles. */
     .nav_toggle_line {
       display: block;
       height: var(--border-width);
       background-color: currentcolor;
       transform-origin: center;
+      --_step: calc(var(--burger-duration) * 0.7);
+      --_meet: calc(var(--burger) * 11.77 / 18.53 / 2 - var(--border-width) / 2);
+      /* to the three lines: unturn, then part */
       transition:
-        translate var(--hover-duration) var(--open-ease),
-        rotate var(--hover-duration) var(--open-ease),
-        opacity var(--open-duration) var(--open-ease);
+        rotate var(--burger-duration) var(--ease-smooth),
+        translate var(--burger-duration) var(--ease-smooth) var(--_step),
+        scale var(--burger-duration) var(--ease-smooth) var(--_step);
     }
-    /* open: the three lines become the close cross (Figma 59:191) */
     .nav_toggle[aria-expanded="true"] .nav_toggle_line {
+      /* to the cross: meet, then turn */
+      transition:
+        translate var(--burger-duration) var(--ease-smooth),
+        scale var(--burger-duration) var(--ease-smooth),
+        rotate var(--burger-duration) var(--ease-smooth) var(--_step);
       &:nth-child(1) {
-        translate: 0 calc(var(--burger) * 11.77 / 18.53 / 2 - var(--border-width) / 2);
+        translate: 0 var(--_meet);
         rotate: 45deg;
       }
       &:nth-child(2) {
-        opacity: 0;
+        scale: 0 1;
       }
       &:nth-child(3) {
-        translate: 0 calc((var(--burger) * 11.77 / 18.53 / 2 - var(--border-width) / 2) * -1);
+        translate: 0 calc(var(--_meet) * -1);
         rotate: -45deg;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .nav_toggle_line,
+      .nav_toggle[aria-expanded="true"] .nav_toggle_line {
+        transition: none;
       }
     }
   }
@@ -114,7 +169,8 @@ const { render = true, theme = "dark" } = Astro.props;
   import { pageLenis } from "@/utils/smooth-scroll";
 
   /* The menu: opened and closed by the nav's button, closed by Escape, the scrim or a link; the page behind it inert
-     and still; the nav's bar takes the menu's colours while it is open; focus goes in, then back to the button. */
+     and still; the nav's bar takes the menu's colours while it is open; focus goes in, then back to the button. The
+     button itself stays on screen at every scroll, in the colours of the section under it. */
   onPage((signal) => {
     const root = document.documentElement;
     const nav = document.querySelector<HTMLElement>(".nav_wrap");
@@ -138,6 +194,39 @@ const { render = true, theme = "dark" } = Astro.props;
       nav.classList.toggle("theme-mist", menuColours);
     };
 
+    /* The button's place: fixed where its stand-in sits in the bar (the bar is at the page's top) */
+    const space = toggle.nextElementSibling as HTMLElement | null;
+    const place = () => {
+      if (!space || root.dataset.menu) return;
+      toggle.dataset.fixed = "";
+      const r = space.getBoundingClientRect();
+      toggle.style.setProperty("--_toggle-top", `${r.top + scrollY}px`);
+      toggle.style.setProperty("--_toggle-right", `${root.clientWidth - r.right}px`);
+    };
+    /* The button's colours: the theme of the section under it; the menu's own while the menu is open (`back`: the menu
+       is lifting past it, the page's colours come back) */
+    const tint = (back = false) => {
+      const old = [...toggle.classList].find((c) => c.startsWith("theme-"));
+      let name: string | undefined;
+      if (!root.dataset.menu || back) {
+        const r = toggle.getBoundingClientRect();
+        const under = document.elementsFromPoint(r.x + r.width / 2, r.y + r.height / 2).find((el) => !nav.contains(el));
+        const host = under?.closest('[class*="theme-"]');
+        name = [...(host?.classList ?? [])].find((c) => c.startsWith("theme-")) ?? "theme-light";
+      }
+      if (old === name) return;
+      if (old) toggle.classList.remove(old);
+      if (name) toggle.classList.add(name);
+    };
+    let frame = 0;
+    const follow = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; tint(); }); };
+    place();
+    tint();
+    document.fonts?.ready.then(() => { place(); tint(); });
+    window.addEventListener("scroll", follow, { signal, passive: true });
+    window.addEventListener("resize", () => { place(); follow(); }, { signal });
+    signal.addEventListener("abort", () => cancelAnimationFrame(frame));
+
     const set = (open: boolean) => {
       clear();
       toggle.setAttribute("aria-expanded", String(open));
@@ -146,25 +235,30 @@ const { render = true, theme = "dark" } = Astro.props;
       const lenis = pageLenis();
       if (lenis) open ? lenis.stop() : lenis.start();
       if (open) {
+        if (nav.getBoundingClientRect().bottom <= 0) root.dataset.menuAway = "";
         menu.hidden = false;
         /* one frame with the panel shown and closed, so its curtain runs from the top */
         requestAnimationFrame(() => requestAnimationFrame(() => {
           if (toggle.getAttribute("aria-expanded") !== "true") return;
           root.dataset.menu = "open";
           theme(true);
+          tint();
         }));
         menu.querySelector<HTMLElement>("a")?.focus({ preventScroll: true });
       } else {
-        if (root.dataset.menu !== "open") { menu.hidden = true; delete root.dataset.menu; theme(false); return; }
+        if (root.dataset.menu !== "open") { menu.hidden = true; delete root.dataset.menu; delete root.dataset.menuAway; theme(false); return; }
         toggle.focus({ preventScroll: true });
+        const wait = reduced() ? 0 : ms("--menu-close-delay");
         const close = reduced() ? 0 : ms("--menu-close-duration");
         root.dataset.menu = "closing";
         /* the bar gets its colours back as the curtain lifts past it, then the panel leaves the tab order */
-        timers.push(window.setTimeout(() => theme(false), close * 0.7));
+        timers.push(window.setTimeout(() => { theme(false); tint(true); }, wait + close * 0.8));
         timers.push(window.setTimeout(() => {
           delete root.dataset.menu;
+          delete root.dataset.menuAway;
           menu.hidden = true;
-        }, close * 1.15 + 20));
+          tint();
+        }, wait + close + 60));
       }
     };
 
@@ -183,7 +277,7 @@ const { render = true, theme = "dark" } = Astro.props;
       set(false);
     }, { signal });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && root.dataset.menu === "open") set(false); }, { signal });
-    signal.addEventListener("abort", () => { clear(); if (root.dataset.menu) { delete root.dataset.menu; menu.hidden = true; theme(false); page().forEach((el) => (el.inert = false)); pageLenis()?.start(); } });
+    signal.addEventListener("abort", () => { clear(); if (root.dataset.menu) { delete root.dataset.menu; delete root.dataset.menuAway; menu.hidden = true; theme(false); page().forEach((el) => (el.inert = false)); pageLenis()?.start(); } });
   });
 </script>
 
