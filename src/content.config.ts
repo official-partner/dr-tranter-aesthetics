@@ -17,7 +17,7 @@ const concerns = defineCollection({
         group: z.enum(["Structure", "Surface"]).optional().describe("Group"),
         image: image().optional().describe("Photo (the page's opening and the home list's preview)"),
         imageAlt: z.string().optional().describe("Photo description"),
-        statement: z.string().optional().describe("Opening statement (words in <em> are set in the lighter cut). The page shows once this is filled"),
+        statement: z.string().optional().describe("Opening statement (words in italics are set in the lighter cut). The page shows once this is filled"),
         consultation: z.string().optional().describe("Consultation length"),
         assessedBy: z.string().optional().describe("Assessed by"),
         happening: z.string().optional().describe("What is happening"),

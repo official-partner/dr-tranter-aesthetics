@@ -2,6 +2,12 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (« la phrase d'ouverture en texte mis en forme »): a concern's opening statement is a formatted text,
+  Markdown as OP System's Contenu writes it (*words* in italics are the lighter cut), read by `inlineRich`
+  (src/utils/rich.ts, the app's own reading). Melasma and Volume loss converted; the page renders as before. Left to the
+  app: the field's kind « Formatted text » is kept in OP's arrangement, set in the app (its worker's `type` op), not in
+  the site; until it is set Contenu shows the field as plain text with its asterisks.
+
 - 2026-11-20, Sam (« ces pages-là, c'est des pages de template CMS… voir qu'est-ce qui manquerait »): the concern
   pages tied to OP System as a CMS template, before more of them are built. Static pages come next; the other concern
   and treatment pages wait for the app's Contenu and Edit passes.
