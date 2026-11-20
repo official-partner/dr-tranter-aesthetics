@@ -1,0 +1,57 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import PageHead from "@/components/section/PageHead.astro";
+import TextSection from "@/components/section/TextSection.astro";
+import StepsSection from "@/components/section/StepsSection.astro";
+import CtaBand from "@/components/section/CtaBand.astro";
+
+/* Our Approach (Figma « Tranter (Client) », frame 59:828). The copy is the Figma's, corrected where PROJECT.md says
+   (Nov 20): no superlative, no old name. The data-figma ids tie each element to the frame (review/data/approach-*). */
+---
+
+<Layout title="Our approach" overlap navTheme="light">
+  {/* Opening */}
+  <PageHead
+    title="Every <em>treatment</em> here follows the same four stages: <em>consultation, assessment, planning, and ongoing care.</em>"
+    figma={{ top: "0", marker: "59:835", title: "59:837" }}
+  />
+  {/* Where we focus */}
+  <TextSection
+    theme="stone"
+    title="Where we <em>focus</em>"
+    text="Our focus is deliberately narrow: the lower face, and how it ages. We are obsessive about finding the right non-surgical protocols and devices for lower-face tightening, skin rejuvenation and collagen stimulation, because that is where our expertise lies: skin and structure, and what is genuinely achievable without surgery."
+    listName="focus"
+    list={[
+      { title: "Lower-face tightening", text: "The concern we are most focused on. We choose each protocol for how well it tightens the lower face without surgery.", ids: ["59:864", "59:867"] },
+      { title: "Skin rejuvenation", text: "Tone, texture and quality of the surface, treated with the same rigour as structure, never as an afterthought.", ids: ["59:865", "59:868"] },
+      { title: "Collagen stimulation", text: "Long-term skin quality depends on collagen, not a single session. Our protocols are built to stimulate and sustain it.", ids: ["59:866", "59:869"] },
+    ]}
+    figma={{ band: "focus", top: "375", title: "59:847", text: "59:862" }}
+  />
+  {/* How every plan comes together */}
+  <StepsSection
+    title="How <em>every plan</em> comes together"
+    theme="mist"
+    wide
+    endWide
+    list="approach-stages"
+    steps={[
+      { title: "Consultation", text: "Every relationship with the clinic begins with a conversation, not a procedure. We ask what concerns you, what you have already tried, and what kind of result would feel meaningful rather than excessive.", ids: ["59:850", "59:854", "59:858"] },
+      { title: "Assessment", text: "We consider the face in three parts. Structure is what supports it: volume, contour and the muscles beneath. Surface is the skin itself: tone, texture and hydration. Cohesion is not a category of concern but the discipline that connects the two, the judgement that decides which to address, in which order, and why.", ids: ["59:851", "59:855", "59:859"] },
+      { title: "Planning", text: "Findings from the assessment become a plan specific to your face and to your own goals, sequenced across whatever timeframe best suits you. Nothing is ever proposed without the reasoning behind it.", ids: ["59:852", "59:856", "59:860"] },
+      { title: "Ongoing care", text: "Skin and structure both change over time, so care continues rather than concludes. Review appointments track what is working and keep your full treatment history known to whoever next cares for you.", ids: ["59:853", "59:857", "59:861"] },
+    ]}
+    image={{ src: "/img/approach-hands.jpg", alt: "A practitioner's hands on a patient's wrist" }}
+    figma={{ band: "plan", top: "801", title: "59:848", image: "59:871" }}
+  />
+  {/* Structure, Surface and Cohesion */}
+  <TextSection
+    theme="mist"
+    title="Structure, Surface and Cohesion"
+    text="We consider the face in three parts. Structure is what supports it: volume, contour and the muscles beneath. Surface is the skin itself: tone, texture and hydration. Cohesion is not a category of concern but the discipline that connects the two, the judgement that decides which to address, in which order, and why."
+    action={{ label: "Browse Structure and Surface concerns →", href: "/concerns" }}
+    figma={{ band: "cohesion", top: "1863", title: "59:849", text: "59:863", action: "59:870" }}
+  />
+  {/* Consultation */}
+  <CtaBand theme="light" figma={{ top: "2017", label: "59:845", marker: "59:841", title: "59:840", pill: "59:842" }} />
+</Layout>

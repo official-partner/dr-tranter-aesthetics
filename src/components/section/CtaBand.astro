@@ -6,11 +6,14 @@ interface Props {
   render?: boolean;
   /** Title; emphasis with <em>, a line break with <br />. */
   title?: string;
+  /** Its ground: stone (the home, a concern), or the light sand after a mist band (Our Approach). */
+  theme?: "stone" | "light";
   /** Figma ids for the build review: band top, label, marker, title, pill. */
   figma?: { top: string; label: string; marker: string; title: string; pill: string };
 }
 const {
   render = true,
+  theme = "stone",
   title = "Every new patient begins with<br />a <em>consultation</em>.",
   figma = { top: "6680", label: "1:161", marker: "1:162", title: "1:160", pill: "1:158" },
 } = Astro.props;
@@ -18,7 +21,7 @@ const {
 
 {
   render && (
-    <section class="cta-band_wrap section-padding theme-stone" id="consultation" data-figma-band="cta" data-band-top={figma.top}>
+    <section class:list={["cta-band_wrap section-padding", `theme-${theme}`]} id="consultation" data-figma-band="cta" data-band-top={figma.top}>
       <div class="cta-band_layout site-grid">
         <p class="cta-band_label lead-marker text-style-label inset-optical" data-figma={figma.label}>Where to start?</p>
         <span class="marker cta-band_marker" data-figma={figma.marker} />

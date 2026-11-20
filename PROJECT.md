@@ -2,6 +2,25 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (« enchaîne avec approach »): Our Approach at `/approach` (Simon's path), from the Figma frame 59:828,
+  measured 31 of 31 on its target (review/data/approach-figma.json, approach-target.json, each difference with its
+  reason). The footer's « Our approach » and the home's « Learn more » go there.
+  - New in the system: `band-page` (375 at 1728, the opening's band on a computer); `PageHead` (a page's opening under
+    the nav, its square centred on the title's capitals); `TextSection` (a title, its text on the main rail, an
+    unnumbered list or a link on the right: a concern's « What is happening » composition); `IndexList numbered={false}`;
+    `StepsSection wide` (the photo from column 8 to the edge) and `endWide`; `CtaBand theme` (light sand after a mist
+    band, as drawn); the nav's colours follow the page's opening (`navTheme`: light on sand).
+  - Fixed for every page: StepsSection kept the home's action-row tracks with no actions, three empty gaps (144 at
+    1728) under « How we treat » on the concern pages. It now ends at the section padding, as Sam's rule says.
+  - The Figma's copy corrected: « the most effective non-surgical protocols » becomes « the right… »; « We adopt
+    whichever protocol gives the closest result to surgery, without it » becomes « We choose each protocol for how well
+    it tightens the lower face without surgery » (no superlative, no comparison with surgery: Simon's A5); « Kensington
+    considers the face… » becomes « We consider the face… », and its missing comma. Question for Simon: the « Structure,
+    Surface and Cohesion » text repeats the Assessment step word for word.
+  - The photo is a stand-in cut from the Figma's render at 67 % of its size (the Figma connector reached its plan's
+    limit of calls): `public/img/approach-hands.jpg`, to replace with the frame's export at full size.
+  - The mist band is 88 shorter than drawn: the steps end wide (--section-padding-wide) where the Figma leaves 240.
+
 - 2026-11-20, Sam (« la phrase d'ouverture en texte mis en forme »): a concern's opening statement is a formatted text,
   Markdown as OP System's Contenu writes it (*words* in italics are the lighter cut), read by `inlineRich`
   (src/utils/rich.ts, the app's own reading). Melasma and Volume loss converted; the page renders as before. Left to the

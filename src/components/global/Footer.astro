@@ -11,7 +11,15 @@ const concerns = await getItems("concerns");
 const link = (c: (typeof concerns)[number]) => ({ id: c.id, name: c.data.name, href: c.data.statement ? `/concerns/${c.id}` : "/concerns" });
 const structure = concerns.filter((c) => c.data.group === "Structure").map(link);
 const surface = concerns.filter((c) => c.data.group === "Surface").map(link);
-const clinic = ["All treatments", "Our approach", "Results", "Our team", "The Clinic", "Journal"];
+/* the clinic's pages: an address once the page is built (Simon's brief, Nov 19, A2), the home until then */
+const clinic = [
+  { label: "All treatments", href: "/" },
+  { label: "Our approach", href: "/approach" },
+  { label: "Results", href: "/" },
+  { label: "Our team", href: "/" },
+  { label: "The Clinic", href: "/" },
+  { label: "Journal", href: "/" },
+];
 const connect = ["Contact", "Careers", "Facebook", "Instagram"];
 const legal = ["Risks and complications", "Privacy policy", "Terms", "Complaints"];
 ---
@@ -31,7 +39,7 @@ const legal = ["Risks and complications", "Privacy policy", "Terms", "Complaints
         </div>
         <div class="footer_group stack gap-4 is-clinic">
           <p class="text-style-label" data-figma="1:171">The Clinic</p>
-          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:179">{clinic.map((l) => <li><a class="footer_link" href="/">{l}</a></li>)}</ul>
+          <ul class="footer_list text-style-list" data-cap-offset="0.3395" data-figma="1:179">{clinic.map((l) => <li><a class="footer_link" href={l.href}>{l.label}</a></li>)}</ul>
         </div>
         <p class="footer_legal text-style-list inset-optical" data-cap-offset="0.3395" data-figma="1:182">© Dr Tranter Aesthetics, {new Date().getFullYear()}<br />AHPRA registration MED0000000000</p>
         <div class="footer_group stack gap-4 is-visit">

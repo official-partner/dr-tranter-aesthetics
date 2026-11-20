@@ -190,6 +190,9 @@
   --band-concern: clamp(var(--band-concern-min) / 16 * 1rem, ((var(--band-concern-min) - ((var(--band-concern-max) - var(--band-concern-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--band-concern-max) - var(--band-concern-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--band-concern-max) / 16 * 1rem);
   --band-concern-min: 0;
   --band-concern-max: 0;
+  --band-page: clamp(var(--band-page-min) / 16 * 1rem, ((var(--band-page-min) - ((var(--band-page-max) - var(--band-page-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--band-page-max) - var(--band-page-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--band-page-max) / 16 * 1rem);
+  --band-page-min: 0;
+  --band-page-max: 0;
   --text-note: clamp(var(--text-note-min) / 16 * 1rem, ((var(--text-note-min) - ((var(--text-note-max) - var(--text-note-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-note-max) - var(--text-note-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-note-max) / 16 * 1rem);
   --text-note-min: 15;
   --text-note-max: 15;
@@ -468,6 +471,8 @@
     --band-footer-max: 731;
     --band-concern-min: 318.815;
     --band-concern-max: 538;
+    --band-page-min: 222.222;
+    --band-page-max: 375;
     --text-note-min: 9.481;
     --text-note-max: 16;
     --text-index-caps-min: 9.481;

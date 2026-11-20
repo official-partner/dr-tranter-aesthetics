@@ -23,9 +23,11 @@ type Props = SeoProps & {
   overlap?: boolean;
   /** Set to `false` for a page with its own head (the concern pages). */
   nav?: boolean;
+  /** The nav's colours, those of the page's opening: dark (the home), light (a page opening on sand). */
+  navTheme?: "dark" | "light";
 };
 
-const { theme = "inherit", overlap = false, nav = true, ...seo } = Astro.props;
+const { theme = "inherit", overlap = false, nav = true, navTheme = "dark", ...seo } = Astro.props;
 
 /* The finishing touches, each off until op.config.json turns it on (src/utils/finishes.ts): the loading screen, the
    transition between pages, the smooth scroll. A "custom" one without its file stands in as its first preset. */
@@ -69,7 +71,7 @@ const { smoothScroll } = finish;
     {loader && <Loader part="cover" preset={loader} />}
     {transition && <PageTransitions part="body" preset={transition} />}
     <SkipLink />
-    <Nav overlap={overlap} render={nav} />
+    <Nav overlap={overlap} render={nav} theme={navTheme} />
     <main id="main" tabindex="-1">
       <slot />
     </main>

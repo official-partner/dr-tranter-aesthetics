@@ -1,0 +1,103 @@
+---
+import Button from "@/components/Button.astro";
+import IndexList from "@/components/content/IndexList.astro";
+
+interface Item {
+  title: string;
+  text: string;
+  /** Figma node ids for the build review: title, text. */
+  ids?: string[];
+}
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Section title; emphasis with <em>. */
+  title: string;
+  /** The text on the main rail. */
+  text: string;
+  /** A short list on the aside rail, each a name and a line, unnumbered (Where we focus). */
+  list?: Item[];
+  /** A link against the right edge, level with the text's last line. */
+  action?: { label: string; href: string };
+  /** A list written in the page: its name for OP System's Modifier. */
+  listName?: string;
+  /** Color theme. */
+  theme?: "inherit" | "stone" | "mist";
+  /** Figma ids for the build review: band name, band top, title, text, action. */
+  figma?: { band: string; top: string; title: string; text: string; action?: string };
+}
+const { render = true, title, text, list, action, listName, theme = "inherit", figma } = Astro.props;
+const steps = list?.map((i) => ({ title: i.title, text: i.text, ids: ["", i.ids?.[0] ?? "", i.ids?.[1] ?? ""] }));
+---
+
+{/* A title, its text on the main rail, and an unnumbered list or a link on the right (Our Approach, Nov 20): the
+    « What is happening » composition of a concern, reused. */}
+{
+  render && (
+    <section class:list={["text-section_wrap section-padding", theme !== "inherit" && `theme-${theme}`]} data-figma-band={figma?.band} data-band-top={figma?.top}>
+      <div class="text-section_layout site-grid">
+        <h2 class="text-section_title text-style-h2" data-figma={figma?.title} set:html={title} />
+        <p class="text-section_text text-style-main" data-figma={figma?.text} set:html={text} />
+        {steps && <IndexList steps={steps} variant="aside" numbered={false} list={listName} class="text-section_list" />}
+        {action && (
+          <div class="at-end text-section_action">
+            <Button element="link" variant="link" href={action.href} data-figma={figma?.action}>{action.label}</Button>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .text-section_layout {
+      row-gap: var(--space-7);
+    }
+    .text-section_title,
+    .text-section_text {
+      grid-column: margin / end;
+    }
+    .text-section_title {
+      max-width: 15ch;
+    }
+    @media (width >= 48rem) {
+      .text-section_layout {
+        row-gap: 0;
+      }
+      .text-section_title,
+      .text-section_text,
+      .text-section_layout > .text-section_list {
+        grid-row: 1;
+      }
+    }
+    @media (width >= 64rem) {
+      .text-section_title {
+        grid-column: margin / span 3;
+      }
+      .text-section_text {
+        grid-column: main / span 4;
+      }
+      .text-section_action {
+        grid-row: 1;
+        grid-column: aside / end;
+        align-self: end;
+      }
+    }
+    /* tablet: the title at the margin, the text and the list on the main rail, as a concern's « What is happening » */
+    @media (48rem <= width < 64rem) {
+      .text-section_title {
+        grid-column: margin / main;
+      }
+      .text-section_text {
+        grid-column: main / end;
+      }
+      .text-section_action {
+        grid-row: 2;
+        grid-column: main / end;
+        justify-self: start;
+        margin-top: var(--space-7);
+      }
+    }
+  }
+</style>

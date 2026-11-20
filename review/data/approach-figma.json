@@ -1,0 +1,375 @@
+{
+ "frame": "59:828",
+ "file": "ckud0OVsXfdavh6x3urC7Y",
+ "width": 1728,
+ "height": 2977,
+ "_note": "Read by script from the Figma connector's layer listing (get_metadata, Nov 20). Boxes are the frame's own pixels; a text's size and line height are the system style its box holds (its height over its lines: 44 for a title, 17.42 for running text, 15.22 for an index or a name), the listing giving no type.",
+ "texts": [
+  {
+   "id": "59:837",
+   "x": 592.0,
+   "y": 20.0,
+   "w": 567.0,
+   "h": 176.0,
+   "size": 44,
+   "lineHeight": 44,
+   "align": "left",
+   "text": "Every treatment here follows the same four stages: consultation, assessment, planning, and ongoing care."
+  },
+  {
+   "id": "59:840",
+   "x": 590.0,
+   "y": 2066.0,
+   "w": 531.0,
+   "h": 132.0,
+   "size": 44,
+   "lineHeight": 44,
+   "align": "left",
+   "text": "Every new patient begins with a consultation."
+  },
+  {
+   "id": "59:844",
+   "x": 1511.93,
+   "y": 2072.34,
+   "w": 176.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Book a consultation"
+  },
+  {
+   "id": "59:845",
+   "x": 27.04,
+   "y": 2066.35,
+   "w": 216.27,
+   "h": 15.0,
+   "size": 16,
+   "lineHeight": 15.04,
+   "align": "left",
+   "text": "Where to start?"
+  },
+  {
+   "id": "59:847",
+   "x": 25.0,
+   "y": 395.0,
+   "w": 287.0,
+   "h": 88.0,
+   "size": 44,
+   "lineHeight": 44,
+   "align": "left",
+   "text": "Where we focus"
+  },
+  {
+   "id": "59:848",
+   "x": 25.0,
+   "y": 856.0,
+   "w": 318.0,
+   "h": 88.0,
+   "size": 44,
+   "lineHeight": 44,
+   "align": "left",
+   "text": "How every plan comes together"
+  },
+  {
+   "id": "59:849",
+   "x": 25.0,
+   "y": 1881.0,
+   "w": 430.0,
+   "h": 88.0,
+   "size": 44,
+   "lineHeight": 44,
+   "align": "left",
+   "text": "Structure, Surface and Cohesion"
+  },
+  {
+   "id": "59:850",
+   "x": 591.47,
+   "y": 833.81,
+   "w": 42.62,
+   "h": 15.22,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "[01]"
+  },
+  {
+   "id": "59:851",
+   "x": 591.47,
+   "y": 1007.04,
+   "w": 42.62,
+   "h": 15.22,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "[02]"
+  },
+  {
+   "id": "59:852",
+   "x": 591.47,
+   "y": 1237.04,
+   "w": 42.62,
+   "h": 15.22,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "[03]"
+  },
+  {
+   "id": "59:853",
+   "x": 591.47,
+   "y": 1413.04,
+   "w": 42.62,
+   "h": 15.22,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "[04]"
+  },
+  {
+   "id": "59:854",
+   "x": 741.98,
+   "y": 831.76,
+   "w": 246.0,
+   "h": 15.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Consultation"
+  },
+  {
+   "id": "59:855",
+   "x": 741.98,
+   "y": 1005.0,
+   "w": 246.0,
+   "h": 15.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Assessment"
+  },
+  {
+   "id": "59:856",
+   "x": 741.98,
+   "y": 1235.0,
+   "w": 246.0,
+   "h": 15.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Planning"
+  },
+  {
+   "id": "59:857",
+   "x": 741.98,
+   "y": 1411.0,
+   "w": 246.0,
+   "h": 15.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Ongoing care"
+  },
+  {
+   "id": "59:858",
+   "x": 742.0,
+   "y": 855.0,
+   "w": 275.0,
+   "h": 106.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Every relationship with the clinic begins with a conversation, not a procedure. We ask what concerns you, what you have already tried, and what kind of result would feel meaningful rather than excessive."
+  },
+  {
+   "id": "59:859",
+   "x": 742.0,
+   "y": 1028.0,
+   "w": 281.0,
+   "h": 153.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "We consider the face in three parts. Structure is what supports it: volume, contour and the muscles beneath. Surface is the skin itself: tone, texture and hydration. Cohesion is not a category of concern but the discipline that connects the two, the judgement that decides which to address, in which order, and why."
+  },
+  {
+   "id": "59:860",
+   "x": 742.0,
+   "y": 1258.24,
+   "w": 275.0,
+   "h": 153.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Findings from the assessment become a plan specific to your face and to your own goals, sequenced across whatever timeframe best suits you. Nothing is ever proposed without the reasoning behind it."
+  },
+  {
+   "id": "59:861",
+   "x": 742.0,
+   "y": 1434.24,
+   "w": 275.0,
+   "h": 153.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Skin and structure both change over time, so care continues rather than concludes. Review appointments track what is working and keep your full treatment history known to whoever next cares for you."
+  },
+  {
+   "id": "59:862",
+   "x": 589.47,
+   "y": 404.0,
+   "w": 548.0,
+   "h": 88.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Our focus is deliberately narrow: the lower face, and how it ages. We are obsessive about finding the most effective non-surgical protocols and devices for lower-face tightening, skin rejuvenation and collagen stimulation, because that is where our expertise lies: skin and structure, and what is genuinely achievable without surgery."
+  },
+  {
+   "id": "59:863",
+   "x": 589.0,
+   "y": 1885.0,
+   "w": 500.0,
+   "h": 88.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Kensington considers the face in three parts. Structure is what supports it: volume, contour and the muscles beneath. Surface is the skin itself: tone, texture and hydration. Cohesion is not a category of concern but the discipline that connects the two the judgement that decides which to address, in which order, and why."
+  },
+  {
+   "id": "59:864",
+   "x": 1301.47,
+   "y": 404.0,
+   "w": 246.0,
+   "h": 15.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Lower-face tightening"
+  },
+  {
+   "id": "59:865",
+   "x": 1301.47,
+   "y": 525.32,
+   "w": 246.0,
+   "h": 15.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Skin rejuvenation"
+  },
+  {
+   "id": "59:866",
+   "x": 1301.47,
+   "y": 640.32,
+   "w": 246.0,
+   "h": 15.0,
+   "size": 16,
+   "lineHeight": 15.22,
+   "align": "left",
+   "text": "Collagen stimulation"
+  },
+  {
+   "id": "59:867",
+   "x": 1302.47,
+   "y": 434.32,
+   "w": 295.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "The concern we are most focused on. We adopt whichever protocol gives the closest result to surgery, without it."
+  },
+  {
+   "id": "59:868",
+   "x": 1302.47,
+   "y": 551.32,
+   "w": 288.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Tone, texture and quality of the surface, treated with the same rigour as structure, never as an afterthought."
+  },
+  {
+   "id": "59:869",
+   "x": 1302.0,
+   "y": 671.0,
+   "w": 322.0,
+   "h": 53.0,
+   "size": 16,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Long-term skin quality depends on collagen, not a single session. Our protocols are built to stimulate and sustain it."
+  },
+  {
+   "id": "59:870",
+   "x": 1318.0,
+   "y": 1964.0,
+   "w": 370.0,
+   "h": 18.0,
+   "size": 15,
+   "lineHeight": 17.42,
+   "align": "left",
+   "text": "Browse Structure and Surface concerns →"
+  }
+ ],
+ "shapes": [
+  {
+   "id": "59:829",
+   "name": "Rectangle 42756",
+   "x": -1.0,
+   "y": 0.0,
+   "w": 1729.0,
+   "h": 375.0
+  },
+  {
+   "id": "59:835",
+   "name": "Rectangle 42723",
+   "x": 449.0,
+   "y": 35.89,
+   "w": 6.0,
+   "h": 6.0
+  },
+  {
+   "id": "59:839",
+   "name": "Rectangle 42754",
+   "x": -1.0,
+   "y": 2017.0,
+   "w": 1729.0,
+   "h": 239.0
+  },
+  {
+   "id": "59:841",
+   "name": "Rectangle 42755",
+   "x": 448.5,
+   "y": 2074.84,
+   "w": 6.0,
+   "h": 6.0
+  },
+  {
+   "id": "59:846",
+   "name": "Rectangle 42748",
+   "x": -6.0,
+   "y": 801.0,
+   "w": 1735.0,
+   "h": 1216.0
+  },
+  {
+   "id": "59:871",
+   "name": "image 331",
+   "x": 1050.0,
+   "y": 828.0,
+   "w": 656.0,
+   "h": 813.0
+  },
+  {
+   "id": "59:842",
+   "name": "pill Book a consultation",
+   "x": 1496.36,
+   "y": 2062.16,
+   "w": 207.15,
+   "h": 37.37
+  }
+ ]
+}

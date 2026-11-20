@@ -1,0 +1,193 @@
+{
+ "_note": "Our Approach, Figma Tranter (Client) 59:828: the design corrected by the system (review/README.md). Nov 20, Claude, from Sam's ask to build the page.",
+ "59:837": {
+  "d": [
+   -2,
+   -2.3
+  ],
+  "why": "caps at the section padding (24), as every opening"
+ },
+ "59:847": {
+  "d": [
+   -1,
+   -2.3
+  ],
+  "why": "caps at the section padding (24)"
+ },
+ "59:862": {
+  "d": [
+   0.5,
+   -8.2
+  ],
+  "why": "text on the title's cap line, as a concern's What is happening (the Figma's text sits 9 under its title)"
+ },
+ "59:864": {
+  "d": [
+   -4,
+   -7.1
+  ],
+  "why": "names on the aside rail, column 10 (the Figma's 1301.5 is 4 off it); the list's own rhythm, a name over its line and space-6 between them, as a concern's factors (the Figma's gaps run 26 to 31)"
+ },
+ "59:867": {
+  "d": [
+   -5,
+   -14.5
+  ],
+  "why": "names on the aside rail, column 10 (the Figma's 1301.5 is 4 off it); the list's own rhythm, a name over its line and space-6 between them, as a concern's factors (the Figma's gaps run 26 to 31)"
+ },
+ "59:865": {
+  "d": [
+   -4,
+   1.6
+  ],
+  "why": "names on the aside rail, column 10 (the Figma's 1301.5 is 4 off it); the list's own rhythm, a name over its line and space-6 between them, as a concern's factors (the Figma's gaps run 26 to 31)"
+ },
+ "59:868": {
+  "d": [
+   -5,
+   -1.4
+  ],
+  "why": "names on the aside rail, column 10 (the Figma's 1301.5 is 4 off it); the list's own rhythm, a name over its line and space-6 between them, as a concern's factors (the Figma's gaps run 26 to 31)"
+ },
+ "59:866": {
+  "d": [
+   -4,
+   -0.7
+  ],
+  "why": "names on the aside rail, column 10 (the Figma's 1301.5 is 4 off it); the list's own rhythm, a name over its line and space-6 between them, as a concern's factors (the Figma's gaps run 26 to 31)"
+ },
+ "59:869": {
+  "d": [
+   -4.5,
+   -8.5
+  ],
+  "why": "names on the aside rail, column 10 (the Figma's 1301.5 is 4 off it); the list's own rhythm, a name over its line and space-6 between them, as a concern's factors (the Figma's gaps run 26 to 31)"
+ },
+ "59:848": {
+  "d": [
+   -1,
+   -37.3
+  ],
+  "why": "the title level with the first step and the photo, as the home's approach (the Figma's is 23 lower)"
+ },
+ "59:850": {
+  "d": [
+   -1.5,
+   -10.9
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:854": {
+  "d": [
+   -10.5,
+   -8.8
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:858": {
+  "d": [
+   -10.5,
+   -9.1
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:855": {
+  "d": [
+   -10.5,
+   0.2
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:859": {
+  "d": [
+   -10.5,
+   0.1
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:852": {
+  "d": [
+   -1.5,
+   20
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:856": {
+  "d": [
+   -10.5,
+   22
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:860": {
+  "d": [
+   -10.5,
+   21.7
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:853": {
+  "d": [
+   -1.5,
+   26.3
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:857": {
+  "d": [
+   -10.5,
+   28.3
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:861": {
+  "d": [
+   -10.5,
+   28
+  ],
+  "why": "texts on column 6, as the home's approach and Melasma; the steps follow their text, space-6 apart, as the home's approach"
+ },
+ "59:871": {
+  "d": [
+   -35.5,
+   -3
+  ],
+  "why": "the photo from column 8 to the edge, 4:5, as the founder's and the team's (the Figma's 1050 is 35 off column 8, 656 wide)"
+ },
+ "59:870": {
+  "d": [
+   40.4,
+   -13
+  ],
+  "why": "against the right edge (the Figma's ends 16 short of it), level with the text's last line; Sam, Nov 10: the buttons' and links' text at 14",
+  "size": 14
+ },
+ "59:845": {
+  "d": [
+   0.5,
+   -27.3
+  ],
+  "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
+ },
+ "59:841": {
+  "d": [
+   0,
+   -31.1
+  ],
+  "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
+ },
+ "59:840": {
+  "d": [
+   0,
+   -31.3
+  ],
+  "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
+ },
+ "59:842": {
+  "d": [
+   16.7,
+   -21.2
+  ],
+  "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
+ }
+}

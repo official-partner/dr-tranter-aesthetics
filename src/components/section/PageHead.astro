@@ -1,0 +1,61 @@
+---
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** The page's opening statement, its h1; emphasis with <em> (the lighter cut). */
+  title: string;
+  /** Figma ids for the build review: band top, marker, title. */
+  figma?: { top: string; marker: string; title: string };
+}
+const { render = true, title, figma } = Astro.props;
+---
+
+{/* A page's opening under the nav: the small square, then the statement on the main rail, on the sand ground (Our Approach,
+    Nov 20). The band keeps the design's height on a computer (--band-page), its content's below. */}
+{
+  render && (
+    <section class="page-head_wrap section-padding" data-figma-band="head" data-band-top={figma?.top}>
+      <div class="page-head_layout site-grid">
+        <span class="marker page-head_marker" data-figma={figma?.marker} />
+        <h1 class="page-head_title lead-marker text-style-h2" data-figma={figma?.title} set:html={title} />
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* the top clears the nav on a tablet and a phone, as the home's opening does (DESIGN.md, Spacing) */
+    .page-head_wrap {
+      min-height: var(--band-page);
+      padding-top: calc(var(--site-margin) + var(--space-10));
+      @media (width >= 64rem) {
+        padding-top: var(--section-padding);
+      }
+    }
+    .page-head_layout {
+      align-items: start;
+    }
+    .page-head_marker {
+      display: none;
+    }
+    .page-head_title {
+      grid-column: margin / end;
+      max-width: 22ch;
+      --_lead-marker: inline-block;
+    }
+    @media (width >= 64rem) {
+      .page-head_marker {
+        display: block;
+        /* centred on the capitals of the title's first line (the Figma's square at 36 for a title at 20) */
+        margin-top: calc((var(--h2) * 0.721 - var(--marker)) / 2);
+      }
+      .page-head_title {
+        grid-column: main / span 5;
+        /* the Figma's box, 567 at 1728: its line breaks (Every treatment here follows / the same four stages: / …) */
+        max-width: 13em;
+        --_lead-marker: none;
+      }
+    }
+  }
+</style>

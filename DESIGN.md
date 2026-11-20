@@ -61,7 +61,7 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
 
 ## Spacing
 - `space-1` to `space-11`, `section-space-small / medium / large`, band heights (`band-hero`, `band-approach`,
-  `band-cta`, `band-concern`) from the Figma.
+  `band-cta`, `band-concern`, `band-page`: a page's opening, 375 at 1728, Nov 20) from the Figma.
 - Role tokens point at a step of the scale (`roles` in the JSON): `--space-media` = `space-3` (16 at 1728, 12 on
   tablet and phone) is the gap between an image and the first text of its card, everywhere (Sam, Nov 10). Change the
   step and every card follows.
@@ -76,7 +76,7 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
 against the right edge), `marker` (the small square), `inset-optical` (the optical indent of capitals),
 `media` (an image box: ratio class, the picture absolute, cover, centred; ratios 5:6, 1.45, 16:10, 9:7, 7:10, 1:1;
 a frame whose photo is still to come stays, empty, on `--background-skeleton`, so the composition holds: Nov 20),
-`section-padding` (every section's padding), `lead-marker` (the marker leading a text where the grid has no column
+`section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
 for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 
 ## Motion

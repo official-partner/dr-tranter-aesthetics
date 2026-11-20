@@ -19,6 +19,8 @@ import ConcernHead from "@/components/section/ConcernHead.astro";
 import ConcernBody from "@/components/section/ConcernBody.astro";
 import ProductsSection from "@/components/section/ProductsSection.astro";
 import NotFound from "@/components/section/NotFound.astro";
+import PageHead from "@/components/section/PageHead.astro";
+import TextSection from "@/components/section/TextSection.astro";
 import { getItems, getItem } from "@/utils/content";
 
 /* the samples show the client's own copy: Melasma and the collections as they are */
@@ -65,7 +67,7 @@ const steps = [
     <ComponentSample file="section/HeroHome.astro" note="L'ouverture de l'accueil."><HeroHome /></ComponentSample>
     <ComponentSample file="section/ConcernsHome.astro" note="Les préoccupations de l'accueil, lues dans la collection."><ConcernsHome /></ComponentSample>
     <ComponentSample file="section/StepsSection.astro" note="Les étapes avec leur photo : l'approche de l'accueil, How we treat d'une préoccupation.">
-      <StepsSection title="The Dr Tranter Aesthetics <em>approach</em>" theme="mist" steps={steps} image={{ src: "/img/approach.jpg", alt: "" }} actions={{ pill: { label: "Learn more", href: "/our-approach" } }} />
+      <StepsSection title="The Dr Tranter Aesthetics <em>approach</em>" theme="mist" steps={steps} image={{ src: "/img/approach.jpg", alt: "" }} actions={{ pill: { label: "Learn more", href: "/approach" } }} />
     </ComponentSample>
     <ComponentSample file="section/ResultsHome.astro" note="Les résultats, lus dans la collection, dans la composition éparpillée du design."><ResultsHome /></ComponentSample>
     <ComponentSample file="section/FounderHome.astro" note="La fondatrice."><FounderHome /></ComponentSample>
@@ -90,6 +92,13 @@ const steps = [
     </ComponentSample>
     <ComponentSample file="section/ProductsSection.astro" note="Les produits recommandés, lus dans la collection.">
       <ProductsSection products={products.map((p) => ({ id: p.id, name: p.data.name, text: p.data.text, image: p.data.image, imageAlt: p.data.imageAlt }))} />
+    </ComponentSample>
+    <ComponentSample file="section/PageHead.astro" note="L'ouverture d'une page sous la navigation : le petit carré, puis la phrase sur le rail principal (Our Approach).">
+      <PageHead title="Every <em>treatment</em> here follows the same four stages: <em>consultation, assessment, planning, and ongoing care.</em>" />
+    </ComponentSample>
+    <ComponentSample file="section/TextSection.astro" note="Un titre, son texte sur le rail principal, et une courte liste sans numéros ou un lien à droite (Our Approach).">
+      <TextSection theme="stone" title="Where we <em>focus</em>" text="Our focus is deliberately narrow: the lower face, and how it ages." list={[{ title: "Lower-face tightening", text: "The concern we are most focused on." }, { title: "Skin rejuvenation", text: "Tone, texture and quality of the surface." }]} />
+      <TextSection theme="mist" title="Structure, Surface and Cohesion" text="We consider the face in three parts." action={{ label: "Browse Structure and Surface concerns →", href: "/concerns" }} />
     </ComponentSample>
     <ComponentSample file="section/NotFound.astro" note="La page introuvable."><NotFound /></ComponentSample>
   </ComponentList>
