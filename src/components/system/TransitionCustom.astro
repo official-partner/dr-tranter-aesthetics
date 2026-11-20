@@ -7,6 +7,13 @@
      colours change as the curtain's edge reaches it, last.
    - From the open menu (Sam, 13:06: « la nouvelle page et son overlay par-dessus le menu »): the menu is part of the
      page being left; the curtain rises over it too, as it dims and drifts with its page. One gesture, nothing to sync.
+   - The page that arrives (Sam, 14:53: « animer la page qui apparaît, les éléments… doux, bien dosé », no split
+     text, no masks): it drifts up into place inside the curtain (--page-shift), and the blocks of its first two
+     sections come in one after the other as the curtain's edge passes them: a fade and a short rise
+     (--page-enter-shift, --page-enter-duration on --page-enter-ease, --page-enter-stagger apart, from
+     --page-enter-wait). An opening photo never fades (it is the page's largest paint): it settles from a slight zoom
+     in its frame (--page-media-scale, --page-media-duration), as the menu's photo does. A page loaded directly opens
+     the same way, sooner (--page-enter-wait-load).
    - Reduced motion, or a browser without view transitions: a short crossfade, nothing travels.
    Every value is a token of base.css (system/gen.py). */
 ---
@@ -17,6 +24,32 @@
       background-color: var(--ink);
     }
     @media (prefers-reduced-motion: no-preference) {
+      /* the arriving page's blocks, in reading order; the second section a beat after the first */
+      html[data-page-transition="custom"] {
+        --_enter-wait: var(--page-enter-wait-load);
+        &[data-astro-transition] {
+          --_enter-wait: var(--page-enter-wait);
+        }
+        & main > :nth-child(-n + 2) > .site-grid > * {
+          animation: tranter-page-enter var(--page-enter-duration) var(--page-enter-ease)
+            calc(var(--_enter-wait) + (var(--_enter-section, 0) + var(--_enter-n, 0)) * var(--page-enter-stagger)) backwards;
+          &:nth-child(2) { --_enter-n: 1; }
+          &:nth-child(3) { --_enter-n: 2; }
+          &:nth-child(4) { --_enter-n: 3; }
+          &:nth-child(5) { --_enter-n: 4; }
+          &:nth-child(n + 6) { --_enter-n: 5; }
+        }
+        & main > :nth-child(2) > .site-grid {
+          --_enter-section: 3;
+        }
+        /* the opening's photo: opaque from the first paint, settling in its frame */
+        & main > :first-child > .site-grid > :is(.media, :has(> .media)) {
+          animation: none;
+          & img {
+            animation: tranter-page-settle var(--page-media-duration) var(--page-enter-ease) backwards;
+          }
+        }
+      }
       html[data-page-transition="custom"][data-astro-transition]::view-transition-old(root) {
         mix-blend-mode: normal;
         animation: tranter-page-leave var(--page-leave-duration) var(--page-leave-ease) both;
@@ -49,6 +82,7 @@
     @keyframes tranter-page-curtain {
       from {
         clip-path: inset(100% 0 0 0);
+        translate: 0 var(--page-shift);
       }
       to {
         clip-path: inset(0 0 0 0);
@@ -58,6 +92,17 @@
       to {
         translate: 0 calc(var(--page-shift) * -1);
         opacity: var(--page-dim);
+      }
+    }
+    @keyframes tranter-page-enter {
+      from {
+        opacity: 0;
+        translate: 0 var(--page-enter-shift);
+      }
+    }
+    @keyframes tranter-page-settle {
+      from {
+        scale: var(--page-media-scale);
       }
     }
     @keyframes tranter-page-fade {

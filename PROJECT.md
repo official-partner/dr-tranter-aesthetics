@@ -2,6 +2,21 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (14:53, « peaufiner l'anim de transition, animer la page qui apparaît, les éléments… doux, bien
+  dosé, seamless », no split text with masks): the page that arrives now opens softly. It drifts up into place inside
+  the curtain; the blocks of its first two sections come in one after the other as the curtain's edge passes them (a
+  fade and a rise of `--page-enter-shift`, 1400 ms on the smooth curve, 90 ms apart, from 680 ms; the second section
+  three beats after the first). An opening photo never fades (the page's largest paint): it settles from a 1.08 zoom
+  in its frame, as the menu's photo does. A page loaded directly opens the same way, from 120 ms. The curtain itself
+  is a little slower (1200 ms). Reduced motion: none of it. All in TransitionCustom.astro, every value a token.
+- 2026-11-20, Sam's comment 1 (Concerns, « partout où on a ce style : le texte et le petit carré de gauche sticky au
+  scroll »): new global class `pinned`. A group's name (with its filters on Treatments) and its square stay in view
+  while the group scrolls by, level with the menu's button (`--pinned-top`), from a tablet up; on a phone the name is
+  above its cards and scrolls with them. On CardGroup (Concerns, Treatments) and CtaBand. Not on a concern page's
+  blocks: there the name sits on a card's caption line, under the block's title, and has nowhere to travel.
+- 2026-11-20, Sam's comment 2 (« un petit background sous l'icône menu quand je l'ouvre, bug ? »): a bug. The theme
+  class the button takes from the section under it also painted that section's ground on the button; it showed while
+  the menu's colour came in. The button takes the text colour only now.
 - 2026-11-20, Sam (13:17, three asks on the menu):
   - « le texte du menu disparaît trop vite au close »: closing, the names and links now leave upward under their
     masks, in the order they came (600 ms each, 14 ms apart), and the curtain lifts after them (220 ms later, 800 ms).

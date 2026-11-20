@@ -78,7 +78,7 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
 against the right edge), `marker` (the small square), `inset-optical` (the optical indent of capitals),
 `media` (an image box: ratio class, the picture absolute, cover, centred; ratios 5:6, 1.45, 16:10, 9:7, 7:10, 1:1;
 a frame whose photo is still to come stays, empty, on `--background-skeleton`, so the composition holds: Nov 20),
-`link-list` (a list of plain links: no underline, on hover the link slides `--space-2` right and a square 0.8 marker shows before it; the menu and the footer, Nov 20), `stacked-card` (a card's picture as wide as the card, its texts stacked: Card, the journal, the products), `section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
+`pinned` (a section's name and its square stay in view while the section scrolls by, at `--pinned-top`, from a tablet up: CardGroup, CtaBand; Nov 20), `link-list` (a list of plain links: no underline, on hover the link slides `--space-2` right and a square 0.8 marker shows before it; the menu and the footer, Nov 20), `stacked-card` (a card's picture as wide as the card, its texts stacked: Card, the journal, the products), `section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
 for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 
 ## The menu's motion (Nov 20)
@@ -100,6 +100,12 @@ for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 - The site's own (TransitionCustom.astro): the next page clipped open from the bottom up (Sam, 13:02) on `--page-arrive-duration` 1000 ms,
   `--page-arrive-ease` osmo; the page left drifts up `--page-shift` and dims to `--page-dim` on `--page-leave-*` (the same
   time and curve: one gesture). From the open menu, the curtain rises over the menu too (it leaves with its page). The same gesture as the menu's opening: one language.
+
+## The arriving page (Nov 20)
+- After the curtain: the first two sections' blocks fade and rise (`--page-enter-shift`) on `--page-enter-duration`,
+  `--page-enter-ease`, `--page-enter-stagger` apart, from `--page-enter-wait` (a page change) or
+  `--page-enter-wait-load` (a direct load). An opening photo settles from `--page-media-scale` on
+  `--page-media-duration`, never fades. No split text, no masks on text.
 
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside

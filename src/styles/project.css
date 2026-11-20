@@ -66,6 +66,20 @@
   background-color: var(--marker-color);
 }
 
+/* A section's name and its square stay in view while their section scrolls by (Sam's comment, Nov 20: « partout où on
+   a ce style »), level with the menu's button, from a tablet up, where they have a column of their own */
+.pinned {
+  @media (width >= 48rem) {
+    position: sticky;
+    top: var(--pinned-top);
+    align-self: start;
+    /* the square keeps its place on the name's capitals */
+    &.marker {
+      top: calc(var(--pinned-top) + (max(var(--text-label-floor), var(--text-label)) * 0.721 - var(--marker)) / 2);
+    }
+  }
+}
+
 /* Small texts set at the margin sit 3.5 design pixels inside it (Figma, 9 times; question 9 for Simon) */
 .inset-optical {
   padding-left: var(--inset-optical);

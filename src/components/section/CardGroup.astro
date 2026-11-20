@@ -49,7 +49,7 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
   render && items.length > 0 && (
     <section class:list={["card-group_wrap section-padding", `theme-${theme}`]} data-figma-band={figma?.band} data-band-top={figma?.top}>
       <div class="card-group_layout site-grid">
-        <div class="card-group_head">
+        <div class="card-group_head pinned">
           <p class="card-group_label lead-marker text-style-label inset-optical" data-figma={figma?.label}>{label}</p>
           {filters && (
             <div class="card-group_filters" role="group" aria-label={label} data-card-filters>
@@ -59,7 +59,7 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
             </div>
           )}
         </div>
-        <span class="marker card-group_marker" data-figma={figma?.marker} />
+        <span class="marker card-group_marker pinned" data-figma={figma?.marker} />
         <ul class="card-group_list" data-op-list={list ?? collection} data-op-source={`astro:${collection}`} data-op-noun={noun}>
           {items.map((c) => (
             <li class="card-group_item" data-op-item={c.id} data-category={c.category && slug(c.category)} data-aside={c.aside ? "" : undefined} hidden={c.aside && filters ? true : undefined}>
