@@ -2,6 +2,9 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (13:02, « je ferais peut-être l'inverse : balayage de bas en haut »): the page change's curtain
+  rises from the bottom instead of coming down from the top; the page left drifts up. From the open menu, the page and
+  the menu now travel the same way (up). Same tokens.
 - 2026-11-20, Sam (12:33, his pick of three proposals: « 1. Le rideau… pense aussi à la transition avec le menu
   ouvert »): the page change is the site's own (op.config.json `"transition": "custom"`,
   src/components/system/TransitionCustom.astro), in place of the starter's slide. The next page is uncovered from the

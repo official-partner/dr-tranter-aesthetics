@@ -1,11 +1,12 @@
 ---
 /* Tranter's page change, « le rideau » (Sam, Nov 20: « quelque chose de plus unique à Tranter… clip mask… elevated »;
    his pick of three). Its job: carry the visitor from one page to the next in the menu's own gesture.
-   - A link followed: the next page is uncovered from the top by a curtain (a clip, --page-arrive-duration on
-     --page-arrive-ease), over the page being left, which drifts down a little (--page-shift) and dims (--page-dim).
-     No coloured panel between the two. The bar is part of its page: its colours change as the curtain's edge passes.
-   - From the open menu: the same curtain runs under the menu and shows below it first; then the menu lifts off the
-     next page as it does when it closes (--menu-close-duration, after --page-menu-delay), its bar going with it.
+   - A link followed: the next page rises from the bottom as a curtain (a clip, --page-arrive-duration on
+     --page-arrive-ease; Sam, 13:02: « balayage de bas en haut »), over the page being left, which drifts up a little
+     (--page-shift) and dims (--page-dim). No coloured panel between the two. The bar is part of its page: its
+     colours change as the curtain's edge reaches it, last.
+   - From the open menu: the same curtain rises under the menu, showing below it first; then the menu lifts the same
+     way, off the next page, as it does when it closes (--menu-close-duration, after --page-menu-delay), its bar going with it.
    - Reduced motion, or a browser without view transitions: a short crossfade, nothing travels.
    Every value is a token of base.css (system/gen.py). */
 ---
@@ -71,7 +72,7 @@
 
     @keyframes tranter-page-curtain {
       from {
-        clip-path: inset(0 0 100% 0);
+        clip-path: inset(100% 0 0 0);
       }
       to {
         clip-path: inset(0 0 0 0);
@@ -79,7 +80,7 @@
     }
     @keyframes tranter-page-leave {
       to {
-        translate: 0 var(--page-shift);
+        translate: 0 calc(var(--page-shift) * -1);
         opacity: var(--page-dim);
       }
     }

@@ -90,8 +90,8 @@ for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
   follow the curtain (`--menu-bar-delay`).
 
 ## The page change (Nov 20): the curtain
-- The site's own (TransitionCustom.astro): the next page clipped open from the top on `--page-arrive-duration` 1000 ms,
-  `--page-arrive-ease` osmo; the page left drifts `--page-shift` and dims to `--page-dim` on `--page-leave-*` (the same
+- The site's own (TransitionCustom.astro): the next page clipped open from the bottom up (Sam, 13:02) on `--page-arrive-duration` 1000 ms,
+  `--page-arrive-ease` osmo; the page left drifts up `--page-shift` and dims to `--page-dim` on `--page-leave-*` (the same
   time and curve: one gesture). From the open menu, the menu lifts after `--page-menu-delay` on the menu's own closing
   tokens. The same gesture as the menu's opening: one language.
 
