@@ -50,7 +50,6 @@
   --page-arrive-ease: var(--ease-osmo);
   --page-shift: var(--space-8);
   --page-dim: 0.55;
-  --page-menu-delay: 420ms;
   --menu-open-duration: 1000ms;
   --menu-open-ease: var(--ease-osmo);
   --menu-close-duration: 650ms;

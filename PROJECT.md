@@ -2,6 +2,9 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-20, Sam (13:06, « mieux synchroniser la fermeture du menu… la nouvelle page et son overlay pourraient être
+  par-dessus le menu »): from the open menu, the next page's curtain rises over the menu itself, which dims and drifts
+  with the page it belongs to. No separate lift of the menu, so nothing to synchronise; `--page-menu-delay` is gone.
 - 2026-11-20, Sam (13:02, « je ferais peut-être l'inverse : balayage de bas en haut »): the page change's curtain
   rises from the bottom instead of coming down from the top; the page left drifts up. From the open menu, the page and
   the menu now travel the same way (up). Same tokens.

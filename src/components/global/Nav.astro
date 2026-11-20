@@ -173,7 +173,7 @@ const { render = true, theme = "dark" } = Astro.props;
     ["pointerenter", "focusin", "touchstart"].forEach((t) => toggle.addEventListener(t, warm, { signal, once: true, passive: true }));
     toggle.addEventListener("click", () => set(toggle.getAttribute("aria-expanded") !== "true"), { signal });
     scrim?.addEventListener("click", () => set(false), { signal });
-    /* a link of the menu: the page change lifts the open menu off the next page (TransitionCustom, the curtain);
+    /* a link of the menu: the page change's curtain rises over the open menu, which leaves with its page (TransitionCustom);
        without the router (a new tab, a link it does not follow) it closes as usual */
     menu.addEventListener("click", (e) => {
       const a = (e.target as HTMLElement).closest("a");
