@@ -51,7 +51,7 @@ const treatments = defineCollection({
     z
       .object({
         name: z.string().describe("Name"),
-        summary: z.string().optional().describe("In a few words (Pigment-targeting laser)"),
+        summary: z.string().optional().describe("In a few words"),
         intro: z.string().optional().describe("Description (its card on the Treatments page)"),
         category: z
           .enum(["Injectables", "RF treatments", "Laser & light", "Facials & peels"])
