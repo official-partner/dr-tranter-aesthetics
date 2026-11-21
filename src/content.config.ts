@@ -56,7 +56,7 @@ const treatments = defineCollection({
         category: z
           .enum(["Injectables", "RF treatments", "Laser & light", "Facials & peels"])
           .optional()
-          .describe("Category (the Treatments page's filters)"),
+          .describe("Category"),
         featured: z.boolean().default(false).describe("Featured (at the top of the Treatments page)"),
         image: image().optional().describe("Photo"),
         imageAlt: z.string().optional().describe("Photo description"),
