@@ -107,6 +107,15 @@ for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
   `--page-enter-wait-load` (a direct load). An opening photo settles from `--page-media-scale` on
   `--page-media-duration`, never fades. No split text, no masks on text.
 
+## Motion added Nov 21 (Sam's picks)
+- One language: what rises, rises from the bottom (the curtain, a pill's ground); what stays, stays (the square, the
+  menu's button); a photo settles in its frame (the menu, an opening, the scroll: `--media-settle-scale`); a word rolls
+  in its place when its meaning changes (a group's name: `--roll-duration`).
+- Hovers: pills fill on `--fill-duration`; a linked card's photo on `--media-hover-duration` to `--media-hover-scale`;
+  the home's list moves one set of square, pill, frame and name on `--follow-duration`.
+- Filters: cards travel on `--filter-duration`. Loader: the starter's logo preset on `theme-dark`.
+- The arriving blocks never run under the curtain: paused while the page change runs.
+
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside
   (the Figma's 23 high at 1728), `--space-1` apart, a column under the group's name on a computer, a wrapping row on a

@@ -2,6 +2,37 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-21, Sam (10:29, « un petit bug vers la fin de l'animation de transition, les éléments finissent pas leur
+  animation, lag »): two causes, both fixed. The arriving blocks' wait was read from an attribute the router takes away
+  when the curtain ends: the wait changed under the running animations and they jumped ahead. And the blocks came in
+  under the curtain, so the page change ended in the middle of their fade, the browser's busiest moment. Now one thing
+  at a time: the blocks are paused while the page change runs and come in on the page itself, `--page-enter-wait`
+  (80 ms) after the curtain. The curtain is 1100 ms on a new curve with a shorter tail (`--ease-curtain`), so the top
+  of the page is not left empty. Sampled frame by frame: the largest step of a block's opacity between two frames went
+  from 0.19 to 0.07.
+- 2026-11-21, Sam (« tu peux faire aussi tes idées : 1, 3, 4, 5, 6, 7, 8 », not 2, the sections' reveal on scroll):
+  - 1, photos: every photo settles in its frame as it comes into view, from `--media-settle-scale` (1.12) to its
+    size, led by the scroll (a CSS scroll timeline, no script; browsers without it show the photo still).
+  - 3, cards: a card that links brings its photo forward in its frame on hover (`--media-hover-scale` 1.04,
+    `--media-hover-duration`), and its link's arrow passes. The Treatments cards have no link yet, so they do not move.
+  - 4, pills: a pill's ground rises from the bottom on hover and focus, as the page's curtain does
+    (`--fill-duration`), its words taking the page's colour as it passes; it drops back quicker.
+  - 5, the square and the name, with Sam's note (« ça reste le même élément… un switch de texte entre structure et
+    surface »): between two groups that follow each other (Structure then Surface on Concerns, Featured then Filter by
+    on Treatments) the square never leaves the line, and the name's word rolls to the next group's when that group's
+    ground reaches it (`--roll-duration`), up going down the page, down coming back. From a tablet up.
+  - 6, filters: the cards travel to their new places when a filter is chosen (the browser's view transition,
+    `--filter-duration`); those that go fade out, those that come fade in. Immediate without view transitions.
+  - 7, loading screen: on, the starter's logo preset on the dark brand ground (op.config.json `"loader": "logo"`,
+    `"loaderTheme": "dark"`), once per tab session. On the home it covers at 100 ms, leaves at 1.07 s, gone at 1.96 s,
+    layout shift 0.006; the page's opening waits under it.
+  - 8, the home's list of concerns, Sam's reading of it (« les éléments sont les mêmes : le bouton, le carré, la
+    photo ; ils se déplacent et changent »): on hover the square, the « Learn more » pill, the photo's frame and the
+    group's name travel from the last row to the new one instead of each row showing its own (`--follow-duration`);
+    the photo changes inside the travelling frame; the group's word rolls only when the group changes; the concern's
+    name slides to its place and its weight follows. Each row still holds its own set in the page, so it works without
+    the script, with the keyboard, and the build's measure still reads it. A mouse on a computer only; not under
+    reduced motion. I read « au scroll » as moving down the list with the pointer: to confirm with Sam.
 - 2026-11-20, Sam (14:53, « peaufiner l'anim de transition, animer la page qui apparaît, les éléments… doux, bien
   dosé, seamless », no split text with masks): the page that arrives now opens softly. It drifts up into place inside
   the curtain; the blocks of its first two sections come in one after the other as the curtain's edge passes them (a

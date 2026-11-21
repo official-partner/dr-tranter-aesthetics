@@ -50,7 +50,7 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
     <section class:list={["card-group_wrap section-padding", `theme-${theme}`]} data-figma-band={figma?.band} data-band-top={figma?.top}>
       <div class="card-group_layout site-grid">
         <div class="card-group_head pinned">
-          <p class="card-group_label lead-marker text-style-label inset-optical" data-figma={figma?.label}>{label}</p>
+          <p class="card-group_label lead-marker text-style-label inset-optical" data-figma={figma?.label}><span class="card-group_word">{label}</span></p>
           {filters && (
             <div class="card-group_filters" role="group" aria-label={label} data-card-filters>
               {[filters.all, ...filters.values].map((v, i) => (
@@ -85,6 +85,23 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
     .card-group_head,
     .card-group_list {
       grid-column: margin / end;
+    }
+    /* the name's word rolls in its place when the next group takes over (the script below) */
+    .card-group_label {
+      overflow: clip;
+      padding-block: 0.2em;
+      margin-block: -0.2em;
+      transition: opacity var(--open-duration) var(--open-ease);
+    }
+    .card-group_word {
+      display: inline-block;
+    }
+    /* a filter chosen: the cards travel to their new places, those that go fade, those that come fade in */
+    html[data-card-filter]::view-transition-group(*),
+    html[data-card-filter]::view-transition-old(*),
+    html[data-card-filter]::view-transition-new(*) {
+      animation-duration: var(--filter-duration);
+      animation-timing-function: var(--ease-smooth);
     }
     .card-group_filters {
       display: flex;
@@ -202,25 +219,131 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
 <script>
   import { onPage } from "@/utils/page";
 
-  /* A group's filters: a pill shows only its category's cards; « All » shows the group as it came (the cards featured
-     above stay there). The count is said to screen readers. */
   onPage((signal) => {
-    document.querySelectorAll<HTMLElement>("[data-card-filters]").forEach((pills) => {
+    const root = document.documentElement;
+    const calm = matchMedia("(prefers-reduced-motion: reduce)");
+    const ms = (name: string) => {
+      const v = getComputedStyle(root).getPropertyValue(name).trim();
+      return (parseFloat(v) || 0) * (v.endsWith("ms") ? 1 : 1000);
+    };
+
+    /* A group's filters (Sam, Nov 21, idea 6): a pill shows only its category's cards; « All » shows the group as it
+       came (the cards featured above stay there). The cards travel to their new places instead of changing at once
+       (the browser's own view transition, each card named for the time of the change); the count is said to screen
+       readers. Without view transitions, or under reduced motion, the change is immediate. */
+    document.querySelectorAll<HTMLElement>("[data-card-filters]").forEach((pills, n) => {
       const group = pills.closest(".card-group_layout");
       const items = [...(group?.querySelectorAll<HTMLElement>(".card-group_item") ?? [])];
       const count = group?.querySelector<HTMLElement>("[data-card-count]");
       pills.addEventListener("click", (e) => {
         const pill = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-filter]");
-        if (!pill) return;
+        if (!pill || pill.getAttribute("aria-pressed") === "true") return;
         const value = pill.dataset.filter;
-        pills.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === pill)));
-        let shown = 0;
-        items.forEach((li) => {
-          li.hidden = value ? li.dataset.category !== value : li.hasAttribute("data-aside");
-          if (!li.hidden) shown++;
+        const apply = () => {
+          pills.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === pill)));
+          let shown = 0;
+          items.forEach((li) => {
+            li.hidden = value ? li.dataset.category !== value : li.hasAttribute("data-aside");
+            if (!li.hidden) shown++;
+          });
+          if (count) count.textContent = `${shown} shown`;
+        };
+        if (!document.startViewTransition || calm.matches || root.hasAttribute("data-card-filter")) return apply();
+        items.forEach((li) => (li.style.viewTransitionName = `card-${n}-${li.dataset.opItem}`));
+        root.dataset.cardFilter = "";
+        document.startViewTransition(apply).finished.finally(() => {
+          items.forEach((li) => (li.style.viewTransitionName = ""));
+          delete root.dataset.cardFilter;
         });
-        if (count) count.textContent = `${shown} shown`;
       }, { signal });
     });
+
+    /* One name, one square down the page (Sam, Nov 21, idea 5 and his note: « ça reste le même élément », « un switch
+       de texte entre structure et surface »). Each group has its own pinned name and square (project.css `pinned`).
+       Between two groups that follow each other, the first's would be pushed up and out as the second's came up from
+       below: two of each for a moment. Here the first group's stay on the line until the next group's ground reaches
+       them, then the next group's take their place there, already on the line: the square never moves, and the
+       name's word rolls to the new one (up going down the page, down coming back). From a tablet up, where `pinned`
+       holds; under reduced motion the groups keep their own, as written. */
+    const groups = [...document.querySelectorAll<HTMLElement>(".card-group_wrap")];
+    /* two groups follow each other when the second starts where the first ends */
+    const pairs = groups.slice(1).map((b, i) => [groups[i], b]);
+    const touch = (a: HTMLElement, b: HTMLElement) => Math.abs(a.getBoundingClientRect().bottom - b.getBoundingClientRect().top) < 2;
+    if (!pairs.length) return;
+    const wide = matchMedia("(width >= 48rem)");
+    const moved = new Map<HTMLElement, number>();
+    const move = (el: HTMLElement | null, y: number) => {
+      if (!el) return;
+      if ((moved.get(el) ?? 0) === y) return;
+      moved.set(el, y);
+      el.style.translate = y ? `0 ${y}px` : "";
+    };
+    /* where an element sits without what this script moved it by */
+    const top = (el: HTMLElement) => el.getBoundingClientRect().top - (moved.get(el) ?? 0);
+    const show = (el: HTMLElement | null, on: boolean, soft = true) => {
+      if (!el) return;
+      if (soft) el.style.opacity = on ? "" : "0";
+      else el.style.visibility = on ? "" : "hidden";
+    };
+    const of = (g: HTMLElement) => ({
+      head: g.querySelector<HTMLElement>(".card-group_head")!,
+      label: g.querySelector<HTMLElement>(".card-group_label")!,
+      word: g.querySelector<HTMLElement>(".card-group_word")!,
+      marker: g.querySelector<HTMLElement>(".card-group_marker"),
+    });
+    const state = new Map<HTMLElement, boolean>();
+    const roll = (out: HTMLElement, into: HTMLElement, up: boolean) => {
+      const time = ms("--roll-duration");
+      const easing = getComputedStyle(root).getPropertyValue("--ease-smooth").trim() || "ease-out";
+      out.animate([{ translate: "0 0" }, { translate: `0 ${up ? -140 : 140}%` }], { duration: time * 0.6, easing });
+      into.animate([{ translate: `0 ${up ? 140 : -140}%` }, { translate: "0 0" }], { duration: time, easing });
+    };
+    const clear = () => {
+      for (const g of groups) {
+        const p = of(g);
+        for (const el of [p.head, p.label, p.marker]) { move(el, 0); show(el, true); show(el, true, false); }
+      }
+      state.clear();
+    };
+    const follow = () => {
+      if (!wide.matches || calm.matches) return clear();
+      for (const [a, b] of pairs) {
+        const A = of(a), B = of(b);
+        const line = parseFloat(getComputedStyle(A.head).top) || 0;
+        /* the second group's name is placed by its head, which this script never moves */
+        const aTop = top(A.head), bTop = top(B.head);
+        /* the first group's name is on the line (or would be pushed above it), the second's has not reached it */
+        const mine = touch(a, b) && aTop <= line + 0.5 && bTop > line + 0.5;
+        if (!mine) {
+          move(A.head, 0); move(A.marker, 0); move(B.label, 0); move(B.marker, 0);
+          for (const el of [A.head, B.label]) show(el, true);
+          for (const el of [A.marker, B.marker]) show(el, true, false);
+          state.delete(a);
+          continue;
+        }
+        /* the next group's ground has reached the name: it takes over */
+        const passed = b.getBoundingClientRect().top <= line + A.label.offsetHeight / 2;
+        move(A.head, Math.max(0, line - aTop));
+        move(B.label, line - bTop);
+        if (A.marker && B.marker && A.marker.offsetParent && B.marker.offsetParent) {
+          const mLine = parseFloat(getComputedStyle(A.marker).top) || 0;
+          move(A.marker, Math.max(0, mLine - top(A.marker)));
+          move(B.marker, mLine - top(B.marker));
+          show(A.marker, !passed, false);
+          show(B.marker, passed, false);
+        }
+        show(A.head, !passed);
+        show(B.label, passed);
+        const was = state.get(a);
+        if (was !== undefined && was !== passed) passed ? roll(A.word, B.word, true) : roll(B.word, A.word, false);
+        state.set(a, passed);
+      }
+    };
+    let frame = 0;
+    const ask = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; follow(); }); };
+    follow();
+    window.addEventListener("scroll", ask, { signal, passive: true });
+    window.addEventListener("resize", ask, { signal });
+    signal.addEventListener("abort", () => { cancelAnimationFrame(frame); clear(); });
   });
 </script>

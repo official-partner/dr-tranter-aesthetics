@@ -7,7 +7,7 @@
   "staging": "",
   "domain": "",
   "live": false,
-  "loader": false,
+  "loader": "logo",
   "transition": "custom",
   "smoothScroll": "light",
   "brandColor": "#2C0F0A",
@@ -18,5 +18,6 @@
   "designWidth": 1728,
   "templates": {
     "concerns": "Concern"
-  }
+  },
+  "loaderTheme": "dark"
 }

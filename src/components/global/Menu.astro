@@ -87,6 +87,8 @@ const groups = [
       transition: translate var(--menu-close-duration) var(--menu-close-ease) var(--menu-close-delay);
     }
     .menu_image {
+      /* the menu's own settle, never the scroll's (project.css) */
+      animation: none;
       scale: var(--menu-image-scale);
       transition: scale var(--menu-close-duration) var(--menu-close-ease) var(--menu-close-delay);
     }

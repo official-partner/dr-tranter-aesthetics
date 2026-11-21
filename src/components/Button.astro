@@ -172,7 +172,8 @@ const named = {
       display: inline-block;
     }
     @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-      .button_wrap:hover .button_arrow-in {
+      /* a card's arrow answers the card (idea 3), a button's its button */
+      :is(.button_wrap, .stacked-card):hover .button_arrow-in {
         animation: button-arrow var(--arrow-duration) var(--hover-ease);
       }
     }
@@ -212,6 +213,43 @@ const named = {
           background-color: var(--button-background-hover);
           color: var(--button-text-hover);
           border-color: var(--button-border-hover);
+        }
+      }
+      /* A pill's hover (Sam, Nov 21, idea 4): its ground rises from the bottom, as the page's curtain does, and its
+         words take the page's colour once the ground is passing under them; it drops back quicker. Hover and focus
+         look the same. */
+      &:not(.link, .play, .close, .arrow) {
+        background-image: linear-gradient(var(--text), var(--text));
+        background-repeat: no-repeat;
+        background-origin: border-box;
+        background-position: 50% 100%;
+        background-size: 100% 0%;
+        transition:
+          background-size calc(var(--fill-duration) * 0.6) var(--hover-ease),
+          color var(--open-duration) var(--hover-ease),
+          border-color var(--hover-duration) var(--hover-ease);
+        &:focus-visible:not(:disabled) {
+          background-size: 100% 100%;
+          color: var(--background);
+          border-color: var(--text);
+        }
+        @media (hover: hover) {
+          &:hover:not(:disabled) {
+            background-size: 100% 100%;
+            color: var(--background);
+            border-color: var(--text);
+            transition:
+              background-size var(--fill-duration) var(--hover-ease),
+              color var(--hover-duration) var(--hover-ease) calc(var(--fill-duration) * 0.12),
+              border-color var(--hover-duration) var(--hover-ease);
+          }
+        }
+      }
+      /* reduced motion: the pill's ground is there or not, nothing rises */
+      @media (prefers-reduced-motion: reduce) {
+        &:not(.link, .play, .close, .arrow),
+        &:not(.link, .play, .close, .arrow):hover {
+          transition: none;
         }
       }
       &.secondary {

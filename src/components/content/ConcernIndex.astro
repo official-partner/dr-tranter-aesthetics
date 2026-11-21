@@ -25,7 +25,7 @@ const { render = true, items } = Astro.props;
     <ul class="concern-index_list text-style-display" data-figma="1:81" data-cap-offset="0.1895" data-op-list="concerns" data-op-source="astro:concerns">
       {items.map((item) => (
         <li class="concern-index_item" data-op-item={item.id}>
-          <span class="concern-index_category text-style-label inset-optical" data-op-field="group" data-figma={item.category === "Structure" ? "1:84" : undefined}>{item.category}</span>
+          <span class="concern-index_category text-style-label inset-optical" data-op-field="group" data-figma={item.category === "Structure" ? "1:84" : undefined}><span class="concern-index_word">{item.category}</span></span>
           {item.image && (
             <span class="concern-index_thumb media" data-figma="1:82">
               <Img {...pic(item.image)} alt="" variant="constrained" sizes="10rem" />
@@ -75,6 +75,17 @@ const { render = true, items } = Astro.props;
     }
     .concern-index_category {
       grid-column: margin / inset;
+      /* its word rolls in it when the group changes (the script below): a little room for the letters' edges */
+      overflow: clip;
+      padding-block: 0.2em;
+    }
+    .concern-index_word {
+      display: block;
+    }
+    .concern-index_link {
+      transition:
+        color var(--hover-duration) var(--hover-ease),
+        font-variation-settings var(--hover-duration) var(--hover-ease);
     }
     .concern-index_thumb {
       grid-column: inset;
@@ -117,3 +128,91 @@ const { render = true, items } = Astro.props;
     }
   }
 </style>
+
+<script>
+  import { onPage } from "@/utils/page";
+
+  /* The list's hover as one set of things (Sam, Nov 21: « les éléments sont les mêmes, le bouton, le carré, la photo:
+     ils se déplacent et changent, mais ça reste le même élément », « un switch de texte entre structure et surface »).
+     Each row keeps its own square, photo, button and group name, as the page is written (and as it works without this
+     script). Here a row's set starts from where the last row's set is, so the eye sees one square, one button and one
+     frame travel down the list; the photo changes inside the travelling frame; the group's name rolls only when the
+     group changes (Structure, Surface); the concern's name slides to its place. With a mouse, on a computer; never
+     under reduced motion. Its job: show which concern is chosen, and that the list is one object. */
+  onPage((signal) => {
+    const able = matchMedia("(hover: hover) and (pointer: fine) and (width >= 64rem)");
+    const calm = matchMedia("(prefers-reduced-motion: reduce)");
+    const root = document.documentElement;
+    const ms = (name: string) => {
+      const v = getComputedStyle(root).getPropertyValue(name).trim();
+      return (parseFloat(v) || 0) * (v.endsWith("ms") ? 1 : 1000);
+    };
+    document.querySelectorAll<HTMLElement>(".concern-index_list").forEach((list) => {
+      const items = [...list.querySelectorAll<HTMLElement>(".concern-index_item")];
+      const part = (li: HTMLElement, name: string) => li.querySelector<HTMLElement>(`.concern-index_${name}`);
+      let current: HTMLElement | null = null;
+      let running: Animation[] = [];
+      let shiftWas = 0;
+      const run = (el: HTMLElement | null, frames: Keyframe[], duration: number, easing: string) => {
+        if (el) running.push(el.animate(frames, { duration, easing }));
+      };
+      const stop = () => { running.forEach((a) => a.cancel()); running = []; };
+
+      const go = (next: HTMLElement | null) => {
+        if (next === current) return;
+        const prev = current;
+        current = next;
+        if (!able.matches || calm.matches) return;
+        const time = ms("--follow-duration");
+        const ease = getComputedStyle(root).getPropertyValue("--ease-smooth").trim() || "ease-out";
+        /* where the travelling set is now, mid-travel included, before anything is reset */
+        const at = prev && part(prev, "marker")?.getBoundingClientRect().top;
+        stop();
+        const held = { visibility: "visible" };
+        if (next) {
+          const to = part(next, "marker")!.getBoundingClientRect().top;
+          const d = at != null ? at - to : 0;
+          const from = `0 calc(-50% + ${d}px)`;
+          const same = prev && part(prev, "word")?.textContent === part(next, "word")?.textContent;
+          if (prev) {
+            for (const name of ["marker", "action"]) run(part(next, name), [{ translate: from }, { translate: "0 -50%" }], time, ease);
+            run(part(next, "category"), [{ translate: from }, { translate: "0 -50%" }], time, ease);
+            /* the photo changes inside the frame as it travels: the last one goes with it and fades */
+            run(part(next, "thumb"), [{ translate: from, opacity: 0 }, { translate: "0 -50%", opacity: 1 }], time, ease);
+            run(part(prev, "thumb"), [{ ...held, translate: "0 -50%", opacity: 1 }, { ...held, translate: `0 calc(-50% + ${-d}px)`, opacity: 0 }], time, ease);
+            if (!same) {
+              const up = d < 0 ? 1 : -1;
+              run(part(prev, "category"), [{ ...held, translate: "0 -50%" }, { ...held, translate: `0 calc(-50% + ${-d}px)` }], time, ease);
+              run(part(prev, "word"), [{ translate: "0 0" }, { translate: `0 ${-140 * up}%` }], time * 0.6, ease);
+              run(part(next, "word"), [{ translate: `0 ${140 * up}%` }, { translate: "0 0" }], time, ease);
+            }
+          } else {
+            for (const name of ["marker", "action", "thumb", "category"]) run(part(next, name), [{ opacity: 0 }, { opacity: 1 }], time * 0.6, ease);
+            run(part(next, "word"), [{ translate: "0 140%" }, { translate: "0 0" }], time, ease);
+          }
+        } else if (prev) {
+          for (const name of ["marker", "action", "thumb", "category"]) run(part(prev, name), [{ ...held, opacity: 1 }, { ...held, opacity: 0 }], time * 0.4, ease);
+        }
+        /* a concern's name slides between its two places instead of jumping: the list's rest line is where any other
+           row's name sits, the chosen one's place is where the chosen row's name is now */
+        const other = items.find((li) => li !== prev && li !== next);
+        const rest = other && part(other, "link")!.getBoundingClientRect().left;
+        const chosen = next ? part(next, "link")!.getBoundingClientRect().left : null;
+        if (rest != null) {
+          const shift = (chosen ?? shiftWas + rest) - rest;
+          if (chosen != null) shiftWas = shift;
+          if (Math.abs(shift) > 0.5) {
+            if (next) run(part(next, "link"), [{ translate: `${-shift}px 0` }, { translate: "0 0" }], time, ease);
+            if (prev) run(part(prev, "link"), [{ translate: `${shift}px 0` }, { translate: "0 0" }], time, ease);
+          }
+        }
+      };
+      list.addEventListener("pointerover", (e) => go((e.target as HTMLElement).closest<HTMLElement>(".concern-index_item")), { signal });
+      list.addEventListener("pointerleave", () => go(null), { signal });
+      list.addEventListener("focusin", (e) => go((e.target as HTMLElement).closest<HTMLElement>(".concern-index_item")), { signal });
+      list.addEventListener("focusout", (e) => { if (!list.contains(e.relatedTarget as Node)) go(null); }, { signal });
+      signal.addEventListener("abort", stop);
+    });
+  });
+</script>
+

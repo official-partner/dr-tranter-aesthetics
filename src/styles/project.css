@@ -132,6 +132,34 @@
   }
 }
 
+/* A card that links answers the pointer (Sam, Nov 21, idea 3): its photo comes forward a little in its frame, slowly,
+   and its link's arrow passes (Button). `transform`, so it adds to the settle below (`scale`). */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .stacked-card > .media > img {
+    transition: transform var(--media-hover-duration) var(--ease-smooth);
+  }
+  .stacked-card:has(a):hover > .media > img {
+    transform: scale(var(--media-hover-scale));
+  }
+}
+
+/* A photo settles in its frame as it comes into view (idea 1): from a slight zoom to its size, led by the scroll, so
+   it never jumps and costs no script. Browsers without scroll timelines show it still. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .media > img {
+      animation: media-settle ease-out both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+  }
+}
+@keyframes media-settle {
+  from {
+    scale: var(--media-settle-scale);
+  }
+}
+
 /* An image frame: the picture fills it, centred; the ratio is one of the system's families */
 .media {
   position: relative;
