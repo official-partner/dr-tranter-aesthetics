@@ -4,5 +4,10 @@
   "order": 7,
   "summary": "Temple volume loss slowly changes the underlying support structure for the whole upper face, often well before the change itself is ever consciously noticed.",
   "image": "../../assets/content/concerns/temple-hollowing.jpg",
-  "imageAlt": "Skin with a pale line, close-up"
+  "imageAlt": "Skin with a pale line, close-up",
+  "alongside": [
+    "jawline-and-chin",
+    "skin-laxity",
+    "temple-hollowing"
+  ]
 }
