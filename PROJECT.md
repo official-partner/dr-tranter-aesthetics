@@ -2,6 +2,11 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-23, Sam (comment C2, Nov 22: « un copier-coller des titres donne du texte tout en capitales »): the sources
+  were already right (every title typed in its own case, the capitals text-transform's: the starter's new rule
+  caps-typed finds none here); the capitals came from the browser, which copies a text as its style shows it. The
+  layout now carries the starter's `CopyCase` (src/components/system/CopyCase.astro): a copy from the page gives the
+  words as written. Checked in Chromium: « ALLER AU CONTENU » on screen, « Aller au contenu » copied.
 - 2026-11-21, Sam (10:29, « un petit bug vers la fin de l'animation de transition, les éléments finissent pas leur
   animation, lag »): two causes, both fixed. The arriving blocks' wait was read from an attribute the router takes away
   when the curtain ends: the wait changed under the running animations and they jumped ahead. And the blocks came in
