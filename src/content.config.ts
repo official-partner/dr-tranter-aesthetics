@@ -61,6 +61,7 @@ const treatments = defineCollection({
         image: image().optional().describe("Photo"),
         imageAlt: z.string().optional().describe("Photo description"),
         visible: z.boolean().default(true).describe("Visible on the site"),
+        draft: z.boolean().default(false).describe("Draft"),
         order: z.number().optional().describe("Order"),
       })
       .describe("Treatments"),
@@ -76,6 +77,7 @@ const products = defineCollection({
         image: image().optional().describe("Photo"),
         imageAlt: z.string().optional().describe("Photo description"),
         visible: z.boolean().default(true).describe("Visible on the site"),
+        draft: z.boolean().default(false).describe("Draft"),
         order: z.number().optional().describe("Order"),
       })
       .describe("Products"),
@@ -88,9 +90,17 @@ const articles = defineCollection({
       .object({
         title: z.string().describe("Title"),
         date: z.coerce.date().optional().describe("Date"),
+        summary: z.string().optional().describe("Summary (its card and the page's opening)"),
+        // the article's text, a rich text in OP System's Contenu (its kind given here, Nov 23): subheadings, bold,
+        // italic, links, lists and quotes, kept as Markdown
+        body: z.string().optional().describe("Text").meta({ kind: "rich" }),
         image: image().optional().describe("Photo"),
         imageAlt: z.string().optional().describe("Photo description"),
+        seoTitle: z.string().optional().describe("Title for Google"),
+        seoDescription: z.string().optional().describe("Description for Google"),
+        ogImage: image().optional().describe("Share image"),
         visible: z.boolean().default(true).describe("Visible on the site"),
+        draft: z.boolean().default(false).describe("Draft"),
         order: z.number().optional().describe("Order"),
       })
       .describe("Journal"),
@@ -105,6 +115,7 @@ const results = defineCollection({
         image: image().optional().describe("After photo"),
         imageAlt: z.string().optional().describe("After photo description"),
         visible: z.boolean().default(true).describe("Visible on the site"),
+        draft: z.boolean().default(false).describe("Draft"),
         order: z.number().optional().describe("Order"),
       })
       .describe("Results"),

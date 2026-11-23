@@ -2,13 +2,14 @@
 import Button from "@/components/Button.astro";
 import CardRow from "@/components/content/CardRow.astro";
 import Img from "@/components/media/Img.astro";
-import { getItems } from "@/utils/content";
+import { listed, ruleMarks } from "@/utils/lists";
 import { pic } from "@/utils/media";
 
-/* the three latest articles of the journal; the date as the design writes it, [MM.DD.YY] */
+/* the journal's articles the list « journal-home » shows (its rule in src/data/lists.json: the first three, which OP
+   System's List options changes); the date as the design writes it, [MM.DD.YY] */
 const ids = [["1:139", "1:148", "1:151", "1:153"], ["1:145", "1:149", "1:152", "1:155"], ["1:140", "1:147", "1:150", "1:154"]];
 const two = (n: number) => String(n).padStart(2, "0");
-const posts = (await getItems("articles")).slice(0, 3).map(({ id, data }, i) => ({
+const posts = (await listed<"articles">("journal-home")).map(({ id, data }, i) => ({
   id,
   title: data.title,
   image: data.image,
@@ -23,7 +24,7 @@ const posts = (await getItems("articles")).slice(0, 3).map(({ id, data }, i) => 
   <div class="journal-home_layout site-grid">
     <h2 class="journal-home_title text-style-h2" data-figma="1:138">Our journal: notes on <em>skin</em>, <em>structure</em> and <em>care</em></h2>
     <div class="at-end journal-home_action"><Button element="link" href="/journal" data-figma="1:136">View all articles</Button></div>
-    <CardRow data-op-list="articles" data-op-source="astro:articles">
+    <CardRow {...ruleMarks("journal-home")}>
       {posts.map((p) => (
         <li class="journal-home_card stacked-card" data-op-item={p.id}>
           {p.image && <div class="media ratio-9-7" data-figma={p.ids[0]}><Img {...pic(p.image)} alt={p.alt} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" /></div>}

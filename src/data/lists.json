@@ -1,0 +1,9 @@
+{
+  "lists": {
+    "journal-home": {
+      "collection": "articles",
+      "shows": "all",
+      "limit": 3
+    }
+  }
+}
