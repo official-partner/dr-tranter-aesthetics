@@ -1,6 +1,5 @@
 ---
 import Button from "@/components/Button.astro";
-import { SITE_LOCALE } from "@/consts.ts";
 
 interface Props {
   /** Set to `false` to omit the component. */
@@ -14,7 +13,7 @@ interface Props {
 const {
   render = true,
   target = "main",
-  label = SITE_LOCALE.startsWith("fr") ? "Aller au contenu" : "Skip to content", // in the site's language
+  label = "Aller au contenu",
 } = Astro.props;
 ---
 

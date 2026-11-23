@@ -71,7 +71,7 @@ const { smoothScroll } = finish;
   <body>
     {loader && <Loader part="cover" preset={loader} />}
     {transition && <PageTransitions part="body" preset={transition} />}
-    <SkipLink />
+    <SkipLink label={SITE_LOCALE.startsWith("fr") ? "Aller au contenu" : "Skip to content"} />
     <Nav overlap={overlap} render={nav} theme={navTheme} />
     <main id="main" tabindex="-1">
       <slot />
