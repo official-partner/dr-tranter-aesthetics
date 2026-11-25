@@ -2,5 +2,6 @@
   "name": "CO2 Laser Resurfacing",
   "intro": "Considered for deeper texture, scarring and pigmentation concerns where a more intensive approach is clinically appropriate.",
   "category": "Laser & light",
-  "order": 7
+  "order": 7,
+  "summary": "Ablative resurfacing"
 }

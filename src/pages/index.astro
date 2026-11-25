@@ -3,10 +3,16 @@ import Layout from "@/layouts/BaseLayout.astro";
 import HeroHome from "@/components/section/HeroHome.astro";
 import ConcernsHome from "@/components/section/ConcernsHome.astro";
 import StepsSection from "@/components/section/StepsSection.astro";
-import ResultsHome from "@/components/section/ResultsHome.astro";
-import FounderHome from "@/components/section/FounderHome.astro";
+import CardGroup from "@/components/section/CardGroup.astro";
+import PeopleHome from "@/components/section/PeopleHome.astro";
+import { getItems } from "@/utils/content";
 import JournalHome from "@/components/section/JournalHome.astro";
 import CtaBand from "@/components/section/CtaBand.astro";
+
+/* the featured treatments (the collection's « Featured », as on the Treatments page) */
+const featured = (await getItems("treatments"))
+  .filter((t) => t.data.featured)
+  .map((t) => ({ id: t.id, name: t.data.name, summary: t.data.summary, image: t.data.image && { src: t.data.image, alt: t.data.imageAlt } }));
 ---
 
 <Layout title="Cosmetic medicine, Byron Bay" overlap>
@@ -30,10 +36,10 @@ import CtaBand from "@/components/section/CtaBand.astro";
     actions={{ pill: { label: "Learn more", href: "/approach", figma: "1:109" }, link: { label: "Book a consultation →", href: "#consultation", figma: "1:111" } }}
     figma={{ band: "approach", top: "2156.19", title: "1:95", image: "1:94" }}
   />
-  {/* Results */}
-  <ResultsHome />
-  {/* Founder */}
-  <FounderHome />
+  {/* Featured treatments (Figma 4001:96, Nov 25) */}
+  <CardGroup label="Featured treatments" title="Featured <em>treatments</em>" theme="mist" collection="treatments" noun="Treatment" list="featured-treatments" items={featured} action={{ label: "All treatments →", href: "/treatments" }} />
+  {/* The founder, then the team, in one scroll */}
+  <PeopleHome />
   {/* Journal */}
   <JournalHome />
   {/* Consultation */}

@@ -2,6 +2,35 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-25, Sam (17:36, the home from the new Figma « Starter (Copy) », aoeqIxiMORSdvcWd3SnWsA, frame 4001:2; « c'est
+  le même système… avec juste des petits changements »):
+  - Removed from the home: Results (its component stays, for the Results page).
+  - Where would you like to start: the Surface group starts `--space-5` below Structure (32 at 1728, the Figma's gap);
+    the pill and the link under the list move 32 down (home-target.json says so).
+  - New: Featured treatments, on mist after the approach: the title at the margin, two cards a row (CardGroup now
+    takes a `title` in place of its name and square, and an `action` pill), « All treatments → ». It shows the
+    collection's featured treatments, the same flag as the Treatments page (Weight Loss Consultation, Cosmetic
+    Treatments, Biostimulators, FaceTite); the Figma's cards (EMFACE, CO2 Laser Resurfacing, FaceTite twice) look like
+    placeholders: to confirm which four. Their line is the item's `summary`; EMFACE's and CO2's set to the Figma's
+    words. No « View treatment »: no treatment has its page yet.
+  - The founder, then the team, in one scroll (PeopleHome, in place of FounderHome; the Figma's « Meet the team »
+    frames 4001:199 and 4001:218 and their note). « Meet the founder. » holds at the top left and its word rolls to
+    « team. » when the team's first name reaches the square; the square holds at the middle of the screen; the names
+    scroll; the one at the square is lit (the others at `--people-dim`) and its portrait rises over the last from the
+    bottom (`--people-swap-duration`, the curtain's curve; from the top going back up) and settles. The portrait holds
+    on the right, as tall as the screen less the margin above and below, as wide as that allows at its ratio but
+    never more than half the screen (Sam's words); so it is not a `.media` of the grid. On a phone the title and the
+    portrait hold together at the top and the names pass under them. Reduced motion: the portrait and the word change
+    at once.
+  - New collection `team` (the home and Our team, the pop-up there): name, role, bio, portrait, from the Figma's
+    names and roles. Portraits: Dr Sarah Tranter's (the founder's photo), and for Megan Newman and Abbey Lang the two
+    photos the Figma puts there (placeholders, the second a man for Abbey); Dr Mona Board and Alice McIvor show the
+    empty frame until Sarah sends theirs.
+  - Journal: the Figma's composition, four articles each on its own columns and ratio (third/end 16:10, margin/span 4
+    7:10, half/span 3 5:6, marker/span 5 1.45 with its title above), « Read → » by each title, « View all articles »
+    at the end; no dates (the Figma shows none). The list « journal-home » now shows four; a fourth placeholder article
+    added from Simon's brief, « Pigmentation and redness are not the same problem » (no photo, no date). The Figma's
+    titles and photos are placeholders; the articles' own are kept.
 - 2026-11-24, Sam (comments 8 to 19 in OP System, Nov 24, 23:00 to 23:07, handled in the conversation):
   - 8 and 10, a block with a photo and a link (« chaque fois qu'on a un bloc comme ça, avec une image et lien, tout
     le bloc doit être cliquable »): new global class `linked-card`: the block's own link (marked `data-card-link`)

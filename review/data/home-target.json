@@ -84,16 +84,16 @@
  "1:90": {
   "d": [
    0.0,
-   99.4
+   131.4
   ],
-  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +123.7"
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +123.7 ; Sam, 25 nov : un petit espacement entre les deux groupes de la liste (Structure, Surface), +32"
  },
  "1:92": {
   "d": [
    35.4,
-   97.1
+   129.1
   ],
-  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +123.4"
+  "why": "Sam, 10 nov : pastilles plus serrées et texte des boutons à 14 (bords droits, centres et lignes de base conservés) ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +123.4 ; Sam, 25 nov : un petit espacement entre les deux groupes de la liste (Structure, Surface), +32"
  },
  "1:95": {
   "d": [

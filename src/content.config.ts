@@ -121,4 +121,24 @@ const results = defineCollection({
       .describe("Results"),
 });
 
-export const collections = { concerns, treatments, products, articles, results };
+/* The team (Sam, Nov 25): the same people on the home and on Our team, and in the pop-up a member opens there, so a
+   collection (CLAUDE.md, Content: the same items listed on several pages). Names and roles from the Figma (« Meet the
+   team »), bios and photos to come from Sarah. */
+const team = defineCollection({
+  loader: glob({ pattern: "*.json", base: "./src/content/team" }),
+  schema: ({ image }) =>
+    z
+      .object({
+        name: z.string().describe("Name"),
+        role: z.string().optional().describe("Role"),
+        bio: z.string().optional().describe("Bio (the pop-up on Our team)"),
+        photo: image().optional().describe("Portrait"),
+        photoAlt: z.string().optional().describe("Portrait description"),
+        visible: z.boolean().default(true).describe("Visible on the site"),
+        draft: z.boolean().default(false).describe("Draft"),
+        order: z.number().optional().describe("Order"),
+      })
+      .describe("Team"),
+});
+
+export const collections = { concerns, treatments, products, articles, results, team };

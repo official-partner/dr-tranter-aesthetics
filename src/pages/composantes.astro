@@ -12,7 +12,7 @@ import HeroHome from "@/components/section/HeroHome.astro";
 import ConcernsHome from "@/components/section/ConcernsHome.astro";
 import StepsSection from "@/components/section/StepsSection.astro";
 import ResultsHome from "@/components/section/ResultsHome.astro";
-import FounderHome from "@/components/section/FounderHome.astro";
+import PeopleHome from "@/components/section/PeopleHome.astro";
 import JournalHome from "@/components/section/JournalHome.astro";
 import CtaBand from "@/components/section/CtaBand.astro";
 import ConcernHead from "@/components/section/ConcernHead.astro";
@@ -72,8 +72,8 @@ const steps = [
       <StepsSection title="The Dr Tranter Aesthetics <em>approach</em>" theme="mist" steps={steps} image={{ src: "/img/approach.jpg", alt: "" }} actions={{ pill: { label: "Learn more", href: "/approach" } }} />
     </ComponentSample>
     <ComponentSample file="section/ResultsHome.astro" note="Les résultats, lus dans la collection, dans la composition éparpillée du design."><ResultsHome /></ComponentSample>
-    <ComponentSample file="section/FounderHome.astro" note="La fondatrice."><FounderHome /></ComponentSample>
-    <ComponentSample file="section/JournalHome.astro" note="Les trois derniers articles du journal."><JournalHome /></ComponentSample>
+    <ComponentSample file="section/PeopleHome.astro" note="La fondatrice, puis l'équipe, dans un même défilement : le titre et le portrait restent en place, le nom au carré est allumé et son portrait monte."><PeopleHome /></ComponentSample>
+    <ComponentSample file="section/JournalHome.astro" note="Quatre articles du journal, chacun à sa taille, dans la composition du design."><JournalHome /></ComponentSample>
     <ComponentSample file="section/CtaBand.astro" note="L'invitation de fin, sur chaque page."><CtaBand /></ComponentSample>
     {d?.statement && (
       <ComponentSample file="section/ConcernHead.astro" note="L'ouverture d'une préoccupation (Melasma).">

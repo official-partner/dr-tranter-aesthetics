@@ -67,6 +67,10 @@
   --follow-image-duration: 300ms;
   --cut-duration: 500ms;
   --cut-ease: var(--ease-smooth);
+  --people-swap-duration: 1100ms;
+  --people-swap-ease: var(--ease-curtain);
+  --people-dim: 0.35;
+  --people-ratio: 0.837;
   --pinned-top: calc(var(--site-margin) + var(--pill-y));
   --page-dim: 0.55;
   --menu-open-duration: 1000ms;

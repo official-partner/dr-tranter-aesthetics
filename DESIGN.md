@@ -125,6 +125,12 @@ for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 - The arriving blocks come in with the curtain, `--page-curtain-wait` after the swap, a wait set once per page change
   and never changed under them (Sam, Nov 24; it was after the whole curtain).
 
+## The founder and the team (Nov 25)
+- One scroll: the title, the square and the portrait hold; the names pass the square. The portrait's size comes from
+  the screen (height less two margins; width at `--people-ratio`, at most half the screen). A portrait changes as the
+  curtain does, from the bottom going down (`--people-swap-duration`, `--people-swap-ease`), and settles
+  (`--media-settle-scale`). Names off the square at `--people-dim`. The title's word rolls (`--roll-duration`).
+
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside
   (the Figma's 23 high at 1728), `--space-1` apart, a column under the group's name on a computer, a wrapping row on a

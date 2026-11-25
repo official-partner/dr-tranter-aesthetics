@@ -1,0 +1,376 @@
+---
+import Img from "@/components/media/Img.astro";
+import { getItems } from "@/utils/content";
+import { pic } from "@/utils/media";
+
+/* The founder, then the team, in one scroll (Sam, Nov 25; Figma « Starter (Copy) » 4001:2 and « Meet the team »
+   4001:199, 4001:218, with its note: « The section opens on Dr Sarah Tranter, then, as you scroll, gives way to the team:
+   each further scroll brings the next practitioner into focus, highlighting their name and changing the portrait »).
+   The team is the collection `team` (Our team shows it too); the founder's words are the home's own. */
+const team = await getItems("team");
+const founder = team.find((m) => m.id === "sarah-tranter");
+type Photo = { src?: Parameters<typeof pic>[0]; alt: string; id?: string };
+const photos: Photo[] = [];
+const photoOf = (p?: Photo) => {
+  if (!p) return -1;
+  const at = photos.findIndex((q) => q.src === p.src);
+  if (at >= 0) return at;
+  photos.push(p);
+  return photos.length - 1;
+};
+const founderPhoto = photoOf(founder?.data.photo && { src: founder.data.photo, alt: founder.data.photoAlt ?? "", id: founder.id });
+/* a member whose portrait is still to come shows the empty frame, never someone else's portrait */
+const empty = () => {
+  const at = photos.findIndex((q) => !q.src);
+  if (at >= 0) return at;
+  photos.push({ alt: "" });
+  return photos.length - 1;
+};
+const people = team.map(({ id, data }) => ({
+  id,
+  name: data.name,
+  role: data.role,
+  photo: data.photo ? photoOf({ src: data.photo, alt: data.photoAlt ?? "", id }) : empty(),
+}));
+---
+
+<section class="people-home_wrap section-padding theme-dark-sand" data-people>
+  <h2 class="sr-only">Meet the founder and the team</h2>
+  <div class="people-home_layout site-grid">
+    {/* on a phone the title and the portrait hold together at the top; elsewhere each holds in its own place */}
+    <div class="people-home_stage">
+      <p class="people-home_title text-style-h2" aria-hidden="true">
+        Meet the <span class="people-home_switch"><em class="people-home_word is-shown" data-word="founder">founder.</em><em class="people-home_word" data-word="team">team.</em></span>
+      </p>
+      <div class="people-home_media" data-people-media>
+        {photos.map((p, i) => (
+          <div class:list={["people-home_photo", i === 0 && "is-shown", p.src && "theme-light"]} data-photo={i} data-op-source={p.id && "astro:team"} data-op-item={p.id} data-op-field={p.id && "photo"}>
+            {p.src && <Img {...pic(p.src)} alt={p.alt} variant="constrained" sizes="(width >= 48rem) 50vw, 100vw" />}
+          </div>
+        ))}
+      </div>
+    </div>
+    <span class="marker people-home_marker" data-people-line />
+    <div class="people-home_flow">
+      {/* the founder */}
+      <div class="people-home_person is-founder is-active" data-person data-photo={founderPhoto} data-op-source={founder && "astro:team"} data-op-item={founder?.id}>
+        <p class="people-home_name lead-marker text-style-label" data-people-name>Dr Sarah Tranter</p>
+        <p class="people-home_role text-style-serif">Founder &amp; Cosmetic Physician · 15+ years in practice</p>
+      </div>
+      <p class="people-home_bio text-style-main">
+        Dr Sarah Tranter founded the clinic on a simple premise: that treatment should follow judgement, not the other way around. Her approach considers the face as one system of structure and surface, not a list of isolated concerns. Every protocol at the clinic reflects standards she has set personally, whether or not she is the one delivering care.
+      </p>
+      {/* the team */}
+      <ul class="people-home_team" data-op-list="team" data-op-source="astro:team" data-op-noun="Team member">
+        {people.map((m) => (
+          <li class="people-home_person" data-person data-team data-photo={m.photo} data-op-item={m.id}>
+            <p class="people-home_name text-style-label" data-op-field="name" data-people-name>{m.name}</p>
+            {m.role && <p class="people-home_role text-style-serif" data-op-field="role">{m.role}</p>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  @layer components {
+    /* The portrait: as tall as the screen less the margin above and below, as wide as that height allows at the
+       portrait's ratio (--people-ratio) but never more than half the screen (Sam, Nov 25: « au moins la hauteur de
+       l'écran avec le petit padding de chaque côté… un maximum de la moitié de l'écran »). So it is not an image frame
+       of the grid (.media, whose edges are columns): its width comes from the screen's height. Its photos lie one on
+       the other; the one shown is on top. */
+    .people-home_media {
+      position: relative;
+      --_h: calc(100svh - var(--site-margin) * 2);
+      height: var(--_h);
+      width: min(var(--_h) * var(--people-ratio), 50vw - var(--site-margin));
+      aspect-ratio: auto;
+      background-color: var(--background-skeleton);
+      overflow: clip;
+    }
+    /* a portrait wears the light theme, so the menu's button over its corner is drawn dark; an empty frame keeps the
+       section's (its skeleton is the section's text, faint) */
+    .people-home_photo {
+      position: absolute;
+      inset: 0;
+      visibility: hidden;
+      &.is-shown,
+      &.is-leaving {
+        visibility: visible;
+      }
+      &.is-shown {
+        z-index: 1;
+      }
+      /* an empty frame: the skeleton's ground */
+      background-color: var(--background-skeleton);
+      & img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    .people-home_switch {
+      display: inline-grid;
+      overflow: clip;
+      vertical-align: top;
+      padding-block: 0.12em;
+      margin-block: -0.12em;
+    }
+    .people-home_word {
+      grid-area: 1 / 1;
+      translate: 0 120%;
+      &.is-shown {
+        translate: 0 0;
+      }
+    }
+    .people-home_flow {
+      display: grid;
+      grid-template-columns: subgrid;
+      align-content: start;
+    }
+    .people-home_person,
+    .people-home_team,
+    .people-home_bio {
+      grid-column: margin / end;
+    }
+    .people-home_team {
+      display: flex;
+      flex-direction: column;
+      row-gap: var(--space-8);
+      margin-top: var(--space-11);
+    }
+    .people-home_role {
+      margin-top: var(--space-2);
+      max-width: 22.8ch;
+    }
+    .people-home_bio {
+      max-width: 53.5ch;
+      margin-top: 34svh;
+    }
+    /* the one at the square is lit, the others step back */
+    .people-home_person {
+      transition: opacity var(--hover-duration) var(--hover-ease);
+      [data-people-ready] &:not(.is-active) {
+        opacity: var(--people-dim);
+      }
+    }
+    .people-home_marker {
+      display: none;
+    }
+
+    /* phone: the title and the portrait hold at the top together, the names pass under them */
+    @media (width < 48rem) {
+      .people-home_stage {
+        grid-column: margin / end;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding-top: var(--section-padding);
+        margin-top: calc(var(--section-padding) * -1);
+        padding-bottom: var(--space-5);
+        background-color: var(--background);
+      }
+      .people-home_media {
+        margin-top: var(--space-5);
+        --_h: 46svh;
+        width: 100%;
+      }
+      .people-home_flow {
+        grid-column: margin / end;
+        padding-top: var(--space-7);
+        padding-bottom: 0;
+      }
+      .people-home_name {
+        --_lead-marker: inline-block;
+      }
+      .people-home_bio {
+        margin-top: var(--space-7);
+      }
+    }
+
+    /* from a tablet up: the title holds at the top left, the square at the middle of the screen, the portrait on the
+       right; the names pass by the square */
+    @media (width >= 48rem) {
+      .people-home_stage {
+        display: contents;
+      }
+      .people-home_layout {
+        align-items: start;
+      }
+      .people-home_title,
+      .people-home_marker,
+      .people-home_flow,
+      .people-home_media {
+        grid-row: 1;
+      }
+      .people-home_title {
+        grid-column: margin / span 4;
+        position: sticky;
+        top: var(--section-padding);
+      }
+      .people-home_media {
+        grid-column: half / end;
+        justify-self: end;
+        position: sticky;
+        top: var(--site-margin);
+        /* the section's own padding is the margin: the portrait starts at its top */
+        margin-top: calc(var(--section-padding) * -1 + var(--site-margin));
+      }
+      .people-home_marker {
+        display: block;
+        grid-column: margin;
+        position: sticky;
+        top: calc(50svh - var(--marker) / 2);
+        margin-top: calc(50svh - var(--section-padding) - var(--marker) / 2);
+      }
+      .people-home_flow {
+        grid-column: margin / half;
+        /* the founder's name starts at the middle of the screen, the last name ends there */
+        padding-top: calc(50svh - var(--section-padding) - (max(var(--text-label-floor), var(--text-label)) * 0.721) / 2);
+        /* and stays there a little while its portrait shows, before the section leaves */
+        padding-bottom: calc(50svh - var(--section-padding) + var(--space-11));
+      }
+    }
+    @media (48rem <= width < 64rem) {
+      .people-home_flow {
+        grid-template-columns: subgrid;
+      }
+      .people-home_person,
+      .people-home_team,
+      .people-home_bio {
+        grid-column: inset / half;
+        padding-right: var(--space-5);
+      }
+    }
+    @media (width >= 64rem) {
+      .people-home_marker {
+        grid-column: marker;
+      }
+      .people-home_flow {
+        grid-column: marker / half;
+      }
+      .people-home_person,
+      .people-home_team {
+        grid-column: main / half;
+      }
+      .people-home_bio {
+        grid-column: marker / half;
+      }
+    }
+  }
+</style>
+
+<script>
+  import { onPage } from "@/utils/page";
+
+  /* The founder, then the team (Sam, Nov 25). Its job: show who is who as the visitor reads down the names. The name at
+     the square is lit and its portrait shows: the next portrait rises over the last from the bottom, as the page's
+     curtain does (from the top coming back up), and settles in its frame; the title's word rolls from « founder » to
+     « team » when the first name of the team reaches the square. On a phone the line is a third of the way down the room left under the title and the portrait.
+     Under reduced motion the portrait and the word change at once. Without this script: the founder's portrait, every
+     name lit. */
+  onPage((signal) => {
+    const root = document.documentElement;
+    const calm = matchMedia("(prefers-reduced-motion: reduce)");
+    const ms = (name: string) => {
+      const v = getComputedStyle(root).getPropertyValue(name).trim();
+      return (parseFloat(v) || 0) * (v.endsWith("ms") ? 1 : 1000);
+    };
+    const ease = (name: string) => getComputedStyle(root).getPropertyValue(name).trim() || "ease-out";
+
+    document.querySelectorAll<HTMLElement>("[data-people]").forEach((section) => {
+      const people = [...section.querySelectorAll<HTMLElement>("[data-person]")];
+      const photos = [...section.querySelectorAll<HTMLElement>("[data-photo]:not([data-person])")];
+      const line = section.querySelector<HTMLElement>("[data-people-line]");
+      const stage = section.querySelector<HTMLElement>(".people-home_stage");
+      const words = [...section.querySelectorAll<HTMLElement>(".people-home_word")];
+      if (!people.length) return;
+      section.dataset.peopleReady = "";
+      /* the photos load before they are needed: once the section is near */
+      const near = new IntersectionObserver((seen) => {
+        if (!seen.some((e) => e.isIntersecting)) return;
+        photos.forEach((p) => p.querySelectorAll("img").forEach((img) => (img.loading = "eager")));
+        near.disconnect();
+      }, { rootMargin: "100% 0px" });
+      near.observe(section);
+      signal.addEventListener("abort", () => near.disconnect());
+
+      let active = 0;
+      let shown = photos.length ? 0 : -1;
+      let team = false;
+      let running: Animation[] = [];
+
+      const where = () => {
+        if (line && line.offsetParent) {
+          const r = line.getBoundingClientRect();
+          return r.top + r.height / 2;
+        }
+        /* a phone: a third of the way down the room left under the title and the portrait, where the names are seen */
+        const under = Math.max(0, stage?.getBoundingClientRect().bottom ?? innerHeight / 2);
+        return under + (innerHeight - under) / 3;
+      };
+      const showPhoto = (to: number, down: boolean) => {
+        if (to < 0 || to === shown) return;
+        const from = photos[shown];
+        const next = photos[to];
+        running.forEach((a) => a.finish());
+        running = [];
+        photos.forEach((p) => p.classList.remove("is-leaving"));
+        from?.classList.remove("is-shown");
+        from?.classList.add("is-leaving");
+        next.classList.add("is-shown");
+        shown = to;
+        if (calm.matches) return from?.classList.remove("is-leaving");
+        const time = ms("--people-swap-duration");
+        const curve = ease("--people-swap-ease");
+        const closed = down ? "inset(100% 0 0 0)" : "inset(0 0 100% 0)";
+        const a = next.animate([{ clipPath: closed }, { clipPath: "inset(0 0 0 0)" }], { duration: time, easing: curve });
+        const img = next.querySelector("img");
+        if (img) running.push(img.animate([{ scale: getComputedStyle(root).getPropertyValue("--media-settle-scale").trim() || "1.1" }, { scale: "1" }], { duration: time * 1.4, easing: ease("--ease-smooth") }));
+        /* the last one slips a little the other way as it is covered */
+        const fimg = from?.querySelector("img");
+        if (fimg) running.push(fimg.animate([{ translate: "0 0" }, { translate: `0 ${down ? -6 : 6}%` }], { duration: time, easing: curve }));
+        running.push(a);
+        a.finished.then(() => from?.classList.remove("is-leaving"), () => {});
+      };
+      const roll = (toTeam: boolean) => {
+        if (toTeam === team) return;
+        team = toTeam;
+        const [f, t] = words;
+        const out = toTeam ? f : t;
+        const into = toTeam ? t : f;
+        out.classList.remove("is-shown");
+        into.classList.add("is-shown");
+        if (calm.matches) return;
+        const time = ms("--roll-duration");
+        const up = toTeam;
+        out.animate([{ translate: "0 0" }, { translate: `0 ${up ? -120 : 120}%` }], { duration: time * 0.7, easing: ease("--ease-smooth"), fill: "forwards" }).finished.then((x) => x.cancel(), () => {});
+        into.animate([{ translate: `0 ${up ? 120 : -120}%` }, { translate: "0 0" }], { duration: time, easing: ease("--ease-smooth") });
+      };
+      const follow = () => {
+        const y = where();
+        let i = 0;
+        people.forEach((p, n) => {
+          const name = p.querySelector<HTMLElement>("[data-people-name]") ?? p;
+          if (name.getBoundingClientRect().top <= y + 2) i = n;
+        });
+        if (i !== active) {
+          const down = i > active;
+          people[active].classList.remove("is-active");
+          people[i].classList.add("is-active");
+          active = i;
+          const photo = Number(people[i].dataset.photo ?? -1);
+          if (photo >= 0) showPhoto(photo, down);
+        }
+        roll(people[i].hasAttribute("data-team"));
+      };
+      let frame = 0;
+      const ask = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; follow(); }); };
+      follow();
+      window.addEventListener("scroll", ask, { signal, passive: true });
+      window.addEventListener("resize", ask, { signal });
+      signal.addEventListener("abort", () => cancelAnimationFrame(frame));
+    });
+  });
+</script>

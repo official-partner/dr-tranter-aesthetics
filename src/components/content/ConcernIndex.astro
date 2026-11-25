@@ -24,8 +24,8 @@ const { render = true, items } = Astro.props;
   render && items?.length > 0 && (
     <div class="concern-index_wrap">
       <ul class="concern-index_list text-style-display" data-figma="1:81" data-cap-offset="0.1895" data-op-list="concerns" data-op-source="astro:concerns">
-        {items.map((item) => (
-          <li class="concern-index_item" data-op-item={item.id}>
+        {items.map((item, i) => (
+          <li class:list={["concern-index_item", i > 0 && item.category !== items[i - 1].category && "is-group-start"]} data-op-item={item.id}>
             <span class="concern-index_category text-style-label inset-optical" data-op-field="group" data-figma={item.category === "Structure" ? "1:84" : undefined}><span class="concern-index_word">{item.category}</span></span>
             {item.image && (
               <span class="concern-index_thumb media" data-figma="1:82">
@@ -80,6 +80,10 @@ const { render = true, items } = Astro.props;
     }
     .concern-index_item {
       --_mid: calc(var(--display) * 0.651);
+    }
+    /* the next group starts a little apart (Sam, Nov 25: « un petit espacement entre les deux types »; Figma 4001:32) */
+    .concern-index_item.is-group-start {
+      margin-top: var(--space-5);
     }
     /* the name stays on its rail when chosen (Sam, comment 6: « enlever le mouvement du texte vers la droite »); only
        its colour and its cut change */

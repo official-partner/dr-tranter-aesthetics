@@ -1,4 +1,5 @@
 ---
+import Button from "@/components/Button.astro";
 import Card from "@/components/content/Card.astro";
 import type { Pic } from "@/utils/media";
 
@@ -20,6 +21,11 @@ interface Props {
   render?: boolean;
   /** The group's name (Structure, Surface, Featured treatments, Filter by). */
   label: string;
+  /** A title in place of the name and its square (the home's Featured treatments, Nov 25): its words, `<em>` for the
+      lighter cut. */
+  title?: string;
+  /** A pill under the cards (« All treatments → »). */
+  action?: { label: string; href: string };
   /** Its ground. */
   theme?: "light" | "stone" | "mist";
   /** The collection the cards show, for OP System's Contenu and Edit. */
@@ -39,7 +45,7 @@ interface Props {
   /** Figma ids for the build review: band name, band top, label, marker. */
   figma?: { band: string; top: string; label: string; marker: string };
 }
-const { render = true, label, theme = "light", collection, noun, textField = "summary", link = "View →", items, filters, list, figma } = Astro.props;
+const { render = true, label, title, action, theme = "light", collection, noun, textField = "summary", link = "View →", items, filters, list, figma } = Astro.props;
 const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 ---
 
@@ -47,10 +53,14 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
     row from the main rail (Figma 59:602, 59:983, Nov 20). With filters, a pill per category under the name. */}
 {
   render && items.length > 0 && (
-    <section class:list={["card-group_wrap section-padding", `theme-${theme}`]} data-figma-band={figma?.band} data-band-top={figma?.top}>
+    <section class:list={["card-group_wrap section-padding", `theme-${theme}`, title && "has-title"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
       <div class="card-group_layout site-grid">
         <div class="card-group_head">
-          <p class="card-group_label lead-marker text-style-label inset-optical" data-figma={figma?.label}><span class="card-group_word">{label}</span></p>
+          {title ? (
+            <h2 class="card-group_title text-style-h2" set:html={title} />
+          ) : (
+            <p class="card-group_label lead-marker text-style-label inset-optical" data-figma={figma?.label}><span class="card-group_word">{label}</span></p>
+          )}
           {filters && (
             <div class="card-group_filters" role="group" aria-label={label} data-card-filters>
               {[filters.all, ...filters.values].map((v, i) => (
@@ -59,7 +69,7 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
             </div>
           )}
         </div>
-        <span class="marker card-group_marker" data-figma={figma?.marker} />
+        {!title && <span class="marker card-group_marker" data-figma={figma?.marker} />}
         <ul class="card-group_list" data-op-list={list ?? collection} data-op-source={`astro:${collection}`} data-op-noun={noun}>
           {items.map((c) => (
             <li class="card-group_item" data-op-item={c.id} data-category={c.category && slug(c.category)} data-aside={c.aside ? "" : undefined} hidden={c.aside && filters ? true : undefined}>
@@ -67,6 +77,7 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
             </li>
           ))}
         </ul>
+        {action && <div class="card-group_action"><Button element="link" href={action.href}>{action.label}</Button></div>}
         {filters && <p class="sr-only" aria-live="polite" data-card-count />}
       </div>
     </section>
@@ -81,6 +92,29 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
     }
     .card-group_layout {
       row-gap: var(--space-7);
+    }
+    /* with a title (the home): it stays where it is, the section ends with its pill, at the small padding */
+    .card-group_wrap.has-title {
+      padding-bottom: var(--section-padding);
+      & .card-group_head {
+        position: static;
+        grid-column: margin / end;
+        @media (width >= 48rem) {
+          grid-column: margin / main;
+        }
+      }
+    }
+    .card-group_title {
+      max-width: 12ch;
+    }
+    .card-group_action {
+      grid-column: margin / end;
+      margin-top: calc(var(--space-10) - var(--space-7));
+      @media (width >= 48rem) {
+        grid-column: main / end;
+        grid-row: 2;
+        margin-top: var(--space-10);
+      }
     }
     .card-group_head,
     .card-group_list {

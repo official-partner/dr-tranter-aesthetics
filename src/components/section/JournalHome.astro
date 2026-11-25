@@ -1,80 +1,139 @@
 ---
 import Button from "@/components/Button.astro";
-import CardRow from "@/components/content/CardRow.astro";
 import Img from "@/components/media/Img.astro";
 import { listed, ruleMarks } from "@/utils/lists";
 import { pic } from "@/utils/media";
 
-/* the journal's articles the list « journal-home » shows (its rule in src/data/lists.json: the first three, which OP
-   System's List options changes); the date as the design writes it, [MM.DD.YY] */
-const ids = [["1:139", "1:148", "1:151", "1:153"], ["1:145", "1:149", "1:152", "1:155"], ["1:140", "1:147", "1:150", "1:154"]];
-const two = (n: number) => String(n).padStart(2, "0");
+/* The home's journal (Figma « Starter (Copy) » 4001:2, Nov 25): four articles set apart across the grid, each its own
+   size, the last with its title above its photo. The articles the list « journal-home » shows (its rule in
+   src/data/lists.json: the first four, which OP System's List options changes). A fifth would follow the fourth. */
+const shapes = ["is-a ratio-16-10", "is-b ratio-7-10", "is-c ratio-5-6", "is-d ratio-145"];
 const posts = (await listed<"articles">("journal-home")).map(({ id, data }, i) => ({
   id,
   title: data.title,
   image: data.image,
   alt: data.imageAlt ?? "",
-  date: data.date,
-  label: data.date ? `[${two(data.date.getUTCMonth() + 1)}.${two(data.date.getUTCDate())}.${two(data.date.getUTCFullYear() % 100)}]` : "",
-  ids: ids[i] ?? [],
+  shape: shapes[i] ?? shapes[3],
 }));
 ---
 
-<section class="journal-home_wrap section-padding" data-figma-band="journal" data-band-top="5872.82">
+<section class="journal-home_wrap section-padding">
   <div class="journal-home_layout site-grid">
-    <h2 class="journal-home_title text-style-h2" data-figma="1:138">Our journal: notes on <em>skin</em>, <em>structure</em> and <em>care</em></h2>
-    <div class="at-end journal-home_action"><Button element="link" href="/journal" data-figma="1:136">View all articles</Button></div>
-    <CardRow {...ruleMarks("journal-home")}>
-      {posts.map((p) => (
-        <li class="journal-home_card stacked-card linked-card" data-op-item={p.id}>
-          {p.image && <div class="media ratio-9-7" data-figma={p.ids[0]}><Img {...pic(p.image)} alt={p.alt} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" /></div>}
-          {p.date && <p class="journal-home_date text-style-date" data-op-field="date" data-figma={p.ids[1]}><time datetime={p.date.toISOString().slice(0, 10)}>{p.label}</time></p>}
-          <h3 class="journal-home_card-title text-style-h3" data-op-field="title" data-figma={p.ids[2]}>{p.title}</h3>
-          <Button element="link" variant="link" href="/journal" data-figma={p.ids[3]} data-card-link>Read the article →</Button>
-        </li>
-      ))}
-    </CardRow>
+    <h2 class="journal-home_title text-style-h2">Our journal: notes on <em>skin</em>, <em>structure</em> and <em>care</em></h2>
+    <ul class="journal-home_list" {...ruleMarks("journal-home")}>
+      {posts.map((p) => {
+        const [slot, ratio] = p.shape.split(" ");
+        return (
+          <li class:list={["journal-home_card stacked-card linked-card", slot]} data-op-item={p.id}>
+            <div class:list={["media", ratio]} data-op-field="image">
+              {p.image && <Img {...pic(p.image)} alt={p.alt} variant="constrained" sizes="(width >= 64rem) 40vw, (width >= 48rem) 50vw, 100vw" />}
+            </div>
+            <div class="journal-home_meta">
+              <h3 class="journal-home_card-title text-style-h3" data-op-field="title">{p.title}</h3>
+              <Button element="link" variant="link" href="/journal" data-card-link>Read →</Button>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+    <div class="journal-home_action"><Button element="link" variant="link" href="/journal">View all articles</Button></div>
   </div>
 </section>
 
 <style is:global>
   @layer components {
-    /* the journal ends wide on purpose (Sam, Nov 10) */
-    .journal-home_wrap {
-      padding-bottom: var(--section-padding-wide);
-    }
-    .journal-home_layout {
-      row-gap: var(--space-11);
-      @media (width < 48rem) {
-        row-gap: var(--space-5);
-        & > .card-row_wrap {
-          margin-top: calc(var(--space-11) - var(--space-5));
-        }
-      }
-    }
     .journal-home_title {
       grid-column: margin / end;
       max-width: 19.7ch;
     }
-    .journal-home_date {
-      margin-top: var(--space-media);
+    /* its articles are the layout's own items: the list holds them for OP System only */
+    .journal-home_layout {
+      row-gap: var(--space-stack);
     }
-    .journal-home_card-title {
-      margin-top: var(--space-4);
-      width: 26ch;
-      max-width: 100%;
-      @media (width >= 64rem) {
-        max-width: none;
+    .journal-home_list {
+      display: contents;
+    }
+    .journal-home_card {
+      grid-column: margin / end;
+    }
+    /* a title, its « Read → » set against the right edge, on the photo's width */
+    .journal-home_meta {
+      align-self: stretch;
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      column-gap: var(--space-5);
+      margin-top: var(--space-media);
+      & > .button_wrap {
+        flex: none;
       }
     }
-    .journal-home_card > .button_wrap {
-      margin-top: var(--space-action);
+    .journal-home_card-title {
+      max-width: 18ch;
     }
-    @media (width >= 48rem) {
-      .journal-home_title,
-      .journal-home_action {
+    /* the last: its title above its photo */
+    .journal-home_card.is-d .journal-home_meta {
+      order: -1;
+      margin-top: 0;
+      margin-bottom: var(--space-media);
+    }
+    .journal-home_action {
+      grid-column: margin / end;
+      justify-self: end;
+      margin-top: var(--space-8);
+    }
+
+    /* tablet: two columns, the right one a beat lower */
+    @media (48rem <= width < 64rem) {
+      .journal-home_card {
+        grid-column: margin / span 4;
+        &:is(.is-a, .is-c) {
+          grid-column: span 4 / end;
+        }
+        &.is-c {
+          margin-top: var(--space-11);
+        }
+        &.is-d {
+          grid-column: main / end;
+        }
+      }
+    }
+
+    /* computer: the composition of the design, each article on its own columns */
+    @media (width >= 64rem) {
+      .journal-home_layout {
+        align-items: start;
+        row-gap: var(--space-11);
+      }
+      .journal-home_title {
         grid-row: 1;
-        align-self: start;
+        grid-column: margin / span 4;
+      }
+      .journal-home_card {
+        &.is-a {
+          grid-row: 1 / span 2;
+          grid-column: third / end;
+        }
+        &.is-b {
+          grid-row: 2;
+          grid-column: margin / span 4;
+        }
+        &.is-c {
+          grid-row: 2;
+          grid-column: half / span 3;
+          margin-top: calc(var(--space-11) + var(--space-10));
+        }
+        &.is-d {
+          grid-row: 3;
+          grid-column: marker / span 5;
+          margin-top: calc(var(--space-11) + var(--space-10));
+        }
+      }
+      .journal-home_action {
+        grid-row: 3;
+        grid-column: aside / end;
+        align-self: end;
+        margin-top: 0;
       }
     }
   }
