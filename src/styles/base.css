@@ -56,13 +56,15 @@
   --page-enter-wait: 80ms;
   --page-media-duration: 2000ms;
   --page-media-scale: 1.08;
-  --fill-duration: 520ms;
   --media-settle-scale: 1.12;
   --media-hover-scale: 1.04;
   --media-hover-duration: 1200ms;
   --filter-duration: 600ms;
   --follow-duration: 700ms;
   --roll-duration: 600ms;
+  --follow-image-duration: 300ms;
+  --cut-duration: 1100ms;
+  --cut-ease: var(--ease-travel);
   --pinned-top: calc(var(--site-margin) + var(--pill-y));
   --page-dim: 0.55;
   --menu-open-duration: 1000ms;
@@ -272,6 +274,7 @@
   --display-font-family: var(--season);
   --display-font-weight: 420;
   --display-font-variation: "SERF" 50;
+  --display-font-axis: 50;
   --display-font-feature: normal;
   --display-margin-top: 0rem;
   --display-margin-bottom: 0rem;
@@ -282,6 +285,7 @@
   --h1-font-family: var(--season);
   --h1-font-weight: 550;
   --h1-font-variation: "SERF" 0;
+  --h1-font-axis: 0;
   --h1-font-feature: normal;
   --h1-margin-top: 0rem;
   --h1-margin-bottom: 0rem;
@@ -292,6 +296,7 @@
   --h2-font-family: var(--season);
   --h2-font-weight: 550;
   --h2-font-variation: "SERF" 0;
+  --h2-font-axis: 0;
   --h2-font-feature: normal;
   --h2-margin-top: 0rem;
   --h2-margin-bottom: 0rem;
@@ -302,6 +307,7 @@
   --h3-font-family: var(--season);
   --h3-font-weight: 420;
   --h3-font-variation: "SERF" 50;
+  --h3-font-axis: 50;
   --h3-font-feature: normal;
   --h3-margin-top: 0rem;
   --h3-margin-bottom: 0rem;
@@ -312,6 +318,7 @@
   --text-main-font-family: var(--season);
   --text-main-font-weight: 420;
   --text-main-font-variation: "SERF" 50;
+  --text-main-font-axis: 50;
   --text-main-font-feature: normal;
   --text-main-margin-top: 0rem;
   --text-main-margin-bottom: 0rem;
@@ -322,6 +329,7 @@
   --text-serif-font-family: var(--season);
   --text-serif-font-weight: 470;
   --text-serif-font-variation: "SERF" 100;
+  --text-serif-font-axis: 100;
   --text-serif-font-feature: normal;
   --text-serif-margin-top: 0rem;
   --text-serif-margin-bottom: 0rem;
@@ -332,6 +340,7 @@
   --text-index-font-family: var(--season);
   --text-index-font-weight: 550;
   --text-index-font-variation: "SERF" 0;
+  --text-index-font-axis: 0;
   --text-index-font-feature: normal;
   --text-index-margin-top: 0rem;
   --text-index-margin-bottom: 0rem;
@@ -342,6 +351,7 @@
   --text-list-font-family: var(--season);
   --text-list-font-weight: 400;
   --text-list-font-variation: "SERF" 0;
+  --text-list-font-axis: 0;
   --text-list-font-feature: normal;
   --text-list-margin-top: 0rem;
   --text-list-margin-bottom: 0rem;
@@ -352,6 +362,7 @@
   --text-tight-font-family: var(--season);
   --text-tight-font-weight: 420;
   --text-tight-font-variation: "SERF" 50;
+  --text-tight-font-axis: 50;
   --text-tight-font-feature: normal;
   --text-tight-margin-top: 0rem;
   --text-tight-margin-bottom: 0rem;
@@ -362,6 +373,7 @@
   --text-label-font-family: var(--season);
   --text-label-font-weight: 550;
   --text-label-font-variation: "SERF" 0;
+  --text-label-font-axis: 0;
   --text-label-font-feature: normal;
   --text-label-margin-top: 0rem;
   --text-label-margin-bottom: 0rem;
@@ -372,6 +384,7 @@
   --text-action-font-family: var(--season);
   --text-action-font-weight: 550;
   --text-action-font-variation: "SERF" 0;
+  --text-action-font-axis: 0;
   --text-action-font-feature: normal;
   --text-action-margin-top: 0rem;
   --text-action-margin-bottom: 0rem;
@@ -382,6 +395,7 @@
   --text-note-font-family: var(--season);
   --text-note-font-weight: 550;
   --text-note-font-variation: "SERF" 0;
+  --text-note-font-axis: 0;
   --text-note-font-feature: normal;
   --text-note-margin-top: 0rem;
   --text-note-margin-bottom: 0rem;
@@ -392,6 +406,7 @@
   --text-index-caps-font-family: var(--season);
   --text-index-caps-font-weight: 550;
   --text-index-caps-font-variation: "SERF" 0;
+  --text-index-caps-font-axis: 0;
   --text-index-caps-font-feature: normal;
   --text-index-caps-margin-top: 0rem;
   --text-index-caps-margin-bottom: 0rem;
@@ -402,6 +417,7 @@
   --text-date-font-family: var(--season);
   --text-date-font-weight: 550;
   --text-date-font-variation: "SERF" 0;
+  --text-date-font-axis: 0;
   --text-date-font-feature: normal;
   --text-date-margin-top: 0rem;
   --text-date-margin-bottom: 0rem;

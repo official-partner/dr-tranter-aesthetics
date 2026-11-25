@@ -243,3 +243,14 @@ const groups = [
     }
   }
 </style>
+
+<script>
+  import { onPage } from "@/utils/page";
+  import { linkMarkers } from "@/utils/link-marker";
+
+  /* the menu's lists, as the footer's: one square glides from link to link (src/utils/link-marker.ts) */
+  onPage((signal) => {
+    const menu = document.getElementById("site-menu");
+    if (menu) linkMarkers(menu, signal);
+  });
+</script>

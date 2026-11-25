@@ -2,6 +2,34 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-24, Sam (comments 3 to 7 in OP System, Nov 22, handled at his ask in the conversation):
+  - 3, the pills (« hover bouton plus simple: juste fade le changement de couleur, pas de rideau »): a pill fills
+    with the text's colour and its words take the ground's, fading in place on `--hover-duration`; replaces the rising
+    ground of Nov 21 (idea 4). Every pill of the site, the secondary one too; `--fill-duration` is gone. Read as the
+    same filled pill reached by a fade, not the plain hover of before Nov 21 (line and words only).
+  - 4 and 5, the home's list (« ça devrait être le même élément/bloc d'image, seulement l'image à l'intérieur
+    change », « j'aime l'idée du texte switch en masque mais c'est buggy »): with a mouse on a computer the script now
+    lays one set beside the list (one group name, one frame, one square, one pill) and moves it to the chosen row by
+    CSS transitions, so a quick pass changes course from wherever it is instead of restarting two frames. The photos
+    are stacked in the one frame, the next fading in over the last (`--follow-image-duration`, 300 ms); the group's
+    words are stacked in the one label and roll in its mask (up going down the list, down coming back). The rows keep
+    their own sets for the keyboard without a mouse, reduced motion, tablets, phones and the measure. The list sits in
+    a wrapper (`concern-index_wrap`) so the set is never one of the list's items for OP System's Modifier; it is made
+    again on `op:list`.
+  - 6, the concern's name (« enlever le mouvement du texte vers la droite… animer la font variable de façon smooth…
+    comme on avait dans le brand guide »): the name stays on the main rail when chosen; its axis and weight are two
+    registered numbers (`--_cut-axis`, `--_cut-weight`) that move from Mix Regular to Sans Medium over `--cut-duration`
+    (1100 ms) on `--cut-ease` (the travel curve), as the brand guide's accent switch did (« Kensington Brand »,
+    Oct 5). New tokens `--<style>-font-axis` (the SERF number of each text style) in gen.py. Reverses the place of the
+    Figma's hovered row (1:83 on the detail rail): in review/data/home-target.json, -141.3.
+  - 7, the footer's lists (« c'est le même élément point qui change d'endroit sur la même liste »): one square per
+    list glides from link to link on `--follow-duration` (src/utils/link-marker.ts), beside the list, never in it.
+    The menu's lists are the same family (`link-list`) and do it too. Without a mouse or with reduced motion each link
+    shows its own square, as before; a link focused from the keyboard now looks as hovered.
+  - Checked: the home 92 of 92 on its target, widths 0 failures, rules 0 new; compare on the home, Concerns and
+    Treatments: nothing else changed at rest (only the pills' rounded edges, antialiased differently), 20 of 20
+    presses the same; frame by frame at 1440: one frame in a quick pass, its photos crossfading inside it, the word's roll
+    reversing from mid-way, the cut moving through its axis, the footer's and the menu's square gliding.
 - 2026-11-23, Sam (comment C2, Nov 22: « un copier-coller des titres donne du texte tout en capitales »): the sources
   were already right (every title typed in its own case, the capitals text-transform's: the starter's new rule
   caps-typed finds none here); the capitals came from the browser, which copies a text as its style shows it. The

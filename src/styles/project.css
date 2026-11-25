@@ -85,8 +85,10 @@
   padding-left: var(--inset-optical);
 }
 
-/* A list of links (the footer's, the menu's): trimmed as one block; a link hovered moves aside and shows the small
-   square before it, as the Figma draws both (Nov 20). Its colour stays the list's; a muted list's link comes to the text */
+/* A list of links (the footer's, the menu's): trimmed as one block; a link hovered or focused moves aside and shows the
+   small square before it, as the Figma draws both (Nov 20). Its colour stays the list's; a muted list's link comes to
+   the text. With a mouse, one square glides from link to link (src/utils/link-marker.ts; Sam, comment 7, Nov 22) in
+   place of each link's own. */
 .link-list {
   text-box: none;
   margin-block: -0.3395em;
@@ -110,6 +112,13 @@
       translate: 0 -50%;
       transition: opacity var(--hover-duration) var(--hover-ease);
     }
+    &:focus-visible {
+      color: var(--text);
+      translate: var(--space-2) 0;
+      &::before {
+        opacity: 1;
+      }
+    }
     @media (hover: hover) {
       &:hover {
         color: var(--text);
@@ -120,6 +129,33 @@
       }
     }
   }
+  &[data-marked] a::before {
+    display: none;
+  }
+  /* the one square, beside the list: where a link's own square would be, at the link's middle */
+  & + [data-link-marker] {
+    position: absolute;
+    top: 0;
+    left: calc(var(--space-2) - var(--space-4));
+    width: calc(var(--marker) * 0.8);
+    aspect-ratio: 1;
+    background-color: var(--text);
+    opacity: 0;
+    pointer-events: none;
+    translate: var(--_mark-x, 0%) calc(var(--_mark-y, 0%) - 50%);
+    transition:
+      translate var(--follow-duration) var(--ease-smooth),
+      opacity var(--hover-duration) var(--hover-ease);
+    &[data-on] {
+      opacity: 1;
+    }
+    &[data-placing] {
+      transition: opacity var(--hover-duration) var(--hover-ease);
+    }
+  }
+}
+:has(> .link-list + [data-link-marker]) {
+  position: relative;
 }
 
 /* A card: its picture as wide as the card, its texts stacked under it at their own width (a concern, an article, a product) */

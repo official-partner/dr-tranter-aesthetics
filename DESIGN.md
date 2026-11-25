@@ -108,11 +108,17 @@ for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
   `--page-media-duration`, never fades. No split text, no masks on text.
 
 ## Motion added Nov 21 (Sam's picks)
-- One language: what rises, rises from the bottom (the curtain, a pill's ground); what stays, stays (the square, the
-  menu's button); a photo settles in its frame (the menu, an opening, the scroll: `--media-settle-scale`); a word rolls
-  in its place when its meaning changes (a group's name: `--roll-duration`).
-- Hovers: pills fill on `--fill-duration`; a linked card's photo on `--media-hover-duration` to `--media-hover-scale`;
-  the home's list moves one set of square, pill, frame and name on `--follow-duration`.
+- One language: what rises, rises from the bottom (the curtain); what stays, stays (the square, the menu's button); a
+  photo settles in its frame (the menu, an opening, the scroll: `--media-settle-scale`); a word rolls in its place
+  when its meaning changes (a group's name: `--roll-duration`); one marker travels along a list instead of each item
+  showing its own (Sam, Nov 22).
+- Hovers: a pill fills with the text's colour, fading in place on `--hover-duration` (Sam, comment 3, Nov 22: no
+  curtain); a linked card's photo on `--media-hover-duration` to `--media-hover-scale`; the home's list moves one set
+  of square, pill, frame and group name on `--follow-duration`, the photo changing inside the one frame
+  (`--follow-image-duration`), the group's word rolling inside the one label; a list of links (footer, menu) moves one
+  square from link to link on `--follow-duration` (src/utils/link-marker.ts). A concern's name stays on its rail and
+  moves between Mix Regular and Sans Medium through the font's axes (`--cut-duration`, `--cut-ease`, from the brand
+  guide's accent switch; the axis numbers are `--<style>-font-axis`).
 - Filters: cards travel on `--filter-duration`. Loader: the starter's logo preset on `theme-dark`.
 - The arriving blocks never run under the curtain: paused while the page change runs.
 

@@ -69,10 +69,10 @@
  },
  "1:83": {
   "d": [
-   0,
+   -141.3,
    90.2
   ],
-  "why": "list -5.47 and hover item on its line -3.12 ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +122.8"
+  "why": "list -5.47 and hover item on its line -3.12 ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +122.8 ; Sam, 22 nov, commentaire 6 : le nom reste sur son rail au survol, sans glisser vers la droite (seule sa coupe change), -141.3"
  },
  "1:188": {
   "d": [
