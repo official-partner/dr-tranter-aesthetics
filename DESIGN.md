@@ -78,7 +78,7 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
 against the right edge), `marker` (the small square), `inset-optical` (the optical indent of capitals),
 `media` (an image box: ratio class, the picture absolute, cover, centred; ratios 5:6, 1.45, 16:10, 9:7, 7:10, 1:1;
 a frame whose photo is still to come stays, empty, on `--background-skeleton`, so the composition holds: Nov 20),
-`pinned` (a section's name and its square stay in view while the section scrolls by, at `--pinned-top`, from a tablet up: CardGroup, CtaBand; Nov 20), `link-list` (a list of plain links: no underline, on hover the link slides `--space-2` right and a square 0.8 marker shows before it; the menu and the footer, Nov 20), `stacked-card` (a card's picture as wide as the card, its texts stacked: Card, the journal, the products), `section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
+`link-list` (a list of plain links: no underline, on hover, on focus and for the page shown the link slides `--space-2` right and a square 0.8 marker shows before it; with a mouse one square glides from link to link and rests on the page shown, src/utils/link-marker.ts; the menu and the footer, Nov 20 and 24), `linked-card` (a block with a photo and a link is one link: its `data-card-link` stretches over it, and its photo comes forward on hover; Card, the journal's cards, a concern page's treatment cards; Sam, Nov 24), `stacked-card` (a card's picture as wide as the card, its texts stacked: Card, the journal, the products), `section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
 for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
 
 ## The menu's motion (Nov 20)
@@ -117,10 +117,13 @@ for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
   of square, pill, frame and group name on `--follow-duration`, the photo changing inside the one frame
   (`--follow-image-duration`), the group's word rolling inside the one label; a list of links (footer, menu) moves one
   square from link to link on `--follow-duration` (src/utils/link-marker.ts). A concern's name stays on its rail and
-  moves between Mix Regular and Sans Medium through the font's axes (`--cut-duration`, `--cut-ease`, from the brand
-  guide's accent switch; the axis numbers are `--<style>-font-axis`).
-- Filters: cards travel on `--filter-duration`. Loader: the starter's logo preset on `theme-dark`.
-- The arriving blocks never run under the curtain: paused while the page change runs.
+  moves between Mix Regular and Sans Medium through the font's axes (`--cut-duration` 500 ms, `--cut-ease` the smooth
+  curve: the brand guide's accent switch, quicker, Sam, Nov 24; the axis numbers are `--<style>-font-axis`).
+- Filters: the page goes back to the group's top, the cards that go fade out (`--filter-out-duration`), then those that
+  stay travel and those that come fade in (`--filter-duration`), measured against the list; left and right are counted
+  among the cards shown (Sam, Nov 24). Loader: the starter's logo preset on `theme-dark`.
+- The arriving blocks come in with the curtain, `--page-curtain-wait` after the swap, a wait set once per page change
+  and never changed under them (Sam, Nov 24; it was after the whole curtain).
 
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside

@@ -75,7 +75,7 @@ const facts = [
 ].filter((f) => !!f);
 ---
 
-<Layout title={d.name} nav={false}>
+<Layout title={d.name} nav="menu" navTheme="light">
   <div data-op-item={concern.id} data-op-source="astro:concerns">
     {/* Head */}
     <ConcernHead name={d.name} statement={d.statement ?? ""} facts={facts} image={d.image && { src: d.image, alt: d.imageAlt }} />

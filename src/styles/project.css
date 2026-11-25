@@ -66,20 +66,6 @@
   background-color: var(--marker-color);
 }
 
-/* A section's name and its square stay in view while their section scrolls by (Sam's comment, Nov 20: « partout où on
-   a ce style »), level with the menu's button, from a tablet up, where they have a column of their own */
-.pinned {
-  @media (width >= 48rem) {
-    position: sticky;
-    top: var(--pinned-top);
-    align-self: start;
-    /* the square keeps its place on the name's capitals */
-    &.marker {
-      top: calc(var(--pinned-top) + (max(var(--text-label-floor), var(--text-label)) * 0.721 - var(--marker)) / 2);
-    }
-  }
-}
-
 /* Small texts set at the margin sit 3.5 design pixels inside it (Figma, 9 times; question 9 for Simon) */
 .inset-optical {
   padding-left: var(--inset-optical);
@@ -87,8 +73,8 @@
 
 /* A list of links (the footer's, the menu's): trimmed as one block; a link hovered or focused moves aside and shows the
    small square before it, as the Figma draws both (Nov 20). Its colour stays the list's; a muted list's link comes to
-   the text. With a mouse, one square glides from link to link (src/utils/link-marker.ts; Sam, comment 7, Nov 22) in
-   place of each link's own. */
+   the text. The link of the page shown looks so too (comment 19, Nov 24). With a mouse, one square glides from link to
+   link (src/utils/link-marker.ts; Sam, comment 7, Nov 22) in place of each link's own, and rests on the page shown. */
 .link-list {
   text-box: none;
   margin-block: -0.3395em;
@@ -112,7 +98,8 @@
       translate: 0 -50%;
       transition: opacity var(--hover-duration) var(--hover-ease);
     }
-    &:focus-visible {
+    /* the page shown keeps its square (Sam, Nov 24, comment 19), as a link hovered or focused */
+    &:is(:focus-visible, [aria-current="page"]) {
       color: var(--text);
       translate: var(--space-2) 0;
       &::before {
@@ -168,13 +155,23 @@
   }
 }
 
-/* A card that links answers the pointer (Sam, Nov 21, idea 3): its photo comes forward a little in its frame, slowly,
+/* A block with a photo and a link is one link (Sam, Nov 24, comments 8 and 10: « chaque fois qu'on a un bloc comme ça,
+   avec une image et un lien, tout le bloc doit être cliquable »): its own link (marked data-card-link) stretches over
+   it. It answers the pointer and the keyboard (Nov 21, idea 3): its photo comes forward a little in its frame, slowly,
    and its link's arrow passes (Button). `transform`, so it adds to the settle below (`scale`). */
+.linked-card {
+  position: relative;
+  & [data-card-link]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+}
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .stacked-card > .media > img {
+  .linked-card .media > img {
     transition: transform var(--media-hover-duration) var(--ease-smooth);
   }
-  .stacked-card:has(a):hover > .media > img {
+  .linked-card:has([data-card-link]:is(:hover, :focus-visible)) .media > img {
     transform: scale(var(--media-hover-scale));
   }
 }

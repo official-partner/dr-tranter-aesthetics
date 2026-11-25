@@ -1,12 +1,16 @@
 ---
 import Logo from "@/components/content/Logo.astro";
-import { clinicLinks, connectLinks, legalLinks, concernLinks } from "@/utils/site-links";
+import { clinicLinks, connectLinks, legalLinks, concernLinks, isHere } from "@/utils/site-links";
 
 interface Props {
   /** Set to `false` to omit the component. */
   render?: boolean;
+  /** Set to `false` for a page that already shows the logo close above the footer (the page not found). */
+  logo?: boolean;
 }
-const { render = true } = Astro.props;
+const { render = true, logo = true } = Astro.props;
+const path = Astro.url.pathname;
+const here = (href: string, list: { href: string }[]) => (isHere(href, path, list) ? "page" : undefined);
 const { structure, surface } = await concernLinks();
 const connect = connectLinks.filter((l) => l.footer !== false);
 ---
@@ -15,18 +19,18 @@ const connect = connectLinks.filter((l) => l.footer !== false);
   render && (
     <footer class="footer_wrap theme-dark" data-figma-band="footer" data-band-top="6919">
       <div class="footer_layout site-grid">
-        <Logo class="footer_logo" data-figma="1:167" />
+        {logo && <Logo class="footer_logo" data-figma="1:167" />}
         <div class="footer_group stack gap-4 is-structure">
           <p class="text-style-label" data-figma="1:169">Structure</p>
-          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:174" data-op-list="concerns" data-op-source="astro:concerns">{structure.map((c) => <li data-op-item={c.id}><a href={c.href} data-op-field="name">{c.name}</a></li>)}</ul>
+          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:174" data-op-list="concerns" data-op-source="astro:concerns">{structure.map((c) => <li data-op-item={c.id}><a href={c.href} aria-current={here(c.href, structure)} data-op-field="name">{c.name}</a></li>)}</ul>
         </div>
         <div class="footer_group stack gap-4 is-surface">
           <p class="text-style-label" data-figma="1:170">Surface</p>
-          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:175" data-op-list="concerns" data-op-source="astro:concerns">{surface.map((c) => <li data-op-item={c.id}><a href={c.href} data-op-field="name">{c.name}</a></li>)}</ul>
+          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:175" data-op-list="concerns" data-op-source="astro:concerns">{surface.map((c) => <li data-op-item={c.id}><a href={c.href} aria-current={here(c.href, surface)} data-op-field="name">{c.name}</a></li>)}</ul>
         </div>
         <div class="footer_group stack gap-4 is-clinic">
           <p class="text-style-label" data-figma="1:171">The Clinic</p>
-          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:179">{clinicLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:179">{clinicLinks.map((l) => <li><a href={l.href} aria-current={here(l.href, clinicLinks)}>{l.label}</a></li>)}</ul>
         </div>
         <p class="footer_legal text-style-list inset-optical" data-cap-offset="0.3395" data-figma="1:182">© Dr Tranter Aesthetics, {new Date().getFullYear()}<br />AHPRA registration MED0000000000</p>
         <div class="footer_group stack gap-4 is-visit">
@@ -37,11 +41,11 @@ const connect = connectLinks.filter((l) => l.footer !== false);
         </div>
         <div class="footer_group stack gap-4 is-connect is-muted">
           <p class="text-style-label" data-figma="1:173">Connect</p>
-          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:181">{connect.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:181">{connect.map((l) => <li><a href={l.href} aria-current={here(l.href, connect)}>{l.label}</a></li>)}</ul>
         </div>
         <div class="footer_group stack gap-4 is-legal is-muted">
           <p class="text-style-label" data-figma="1:172">Legal</p>
-          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:180">{legalLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+          <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:180">{legalLinks.map((l) => <li><a href={l.href} aria-current={here(l.href, legalLinks)}>{l.label}</a></li>)}</ul>
         </div>
       </div>
     </footer>

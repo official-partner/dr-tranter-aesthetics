@@ -9,14 +9,25 @@
      page being left; the curtain rises over it too, as it dims and drifts with its page. One gesture, nothing to sync.
    - The page that arrives (Sam, 14:53: « animer la page qui apparaît, les éléments… doux, bien dosé », no split
      text, no masks): it drifts up into place inside the curtain (--page-shift), and the blocks of its first two
-     sections come in one after the other once the curtain has ended: a fade and a short rise
-     (--page-enter-shift, --page-enter-duration on --page-enter-ease, --page-enter-stagger apart, --page-enter-wait
-     after the curtain). An opening photo never fades (it is the page's largest paint): it settles from a slight zoom
+     sections come in one after the other as the curtain rises over them: a fade and a short rise
+     (--page-enter-shift, --page-enter-duration on --page-enter-ease, --page-enter-stagger apart, --page-curtain-wait
+     after the swap; Sam, Nov 24). An opening photo never fades (it is the page's largest paint): it settles from a slight zoom
      in its frame (--page-media-scale, --page-media-duration), as the menu's photo does. A page loaded directly opens
      the same way.
    - Reduced motion, or a browser without view transitions: a short crossfade, nothing travels.
    Every value is a token of base.css (system/gen.py). */
 ---
+
+<script is:inline>
+  /* the arriving page's blocks come in with the curtain (the styles below): the page that arrives by a page change is
+     marked at the swap, once, and stays so until the next one (the router gives the root the new page's attributes) */
+  if (!window.__tranterArrive) {
+    window.__tranterArrive = true;
+    document.addEventListener("astro:after-swap", () => {
+      document.documentElement.dataset.arrive = "curtain";
+    });
+  }
+</script>
 
 <style is:global>
   @layer components {
@@ -27,13 +38,14 @@
       /* the arriving page's blocks, in reading order; the second section a beat after the first */
       html[data-page-transition="custom"] {
         --_enter-wait: var(--page-enter-wait);
-        /* One thing at a time (Sam, Nov 21: « les éléments finissent pas leur animation, lag »): the blocks wait for the
-           curtain to end, then come in on the page itself. Before, they came in under the curtain, the browser was
-           busiest just as the page change ended, in the middle of their fade, and a wait that changed at that moment
-           made them jump ahead. Paused, never re-timed: `data-astro-transition` is there for as long as the router's
-           page change runs. */
-        &[data-astro-transition] main > :nth-child(-n + 2) > .site-grid > * {
-          animation-play-state: paused;
+        /* In step with the curtain (Sam, Nov 24, comment 12: « les textes apparaissent trop tard après une transition »):
+           after a page change the blocks start --page-curtain-wait after the swap, while the curtain rises, so each
+           comes in as its edge passes it. Before (Nov 21) they waited for the whole curtain. The wait is set once, at
+           the swap (`data-arrive`, the script below), and kept until the next change: it never changes under a
+           running animation, which is what made them jump ahead on Nov 21 (« les éléments finissent pas leur
+           animation, lag »). A page loaded directly keeps --page-enter-wait. */
+        &[data-arrive="curtain"] {
+          --_enter-wait: var(--page-curtain-wait);
         }
         /* under the loading screen the opening waits for it to leave */
         &[data-loader="play"] main > :nth-child(-n + 2) > .site-grid :is(*, img) {

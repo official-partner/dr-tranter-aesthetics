@@ -30,6 +30,14 @@ export const legalLinks: SiteLink[] = [
   { label: "Complaints", href: "/" },
 ];
 
+/** Whether a link of a list leads to the page shown (`path`, Astro.url.pathname), so it carries aria-current and its
+ * small square (Sam, Nov 24, comment 19: « la page active doit avoir son petit carré »). A link whose address the list
+ * gives to several links (the home, while a page is still to come) is never the current one. */
+export function isHere(href: string, path: string, list: { href: string }[]): boolean {
+  const clean = (p: string) => p.replace(/\/+$/, "") || "/";
+  return clean(href) === clean(path) && list.filter((l) => clean(l.href) === clean(href)).length === 1;
+}
+
 /** The concerns by group, each to its page once it has one, else to the Concerns page. */
 export async function concernLinks() {
   const concerns = await getItems("concerns");

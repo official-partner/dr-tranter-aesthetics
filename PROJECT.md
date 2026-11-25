@@ -2,6 +2,48 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-24, Sam (comments 8 to 19 in OP System, Nov 24, 23:00 to 23:07, handled in the conversation):
+  - 8 and 10, a block with a photo and a link (« chaque fois qu'on a un bloc comme ça, avec une image et lien, tout
+    le bloc doit être cliquable »): new global class `linked-card`: the block's own link (marked `data-card-link`)
+    stretches over it, and the photo's hover of Nov 21 (idea 3) moves to it, with the keyboard's focus too. On Card
+    (Concerns, Treatments, when the card has a link), the home's journal cards and a concern page's treatment cards
+    (the recommended one and the others). A card with no page yet stays still and plain.
+  - 9, a concern's opening statement (« prendre 1 colonne de plus »): on a computer it takes its six columns; the 24
+    characters' measure had held it to about five (625 px at 1300, was 503).
+  - 11, a concern's page (« avoir le menu burger sur cette page aussi »): the bar comes back with the menu's button
+    alone (BaseLayout `nav="menu"`, Nav `quiet`); the logo and the pill come in with the menu, as when it is opened
+    from down the page. The bar lets the pointer through to the page's own head (Back, the crumb).
+  - 12, the page change (« les textes apparaissent trop tard après une transition »): the arriving page's blocks start
+    `--page-curtain-wait` (400 ms) after the swap, while the curtain rises, instead of after the whole curtain. The
+    wait is set once at the swap (`data-arrive`, an inline script in TransitionCustom) and kept until the next page
+    change, so it never changes under a running animation (the jump of Nov 21). Measured from the home to Our
+    approach: the first blocks start at about 450 ms, are at 90 % at 920 ms (the curtain ends at 1100), whole at
+    1450; before, they started after 1180 ms. A page loaded directly keeps `--page-enter-wait`.
+  - 13, the Treatments filters (« buggy, le reorder des items… scroll up au top de la section… seamless »): two faults.
+    The cards went left and right by their place among all the cards, hidden ones included, so a filter left holes;
+    they are now counted among the cards shown (`:nth-child(even of :not([hidden]))`). And the browser's view
+    transition froze and crossfaded the whole page for the change, which broke as the page scrolled: replaced by the
+    cards' own movement (FLIP, measured against the list): the cards that go fade out (`--filter-out-duration`,
+    200 ms), then those that stay travel and those that come fade in (`--filter-duration`). The page goes back to the
+    group's top when it started above the screen. A click in the middle of a change starts from where the cards are.
+  - 14, the closing invitation (« pas besoin de rendre celui-là sticky »): its label and square no longer stay in view,
+    on every page. Reverses part of comment 1 (Nov 20). `pinned` was then a global class of one component: its rules
+    went into CardGroup (`.card-group_head`, `.card-group_marker`).
+  - 15 and 16, a concern's head: Back comes to the text's colour on hover and focus; « Concerns » in the crumb leads to
+    the Concerns page, answering the other way (from the text's colour to the quieter one).
+  - 17, the page not found (« aligner ça avec le logo de la nav, plus haut. ne pas mettre le logo sur le footer pour
+    cette page »): from a tablet up its title starts on the nav's line (both at 23 px at 1652); the footer has no logo
+    on it (Footer `logo`, BaseLayout `footerLogo`). Its square is now centred on the title's capitals.
+  - 18, the home's list (« switch entre variables plus quick »): `--cut-duration` 1100 to 500 ms, `--cut-ease` the
+    travel curve to the smooth one, so the cut answers at once.
+  - 19, the footer and the menu (« la page active doit avoir son petit carré »): the link of the page shown carries
+    aria-current and looks hovered (moved aside, its square); with a mouse the gliding square rests on it and goes back
+    to it when the pointer leaves (`isHere`, src/utils/site-links.ts: a link whose address the list gives to several
+    links, the home while a page is to come, is never the current one).
+  - Checked: the home 92 of 92; widths 0 failures on the home, Concerns, Treatments, Volume loss, Our approach and the
+    404; rules 0 new; frame by frame at 1300 and 1652: the cards' links, the concern page's bar and its menu, the
+    footer's square on Melasma, the 404's line, the filters (no hole, the group's top, a second click mid-change), the
+    blocks after the curtain. Looked at: Concerns, Treatments, Our approach at 1300; Volume loss at 1300, 900, 390.
 - 2026-11-24, Sam (comments 3 to 7 in OP System, Nov 22, handled at his ask in the conversation):
   - 3, the pills (« hover bouton plus simple: juste fade le changement de couleur, pas de rideau »): a pill fills
     with the text's colour and its words take the ground's, fading in place on `--hover-duration`; replaces the rising

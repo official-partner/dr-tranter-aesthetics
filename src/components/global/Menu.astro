@@ -1,7 +1,8 @@
 ---
-import { clinicLinks, connectLinks, concernLinks } from "@/utils/site-links";
+import { clinicLinks, connectLinks, concernLinks, isHere } from "@/utils/site-links";
 
 const { structure, surface } = await concernLinks();
+const path = Astro.url.pathname;
 const groups = [
   { name: "Structure", key: "structure", links: structure.map((c) => ({ label: c.name, href: c.href, id: c.id })), concerns: true },
   { name: "Surface", key: "surface", links: surface.map((c) => ({ label: c.name, href: c.href, id: c.id })), concerns: true },
@@ -22,7 +23,7 @@ const groups = [
           <ul class="link-list text-style-list" data-op-list={g.concerns ? "concerns" : undefined} data-op-source={g.concerns ? "astro:concerns" : undefined}>
             {g.links.map((l, i) => (
               <li data-op-item={g.concerns ? (l as { id?: string }).id : undefined}>
-                <a href={l.href}><span class="menu_mask"><span class="menu_rise" style={`--i: ${i + 1}`} data-op-field={g.concerns ? "name" : undefined}>{l.label}</span></span></a>
+                <a href={l.href} aria-current={isHere(l.href, path, g.links) ? "page" : undefined}><span class="menu_mask"><span class="menu_rise" style={`--i: ${i + 1}`} data-op-field={g.concerns ? "name" : undefined}>{l.label}</span></span></a>
               </li>
             ))}
           </ul>

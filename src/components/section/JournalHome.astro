@@ -26,11 +26,11 @@ const posts = (await listed<"articles">("journal-home")).map(({ id, data }, i) =
     <div class="at-end journal-home_action"><Button element="link" href="/journal" data-figma="1:136">View all articles</Button></div>
     <CardRow {...ruleMarks("journal-home")}>
       {posts.map((p) => (
-        <li class="journal-home_card stacked-card" data-op-item={p.id}>
+        <li class="journal-home_card stacked-card linked-card" data-op-item={p.id}>
           {p.image && <div class="media ratio-9-7" data-figma={p.ids[0]}><Img {...pic(p.image)} alt={p.alt} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" /></div>}
           {p.date && <p class="journal-home_date text-style-date" data-op-field="date" data-figma={p.ids[1]}><time datetime={p.date.toISOString().slice(0, 10)}>{p.label}</time></p>}
           <h3 class="journal-home_card-title text-style-h3" data-op-field="title" data-figma={p.ids[2]}>{p.title}</h3>
-          <Button element="link" variant="link" href="/journal" data-figma={p.ids[3]}>Read the article →</Button>
+          <Button element="link" variant="link" href="/journal" data-figma={p.ids[3]} data-card-link>Read the article →</Button>
         </li>
       ))}
     </CardRow>

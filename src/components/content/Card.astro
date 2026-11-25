@@ -23,7 +23,7 @@ const { title, text, href, link = "View →", image, item, ids } = Astro.props;
 ---
 
 {/* A card of the site: a photo at 1.45, its name in capitals, a line, a link (the Concerns page; Nov 20) */}
-<article class="card_wrap stacked-card" data-op-source={item && `astro:${item.collection}`} data-op-item={item?.id}>
+<article class:list={["card_wrap stacked-card", href && "linked-card"]} data-op-source={item && `astro:${item.collection}`} data-op-item={item?.id}>
   <div class="media ratio-145" data-op-field={item && "image"} data-figma={ids?.[0]}>
     {image && <Img {...pic(image.src)} alt={image.alt ?? ""} variant="constrained" sizes="(width >= 64rem) 25vw, (width >= 48rem) 25vw, 75vw" />}
   </div>
@@ -31,7 +31,7 @@ const { title, text, href, link = "View →", image, item, ids } = Astro.props;
   {text && <p class="card_text text-style-main" data-op-field={item?.textField} data-figma={ids?.[2]}>{text}</p>}
   {href && (
     <div class="card_action">
-      <Button element="link" variant="link" href={href} data-figma={ids?.[3]}>{link}</Button>
+      <Button element="link" variant="link" href={href} data-figma={ids?.[3]} data-card-link>{link}</Button>
     </div>
   )}
 </article>

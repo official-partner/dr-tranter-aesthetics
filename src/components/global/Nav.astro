@@ -10,14 +10,17 @@ interface Props {
   overlap?: boolean;
   /** The colours of the page's opening it sits on: dark (the home's ink), light (a page opening on sand). */
   theme?: "dark" | "light";
+  /** The menu's button alone, for a page with its own head (a concern's page): the logo and the pill come in with
+   * the menu. */
+  quiet?: boolean;
 }
 
-const { render = true, theme = "dark" } = Astro.props;
+const { render = true, theme = "dark", quiet = false } = Astro.props;
 ---
 
 {
   render && (
-    <header class:list={["nav_wrap", `theme-${theme}`]} data-figma-band="header" data-nav-theme={theme}>
+    <header class:list={["nav_wrap", `theme-${theme}`]} data-figma-band="header" data-nav-theme={theme} data-nav-quiet={quiet ? "" : undefined}>
       <Menu />
       <div class="nav_inner site-grid">
         <Logo class="nav_logo" data-figma="1:65" />
@@ -74,6 +77,25 @@ const { render = true, theme = "dark" } = Astro.props;
     html[data-menu-away][data-menu="open"] :is(.nav_logo, .nav_actions > .button_wrap) {
       opacity: 1;
       transition: opacity var(--hover-duration) var(--hover-ease) var(--menu-bar-delay);
+    }
+    /* A page with its own head (a concern's page: Back, the name, the crumb) has the menu's button alone in its bar
+       (Sam, comment 11, Nov 24: « avoir le menu burger sur cette page aussi »): the logo and the pill come in with the
+       menu, as when it is opened from down the page (the script marks it away) */
+    .nav_wrap[data-nav-quiet] {
+      /* the page's own head stays within reach under the bar: only the button takes the pointer */
+      pointer-events: none;
+      & .nav_toggle {
+        pointer-events: auto;
+      }
+      & :is(.nav_logo, .nav_actions > .button_wrap) {
+        visibility: hidden;
+      }
+    }
+    html[data-menu] .nav_wrap[data-nav-quiet] {
+      pointer-events: auto;
+      & :is(.nav_logo, .nav_actions > .button_wrap) {
+        visibility: visible;
+      }
     }
     .nav_logo {
       grid-column: margin / span 2;
@@ -240,7 +262,7 @@ const { render = true, theme = "dark" } = Astro.props;
       const lenis = pageLenis();
       if (lenis) open ? lenis.stop() : lenis.start();
       if (open) {
-        if (nav.getBoundingClientRect().bottom <= 0) root.dataset.menuAway = "";
+        if (nav.getBoundingClientRect().bottom <= 0 || nav.hasAttribute("data-nav-quiet")) root.dataset.menuAway = "";
         menu.hidden = false;
         /* one frame with the panel shown and closed, so its curtain runs from the top */
         requestAnimationFrame(() => requestAnimationFrame(() => {

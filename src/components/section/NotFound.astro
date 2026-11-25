@@ -47,10 +47,16 @@ const { render = true } = Astro.props;
       max-width: 34ch;
       color: var(--text-2);
     }
+    /* from a tablet up, where the title sits beside the logo, it starts on the nav's line (Sam, comment 17, Nov 24:
+       « aligner ça avec le logo de la nav, plus haut ») */
     @media (width >= 48rem) {
+      .not-found_wrap {
+        padding-top: var(--site-margin);
+      }
       .not-found_marker {
         display: block;
         grid-row: 1;
+        margin-top: calc((var(--h2) * 0.721 - var(--marker)) / 2);
       }
       .not-found_title,
       .not-found_text,

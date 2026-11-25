@@ -172,8 +172,8 @@ const named = {
       display: inline-block;
     }
     @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-      /* a card's arrow answers the card (idea 3), a button's its button */
-      :is(.button_wrap, .stacked-card):hover .button_arrow-in {
+      /* a button's arrow answers its button; a card's link covers its card (project.css, linked-card) */
+      .button_wrap:is(:hover, :focus-visible) .button_arrow-in {
         animation: button-arrow var(--arrow-duration) var(--hover-ease);
       }
     }

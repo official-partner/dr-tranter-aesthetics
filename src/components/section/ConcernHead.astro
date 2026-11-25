@@ -33,7 +33,7 @@ const { render = true, name, statement, facts, image } = Astro.props;
         <a class="concern-head_back text-style-action inset-optical" href="/concerns" data-figma="1:450"><span class="concern-head_arrow" aria-hidden="true">→</span>Back</a>
         <span class="marker concern-head_marker" data-figma="1:358" />
         <h1 class="concern-head_name lead-marker text-style-h2" data-op-field="name" data-figma="1:434">{name}</h1>
-        <p class="concern-head_crumb text-style-action" data-figma="1:453">Concerns / <span class="concern-head_current">{name}</span></p>
+        <p class="concern-head_crumb text-style-action" data-figma="1:453"><a class="concern-head_up" href="/concerns">Concerns</a> / <span class="concern-head_current">{name}</span></p>
         <p class="concern-head_statement text-style-h2" data-op-field="statement" data-figma="1:357" set:html={inlineRich(statement)} />
         {/* the frame stays, empty, while the concern's photo is still to come (DESIGN.md, Global classes: media) */}
         <div class="concern-head_media media ratio-5-6" data-op-field="image" data-figma="1:359">
@@ -65,11 +65,36 @@ const { render = true, name, statement, facts, image } = Astro.props;
       row-gap: var(--space-7);
       align-items: start;
     }
+    /* Back comes to the text's colour on hover and on focus (Sam, comment 15, Nov 24: « hover sur le back, devient
+       noir »); « Concerns » in the crumb leads to the Concerns page and answers the other way, from the text's colour
+       to the quieter one (comment 16: « concern cliquable »). */
     .concern-head_back {
       grid-column: margin / end;
       display: inline-flex;
       gap: var(--space-3);
       color: var(--text-2);
+      &:focus-visible {
+        color: var(--text);
+      }
+    }
+    .concern-head_up {
+      color: inherit;
+      text-decoration: none;
+      &:focus-visible {
+        color: var(--text-2);
+      }
+    }
+    .concern-head_back,
+    .concern-head_up {
+      transition: color var(--hover-duration) var(--hover-ease);
+    }
+    @media (hover: hover) {
+      .concern-head_back:hover {
+        color: var(--text);
+      }
+      .concern-head_up:hover {
+        color: var(--text-2);
+      }
     }
     .concern-head_arrow {
       display: inline-block;
@@ -90,6 +115,11 @@ const { render = true, name, statement, facts, image } = Astro.props;
     }
     .concern-head_statement {
       max-width: 24ch;
+      /* on a computer it takes its six columns (Sam, comment 9, Nov 24: « prendre 1 colonne de plus pour ce texte »:
+         the measure of 24 characters held it to about five) */
+      @media (width >= 64rem) {
+        max-width: none;
+      }
     }
     .concern-head_facts {
       display: flex;

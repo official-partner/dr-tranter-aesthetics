@@ -48,11 +48,11 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
           <h2 class="concern-body_title text-style-h2" data-figma="1:365">What we would consider</h2>
           <p class="concern-body_label lead-marker text-style-label inset-optical" data-figma="1:392">Recommended starting point</p>
           <span class="marker concern-body_marker" data-figma="1:389" />
-          <article class="concern-body_card is-wide">
+          <article class="concern-body_card is-wide linked-card">
             <div class="media ratio-145" data-figma={recommended.ids?.[0]}>{recommended.image && <Img {...pic(recommended.image.src)} alt={recommended.image.alt ?? ""} variant="constrained" sizes="(width >= 48rem) 45vw, 100vw" />}</div>
             <div class="concern-body_caption" data-op-source={recommended.item && `astro:${recommended.item.collection}`} data-op-item={recommended.item?.id}>
               <h3 class="text-style-index" data-op-field={recommended.item && "name"} data-figma={recommended.ids?.[1]}>{recommended.title}</h3>
-              <Button element="link" variant="link" href={recommended.href} data-figma={recommended.ids?.[3]}>{recommended.link}</Button>
+              <Button element="link" variant="link" href={recommended.href} data-figma={recommended.ids?.[3]} data-card-link>{recommended.link}</Button>
             </div>
             {recommended.text && <p class="concern-body_card-text text-style-main" data-op-field="recommendedText" data-figma={recommended.ids?.[2]}>{recommended.text}</p>}
           </article>
@@ -65,11 +65,11 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
           <p class="concern-body_label lead-marker text-style-label inset-optical" data-figma="1:393">Also considered</p>
           <span class="marker concern-body_marker" data-figma="1:390" />
           {also.map((c) => (
-            <article class="concern-body_card" data-op-source={c.item && `astro:${c.item.collection}`} data-op-item={c.item?.id}>
+            <article class="concern-body_card linked-card" data-op-source={c.item && `astro:${c.item.collection}`} data-op-item={c.item?.id}>
               <div class="media ratio-145" data-op-field={c.item && "image"} data-figma={c.ids?.[0]}>{c.image && <Img {...pic(c.image.src)} alt={c.image.alt ?? ""} variant="constrained" sizes="(width >= 48rem) 30vw, 75vw" />}</div>
               <h3 class="text-style-index-caps" data-op-field={c.item && "name"} data-figma={c.ids?.[1]}>{c.title}</h3>
               <p class="text-style-main" data-op-field={c.item && "summary"} data-figma={c.ids?.[2]}>{c.text}</p>
-              <Button element="link" variant="link" href={c.href} data-figma={c.ids?.[3]}>{c.link}</Button>
+              <Button element="link" variant="link" href={c.href} data-figma={c.ids?.[3]} data-card-link>{c.link}</Button>
             </article>
           ))}
         </div>
