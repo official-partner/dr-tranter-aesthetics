@@ -61,6 +61,7 @@ const people = team.map(({ id, data }) => ({
         Dr Sarah Tranter founded the clinic on a simple premise: that treatment should follow judgement, not the other way around. Her approach considers the face as one system of structure and surface, not a list of isolated concerns. Every protocol at the clinic reflects standards she has set personally, whether or not she is the one delivering care.
       </p>
       {/* the team */}
+      <p class="people-home_team-title text-style-h2" aria-hidden="true">Meet the <em>team.</em></p>
       <ul class="people-home_team" data-op-list="team" data-op-source="astro:team" data-op-noun="Team member">
         {people.map((m) => (
           <li class="people-home_person" data-person data-team data-photo={m.photo} data-op-item={m.id}>
@@ -110,12 +111,12 @@ const people = team.map(({ id, data }) => ({
         object-fit: cover;
       }
     }
+    /* the rolling word sits on the title's baseline (Sam, Nov 25, on an iPhone: « founder » sat lower than « Meet the »:
+       a box that clips its overflow takes its baseline from its bottom edge); a clip-path clips without moving it */
     .people-home_switch {
       display: inline-grid;
-      overflow: clip;
-      vertical-align: top;
-      padding-block: 0.12em;
-      margin-block: -0.12em;
+      vertical-align: baseline;
+      clip-path: inset(-0.2em -0.5em);
     }
     .people-home_word {
       grid-area: 1 / 1;
@@ -159,33 +160,43 @@ const people = team.map(({ id, data }) => ({
       display: none;
     }
 
-    /* phone: the title and the portrait hold at the top together, the names pass under them */
+    /* phone: a plain scroll (Sam, Nov 25: « sur mobile je ferais juste un scroll normal… quelque chose de beaucoup plus
+       simple »): the title, the founder's portrait, her name and words, then « Meet the team. » and the names, all lit;
+       no other portrait */
+    .people-home_team-title {
+      display: none;
+    }
     @media (width < 48rem) {
-      .people-home_stage {
-        grid-column: margin / end;
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        padding-top: var(--section-padding);
-        margin-top: calc(var(--section-padding) * -1);
-        padding-bottom: var(--space-5);
-        background-color: var(--background);
-      }
-      .people-home_media {
-        margin-top: var(--space-5);
-        --_h: 46svh;
-        width: 100%;
-      }
+      .people-home_stage,
       .people-home_flow {
         grid-column: margin / end;
+      }
+      .people-home_media {
+        margin-top: var(--space-7);
+        width: 100%;
+        height: auto;
+        aspect-ratio: 5 / 6;
+      }
+      .people-home_photo:not([data-photo="0"]) {
+        display: none;
+      }
+      .people-home_flow {
         padding-top: var(--space-7);
-        padding-bottom: 0;
       }
       .people-home_name {
         --_lead-marker: inline-block;
       }
       .people-home_bio {
         margin-top: var(--space-7);
+      }
+      .people-home_team-title {
+        display: block;
+        grid-column: margin / end;
+        margin-top: var(--space-10);
+      }
+      .people-home_team {
+        margin-top: var(--space-7);
+        row-gap: var(--space-6);
       }
     }
 
@@ -265,9 +276,9 @@ const people = team.map(({ id, data }) => ({
   import { onPage } from "@/utils/page";
 
   /* The founder, then the team (Sam, Nov 25). Its job: show who is who as the visitor reads down the names. The name at
-     the square is lit and its portrait shows: the next portrait rises over the last from the bottom, as the page's
+     the square is lit and its portrait shows (from a tablet up; a phone scrolls plainly): the next portrait rises over the last from the bottom, as the page's
      curtain does (from the top coming back up), and settles in its frame; the title's word rolls from « founder » to
-     « team » when the first name of the team reaches the square. On a phone the line is a third of the way down the room left under the title and the portrait.
+     « team » when the first name of the team reaches the square.
      Under reduced motion the portrait and the word change at once. Without this script: the founder's portrait, every
      name lit. */
   onPage((signal) => {
@@ -283,10 +294,9 @@ const people = team.map(({ id, data }) => ({
       const people = [...section.querySelectorAll<HTMLElement>("[data-person]")];
       const photos = [...section.querySelectorAll<HTMLElement>("[data-photo]:not([data-person])")];
       const line = section.querySelector<HTMLElement>("[data-people-line]");
-      const stage = section.querySelector<HTMLElement>(".people-home_stage");
       const words = [...section.querySelectorAll<HTMLElement>(".people-home_word")];
       if (!people.length) return;
-      section.dataset.peopleReady = "";
+      const wide = matchMedia("(width >= 48rem)");
       /* the photos load before they are needed: once the section is near */
       const near = new IntersectionObserver((seen) => {
         if (!seen.some((e) => e.isIntersecting)) return;
@@ -306,9 +316,7 @@ const people = team.map(({ id, data }) => ({
           const r = line.getBoundingClientRect();
           return r.top + r.height / 2;
         }
-        /* a phone: a third of the way down the room left under the title and the portrait, where the names are seen */
-        const under = Math.max(0, stage?.getBoundingClientRect().bottom ?? innerHeight / 2);
-        return under + (innerHeight - under) / 3;
+        return innerHeight / 2;
       };
       const showPhoto = (to: number, down: boolean) => {
         if (to < 0 || to === shown) return;
@@ -348,7 +356,21 @@ const people = team.map(({ id, data }) => ({
         out.animate([{ translate: "0 0" }, { translate: `0 ${up ? -120 : 120}%` }], { duration: time * 0.7, easing: ease("--ease-smooth"), fill: "forwards" }).finished.then((x) => x.cancel(), () => {});
         into.animate([{ translate: `0 ${up ? 120 : -120}%` }, { translate: "0 0" }], { duration: time, easing: ease("--ease-smooth") });
       };
+      /* a phone: everything as written, lit, the founder's portrait */
+      const plain = () => {
+        delete section.dataset.peopleReady;
+        people.forEach((p, n) => p.classList.toggle("is-active", n === 0));
+        active = 0;
+        if (shown !== 0 && photos.length) {
+          running.forEach((a) => a.cancel());
+          photos.forEach((p, n) => { p.classList.toggle("is-shown", n === 0); p.classList.remove("is-leaving"); });
+          shown = 0;
+        }
+        if (team) { team = false; words.forEach((w, n) => w.classList.toggle("is-shown", n === 0)); }
+      };
       const follow = () => {
+        if (!wide.matches) return plain();
+        section.dataset.peopleReady = "";
         const y = where();
         let i = 0;
         people.forEach((p, n) => {

@@ -2,6 +2,11 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-25, Sam (18:00, on his iPhone): « founder » sat lower than « Meet the »: the rolling word's box clipped its
+  overflow, which takes a box's baseline from its bottom edge; it is clipped by a clip-path now, on the title's
+  baseline. And on a phone the section is a plain scroll (« le layout permet pas ça… quelque chose de beaucoup plus
+  simple »): the title, the founder's portrait, her name and words, then « Meet the team. » and the names, all lit,
+  no other portrait, nothing held. From a tablet up, unchanged.
 - 2026-11-25, Sam (17:36, the home from the new Figma « Starter (Copy) », aoeqIxiMORSdvcWd3SnWsA, frame 4001:2; « c'est
   le même système… avec juste des petits changements »):
   - Removed from the home: Results (its component stays, for the Results page).
