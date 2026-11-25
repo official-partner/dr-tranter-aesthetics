@@ -1,0 +1,29 @@
+<script>
+  import { onPage } from "@/utils/page";
+
+  /* The photos appear (Simon, Nov 25, comment 2; project.css, .media[data-reveal]). Every image frame below the page's
+     opening (its first two sections, which have their own entrance) is marked, then let go once, as it comes into view. Under reduced motion nothing is marked. */
+  onPage((signal) => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+    const opening = [...document.querySelectorAll("main > :nth-child(-n + 2)")];
+    const frames = [...document.querySelectorAll<HTMLElement>("main .media, footer .media")].filter((m) => !opening.some((o) => o.contains(m)));
+    /* a frame is watched through its parent: the frame itself, clipped shut, is never « in view » to the browser */
+    const of = new Map<Element, HTMLElement[]>();
+    const seen = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        of.get(e.target)?.forEach((m) => m.classList.add("is-revealed"));
+        seen.unobserve(e.target);
+      }
+    }, { rootMargin: "0px 0px -12% 0px" });
+    for (const m of frames) {
+      /* a frame already past (the page opened lower down) shows as it is */
+      if (m.getBoundingClientRect().bottom < 0 || !m.parentElement) continue;
+      m.dataset.reveal = "";
+      const host = m.parentElement;
+      of.set(host, [...(of.get(host) ?? []), m]);
+      seen.observe(host);
+    }
+    signal.addEventListener("abort", () => seen.disconnect());
+  });
+</script>

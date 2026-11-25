@@ -176,20 +176,24 @@
   }
 }
 
-/* A photo settles in its frame as it comes into view (idea 1): from a slight zoom to its size, led by the scroll, so
-   it never jumps and costs no script. Browsers without scroll timelines show it still. */
+/* A photo appears as it comes into view (Simon, Nov 25, comment 2: « des anims comme Velkei, tu fais apparaître les
+   photos »; in place of the scroll-led settle of Nov 21): once, its frame is uncovered from the bottom, as the page's
+   curtain, and the picture settles in it from a zoom. Reveal.astro marks the frames below the page's opening (which
+   has its own entrance) and lets each go as it enters; without it, or under reduced motion, the photos simply show. */
 @media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .media > img {
-      animation: media-settle ease-out both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 45%;
+  .media[data-reveal] {
+    clip-path: inset(100% 0 0 0);
+    & > img {
+      scale: var(--reveal-scale);
     }
-  }
-}
-@keyframes media-settle {
-  from {
-    scale: var(--media-settle-scale);
+    &.is-revealed {
+      clip-path: inset(0 0 0 0);
+      transition: clip-path var(--reveal-duration) var(--reveal-ease);
+      & > img {
+        scale: 1;
+        transition: scale var(--reveal-settle-duration) var(--ease-smooth);
+      }
+    }
   }
 }
 

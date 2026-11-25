@@ -71,11 +71,19 @@ const posts = (await listed<"articles">("journal-home")).map(({ id, data }, i) =
     .journal-home_card-title {
       max-width: 18ch;
     }
-    /* the last: its title above its photo */
-    .journal-home_card.is-d .journal-home_meta {
-      order: -1;
-      margin-top: 0;
-      margin-bottom: var(--space-media);
+    /* the last: its title above its photo, its « Read → » at the foot of the block, on the right (Sam, comment 9) */
+    .journal-home_card.is-d {
+      & .journal-home_meta {
+        display: contents;
+      }
+      & .journal-home_card-title {
+        order: -1;
+        margin-bottom: var(--space-media);
+      }
+      & .button_wrap {
+        align-self: end;
+        margin-top: var(--space-media);
+      }
     }
     .journal-home_action {
       grid-column: margin / end;
@@ -121,7 +129,8 @@ const posts = (await listed<"articles">("journal-home")).map(({ id, data }, i) =
         &.is-c {
           grid-row: 2;
           grid-column: half / span 3;
-          margin-top: calc(var(--space-11) + var(--space-10));
+          /* more room above it (Sam, comment 8: « faire plus respirer ») */
+          margin-top: calc(var(--space-11) * 2 + var(--space-10));
         }
         &.is-d {
           grid-row: 3;

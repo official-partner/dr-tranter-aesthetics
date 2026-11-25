@@ -2,6 +2,22 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-25, the home's comments (Simon 1 to 3, Sam 4 to 9):
+  - Simon 2 (« des anims comme Velkei, tu fais apparaître les photos »): every photo below the page's opening appears
+    once as it comes into view, its frame uncovered from the bottom (`--reveal-duration`, the curtain's curve) and the
+    picture settling from `--reveal-scale` (src/components/global/Reveal.astro, project.css `.media[data-reveal]`), in
+    place of the scroll-led settle of Nov 21. Reduced motion, or no script: the photos simply show.
+  - Sam 4: the approach section on white (stone).
+  - Sam 5: the portrait keeps the portraits' ratio (5:6); as tall as the screen less two margins when its columns
+    allow, else as wide as its columns (half to the end) and set top right; the words never pass under it.
+  - Sam 6: the portraits cross-fade with a slight scale (`--people-swap-duration`, `--people-swap-scale`), in CSS, so
+    a fast scroll only retargets it (checked: after a fast scroll the last name's portrait alone shows).
+  - Sam 7: the square holds only while the names pass, then scrolls on with the last one (it spans the names' rows).
+  - Sam 8: more room above the journal's third article. Sam 9: the last article's « Read → » at the foot of its block.
+  - Simon 1 (the hero, « la nouvelle version est dans Tranter (Client) ») was written before Sam's « Starter (Copy) »
+    of the afternoon, from which the home was redone; that file's hero is the one built. Tranter (Client) can no longer
+    be read by the connector (no access): to confirm the hero there.
+  - Simon 3 (« faire l'anim de transition ici », the founder): done this afternoon, the founder then the team.
 - 2026-11-25, Sam (18:00, on his iPhone): « founder » sat lower than « Meet the »: the rolling word's box clipped its
   overflow, which takes a box's baseline from its bottom edge; it is clipped by a clip-path now, on the title's
   baseline. And on a phone the section is a plain scroll (« le layout permet pas ça… quelque chose de beaucoup plus
