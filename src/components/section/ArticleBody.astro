@@ -64,7 +64,8 @@ const html = richHtml(body, classes);
       grid-column: margin / end;
     }
     /* the text's blocks on the grid: a title on the left, its first paragraph beside it on the main rail (the grid
-       places each block after the one before, so a title and the paragraph after it share a row), the rest under */
+       places each block after the one before, so a title and the paragraph after it share a row), the rest under
+       (the legal pages, Figma 4001:581: the titles a step apart, --space-8) */
     .article-body_text {
       display: grid;
       grid-template-columns: subgrid;
@@ -75,9 +76,14 @@ const html = richHtml(body, classes);
         margin: 0;
         max-width: 60ch;
       }
-      & > h2:not(:first-child),
-      & > h2:not(:first-child) + * {
-        margin-top: var(--space-10);
+      & > h2:not(:first-child) {
+        margin-top: var(--space-8);
+      }
+      /* beside its title from a tablet up, its first paragraph starts level with it */
+      @media (width >= 48rem) {
+        & > h2:not(:first-child) + * {
+          margin-top: var(--space-8);
+        }
       }
       & > :is(ul, ol) {
         padding-left: 1.2em;
@@ -102,8 +108,10 @@ const html = richHtml(body, classes);
         & > * {
           grid-column: main / end;
         }
+        /* a title on two rows: a title of two lines does not push its second paragraph down */
         & > h2 {
           grid-column: margin / main;
+          grid-row: span 2;
         }
       }
       .article-body_facts {

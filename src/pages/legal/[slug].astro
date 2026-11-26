@@ -1,0 +1,34 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import PageHead from "@/components/section/PageHead.astro";
+import ArticleBody from "@/components/section/ArticleBody.astro";
+import { getItems, getItem } from "@/utils/content";
+import { clinic } from "@/data/clinic";
+
+/* One page per legal text (Figma « Starter (Copy) » 4001:581, drawn for the privacy policy): its title, when it was
+   last updated and where it applies, then its text, its « ## » titles on the left. The texts are the brief's (C4),
+   placeholders with their « [Placeholder] » marks until Sarah sends hers. */
+export async function getStaticPaths() {
+  const pages = await getItems("legal");
+  return pages.map((p) => ({ params: { slug: p.id } }));
+}
+
+const { slug } = Astro.params;
+const page = slug ? await getItem("legal", slug) : undefined;
+if (!page) return Astro.rewrite("/404");
+const d = page.data;
+---
+
+<Layout title={d.title} navTheme="light">
+  <div data-op-item={page.id} data-op-source="astro:legal">
+    <PageHead
+      theme="stone"
+      title={d.title}
+      facts={[
+        ...(d.updated ? [{ label: "Last updated", lines: [d.updated] }] : []),
+        { label: "Applies to", lines: [clinic.town] },
+      ]}
+    />
+    <ArticleBody body={d.body} />
+  </div>
+</Layout>

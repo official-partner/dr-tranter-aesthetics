@@ -184,4 +184,18 @@ const team = defineCollection({
       .describe("Team"),
 });
 
-export const collections = { concerns, treatments, products, articles, results, team };
+const legal = defineCollection({
+  loader: glob({ pattern: "*.json", base: "./src/content/legal" }),
+  schema: z
+    .object({
+      title: z.string().describe("Title"),
+      updated: z.string().optional().describe("Last updated"),
+      body: z.string().optional().describe("Text").meta({ kind: "rich" }),
+      visible: z.boolean().default(true).describe("Visible on the site"),
+      draft: z.boolean().default(false).describe("Draft"),
+      order: z.number().optional().describe("Order"),
+    })
+    .describe("Legal pages"),
+});
+
+export const collections = { concerns, treatments, products, articles, results, team, legal };

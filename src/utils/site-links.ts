@@ -1,4 +1,5 @@
 import { getItems } from "@/utils/content";
+import { RISKS_PATH } from "@/consts";
 
 /* The site's links, read by the footer and the menu: one place for each (CLAUDE.md, one place per fact). A page's
    address once it is built (Simon's brief, Nov 19, A2), the home until then. Contact and Careers open the « Send an
@@ -24,10 +25,10 @@ export const connectLinks: SiteLink[] = [
 ];
 
 export const legalLinks: SiteLink[] = [
-  { label: "Risks and complications", href: "/" },
-  { label: "Privacy policy", href: "/" },
-  { label: "Terms", href: "/" },
-  { label: "Complaints", href: "/" },
+  { label: "Risks and complications", href: RISKS_PATH },
+  { label: "Privacy policy", href: "/legal/privacy-policy" },
+  { label: "Terms", href: "/legal/terms" },
+  { label: "Complaints", href: "/legal/complaints" },
 ];
 
 /** Whether a link of a list leads to the page shown (`path`, Astro.url.pathname), so it carries aria-current and its
