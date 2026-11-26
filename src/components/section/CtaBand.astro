@@ -7,7 +7,9 @@ interface Props {
   /** Title; emphasis with <em>, a line break with <br />. */
   title?: string;
   /** Its ground: stone (the home, a concern), or the light sand after a mist band (Our Approach). */
-  theme?: "stone" | "light";
+  theme?: "stone" | "light" | "dark";
+  /** Start on a hairline, after a band on the same ground (Our team). */
+  rule?: boolean;
   /** The small name at the margin. */
   label?: string;
   /** The pill on the right. */
@@ -18,6 +20,7 @@ interface Props {
 const {
   render = true,
   theme = "stone",
+  rule = false,
   label = "Where to start?",
   action = { label: "Book a consultation", href: "#consultation" },
   title = "Every new patient begins with<br />a <em>consultation</em>.",
@@ -27,7 +30,7 @@ const {
 
 {
   render && (
-    <section class:list={["cta-band_wrap section-padding", `theme-${theme}`]} id="consultation" data-figma-band="cta" data-band-top={figma.top}>
+    <section class:list={["cta-band_wrap section-padding", `theme-${theme}`, rule && "section-rule"]} id="consultation" data-figma-band="cta" data-band-top={figma.top}>
       <div class="cta-band_layout site-grid">
         <p class="cta-band_label lead-marker text-style-label inset-optical" data-figma={figma.label}>{label}</p>
         <span class="marker cta-band_marker" data-figma={figma.marker} />

@@ -1,0 +1,26 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import PageHead from "@/components/section/PageHead.astro";
+import ConcernIndex from "@/components/content/ConcernIndex.astro";
+import TeamProfiles from "@/components/section/TeamProfiles.astro";
+import CtaBand from "@/components/section/CtaBand.astro";
+import { getItems } from "@/utils/content";
+
+/* Our team (Figma « Starter (Copy) » 4001:904, its hover 4001:934, a profile 4001:958): the team on the dark ground,
+   the list of the home's concerns made for people (a name and its role; chosen, its photo, square and Full profile
+   beside it), each profile opened over the page. The team as it stands in the Figma (brief A2); bios and photos to
+   come from Sarah. */
+const team = await getItems("team");
+const items = team.map(({ id, data }) => ({ id, label: data.name, sub: data.role, href: `#team-${id}`, image: data.photo }));
+---
+
+<Layout title="Our team" description="The team at Dr Tranter Aesthetics: cosmetic doctors, nurses and dermal therapists trained within the same method." navTheme="dark">
+  <PageHead theme="dark" title="Meet our <em>team</em>" text="A team of cosmetic doctors, nurses and dermal therapists, each independently expert, all trained within the same method." />
+  <section class="theme-dark section-padding section-rule">
+    <div class="site-grid">
+      <ConcernIndex variant="people" items={items} action="Full profile" list="team" source="astro:team" />
+    </div>
+  </section>
+  <TeamProfiles />
+  <CtaBand theme="dark" rule />
+</Layout>

@@ -4,9 +4,11 @@ import Img from "@/components/media/Img.astro";
 import { pic, type Pic } from "@/utils/media";
 
 interface Item {
-  /** The concern's id in the collection. */
+  /** The item's id in its collection. */
   id?: string;
   label: string;
+  /** A second line under the name (a person's role). */
+  sub?: string;
   category?: string;
   href: string;
   image?: Pic;
@@ -14,28 +16,44 @@ interface Item {
 interface Props {
   /** Set to `false` to omit the component. */
   render?: boolean;
-  /** The concerns, in order. */
+  /** The items, in order. */
   items: Item[];
+  /** `concerns`: the large names of the home's list; `people`: a name and its role, the others dimmed when one is
+      chosen (Our team, Figma 4001:904 and 934). */
+  variant?: "concerns" | "people";
+  /** The button's words. */
+  action?: string;
+  /** The list's name and source for OP System. */
+  list?: string;
+  source?: string;
 }
-const { render = true, items } = Astro.props;
+const { render = true, items, variant = "concerns", action = "Learn more", list = "concerns", source = "astro:concerns" } = Astro.props;
+const people = variant === "people";
 ---
 
 {
   render && items?.length > 0 && (
-    <div class="concern-index_wrap">
-      <ul class="concern-index_list text-style-display" data-figma="1:81" data-cap-offset="0.1895" data-op-list="concerns" data-op-source="astro:concerns">
+    <div class:list={["concern-index_wrap", people && "is-people"]}>
+      <ul class:list={["concern-index_list", !people && "text-style-display"]} data-figma={people ? undefined : "1:81"} data-cap-offset={people ? undefined : "0.1895"} data-op-list={list} data-op-source={source}>
         {items.map((item, i) => (
           <li class:list={["concern-index_item", i > 0 && item.category !== items[i - 1].category && "is-group-start"]} data-op-item={item.id}>
-            <span class="concern-index_category text-style-label inset-optical" data-op-field="group" data-figma={item.category === "Structure" ? "1:84" : undefined}><span class="concern-index_word">{item.category}</span></span>
+            {item.category && <span class="concern-index_category text-style-label inset-optical" data-op-field="group" data-figma={item.category === "Structure" ? "1:84" : undefined}><span class="concern-index_word">{item.category}</span></span>}
             {item.image && (
-              <span class="concern-index_thumb media" data-figma="1:82">
+              <span class="concern-index_thumb media" data-figma={people ? undefined : "1:82"}>
                 <Img {...pic(item.image)} alt="" variant="constrained" sizes="10rem" />
               </span>
             )}
-            <span class="concern-index_marker marker" data-figma="1:88" />
-            <a class="concern-index_link" data-op-field="name" href={item.href} data-cap-offset="0.1895" data-figma={item.label === "Temple hollowing" ? "1:83" : undefined}>{item.label}</a>
+            <span class="concern-index_marker marker" data-figma={people ? undefined : "1:88"} />
+            {people ? (
+              <a class="concern-index_link" href={item.href}>
+                <span class="concern-index_name text-style-label" data-op-field="name">{item.label}</span>
+                {item.sub && <span class="concern-index_sub text-style-serif" data-op-field="role">{item.sub}</span>}
+              </a>
+            ) : (
+              <a class="concern-index_link" data-op-field="name" href={item.href} data-cap-offset="0.1895" data-figma={item.label === "Temple hollowing" ? "1:83" : undefined}>{item.label}</a>
+            )}
             <span class="concern-index_action">
-              <Button element="link" href={item.href} tabindex="-1" data-figma="1:188">Learn more</Button>
+              <Button element="link" href={item.href} tabindex="-1" data-figma={people ? undefined : "1:188"}>{action}</Button>
             </span>
           </li>
         ))}
@@ -192,6 +210,28 @@ const { render = true, items } = Astro.props;
       transition: none;
     }
 
+    /* people (Our team): a name and its role, a step apart; when one is chosen the others dim (--people-dim, as the
+       home's team list) and its photo, square and Full profile show beside it, on the row's middle */
+    .concern-index_wrap.is-people {
+      & .concern-index_list {
+        row-gap: var(--space-6);
+        margin-block: 0;
+        color: var(--text);
+      }
+      & .concern-index_item {
+        --_mid: 50%;
+      }
+      & .concern-index_link {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        justify-self: start;
+        transition: opacity var(--hover-duration) var(--hover-ease);
+      }
+      & .concern-index_list:has(.concern-index_item:is(:hover, :focus-within)) .concern-index_item:not(:hover, :focus-within) .concern-index_link {
+        opacity: var(--people-dim);
+      }
+    }
     @media (width < 48rem) {
       .concern-index_link {
         grid-column: margin / end;
@@ -252,15 +292,18 @@ const { render = true, items } = Astro.props;
         const category = from("category");
         const marker = from("marker");
         const action = from("action");
-        if (!category || !marker || !action) return (set = null);
-        const label = copy(category, false);
-        const words = groups.map((g) => {
-          const w = document.createElement("span");
-          w.className = "concern-index_word";
-          w.textContent = g;
-          label.append(w);
-          return w;
-        });
+        if (!marker || !action) return (set = null);
+        /* a list with groups has one label whose word rolls; a list of people has none */
+        const label = category ? copy(category, false) : null;
+        const words = label
+          ? groups.map((g) => {
+              const w = document.createElement("span");
+              w.className = "concern-index_word";
+              w.textContent = g;
+              label.append(w);
+              return w;
+            })
+          : [];
         const frame = from("thumb");
         const thumb = frame ? copy(frame, false) : null;
         const images = rows.map((r) => {
@@ -272,7 +315,7 @@ const { render = true, items } = Astro.props;
         });
         const button = copy(action, true);
         set = {
-          all: [label, ...(thumb ? [thumb] : []), copy(marker, false), button],
+          all: [...(label ? [label] : []), ...(thumb ? [thumb] : []), copy(marker, false), button],
           thumb,
           link: button.querySelector("a"),
           words,
@@ -330,7 +373,13 @@ const { render = true, items } = Astro.props;
         if (row) go(row);
       }, { signal });
       wrap.addEventListener("pointerleave", () => go(null), { signal });
-      wrap.addEventListener("focusin", (e) => go((e.target as HTMLElement).closest<HTMLElement>(".concern-index_item")), { signal });
+      /* the travelling button takes focus when pressed: it is the chosen row's, the set stays (else the press would hide
+         it before the click lands) */
+      wrap.addEventListener("focusin", (e) => {
+        const t = e.target as HTMLElement;
+        if (t.closest(".is-follow")) return;
+        go(t.closest<HTMLElement>(".concern-index_item"));
+      }, { signal });
       wrap.addEventListener("focusout", (e) => { if (!wrap.contains(e.relatedTarget as Node)) go(null); }, { signal });
       window.addEventListener("resize", () => current && place(current, true), { signal });
       /* OP's Modifier copied, removed or moved a row: the set is made again from the rows as they are */

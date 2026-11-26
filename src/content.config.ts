@@ -174,6 +174,10 @@ const team = defineCollection({
       .object({
         name: z.string().describe("Name"),
         role: z.string().optional().describe("Role"),
+        practice: z.string().optional().describe("Years in practice (« 8 years in practice »)"),
+        credentials: z.string().optional().describe("Credentials"),
+        expertise: z.string().optional().describe("Areas of expertise"),
+        treatments: z.array(reference("treatments")).optional().describe("Treatments performed"),
         bio: z.string().optional().describe("Bio (the pop-up on Our team)"),
         photo: image().optional().describe("Portrait"),
         photoAlt: z.string().optional().describe("Portrait description"),

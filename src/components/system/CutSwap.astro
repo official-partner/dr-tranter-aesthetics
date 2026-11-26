@@ -98,6 +98,19 @@
       }
       return starts;
     };
+    /* nothing but spaces between a written <br> and this point */
+    const afterBreak = (node: Text, offset: number) => {
+      if (node.data.slice(0, offset).trim()) return false;
+      let at: Node | null = node;
+      while (at) {
+        let prev: Node | null = at.previousSibling;
+        while (prev && prev.nodeType === Node.TEXT_NODE && !prev.textContent?.trim()) prev = prev.previousSibling;
+        if (prev) return prev.nodeName === "BR";
+        at = at.parentNode;
+        if (at instanceof HTMLElement && at.hasAttribute("data-cut-swap")) return false;
+      }
+      return false;
+    };
     /* the cut in which the text is wider, measured on one line */
     const widerSwapped = (el: HTMLElement) => {
       el.classList.add("is-measuring", "is-held");
@@ -117,8 +130,10 @@
       el.classList.add("is-measuring");
       el.classList.toggle("is-swapped", widerSwapped(el));
       const starts = lineStarts(el);
-      /* from the last, so each split leaves the earlier offsets where they were */
+      /* from the last, so each split leaves the earlier offsets where they were; a line the text already starts
+         with its own <br> keeps that one only */
       for (const [node, offset] of starts.reverse()) {
+        if (afterBreak(node, offset)) continue;
         const after = node.splitText(offset);
         const br = document.createElement("br");
         br.setAttribute("data-cut-br", "");

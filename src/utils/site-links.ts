@@ -10,7 +10,7 @@ export const clinicLinks: SiteLink[] = [
   { label: "All treatments", href: "/treatments" },
   { label: "Our approach", href: "/approach" },
   { label: "Results", href: "/results" },
-  { label: "Our team", href: "/" },
+  { label: "Our team", href: "/team" },
   { label: "The Clinic", href: "/the-clinic" },
   { label: "Journal", href: "/journal" },
 ];

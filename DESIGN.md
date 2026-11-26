@@ -172,6 +172,14 @@ StepsSection, DetailsSection; a treatment's page, Nov 25).
   held (`<br data-cut-br>`, nowrap), so no word changes line during or after the glide; found again on a new width.
   Not under reduced motion, not while OP System edits the text.
 
+## Our team (Nov 25)
+- `/team` (Figma 4001:904, 934, 958): PageHead on the dark ground, then the home's concern list made for people
+  (ConcernIndex `variant="people"`: a name and its role; chosen, the others dim to `--people-dim` and the photo, the
+  square and Full profile travel beside it, as on the home), then CtaBand on dark after a hairline (`rule`).
+- A profile is a `<dialog>` over the page (TeamProfiles): Back, the name in capitals (text-style-h2, uppercase from the
+  CSS), role and years in practice, credentials, areas of expertise, treatments performed, bio, the portrait from the
+  half rail; it fades on `--open-duration`. Opened by any link to `#team-<id>`.
+
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside
   (the Figma's 23 high at 1728), `--space-1` apart, a column under the group's name on a computer, a wrapping row on a
