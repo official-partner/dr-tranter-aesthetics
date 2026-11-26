@@ -1,0 +1,67 @@
+---
+import Button from "@/components/Button.astro";
+import { clinic } from "@/data/clinic";
+import { RISKS_PATH } from "@/consts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+const { render = true } = Astro.props;
+/* The registration banner (Figma 4001:300): the founder's AHPRA registration, the 18+ notice and the risks, a thin
+   strip above the bar on every page, as the Figma draws it (1728 by 31), scrolling away with the page. The page under
+   it keeps its own spacing: the strip comes first and the bar sits right under it. The Figma's sentence ends with
+   « Read more » before the link of the same words: said once, as the link. */
+---
+
+{
+  render && (
+    <aside class="registration_wrap theme-light" aria-label="Registration and risks" data-figma-band="registration">
+      <div class="registration_layout site-grid">
+        <div class="registration_row">
+        <p class="registration_text text-style-tight">
+          {clinic.ahpra && <span class="registration_number">{clinic.ahpra}</span>} This website contains imagery suitable for audiences 18+. All non-surgical procedures carry risks.
+        </p>
+        <Button element="link" variant="link" href={RISKS_PATH} class="registration_link">Read more →</Button>
+        </div>
+      </div>
+    </aside>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .registration_wrap {
+      padding-block: var(--space-2);
+    }
+    /* the notice, then its link against the right edge; on a phone the link goes under it */
+    .registration_row {
+      grid-column: margin / end;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-2) var(--space-6);
+    }
+    .registration_text {
+      color: var(--text-2);
+    }
+    .registration_number {
+      color: var(--text);
+    }
+    /* the strip and the bar are one block at the page's top (BaseLayout's site-top): the bar, laid over the page,
+       starts under the strip */
+    .site-top {
+      position: relative;
+      & > .registration_wrap + .nav_wrap {
+        top: 100%;
+      }
+    }
+    @media (width >= 64rem) {
+      .registration_row {
+        grid-column: main / end;
+        flex-wrap: nowrap;
+      }
+    }
+  }
+</style>

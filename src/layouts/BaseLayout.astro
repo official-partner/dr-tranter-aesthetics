@@ -9,6 +9,8 @@ import PageTransitions from "@/components/system/PageTransitions.astro";
 import SmoothScroll from "@/components/system/SmoothScroll.astro";
 import CopyCase from "@/components/system/CopyCase.astro";
 import CutSwap from "@/components/system/CutSwap.astro";
+import Registration from "@/components/global/Registration.astro";
+import Booking from "@/components/global/Booking.astro";
 import Enquiry from "@/components/global/Enquiry.astro";
 import Tracking from "@/components/system/Tracking.astro";
 import ConsentBanner from "@/components/global/ConsentBanner.astro";
@@ -80,11 +82,15 @@ const { smoothScroll } = finish;
     {loader && <Loader part="cover" preset={loader} />}
     {transition && <PageTransitions part="body" preset={transition} />}
     <SkipLink label={SITE_LOCALE.startsWith("fr") ? "Aller au contenu" : "Skip to content"} />
-    <Nav overlap={overlap} render={nav !== false} quiet={nav === "menu"} theme={navTheme} />
+    <div class="site-top">
+      <Registration render={nav !== false} />
+      <Nav overlap={overlap} render={nav !== false} quiet={nav === "menu"} theme={navTheme} />
+    </div>
     <main id="main" tabindex="-1">
       <slot />
     </main>
     <Footer logo={footerLogo} />
+    <Booking />
     <Enquiry />
     <ConsentBanner />
     <CopyCase />

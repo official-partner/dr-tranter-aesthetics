@@ -1,0 +1,106 @@
+---
+import Sheet from "@/components/content/Sheet.astro";
+import IndexList from "@/components/content/IndexList.astro";
+import Button from "@/components/Button.astro";
+import { clinic } from "@/data/clinic";
+/* Book a consultation (Figma 4001:237), over every page: every Book button opens it (each still links to the clinic's
+   booking page, which it stands in front of: without the script, the button goes straight there). What a first visit
+   is, its length and fee, then the way to the clinic's booking page, where the time is chosen: the Figma's booking
+   widget is that link (Mia Endozo's tracking guide, Nov 21, step 3: no booking embed, a plain link that Pabau tracks
+   itself). « Not ready to book? » opens Send an enquiry in its place. */
+const steps = [
+  { title: "Conversation", text: "We start with your concerns, your priorities and what you have already tried." },
+  { title: "Assessment", text: "A careful look at your structure and surface, together." },
+  { title: "Plan", text: "A plan discussed with you, with nothing booked on the day unless you choose to." },
+];
+const facts = [
+  { label: "Duration", value: clinic.consultation.duration },
+  { label: "Fee", value: clinic.consultation.fee },
+].filter((f) => f.value);
+---
+
+<Sheet id="book" catches={clinic.booking} labelledby="book-title" theme="light" class="booking_wrap">
+  <span class="marker title-marker booking_marker" />
+  <h2 class="booking_title lead-marker text-style-h2" id="book-title">Book a consultation</h2>
+  {
+    facts.length > 0 && (
+      <dl class="booking_facts">
+        {facts.map((f) => (
+          <div class="stack">
+            <dt class="text-style-label">{f.label}</dt>
+            <dd class="text-style-serif">{f.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )
+  }
+  <hr class="sheet_rule booking_rule" />
+  <p class="booking_label text-style-label">What to expect</p>
+  <IndexList steps={steps} wide list="booking-steps" class="booking_steps" />
+  <div class="booking_action stack">
+    <p class="text-style-main">The time is chosen on the clinic's booking page.</p>
+    <Button element="link" href={clinic.booking}>Choose a time</Button>
+  </div>
+  <Button element="link" variant="link" href="#enquiry" class="booking_enquiry">Not ready to book? Send an enquiry →</Button>
+</Sheet>
+
+<style is:global>
+  @layer components {
+    .booking_title,
+    .booking_facts,
+    .booking_label,
+    .booking_action {
+      grid-column: margin / end;
+    }
+    .booking_title {
+      --_lead-marker: inline-block;
+    }
+    .booking_facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-6) var(--space-8);
+      margin: 0;
+      & dd {
+        margin: 0;
+      }
+    }
+    .booking_action {
+      --_gap-size: var(--space-5);
+      align-items: start;
+      margin-top: var(--space-8);
+    }
+    .booking_enquiry {
+      grid-column: margin / end;
+      justify-self: end;
+    }
+    @media (width >= 48rem) {
+      .booking_marker {
+        grid-row: 1;
+      }
+      .booking_title {
+        grid-row: 1;
+        grid-column: main / aside;
+        --_lead-marker: none;
+      }
+      .booking_facts {
+        grid-row: 1;
+        grid-column: aside / end;
+        flex-direction: column;
+      }
+      .booking_rule {
+        grid-row: 2;
+      }
+      .booking_label,
+      .booking_steps {
+        grid-row: 3;
+      }
+      .booking_label {
+        grid-column: margin / main;
+      }
+      .booking_action {
+        grid-row: 4;
+        grid-column: main / end;
+      }
+    }
+  }
+</style>

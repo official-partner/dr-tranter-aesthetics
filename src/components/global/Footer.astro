@@ -33,7 +33,7 @@ import { clinic } from "@/data/clinic";
           <p class="text-style-label" data-figma="1:171">The Clinic</p>
           <ul class="footer_list link-list text-style-list" data-cap-offset="0.3395" data-figma="1:179">{clinicLinks.map((l) => <li><a href={l.href} aria-current={here(l.href, clinicLinks)}>{l.label}</a></li>)}</ul>
         </div>
-        <p class="footer_legal text-style-list inset-optical" data-cap-offset="0.3395" data-figma="1:182">© Dr Tranter Aesthetics, {new Date().getFullYear()}<br />AHPRA registration MED0000000000</p>
+        <p class="footer_legal text-style-list inset-optical" data-cap-offset="0.3395" data-figma="1:182">© Dr Tranter Aesthetics, {new Date().getFullYear()}<br />AHPRA registration {clinic.ahpra}</p>
         <div class="footer_group stack gap-4 is-visit">
           <p class="text-style-label" data-figma="1:168">Visit Us</p>
           <p class="text-style-tight" data-figma="1:184" set:html={clinic.address.join("<br />")} />

@@ -81,7 +81,8 @@ a frame whose photo is still to come stays, empty, on `--background-skeleton`, s
 `link-list` (a list of plain links: no underline, on hover, on focus and for the page shown the link slides `--space-2` right and a square 0.8 marker shows before it; with a mouse one square glides from link to link and rests on the page shown, src/utils/link-marker.ts; the menu and the footer, Nov 20 and 24), `linked-card` (a block with a photo and a link is one link: its `data-card-link` stretches over it, and its photo comes forward on hover; Card, the journal's cards, a concern page's treatment cards; Sam, Nov 24), `stacked-card` (a card's picture as wide as the card, its texts stacked: Card, the journal, the products), `section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
 for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width), `fact-row` (facts on the grid from a computer up, each on two columns from the main rail: ItemHead, PageHead, ArticleBody; Sam, Nov 25, comment 21), `section-rule` (a band that follows
 another on the same ground starts on a hairline, `--text-3`: a section's `rule` prop, TextSection, CardGroup,
-StepsSection, DetailsSection; a treatment's page, Nov 25).
+StepsSection, DetailsSection; a treatment's page, Nov 25), `title-marker` (the square of a title set in h2 at the
+marker rail from a tablet up, centred on its first line's capitals: PageHead, NotFound, Book a consultation; Nov 25).
 
 ## The menu's motion (Nov 20)
 - One thing at a time: the cross forms (`--hover-duration`, out curve); a curtain clips the panel open from the top
@@ -191,8 +192,17 @@ StepsSection, DetailsSection; a treatment's page, Nov 25).
   the sheet's fade.
 
 ## Booking, enquiry and consent (Nov 25)
-- Every Book button leads to the clinic's Pabau booking page (`clinic.booking`, src/data/clinic.ts), as Mia Endozo's
-  tracking guide asks; the Figma's Book a consultation pop-up (4001:237) is not built while that holds.
+- Every Book button links to the clinic's Pabau booking page (`clinic.booking`, src/data/clinic.ts), as Mia Endozo's
+  tracking guide asks, and opens Book a consultation in front of it (Figma 4001:237; `global/Booking.astro`, a Sheet
+  with `catches`): what a first visit is ([01] to [03]), its length (and its fee once known), then « Choose a time »,
+  the link to Pabau, in place of the Figma's booking widget; « Not ready to book? » opens Send an enquiry in its place.
+  Without the script a Book button goes straight to Pabau.
+- The registration banner (Figma 4001:300; `global/Registration.astro`): a strip on the sand above the bar on every
+  page, the notice from the main rail, « Read more » to Risks at the right edge; on a phone the link goes under it. The
+  strip and the bar are one block (`site-top` in BaseLayout): the bar lies over the page right under the strip, the
+  page's own spacing unchanged. The AHPRA number is one fact (`clinic.ahpra`), read by the footer and the strip.
+- A sheet shows its address (`#book`, `#enquiry`, `#sarah-tranter`); the browser's back closes it; a link inside a
+  sheet to another takes its place.
 - Send an enquiry (Figma 4001:265) is a Sheet (`content/Sheet.astro`, the profiles' too) on every page, opened by
   `#enquiry` (Contact, The Clinic, the vouchers) or `#enquiry-careers` (Careers: the brief's C5 line first); its form
   is Pabau's Capture Form 14 in a frame, to be replaced by Pabau's own embed code.

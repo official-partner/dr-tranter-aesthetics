@@ -12,7 +12,7 @@ const { render = true } = Astro.props;
   render && (
     <section class="not-found_wrap theme-dark">
       <div class="not-found_layout site-grid">
-        <span class="marker not-found_marker" />
+        <span class="marker title-marker not-found_marker" />
         <h1 class="not-found_title lead-marker text-style-h2">This page <em>does not exist</em></h1>
         <p class="not-found_text text-style-main">It may have moved, or the link that brought you here is out of date.</p>
         <div class="not-found_action"><Button element="link" href="/">Back to the home page</Button></div>
@@ -35,9 +35,6 @@ const { render = true } = Astro.props;
       align-content: start;
       row-gap: var(--space-5);
     }
-    .not-found_marker {
-      display: none;
-    }
     .not-found_title,
     .not-found_text,
     .not-found_action {
@@ -54,9 +51,7 @@ const { render = true } = Astro.props;
         padding-top: var(--site-margin);
       }
       .not-found_marker {
-        display: block;
         grid-row: 1;
-        margin-top: calc((var(--h2) * 0.721 - var(--marker)) / 2);
       }
       .not-found_title,
       .not-found_text,

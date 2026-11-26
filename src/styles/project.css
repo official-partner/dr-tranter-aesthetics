@@ -53,6 +53,17 @@
   background-color: var(--marker-color);
 }
 
+/* The square of a title set in h2 (a page's opening, a sheet's, the 404): at the marker rail from a tablet up, centred
+   on the capitals of the title's first line (the Figma's square at 36 for a title at 20); below, the title leads with
+   it (lead-marker) */
+.title-marker {
+  display: none;
+  @media (width >= 48rem) {
+    display: block;
+    margin-top: calc((var(--h2) * 0.721 - var(--marker)) / 2);
+  }
+}
+
 /* Where the grid has no column for the marker (a tablet or a phone), it leads the text it marks: the same square on
    the text's first line, centred on its capitals, the text after it. Off by default; a component turns it on where
    its own marker is hidden (--_lead-marker: inline-block). Sam, Nov 10: the marker is kept at every width. */
