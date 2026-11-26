@@ -38,7 +38,7 @@ for n, (ph, tb, dk) in S['fluid'].items():
     w(f"  --{n}-min: {num(ph)};\n  --{n}-max: {num(tb)};")
 w("\n  /* Role tokens: one job each, pointing at a step of the scale (change the step, every use follows) */")
 for n, r in S.get('roles', {}).items():
-    w(f"  --{n}: var(--{r['ref']});")
+    w(f"  --{n}: calc(var(--{r['ref']}) * {r['times']});" if r.get('times') else f"  --{n}: var(--{r['ref']});")
 w("\n  /* Floors: reading text stops shrinking here (applied with max() in the text-style rules) */")
 for n, f in S['floors'].items():
     w(f"  --{n}-floor: {num(f / 16)}rem;")

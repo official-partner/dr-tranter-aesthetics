@@ -10,6 +10,8 @@ interface Props {
   theme?: "stone" | "light" | "dark";
   /** Start on a hairline, after a band on the same ground (Our team). */
   rule?: boolean;
+  /** End on a hairline, before the footer on the same ground (Our team; Sam, Nov 25, comment 24). */
+  ruleEnd?: boolean;
   /** The small name at the margin. */
   label?: string;
   /** The pill on the right. */
@@ -21,6 +23,7 @@ const {
   render = true,
   theme = "stone",
   rule = false,
+  ruleEnd = false,
   label = "Where to start?",
   action = { label: "Book a consultation", href: clinic.booking },
   title = "Every new patient begins with<br />a <em>consultation</em>.",
@@ -31,7 +34,7 @@ import { clinic } from "@/data/clinic";
 
 {
   render && (
-    <section class:list={["cta-band_wrap section-padding", `theme-${theme}`, rule && "section-rule"]} id="consultation" data-figma-band="cta" data-band-top={figma.top}>
+    <section class:list={["cta-band_wrap section-padding", `theme-${theme}`, rule && "section-rule", ruleEnd && "has-rule-end"]} id="consultation" data-figma-band="cta" data-band-top={figma.top}>
       <div class="cta-band_layout site-grid">
         <p class="cta-band_label lead-marker text-style-label inset-optical" data-figma={figma.label}>{label}</p>
         <span class="marker cta-band_marker" data-figma={figma.marker} />
@@ -49,6 +52,9 @@ import { clinic } from "@/data/clinic";
     /* the closing invitation ends wide on purpose, the same wide bottom as every section that breathes (Sam, Nov 10) */
     .cta-band_wrap {
       padding-bottom: var(--section-padding-wide);
+      &.has-rule-end {
+        border-bottom: var(--border-width) solid var(--text-3);
+      }
     }
     .cta-band_layout {
       align-items: start;

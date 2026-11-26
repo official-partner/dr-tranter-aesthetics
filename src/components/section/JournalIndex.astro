@@ -22,7 +22,7 @@ const posts = (await listed<"articles">("journal")).map(({ id, data }) => ({
 
 {
   render && posts.length > 0 && (
-    <section class="journal-index_wrap section-padding theme-stone" data-filter-scope>
+    <section class="journal-index_wrap section-padding section-rule theme-stone" data-filter-scope>
       <div class="journal-index_layout site-grid">
         <div class="journal-index_head">
           <p class="journal-index_label lead-marker text-style-label inset-optical">Filter by</p>

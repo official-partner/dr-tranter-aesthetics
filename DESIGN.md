@@ -72,6 +72,11 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
   token may point at another step below 48rem, `phone` in the JSON). The exception, on purpose: the closing
   invitation, the journal, the products and the concern body's blocks end wide (`--section-padding-wide` =
   `section-space-large`, 128 at 1728, 64 on tablet and phone; Sam 13:10: twice the old 64, one wide bottom everywhere). The hero's top on a tablet and a phone also clears the nav. Before: five values chosen section by section.
+- Two more ends (Sam, Nov 25, comments 22 to 29, against the Figma): `--section-padding-close` (`space-5`, 32 at 1728)
+  for a band that ends on its facts or its note (a page's opening with a text or facts, an article's foot: the Figma
+  draws 22 to 36), and `--section-padding-tall` (twice `space-11`, 312 at 1728) for an opening whose text sits at its
+  foot (the text starts that far under the title's top, from a computer up) and for the team list's end (the Figma's
+  317). A role token may be a step times a number (`times` in the JSON).
 
 ## Global classes (`src/styles/project.css`)
 `site-grid` (the grid and its named lines), `stack` (a vertical stack, gap from a space token), `at-end` (an action

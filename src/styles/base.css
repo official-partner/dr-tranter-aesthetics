@@ -266,6 +266,8 @@
   --space-stack: var(--space-10);
   --section-padding: var(--site-margin);
   --section-padding-wide: var(--section-space-large);
+  --section-padding-tall: calc(var(--space-11) * 2);
+  --section-padding-close: var(--space-5);
   --space-action: var(--space-5);
 
   /* Floors: reading text stops shrinking here (applied with max() in the text-style rules) */

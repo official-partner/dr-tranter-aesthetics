@@ -110,6 +110,22 @@ const { render = true, title, facts, text, action, theme = "light", figma } = As
       .page-head_text {
         grid-column: main / span 4;
       }
+      /* With a text or facts (Our team, The Clinic, Results; Sam, Nov 25, comments 22, 27, 29: « aligné en bas »,
+         « pas autant de padding en bas »): they sit at the opening's foot, a tall step under the title's top
+         (--section-padding-tall, or more for a long title), and the band ends close under them
+         (--section-padding-close), as the Figma draws them (22 to 26 at 1728). */
+      .page-head_wrap:has(.page-head_text, .page-head_facts) {
+        padding-bottom: var(--section-padding-close);
+        & .page-head_layout {
+          grid-template-rows: minmax(var(--section-padding-tall), auto) auto;
+        }
+        & .page-head_title {
+          margin-bottom: var(--space-10);
+        }
+        & :is(.page-head_facts, .page-head_text) {
+          margin-top: 0;
+        }
+      }
     }
   }
 </style>

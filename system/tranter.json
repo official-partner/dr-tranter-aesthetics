@@ -259,6 +259,15 @@
       "ref": "section-space-large",
       "job": "le bas large, volontaire, d'une section qui doit respirer : 128 à 1728, deux fois l'ancien 64, le même partout (Sam, 10 nov, 13:10)"
     },
+    "section-padding-tall": {
+      "ref": "space-11",
+      "times": 2,
+      "job": "la grande hauteur d'une ouverture de page dont le texte est en bas (le texte part à cette distance du haut du titre) et la fin de la liste de l'équipe : 312 à 1728 (Sam, 25 nov, commentaires 22 et 23)"
+    },
+    "section-padding-close": {
+      "ref": "space-5",
+      "job": "le bas proche d'une bande qui finit sur ses faits ou sa note : l'ouverture d'une page avec un texte, le pied d'un article (Sam, 25 nov, commentaires 22, 26, 27, 29 : le Figma, 22 à 36)"
+    },
     "space-action": {
       "ref": "space-5",
       "job": "entre le texte d'une carte et son lien d'action, partout (Sam, 10 nov, commentaire 24)"

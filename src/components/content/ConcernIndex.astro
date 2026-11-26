@@ -213,6 +213,8 @@ const people = variant === "people";
     /* people (Our team): a name and its role, a step apart; when one is chosen the others dim (--people-dim, as the
        home's team list) and its photo, square and Full profile show beside it, on the row's middle */
     .concern-index_wrap.is-people {
+      /* the list ends tall, room for its photo beside the last name (Sam, Nov 25, comment 23: the Figma's 317) */
+      padding-bottom: calc(var(--section-padding-tall) - var(--section-padding));
       & .concern-index_list {
         row-gap: var(--space-6);
         margin-block: 0;
