@@ -127,12 +127,15 @@ const articles = defineCollection({
       .object({
         title: z.string().describe("Title"),
         date: z.coerce.date().optional().describe("Date"),
+        topic: z.enum(["Skin health", "The Approach", "Technology"]).optional().describe("Topic (the Journal's filters)"),
+        reviewedBy: z.string().optional().describe("Reviewed by"),
         summary: z.string().optional().describe("Summary (its card and the page's opening)"),
         // the article's text, a rich text in OP System's Contenu (its kind given here, Nov 23): subheadings, bold,
         // italic, links, lists and quotes, kept as Markdown
         body: z.string().optional().describe("Text").meta({ kind: "rich" }),
         image: image().optional().describe("Photo"),
         imageAlt: z.string().optional().describe("Photo description"),
+        treatment: reference("treatments").optional().describe("The treatment it speaks of (beside its text)"),
         seoTitle: z.string().optional().describe("Title for Google"),
         seoDescription: z.string().optional().describe("Description for Google"),
         ogImage: image().optional().describe("Share image"),

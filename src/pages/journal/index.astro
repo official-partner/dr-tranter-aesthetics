@@ -1,0 +1,12 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import PageHead from "@/components/section/PageHead.astro";
+import JournalIndex from "@/components/section/JournalIndex.astro";
+
+/* The Journal (Figma « Starter (Copy) » 4001:684): its opening, then its articles with a filter per topic. */
+---
+
+<Layout title="Journal" description="Notes on skin, structure and care from Dr Tranter Aesthetics." navTheme="light">
+  <PageHead theme="stone" title="Our journal: notes on <em>skin, structure</em> and <em>care</em>" />
+  <JournalIndex />
+</Layout>

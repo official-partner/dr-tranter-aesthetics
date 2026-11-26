@@ -1,0 +1,148 @@
+---
+import ArticleCard from "@/components/content/ArticleCard.astro";
+import Filters, { slug } from "@/components/content/Filters.astro";
+import { listed, ruleMarks } from "@/utils/lists";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+const { render = true } = Astro.props;
+/* The Journal's articles (Figma « Starter (Copy) » 4001:684): the list « journal » (src/data/lists.json), four at a
+   time set apart across the grid as on the home, again and again; a pill per topic. */
+const topics = ["Skin health", "The Approach", "Technology"];
+const posts = (await listed<"articles">("journal")).map(({ id, data }) => ({
+  id,
+  title: data.title,
+  image: data.image,
+  alt: data.imageAlt ?? "",
+  category: data.topic && slug(data.topic),
+}));
+---
+
+{
+  render && posts.length > 0 && (
+    <section class="journal-index_wrap section-padding theme-stone" data-filter-scope>
+      <div class="journal-index_layout site-grid">
+        <div class="journal-index_head">
+          <p class="journal-index_label lead-marker text-style-label inset-optical">Filter by</p>
+          <Filters label="Filter by topic" all="All" values={topics} class="journal-index_filters" />
+        </div>
+        <span class="marker journal-index_marker" />
+        <ul class="journal-index_list" data-filter-list {...ruleMarks("journal")}>
+          {posts.map((p) => (
+            <ArticleCard id={p.id} title={p.title} image={p.image} alt={p.alt} category={p.category} class="journal-index_card" />
+          ))}
+        </ul>
+        <p class="sr-only" aria-live="polite" data-filter-count />
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* it ends wide, on purpose, as every section that breathes */
+    .journal-index_wrap {
+      padding-bottom: var(--section-padding-wide);
+    }
+    .journal-index_layout {
+      row-gap: var(--space-stack);
+      align-items: start;
+    }
+    .journal-index_head,
+    .journal-index_card {
+      grid-column: margin / end;
+    }
+    .journal-index_filters {
+      margin-top: var(--space-4);
+    }
+    .journal-index_marker {
+      display: none;
+    }
+    /* the cards are the layout's own items: the list holds them for OP System and the filters only */
+    .journal-index_list {
+      display: contents;
+    }
+    /* four shapes, again and again, counted among the cards a filter shows: wide, tall, upright, wide again */
+    .journal-index_card {
+      &:nth-child(4n + 1 of :not([hidden])) > .media {
+        --ratio: 16 / 10;
+      }
+      &:nth-child(4n + 2 of :not([hidden])) > .media {
+        --ratio: 7 / 10;
+      }
+      &:nth-child(4n + 3 of :not([hidden])) > .media {
+        --ratio: 5 / 6;
+      }
+      /* the fourth, the widest: its title on one or two lines */
+      &:nth-child(4n of :not([hidden])) .article-card_title {
+        max-width: 30ch;
+      }
+    }
+
+    /* tablet: two columns, the right one a beat lower */
+    @media (48rem <= width < 64rem) {
+      .journal-index_card {
+        grid-column: margin / span 4;
+        &:nth-child(even of :not([hidden])) {
+          grid-column: span 4 / end;
+          margin-top: var(--space-11);
+        }
+        &:nth-child(4n of :not([hidden])) {
+          grid-column: main / end;
+          margin-top: 0;
+        }
+      }
+    }
+
+    /* computer: the design's composition, four at a time. The first of each four on the aside (beside the filters,
+       for the first): its box starts on the half rail, before the end of the fourth above it, so the grid gives it a
+       row of its own, and its photo and title sit on the aside within it. The next two share a row, the third a beat
+       lower; the fourth stands in the middle. */
+    @media (width >= 64rem) {
+      .journal-index_layout {
+        row-gap: var(--space-11);
+      }
+      .journal-index_head,
+      .journal-index_marker {
+        grid-row: 1;
+      }
+      .journal-index_head {
+        grid-column: margin / span 3;
+      }
+      .journal-index_marker {
+        display: block;
+        margin-top: calc((max(var(--text-label-floor), var(--text-label)) * 0.721 - var(--marker)) / 2);
+      }
+      .journal-index_filters {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .journal-index_card {
+        &:nth-child(4n + 1 of :not([hidden])) {
+          grid-column: half / end;
+          display: grid;
+          grid-template-columns: subgrid;
+          & > * {
+            grid-column: aside / end;
+          }
+        }
+        &:nth-child(1 of :not([hidden])) {
+          grid-row: 1;
+        }
+        &:nth-child(4n + 2 of :not([hidden])) {
+          grid-column: span 4 / detail;
+        }
+        &:nth-child(4n + 3 of :not([hidden])) {
+          grid-column: half / span 3;
+          margin-top: calc(var(--space-11) + var(--space-10));
+        }
+        &:nth-child(4n of :not([hidden])) {
+          grid-column: marker / span 5;
+          margin-top: var(--space-11);
+        }
+      }
+    }
+  }
+</style>

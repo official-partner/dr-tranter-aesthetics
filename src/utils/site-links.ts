@@ -11,7 +11,7 @@ export const clinicLinks: SiteLink[] = [
   { label: "Results", href: "/" },
   { label: "Our team", href: "/" },
   { label: "The Clinic", href: "/" },
-  { label: "Journal", href: "/" },
+  { label: "Journal", href: "/journal" },
 ];
 
 /* LinkedIn is the menu's only: the footer as drawn has four */

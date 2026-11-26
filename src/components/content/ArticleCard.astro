@@ -1,0 +1,88 @@
+---
+import Button from "@/components/Button.astro";
+import Img from "@/components/media/Img.astro";
+import { pic, type Pic } from "@/utils/media";
+
+interface Props {
+  /** The article's id: its page's address and its key in OP System. */
+  id: string;
+  title: string;
+  image?: Pic;
+  alt?: string;
+  /** Its picture's ratio class (ratio-16-10, ratio-7-10…). */
+  ratio?: string;
+  /** Its date, shown above the title in the stacked card. */
+  date?: Date;
+  /** `side`: the title and « Read → » side by side under the photo (the home, the Journal); `stacked`: the date, the
+      title and « Read the article → » under it (More from the journal). */
+  layout?: "side" | "stacked";
+  /** The title above the photo (the home's last article). */
+  titleFirst?: boolean;
+  /** Its topic's slug, for the Journal's filters. */
+  category?: string;
+  class?: string;
+  sizes?: string;
+}
+const { id, title, image, alt = "", ratio = "ratio-145", date, layout = "side", titleFirst = false, category, class: className, sizes = "(width >= 64rem) 40vw, (width >= 48rem) 50vw, 100vw" } = Astro.props;
+const href = `/journal/${id}`;
+/* the day first, as Australia writes it: [22.01.26] */
+const day = date && [date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear() % 100].map((n) => String(n).padStart(2, "0")).join(".");
+---
+
+{/* An article's card: its photo, its title and its link; the whole card is the link (linked-card). */}
+<li class:list={["article-card_wrap stacked-card linked-card", layout === "stacked" && "is-stacked", titleFirst && "is-title-first", className]} data-op-item={id} data-category={category}>
+  <div class:list={["media", ratio]} data-op-field="image">
+    {image && <Img {...pic(image)} alt={alt} variant="constrained" sizes={sizes} />}
+  </div>
+  <div class="article-card_meta">
+    {layout === "stacked" && day && <p class="article-card_date text-style-date" data-op-field="date">[{day}]</p>}
+    <h3 class="article-card_title text-style-h3" data-op-field="title">{title}</h3>
+    <Button element="link" variant="link" href={href} data-card-link>{layout === "stacked" ? "Read the article →" : "Read →"}</Button>
+  </div>
+</li>
+
+<style is:global>
+  @layer components {
+    /* a card a filter leaves out stays out (stacked-card sets its display) */
+    .article-card_wrap[hidden] {
+      display: none;
+    }
+    /* a title, its « Read → » set against the right edge, on the photo's width */
+    .article-card_meta {
+      align-self: stretch;
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      column-gap: var(--space-5);
+      margin-top: var(--space-media);
+      & > .button_wrap {
+        flex: none;
+      }
+    }
+    .article-card_title {
+      max-width: 18ch;
+    }
+    /* stacked: the date, the title, the link, one under the other */
+    .article-card_wrap.is-stacked .article-card_meta {
+      flex-direction: column;
+      justify-content: start;
+      & .article-card_title {
+        margin-top: var(--space-3);
+      }
+      & > .button_wrap {
+        margin-top: var(--space-action);
+      }
+    }
+    /* its title above its photo, its « Read → » on the right, level with the title's last line (the home's last
+       article, Sam, comments 12 and 13) */
+    .article-card_wrap.is-title-first .article-card_meta {
+      order: -1;
+      margin-top: 0;
+      margin-bottom: var(--space-media);
+      align-items: last baseline;
+      & .article-card_title {
+        max-width: none;
+      }
+    }
+  }
+</style>

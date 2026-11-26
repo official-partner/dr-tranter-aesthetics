@@ -1,0 +1,153 @@
+---
+interface Props {
+  /** What the pills choose among, for screen readers (« Filter by »). */
+  label: string;
+  /** The first pill, which shows everything (« All »). */
+  all: string;
+  /** One pill per value; a card shows under a pill when its `data-category` is the value's slug. */
+  values: string[];
+  /** Figma node ids for the build review, one per pill. */
+  ids?: string[];
+  class?: string;
+}
+/** A value as a card's `data-category` carries it. */
+export const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const { label, all, values, ids, class: className } = Astro.props;
+---
+
+{/* Pills that show one category of a list's cards (the Concerns and Treatments pages' groups, the Journal). The section
+    around them carries `data-filter-scope`, its list `data-filter-list` (each card an `li` with `data-category`, a card
+    to keep out of « All » `data-aside`) and, for screen readers, a `data-filter-count` element. */}
+<div class:list={["filters_wrap", className]} role="group" aria-label={label} data-filters>
+  {[all, ...values].map((v, i) => (
+    <button type="button" class="filters_pill text-style-action" aria-pressed={i === 0 ? "true" : "false"} data-filter={i === 0 ? "" : slug(v)} data-figma={ids?.[i]}>{v}</button>
+  ))}
+</div>
+
+<style is:global>
+  @layer components {
+    .filters_wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+      @media (width >= 64rem) {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+    .filters_pill {
+      padding: var(--tag-y) var(--tag-x);
+      border: var(--border-width) solid var(--button-border);
+      border-radius: var(--radius-round);
+      color: var(--button-text);
+      transition:
+        background-color var(--hover-duration) var(--hover-ease),
+        color var(--hover-duration) var(--hover-ease),
+        border-color var(--hover-duration) var(--hover-ease);
+      @media (hover: hover) {
+        &:hover {
+          border-color: var(--pill-border-solid);
+        }
+      }
+      /* the chosen filter: filled with the text's colour */
+      &[aria-pressed="true"] {
+        background-color: var(--text);
+        border-color: var(--text);
+        color: var(--background);
+      }
+    }
+  }
+</style>
+
+<script>
+  import { onPage } from "@/utils/page";
+  import { pageLenis } from "@/utils/smooth-scroll";
+
+  onPage((signal) => {
+    const root = document.documentElement;
+    const calm = matchMedia("(prefers-reduced-motion: reduce)");
+    const ms = (name: string) => {
+      const v = getComputedStyle(root).getPropertyValue(name).trim();
+      return (parseFloat(v) || 0) * (v.endsWith("ms") ? 1 : 1000);
+    };
+
+    /* A group's filters (Sam, Nov 21, idea 6; Nov 24, comment 13: « les filters sont buggy, ça marche pas bien le
+       reorder des items. aussi, on doit scroll up au top de la section quand on clique un filtre… seamless »). A pill
+       shows only its category's cards; « All » shows the group as it came (the cards featured above stay there). One
+       thing after the other: the page goes back to the group's top when the group starts above the screen; the cards
+       that go fade out where they are (--filter-out-duration); then the cards that stay travel to their new places
+       while those that come fade in at theirs (--filter-duration). Places are measured against the section, so the scroll
+       never disturbs them, and a click in the middle of a change starts from where the cards are. Before (Nov 21) the
+       browser's view transition froze the whole page for the change and crossfaded it, which broke when the page
+       scrolled. The count is said to screen readers. Reduced motion: at once. */
+    document.querySelectorAll<HTMLElement>("[data-filters]").forEach((pills) => {
+      const group = pills.closest<HTMLElement>("[data-filter-scope]");
+      const list = group?.querySelector<HTMLElement>("[data-filter-list]");
+      if (!group || !list) return;
+      const items = [...list.querySelectorAll<HTMLElement>(":scope > li")];
+      const count = group.querySelector<HTMLElement>("[data-filter-count]");
+      let running: Animation[] = [];
+      let turn = 0;
+      const wants = (li: HTMLElement, value: string) => (value ? li.dataset.category === value : !li.hasAttribute("data-aside"));
+      /* a card's place against its section (a list may be « display: contents », with no box of its own), and its
+         opacity, as they are on screen now (in the middle of a change too) */
+      const now = (li: HTMLElement) => {
+        const l = group.getBoundingClientRect();
+        const r = li.getBoundingClientRect();
+        return { x: r.left - l.left, y: r.top - l.top, o: parseFloat(getComputedStyle(li).opacity) };
+      };
+      const run = (li: HTMLElement, frames: Keyframe[], options: KeyframeAnimationOptions) => running.push(li.animate(frames, options));
+
+      pills.addEventListener("click", (e) => {
+        const pill = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-filter]");
+        if (!pill || pill.getAttribute("aria-pressed") === "true") return;
+        const value = pill.dataset.filter ?? "";
+        const mine = ++turn;
+        const quick = calm.matches;
+        pills.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === pill)));
+        /* back to the group's top when it starts above the screen */
+        const top = group.getBoundingClientRect().top;
+        if (top < -1) {
+          const y = Math.round(top + window.scrollY);
+          const lenis = pageLenis();
+          if (lenis && !quick) lenis.scrollTo(y, { duration: ms("--filter-duration") / 1000 });
+          else window.scrollTo({ top: y, behavior: quick ? "auto" : "smooth" });
+        }
+        const apply = () => {
+          let shown = 0;
+          items.forEach((li) => {
+            li.hidden = !wants(li, value);
+            if (!li.hidden) shown++;
+          });
+          if (count) count.textContent = `${shown} shown`;
+        };
+        if (quick) {
+          running.forEach((a) => a.cancel());
+          running = [];
+          return apply();
+        }
+        const time = ms("--filter-duration");
+        const out = ms("--filter-out-duration");
+        const easing = getComputedStyle(root).getPropertyValue("--ease-smooth").trim() || "ease-out";
+        const going = items.filter((li) => !li.hidden && !wants(li, value));
+        going.forEach((li) => run(li, [{ opacity: now(li).o }, { opacity: 0 }], { duration: out, easing, fill: "forwards" }));
+        window.setTimeout(() => {
+          if (mine !== turn) return;
+          const before = new Map(items.filter((li) => !li.hidden).map((li) => [li, now(li)]));
+          running.forEach((a) => a.cancel());
+          running = [];
+          apply();
+          items.filter((li) => !li.hidden).forEach((li) => {
+            const was = before.get(li);
+            if (!was) return run(li, [{ opacity: 0 }, { opacity: 1 }], { duration: time, easing, delay: time * 0.25, fill: "backwards" });
+            const at = now(li);
+            const dx = was.x - at.x;
+            const dy = was.y - at.y;
+            if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5 && was.o > 0.99) return;
+            run(li, [{ translate: `${dx}px ${dy}px`, opacity: was.o }, { translate: "0 0", opacity: 1 }], { duration: time, easing });
+          });
+        }, going.length ? out : 0);
+      }, { signal });
+    });
+  });
+</script>

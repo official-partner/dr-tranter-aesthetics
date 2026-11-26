@@ -14,6 +14,11 @@ import StepsSection from "@/components/section/StepsSection.astro";
 import ResultsHome from "@/components/section/ResultsHome.astro";
 import PeopleHome from "@/components/section/PeopleHome.astro";
 import JournalHome from "@/components/section/JournalHome.astro";
+import JournalIndex from "@/components/section/JournalIndex.astro";
+import JournalMore from "@/components/section/JournalMore.astro";
+import ArticleBody from "@/components/section/ArticleBody.astro";
+import ArticleCard from "@/components/content/ArticleCard.astro";
+import Filters from "@/components/content/Filters.astro";
 import CtaBand from "@/components/section/CtaBand.astro";
 import ItemHead from "@/components/section/ItemHead.astro";
 import ConcernBody from "@/components/section/ConcernBody.astro";
@@ -74,6 +79,20 @@ const steps = [
     </ComponentSample>
     <ComponentSample file="section/ResultsHome.astro" note="Les résultats, lus dans la collection, dans la composition éparpillée du design."><ResultsHome /></ComponentSample>
     <ComponentSample file="section/PeopleHome.astro" note="La fondatrice, puis l'équipe, dans un même défilement : le titre et le portrait restent en place, le nom au carré est allumé et son portrait monte."><PeopleHome /></ComponentSample>
+    <ComponentSample file="content/ArticleCard.astro" note="La carte d'un article : sa photo, son titre et « Read → » côte à côte, ou empilés avec sa date (More from the journal).">
+      <CardRow>
+        <ArticleCard id="pigmentation-vs-redness" title="Pigmentation and redness are not the same problem" />
+        <ArticleCard id="pigmentation-vs-redness" title="Pigmentation and redness are not the same problem" date={new Date("2026-01-22")} layout="stacked" />
+      </CardRow>
+    </ComponentSample>
+    <ComponentSample file="content/Filters.astro" note="Des pastilles qui montrent une catégorie des cartes d'une liste (pages Concerns, Treatments, Journal).">
+      <div class="site-grid"><Filters label="Filter by topic" all="All" values={["Skin health", "The Approach", "Technology"]} /></div>
+    </ComponentSample>
+    <ComponentSample file="section/JournalIndex.astro" note="Les articles du Journal, quatre à la fois dans la composition de l'accueil, un filtre par sujet."><JournalIndex /></ComponentSample>
+    <ComponentSample file="section/ArticleBody.astro" note="Le texte d'un article : ses titres à gauche, ses paragraphes au centre, le traitement dont il parle à droite, sa date au pied.">
+      <ArticleBody body={"## Two mechanisms, one pass\n\nRadiofrequency microneedling works by combining two mechanisms in one device.\n\nThe result is a treatment that can address surface concerns and structural concerns in the same course."} treatment={{ name: "Morpheus8", text: "Addresses structure and surface together in a single treatment.", href: "/treatments/morpheus8" }} facts={[{ label: "Date", value: "22 January 2026" }]} />
+    </ComponentSample>
+    <ComponentSample file="section/JournalMore.astro" note="Trois autres articles sous un article, avec leur date."><JournalMore self="pigmentation-vs-redness" /></ComponentSample>
     <ComponentSample file="section/JournalHome.astro" note="Quatre articles du journal, chacun à sa taille, dans la composition du design."><JournalHome /></ComponentSample>
     <ComponentSample file="section/CtaBand.astro" note="L'invitation de fin, sur chaque page."><CtaBand /></ComponentSample>
     {d?.statement && (

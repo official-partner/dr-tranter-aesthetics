@@ -1,6 +1,7 @@
 ---
 import Button from "@/components/Button.astro";
 import Card from "@/components/content/Card.astro";
+import Filters, { slug } from "@/components/content/Filters.astro";
 import type { Pic } from "@/utils/media";
 
 interface Item {
@@ -55,14 +56,13 @@ interface Props {
   figma?: { band: string; top: string; label: string; marker: string };
 }
 const { render = true, rule = false, label, title, note, action, theme = "light", collection, noun, textField = "summary", link = "View →", items, filters, list, source, figma } = Astro.props;
-const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 ---
 
 {/* A group of cards (the Concerns page, the Treatments page): its name at the margin with the square, its cards two to a
     row from the main rail (Figma 59:602, 59:983, Nov 20). With filters, a pill per category under the name. */}
 {
   render && items.length > 0 && (
-    <section class:list={["card-group_wrap section-padding", `theme-${theme}`, title && "has-title", rule && "section-rule"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
+    <section data-filter-scope class:list={["card-group_wrap section-padding", `theme-${theme}`, title && "has-title", rule && "section-rule"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
       <div class="card-group_layout site-grid">
         <div class="card-group_head">
           {title ? (
@@ -70,16 +70,10 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
           ) : (
             <p class="card-group_label lead-marker text-style-label inset-optical" data-figma={figma?.label}><span class="card-group_word">{label}</span></p>
           )}
-          {filters && (
-            <div class="card-group_filters" role="group" aria-label={label} data-card-filters>
-              {[filters.all, ...filters.values].map((v, i) => (
-                <button type="button" class="card-group_filter text-style-action" aria-pressed={i === 0 ? "true" : "false"} data-filter={i === 0 ? "" : slug(v)} data-figma={filters.ids?.[i]}>{v}</button>
-              ))}
-            </div>
-          )}
+          {filters && <Filters label={label} all={filters.all} values={filters.values} ids={filters.ids} class="card-group_filters" />}
         </div>
         {!title && <span class="marker card-group_marker" data-figma={figma?.marker} />}
-        <ul class="card-group_list" data-op-list={list ?? collection} data-op-source={source ?? `astro:${collection}`} data-op-noun={noun}>
+        <ul class="card-group_list" data-filter-list data-op-list={list ?? collection} data-op-source={source ?? `astro:${collection}`} data-op-noun={noun}>
           {items.map((c) => (
             <li class="card-group_item" data-op-item={c.id} data-category={c.category && slug(c.category)} data-aside={c.aside ? "" : undefined} hidden={c.aside && filters ? true : undefined}>
               <Card title={c.name} text={c.summary} href={c.href} link={link} image={c.image} item={{ collection, id: c.id, textField: c.textField === undefined ? textField : c.textField || undefined }} ids={c.ids} />
@@ -88,7 +82,7 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
         </ul>
         {note && <p class="card-group_note text-style-note">{note}</p>}
         {action && <div class="card-group_action"><Button element="link" href={action.href}>{action.label}</Button></div>}
-        {filters && <p class="sr-only" aria-live="polite" data-card-count />}
+        {filters && <p class="sr-only" aria-live="polite" data-filter-count />}
       </div>
     </section>
   )
@@ -141,6 +135,9 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
         }
       }
     }
+    .card-group_filters {
+      margin-top: var(--space-4);
+    }
     /* the name's word rolls in its place when the next group takes over (the script below) */
     .card-group_label {
       overflow: clip;
@@ -150,37 +147,6 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
     }
     .card-group_word {
       display: inline-block;
-    }
-    .card-group_filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-1);
-      margin-top: var(--space-4);
-      @media (width >= 64rem) {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-    .card-group_filter {
-      padding: var(--tag-y) var(--tag-x);
-      border: var(--border-width) solid var(--button-border);
-      border-radius: var(--radius-round);
-      color: var(--button-text);
-      transition:
-        background-color var(--hover-duration) var(--hover-ease),
-        color var(--hover-duration) var(--hover-ease),
-        border-color var(--hover-duration) var(--hover-ease);
-      @media (hover: hover) {
-        &:hover {
-          border-color: var(--pill-border-solid);
-        }
-      }
-      /* the chosen filter: filled with the text's colour */
-      &[aria-pressed="true"] {
-        background-color: var(--text);
-        border-color: var(--text);
-        color: var(--background);
-      }
     }
     .card-group_marker {
       display: none;
@@ -281,7 +247,6 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
 
 <script>
   import { onPage } from "@/utils/page";
-  import { pageLenis } from "@/utils/smooth-scroll";
 
   onPage((signal) => {
     const root = document.documentElement;
@@ -290,85 +255,6 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
       const v = getComputedStyle(root).getPropertyValue(name).trim();
       return (parseFloat(v) || 0) * (v.endsWith("ms") ? 1 : 1000);
     };
-
-    /* A group's filters (Sam, Nov 21, idea 6; Nov 24, comment 13: « les filters sont buggy, ça marche pas bien le
-       reorder des items. aussi, on doit scroll up au top de la section quand on clique un filtre… seamless »). A pill
-       shows only its category's cards; « All » shows the group as it came (the cards featured above stay there). One
-       thing after the other: the page goes back to the group's top when the group starts above the screen; the cards
-       that go fade out where they are (--filter-out-duration); then the cards that stay travel to their new places
-       while those that come fade in at theirs (--filter-duration). Places are measured against the list, so the scroll
-       never disturbs them, and a click in the middle of a change starts from where the cards are. Before (Nov 21) the
-       browser's view transition froze the whole page for the change and crossfaded it, which broke when the page
-       scrolled. The count is said to screen readers. Reduced motion: at once. */
-    document.querySelectorAll<HTMLElement>("[data-card-filters]").forEach((pills) => {
-      const group = pills.closest<HTMLElement>(".card-group_wrap");
-      const list = group?.querySelector<HTMLElement>(".card-group_list");
-      if (!group || !list) return;
-      const items = [...list.querySelectorAll<HTMLElement>(":scope > .card-group_item")];
-      const count = group.querySelector<HTMLElement>("[data-card-count]");
-      let running: Animation[] = [];
-      let turn = 0;
-      const wants = (li: HTMLElement, value: string) => (value ? li.dataset.category === value : !li.hasAttribute("data-aside"));
-      /* a card's place against the list, and its opacity, as they are on screen now (in the middle of a change too) */
-      const now = (li: HTMLElement) => {
-        const l = list.getBoundingClientRect();
-        const r = li.getBoundingClientRect();
-        return { x: r.left - l.left, y: r.top - l.top, o: parseFloat(getComputedStyle(li).opacity) };
-      };
-      const run = (li: HTMLElement, frames: Keyframe[], options: KeyframeAnimationOptions) => running.push(li.animate(frames, options));
-
-      pills.addEventListener("click", (e) => {
-        const pill = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-filter]");
-        if (!pill || pill.getAttribute("aria-pressed") === "true") return;
-        const value = pill.dataset.filter ?? "";
-        const mine = ++turn;
-        const quick = calm.matches;
-        pills.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === pill)));
-        /* back to the group's top when it starts above the screen */
-        const top = group.getBoundingClientRect().top;
-        if (top < -1) {
-          const y = Math.round(top + window.scrollY);
-          const lenis = pageLenis();
-          if (lenis && !quick) lenis.scrollTo(y, { duration: ms("--filter-duration") / 1000 });
-          else window.scrollTo({ top: y, behavior: quick ? "auto" : "smooth" });
-        }
-        const apply = () => {
-          let shown = 0;
-          items.forEach((li) => {
-            li.hidden = !wants(li, value);
-            if (!li.hidden) shown++;
-          });
-          if (count) count.textContent = `${shown} shown`;
-        };
-        if (quick) {
-          running.forEach((a) => a.cancel());
-          running = [];
-          return apply();
-        }
-        const time = ms("--filter-duration");
-        const out = ms("--filter-out-duration");
-        const easing = getComputedStyle(root).getPropertyValue("--ease-smooth").trim() || "ease-out";
-        const going = items.filter((li) => !li.hidden && !wants(li, value));
-        going.forEach((li) => run(li, [{ opacity: now(li).o }, { opacity: 0 }], { duration: out, easing, fill: "forwards" }));
-        window.setTimeout(() => {
-          if (mine !== turn) return;
-          const before = new Map(items.filter((li) => !li.hidden).map((li) => [li, now(li)]));
-          running.forEach((a) => a.cancel());
-          running = [];
-          apply();
-          items.filter((li) => !li.hidden).forEach((li) => {
-            const was = before.get(li);
-            if (!was) return run(li, [{ opacity: 0 }, { opacity: 1 }], { duration: time, easing, delay: time * 0.25, fill: "backwards" });
-            const at = now(li);
-            const dx = was.x - at.x;
-            const dy = was.y - at.y;
-            if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5 && was.o > 0.99) return;
-            run(li, [{ translate: `${dx}px ${dy}px`, opacity: was.o }, { translate: "0 0", opacity: 1 }], { duration: time, easing });
-          });
-        }, going.length ? out : 0);
-      }, { signal });
-    });
-
     /* One name, one square down the page (Sam, Nov 21, idea 5 and his note: « ça reste le même élément », « un switch
        de texte entre structure et surface »). Each group has its own pinned name and square (`.card-group_head`, `.card-group_marker`: sticky).
        Between two groups that follow each other, the first's would be pushed up and out as the second's came up from

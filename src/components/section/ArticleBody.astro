@@ -1,0 +1,134 @@
+---
+import Button from "@/components/Button.astro";
+import { richHtml, richMarks, type RichClasses } from "@/utils/rich";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** The article's text, a formatted text (Markdown): « ## » a title, set on the left beside its paragraphs. */
+  body?: string;
+  /** The treatment it speaks of, beside the text. */
+  treatment?: { name: string; text?: string; href?: string };
+  /** At its foot: when it was written and who reviewed it. */
+  facts?: { label: string; value: string; field?: string }[];
+  /** Color theme. */
+  theme?: "inherit" | "light" | "stone";
+}
+const { render = true, body, treatment, facts = [], theme = "light" } = Astro.props;
+const classes: RichClasses = { h2: "text-style-h2", h3: "text-style-h3", p: "text-style-main", ul: "text-style-main", ol: "text-style-main", blockquote: "text-style-h3" };
+const html = richHtml(body, classes);
+---
+
+{/* A Journal article's text (Figma 4001:527): its titles on the left, its paragraphs on the main rail, the treatment it
+    speaks of on the right, then its date and who reviewed it. The text is one field, edited in place in OP System. */}
+{
+  render && (html || facts.length > 0) && (
+    <section class:list={["article-body_wrap section-padding", theme !== "inherit" && `theme-${theme}`]}>
+      <div class="article-body_layout site-grid">
+        {html && <div class="article-body_text" data-op-field="body" data-op-rich={richMarks(classes)} set:html={html} />}
+        {treatment && (
+          <aside class="article-body_aside">
+            <p class="text-style-label">{treatment.name}</p>
+            {treatment.text && <p class="article-body_aside-text text-style-main">{treatment.text}</p>}
+            {treatment.href && <Button element="link" variant="link" href={treatment.href} class="article-body_aside-link">View treatment →</Button>}
+          </aside>
+        )}
+        {facts.length > 0 && (
+          <dl class="article-body_facts">
+            {facts.map((f) => (
+              <div class="stack">
+                <dt class="text-style-label">{f.label}</dt>
+                <dd class="text-style-serif" data-op-field={f.field}>{f.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* it ends wide, on purpose, as every section that breathes */
+    .article-body_wrap {
+      padding-bottom: var(--section-padding-wide);
+    }
+    .article-body_layout {
+      row-gap: var(--space-10);
+      align-items: start;
+    }
+    .article-body_text,
+    .article-body_aside,
+    .article-body_facts {
+      grid-column: margin / end;
+    }
+    /* the text's blocks on the grid: a title on the left, its first paragraph beside it on the main rail (the grid
+       places each block after the one before, so a title and the paragraph after it share a row), the rest under */
+    .article-body_text {
+      display: grid;
+      grid-template-columns: subgrid;
+      row-gap: var(--space-5);
+      align-items: start;
+      & > * {
+        grid-column: margin / end;
+        margin: 0;
+        max-width: 60ch;
+      }
+      & > h2:not(:first-child),
+      & > h2:not(:first-child) + * {
+        margin-top: var(--space-10);
+      }
+      & > :is(ul, ol) {
+        padding-left: 1.2em;
+      }
+    }
+    .article-body_aside-text {
+      margin-top: var(--space-3);
+      max-width: 34ch;
+    }
+    .article-body_aside-link {
+      margin-top: var(--space-action);
+    }
+    .article-body_facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-5) var(--space-10);
+      margin: 0;
+    }
+    @media (width >= 48rem) {
+      .article-body_text {
+        grid-row: 1;
+        & > * {
+          grid-column: main / end;
+        }
+        & > h2 {
+          grid-column: margin / main;
+        }
+      }
+      .article-body_facts {
+        grid-column: main / end;
+      }
+    }
+    @media (48rem <= width < 64rem) {
+      .article-body_aside {
+        grid-column: main / end;
+      }
+    }
+    @media (width >= 64rem) {
+      .article-body_text {
+        grid-column: margin / aside;
+        & > * {
+          grid-column: main / span 4;
+        }
+        & > h2 {
+          grid-column: margin / span 3;
+        }
+      }
+      .article-body_aside {
+        grid-row: 1;
+        grid-column: aside / end;
+      }
+    }
+  }
+</style>

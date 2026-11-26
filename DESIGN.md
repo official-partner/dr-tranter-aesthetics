@@ -143,6 +143,18 @@ StepsSection, DetailsSection; a treatment's page, Nov 25).
 - The head's facts: three or four on a computer on the same 206 step, the last as wide as its words; on a tablet two to
   a row from the main rail to the aside, clear of the link; the crumb clear of the menu's button on a tablet.
 
+## The Journal (Nov 25)
+- The Journal page (Figma 4001:684): PageHead on stone, then JournalIndex: the filters (« Filter by », a pill per topic)
+  beside the first article, then the home's composition four at a time (wide on the aside, tall, upright a beat lower,
+  wide in the middle), counted among the cards a filter shows. The first of each four starts on the half rail so the
+  grid gives it a row of its own; its photo and title sit on the aside.
+- An article (Figma 4001:527): ItemHead's `article` variant on stone (its title the h1, its summary under it, its photo
+  on the right under the menu's button, topic and reviewer), ArticleBody on sand (the text one field: a « ## » title on
+  the left, its first paragraph beside it, the rest under on the main rail; the treatment it speaks of on the right;
+  its date at the foot), JournalMore on stone (three more, with their date, [22.01.26]).
+- ArticleCard is every article's card (home, Journal, More from the journal); Filters are the Concerns', Treatments'
+  and Journal's pills (one component, one script).
+
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside
   (the Figma's 23 high at 1728), `--space-1` apart, a column under the group's name on a computer, a wrapping row on a

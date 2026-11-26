@@ -1,0 +1,51 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import ItemHead from "@/components/section/ItemHead.astro";
+import ArticleBody from "@/components/section/ArticleBody.astro";
+import JournalMore from "@/components/section/JournalMore.astro";
+import { getItems, getItem } from "@/utils/content";
+
+/* One page per article (Figma « Starter (Copy) » 4001:527): its opening (title, summary, photo, topic, reviewer), its
+   text with the treatment it speaks of, its date, then three more articles. */
+export async function getStaticPaths() {
+  const articles = await getItems("articles");
+  return articles.map((a) => ({ params: { slug: a.id } }));
+}
+
+const { slug } = Astro.params;
+const article = slug ? await getItem("articles", slug) : undefined;
+if (!article) return Astro.rewrite("/404");
+const d = article.data;
+const treatmentItem = d.treatment ? await getItem("treatments", d.treatment.id) : undefined;
+const treatment = treatmentItem && {
+  name: treatmentItem.data.name,
+  text: treatmentItem.data.intro,
+  href: treatmentItem.data.statement ? `/treatments/${treatmentItem.id}` : undefined,
+};
+const date = d.date && d.date.toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const headFacts = [
+  d.topic && { label: "Topic", value: d.topic, field: "topic" },
+  d.reviewedBy && { label: "Reviewed by", value: d.reviewedBy, field: "reviewedBy" },
+].filter((f) => !!f);
+const footFacts = [
+  date && { label: "Date", value: date, field: "date" },
+  d.reviewedBy && { label: "Reviewed by", value: d.reviewedBy, field: "reviewedBy" },
+].filter((f) => !!f);
+---
+
+<Layout title={d.title} seoTitle={d.seoTitle} description={d.seoDescription ?? d.summary} type="article" nav="menu" navTheme="light">
+  <article data-op-item={article.id} data-op-source="astro:articles">
+    <ItemHead
+      variant="article"
+      theme="stone"
+      name={d.title}
+      parent={{ label: "Journal", href: "/journal" }}
+      statement={d.title}
+      lead={d.summary}
+      facts={headFacts}
+      image={d.image && { src: d.image, alt: d.imageAlt }}
+    />
+    <ArticleBody body={d.body} treatment={treatment} facts={footFacts} />
+  </article>
+  <JournalMore self={article.id} />
+</Layout>

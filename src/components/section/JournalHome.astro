@@ -1,8 +1,7 @@
 ---
 import Button from "@/components/Button.astro";
-import Img from "@/components/media/Img.astro";
+import ArticleCard from "@/components/content/ArticleCard.astro";
 import { listed, ruleMarks } from "@/utils/lists";
-import { pic } from "@/utils/media";
 
 /* The home's journal (Figma « Starter (Copy) » 4001:2, Nov 25): four articles set apart across the grid, each its own
    size, the last with its title above its photo. The articles the list « journal-home » shows (its rule in
@@ -23,17 +22,7 @@ const posts = (await listed<"articles">("journal-home")).map(({ id, data }, i) =
     <ul class="journal-home_list" {...ruleMarks("journal-home")}>
       {posts.map((p) => {
         const [slot, ratio] = p.shape.split(" ");
-        return (
-          <li class:list={["journal-home_card stacked-card linked-card", slot]} data-op-item={p.id}>
-            <div class:list={["media", ratio]} data-op-field="image">
-              {p.image && <Img {...pic(p.image)} alt={p.alt} variant="constrained" sizes="(width >= 64rem) 40vw, (width >= 48rem) 50vw, 100vw" />}
-            </div>
-            <div class="journal-home_meta">
-              <h3 class="journal-home_card-title text-style-h3" data-op-field="title">{p.title}</h3>
-              <Button element="link" variant="link" href="/journal" data-card-link>Read →</Button>
-            </div>
-          </li>
-        );
+        return <ArticleCard id={p.id} title={p.title} image={p.image} alt={p.alt} ratio={ratio} titleFirst={slot === "is-d"} class:list={["journal-home_card", slot]} />;
       })}
     </ul>
     <div class="journal-home_action"><Button element="link" variant="link" href="/journal">View all articles</Button></div>
@@ -56,33 +45,10 @@ const posts = (await listed<"articles">("journal-home")).map(({ id, data }, i) =
     .journal-home_card {
       grid-column: margin / end;
     }
-    /* a title, its « Read → » set against the right edge, on the photo's width */
-    .journal-home_meta {
-      align-self: stretch;
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      column-gap: var(--space-5);
-      margin-top: var(--space-media);
-      & > .button_wrap {
-        flex: none;
-      }
-    }
-    .journal-home_card-title {
-      max-width: 18ch;
-    }
-    /* the last: its title above its photo, on four of its five columns (Sam, comment 13), its « Read → » on the right,
-       level with the title's last line (comment 12) */
-    .journal-home_card.is-d .journal-home_meta {
-      order: -1;
-      margin-top: 0;
-      margin-bottom: var(--space-media);
-      align-items: last baseline;
-      & .journal-home_card-title {
-        max-width: none;
-        @media (width >= 64rem) {
-          width: calc((100% + var(--site-gutter)) * 4 / 5 - var(--site-gutter));
-        }
+    /* the last: its title on four of its five columns (Sam, comment 13) */
+    .journal-home_card.is-d .article-card_title {
+      @media (width >= 64rem) {
+        width: calc((100% + var(--site-gutter)) * 4 / 5 - var(--site-gutter));
       }
     }
     .journal-home_action {

@@ -1,0 +1,68 @@
+---
+import Button from "@/components/Button.astro";
+import ArticleCard from "@/components/content/ArticleCard.astro";
+import CardRow from "@/components/content/CardRow.astro";
+import { listed, ruleMarks } from "@/utils/lists";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** The article the page shows, left out of the list. */
+  self?: string;
+}
+const { render = true, self } = Astro.props;
+/* More from the journal (Figma 4001:527): the list « journal-more » (src/data/lists.json: three, the page's own article
+   left out), each with its date, its title and its link. */
+const posts = await listed<"articles">("journal-more", self);
+---
+
+{
+  render && posts.length > 0 && (
+    <section class="journal-more_wrap section-padding theme-stone">
+      <div class="journal-more_layout site-grid">
+        <h2 class="journal-more_title text-style-h2">More from <em>the journal</em></h2>
+        <div class="journal-more_action"><Button element="link" href="/journal">View all articles</Button></div>
+        <CardRow {...ruleMarks("journal-more")}>
+          {posts.map(({ id, data }) => (
+            <ArticleCard id={id} title={data.title} image={data.image} alt={data.imageAlt ?? ""} date={data.date} layout="stacked" sizes="(width >= 48rem) 30vw, 75vw" />
+          ))}
+        </CardRow>
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* it ends wide, on purpose, as every section that breathes */
+    .journal-more_wrap {
+      padding-bottom: var(--section-padding-wide);
+    }
+    .journal-more_layout {
+      row-gap: var(--space-10);
+      align-items: start;
+    }
+    .journal-more_title {
+      grid-column: margin / end;
+      max-width: 10ch;
+    }
+    /* the pill: under the cards on a phone, level with the title from a tablet up, against the right edge */
+    .journal-more_action {
+      grid-row: 3;
+      grid-column: margin / end;
+    }
+    @media (width >= 48rem) {
+      .journal-more_title,
+      .journal-more_action {
+        grid-row: 1;
+      }
+      .journal-more_title {
+        grid-column: margin / main;
+      }
+      .journal-more_action {
+        grid-column: aside / end;
+        justify-self: end;
+      }
+    }
+  }
+</style>
