@@ -176,9 +176,19 @@ StepsSection, DetailsSection; a treatment's page, Nov 25).
 - `/team` (Figma 4001:904, 934, 958): PageHead on the dark ground, then the home's concern list made for people
   (ConcernIndex `variant="people"`: a name and its role; chosen, the others dim to `--people-dim` and the photo, the
   square and Full profile travel beside it, as on the home), then CtaBand on dark after a hairline (`rule`).
-- A profile is a `<dialog>` over the page (TeamProfiles): Back, the name in capitals (text-style-h2, uppercase from the
-  CSS), role and years in practice, credentials, areas of expertise, treatments performed, bio, the portrait from the
-  half rail; it fades on `--open-duration`. Opened by any link to `#team-<id>`.
+- A profile is a `<dialog>` over the page (TeamProfiles): Back, the name in the site's h2 as written, the family name
+  in `<em>` (the serif cut of every heading's emphasis: « Dr Sarah *Tranter* »; Sam, Nov 25: no style of its own), role
+  and years in practice, credentials, areas of expertise, treatments performed, bio, the portrait from the half rail.
+  Opened by any link to `#<id>`; that address shows while it is open (/team#sarah-tranter, shared, opens it), the
+  browser's back closes it (Sheet keeps these steps from Astro's router).
+- Its motion (Sam, Nov 25: « l'image du hover... grossir et prendre la place de la grosse image »): the page's blocks
+  in view and the sections' rules fade and rise away (`--profile-leave-duration`), the photo beside the chosen name
+  grows from its frame into the portrait's (`--profile-duration` on `--profile-ease`, the menu's osmo: transform and
+  clip-path from the top left corner), the profile's blocks come in as an arriving page's (`--page-enter-*`, after
+  `--profile-text-wait`); the sheet is see-through while the page goes (the same dark). Closing is the reverse, the
+  portrait back to its row (`--profile-return-duration`), the page's blocks coming back in. No photo beside the list
+  (tablet, phone, no photo, a shared address): the same steps, the portrait with the other blocks. Reduced motion:
+  the sheet's fade.
 
 ## Booking, enquiry and consent (Nov 25)
 - Every Book button leads to the clinic's Pabau booking page (`clinic.booking`, src/data/clinic.ts), as Mia Endozo's

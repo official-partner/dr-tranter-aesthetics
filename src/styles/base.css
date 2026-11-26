@@ -74,6 +74,11 @@
   --people-swap-scale: 1.04;
   --people-dim: 0.35;
   --people-ratio: 5 / 6;
+  --profile-duration: 1000ms;
+  --profile-return-duration: 800ms;
+  --profile-ease: var(--ease-osmo);
+  --profile-leave-duration: 450ms;
+  --profile-text-wait: 300ms;
   --pinned-top: calc(var(--site-margin) + var(--pill-y));
   --page-dim: 0.55;
   --menu-open-duration: 1000ms;

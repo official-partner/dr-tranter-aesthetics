@@ -8,16 +8,19 @@ interface Props {
   labelledby?: string;
   /** Its ground. */
   theme?: "dark" | "light" | "stone";
+  /** `own`: its page moves it (`sheet:open`, `sheet:close`, below) in place of the fade; with reduced motion it fades. */
+  motion?: "fade" | "own";
   class?: string;
   [key: string]: unknown;
 }
-const { id, also = [], labelledby, theme = "dark", class: className, ...rest } = Astro.props;
+const { id, also = [], labelledby, theme = "dark", motion = "fade", class: className, ...rest } = Astro.props;
 ---
 
 {/* A sheet over the page (a team member's profile, Send an enquiry: Figma 4001:958, 4001:265): a dialog on the whole
-    screen with its Back, on the site's grid; a link to its address opens it, Back, Escape or the browser's back close
-    it. Without the script the links stay plain anchors. */}
-<dialog class:list={["sheet_wrap", `theme-${theme}`, className]} id={id} aria-labelledby={labelledby} data-sheet-also={also.join(" ") || undefined} data-lenis-prevent {...rest}>
+    screen with its Back, on the site's grid; a link to its address opens it and the address shows it (/team#sarah-tranter
+    can be shared and opens it), Back, Escape or the browser's back close it. Without the script the links stay plain
+    anchors. */}
+<dialog class:list={["sheet_wrap", `theme-${theme}`, className]} id={id} aria-labelledby={labelledby} data-sheet-also={also.join(" ") || undefined} data-lenis-prevent data-sheet-motion={motion === "own" ? "own" : undefined} {...rest}>
   <div class="sheet_layout site-grid section-padding">
     <button type="button" class="sheet_back text-style-action" data-sheet-close>
       <span aria-hidden="true">←</span> Back
@@ -56,6 +59,12 @@ const { id, also = [], labelledby, theme = "dark", class: className, ...rest } =
         background: transparent;
       }
     }
+    /* a sheet its page moves (Our team's profile): shown at once, its page's script carries it in and out */
+    @media (prefers-reduced-motion: no-preference) {
+      .sheet_wrap[data-sheet-motion="own"] {
+        transition: none;
+      }
+    }
     .sheet_layout {
       row-gap: var(--space-7);
       align-content: start;
@@ -89,25 +98,104 @@ const { id, also = [], labelledby, theme = "dark", class: className, ...rest } =
 <script>
   import { onPage } from "@/utils/page";
 
+  /* Opening and closing, with the address. A sheet opened from a link puts its address in the history (`#<id>`), so
+     the browser's back closes it and a shared address opens it; Back and Escape go back the same way. The sheet tells
+     its page as it opens (`sheet:open`, with the link pressed and what had the focus) and before it closes (`sheet:close`: `wait(promise)`
+     holds it open until the page's motion has ended). Astro's router never sees these steps: they stay on the page. */
+  const sheets = () => [...document.querySelectorAll<HTMLDialogElement>(".sheet_wrap")];
+  const find = (hash: string) => (hash ? sheets().find((d) => d.id === hash || (d.dataset.sheetAlso ?? "").split(" ").includes(hash)) : undefined);
+  const bare = () => location.pathname + location.search;
+  /* whether the history's current step is a sheet's */
+  let onSheet = false;
+
+  const open = (d: HTMLDialogElement, hash: string, trigger: Element | null, push: boolean) => {
+    if (d.open) return;
+    if (push && location.hash !== `#${hash}`) {
+      history.pushState({ ...history.state, sheet: hash }, "", `#${hash}`);
+      onSheet = true;
+    }
+    d.dataset.via = hash;
+    d.scrollTop = 0;
+    /* where the focus goes back to when it closes */
+    const from = document.activeElement;
+    d.showModal();
+    d.dispatchEvent(new CustomEvent("sheet:open", { detail: { trigger, from } }));
+    d.querySelector<HTMLElement>("[data-sheet-close]")?.focus({ preventScroll: true });
+  };
+  const close = (d: HTMLDialogElement) => {
+    if (!d.open || d.dataset.closing !== undefined) return;
+    const waits: Promise<unknown>[] = [];
+    d.dispatchEvent(new CustomEvent("sheet:close", { detail: { wait: (p: Promise<unknown>) => waits.push(p) } }));
+    if (!waits.length) return d.close();
+    d.dataset.closing = "";
+    Promise.all(waits).finally(() => {
+      delete d.dataset.closing;
+      d.close();
+    });
+  };
+  /* Back and Escape: back in the history when the sheet put its address there, else closed and its address taken off */
+  const leave = (d: HTMLDialogElement) => {
+    if (history.state?.sheet && history.state.sheet === d.dataset.via) return history.back();
+    close(d);
+    if (location.hash) history.replaceState(history.state, "", bare());
+  };
+
+  /* the browser's back and forward between a sheet and its page: handled here, before Astro's router (a listener in
+     the capture phase runs first), which would otherwise load the page again */
+  if (!(window as { __sheetHistory?: boolean }).__sheetHistory) {
+    (window as { __sheetHistory?: boolean }).__sheetHistory = true;
+    addEventListener(
+      "popstate",
+      (e) => {
+        const hash = location.hash.slice(1);
+        const target = find(hash);
+        const shown = sheets().find((d) => d.open);
+        const from = onSheet;
+        onSheet = Boolean(history.state?.sheet);
+        if (!target && !shown && !from) return;
+        e.stopImmediatePropagation();
+        if (shown && shown !== target) close(shown);
+        if (target) open(target, hash, null, false);
+      },
+      { capture: true },
+    );
+  }
+
   onPage((signal) => {
-    const find = (hash: string) =>
-      [...document.querySelectorAll<HTMLDialogElement>(".sheet_wrap")].find((d) => d.id === hash || (d.dataset.sheetAlso ?? "").split(" ").includes(hash));
     document.addEventListener(
       "click",
       (e) => {
         const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
-        const hash = a?.getAttribute("href")?.slice(1);
-        const d = hash ? find(hash) : undefined;
-        if (!d || !hash) return;
+        const hash = a?.getAttribute("href")?.slice(1) ?? "";
+        const d = find(hash);
+        if (!d) return;
         e.preventDefault();
-        d.dataset.via = hash;
-        if (!d.open) d.showModal();
-        d.querySelector<HTMLElement>("[data-sheet-close]")?.focus();
+        open(d, hash, a, true);
       },
       { signal },
     );
-    document.querySelectorAll<HTMLDialogElement>(".sheet_wrap").forEach((d) => {
-      d.querySelector("[data-sheet-close]")?.addEventListener("click", () => d.close(), { signal });
+    sheets().forEach((d) => {
+      d.querySelector("[data-sheet-close]")?.addEventListener("click", () => leave(d), { signal });
+      d.addEventListener(
+        "cancel",
+        (e) => {
+          e.preventDefault();
+          leave(d);
+        },
+        { signal },
+      );
+      /* closed another way (a second Escape closes a dialog at once): its step of the history goes too */
+      d.addEventListener(
+        "close",
+        () => {
+          if (history.state?.sheet && history.state.sheet === d.dataset.via) history.back();
+        },
+        { signal },
+      );
     });
+    /* an address that names a sheet opens it over its page, once the page's own scripts are ready to move it */
+    const hash = location.hash.slice(1);
+    const d = find(hash);
+    if (d) setTimeout(() => open(d, hash, null, false), 0);
   });
 </script>

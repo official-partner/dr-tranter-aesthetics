@@ -11,7 +11,7 @@ import { getItems } from "@/utils/content";
    beside it), each profile opened over the page. The team as it stands in the Figma (brief A2); bios and photos to
    come from Sarah. */
 const team = await getItems("team");
-const items = team.map(({ id, data }) => ({ id, label: data.name, sub: data.role, href: `#team-${id}`, image: data.photo }));
+const items = team.map(({ id, data }) => ({ id, label: data.name, sub: data.role, href: `#${id}`, image: data.photo }));
 ---
 
 <Layout title="Our team" description="The team at Dr Tranter Aesthetics: cosmetic doctors, nurses and dermal therapists trained within the same method." navTheme="dark">

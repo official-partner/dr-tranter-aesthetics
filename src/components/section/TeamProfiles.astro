@@ -10,22 +10,26 @@ interface Props {
 }
 const { render = true } = Astro.props;
 /* A team member's profile (Figma 4001:958), opened over Our team by « Full profile » or their name (a link to
-   #team-<id>): their name, role and years in practice, credentials, areas of expertise, the treatments they perform,
-   their bio and portrait. A part shows once it is filled (Sarah sends the bios and photos). */
+   #<id>, the address it shows: /team#sarah-tranter): their name in the site's h2, the family name in the serif cut as
+   every heading's emphasis (Sam, Nov 25), role and years in practice, credentials, areas of expertise, the
+   treatments they perform, their bio and portrait. A part shows once it is filled (Sarah sends the bios and photos).
+   Its motion (the script below): the photo of the list grows into the portrait. */
 const [team, treatments] = await Promise.all([getItems("team"), getItems("treatments")]);
 const people = team.map(({ id, data }) => ({
   id,
   ...data,
   performs: (data.treatments ?? []).map((r) => treatments.find((t) => t.id === r.id)).filter((t) => t !== undefined),
+  given: data.name.split(" ").slice(0, -1).join(" "),
+  family: data.name.split(" ").slice(-1)[0],
 }));
 ---
 
 {
   render &&
     people.map((m) => (
-      <Sheet id={`team-${m.id}`} labelledby={`team-${m.id}-name`} class="team-profile_wrap" data-op-item={m.id} data-op-source="astro:team">
+      <Sheet id={m.id} labelledby={`${m.id}-name`} motion="own" class="team-profile_wrap" data-op-item={m.id} data-op-source="astro:team">
           <div class="team-profile_head">
-            <h2 class="team-profile_name text-style-h2" id={`team-${m.id}-name`} data-op-field="name">{m.name}</h2>
+            <h2 class="text-style-h2" id={`${m.id}-name`} data-op-field="name">{m.given && <>{m.given} </>}<em>{m.family}</em></h2>
             {(m.role || m.practice) && <p class="team-profile_role text-style-serif">{[m.role, m.practice].filter(Boolean).join(" · ")}</p>}
           </div>
           {(m.credentials || m.expertise || m.performs.length > 0) && (
@@ -54,9 +58,6 @@ const people = team.map(({ id, data }) => ({
     .team-profile_media {
       grid-column: margin / end;
     }
-    .team-profile_name {
-      text-transform: uppercase;
-    }
     .team-profile_role {
       margin-top: var(--space-3);
     }
@@ -75,6 +76,14 @@ const people = team.map(({ id, data }) => ({
     }
     .team-profile_bio {
       max-width: 52ch;
+    }
+    /* the portrait grows from the list's photo from its top left corner (the script below) */
+    .team-profile_media {
+      transform-origin: 0 0;
+    }
+    /* while the profile comes in or goes, its ground is the page's, seen through (the same dark) */
+    .team-profile_wrap.is-moving {
+      background-color: transparent;
     }
     @media (width >= 48rem) {
       .team-profile_wrap .sheet_layout {
@@ -106,3 +115,219 @@ const people = team.map(({ id, data }) => ({
     }
   }
 </style>
+
+<script>
+  import { onPage } from "@/utils/page";
+
+  /* Our team to a profile and back (Sam, Nov 25: « l'image du hover reste en place et se déplace pour grossir et
+     prendre la place de la grosse image... le texte qui apparaît, les éléments de la page qui disparaissent »). Its
+     job: carry the visitor from the list to the person, one photo the whole way.
+     - Opening: the page's blocks in view fade and rise away (--profile-leave-duration); the photo beside the chosen
+       name grows from its square into the portrait's frame (--profile-duration on --profile-ease: its size, its place
+       and its crop at once, `transform` and `clip-path` only); the profile's blocks come in one after the other as
+       the site's pages do (--page-enter-shift, --page-enter-duration, --page-enter-stagger, after --profile-text-wait).
+       The sheet's ground stays see-through until the page has gone: it is the same dark.
+     - Closing (Back, Escape, the browser's back): the reverse; the portrait goes back to its row
+       (--profile-return-duration) and the page's blocks come back in.
+     - No photo beside the list (a tablet, a phone, a person without one, an address opened directly): the same steps,
+       the portrait coming in with the other blocks.
+     - Reduced motion: the sheet's fade, nothing travels. */
+  onPage((signal) => {
+    const calm = matchMedia("(prefers-reduced-motion: reduce)");
+    const token = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    /* a duration as the browser gives it back (« 1s », « 450ms »), in ms */
+    const ms = (name: string) => {
+      const v = token(name);
+      return (parseFloat(v) || 0) * (v.endsWith("ms") ? 1 : 1000);
+    };
+    const rowFor = (id: string) => document.querySelector(`.concern-index_link[href="#${CSS.escape(id)}"]`)?.closest<HTMLElement>(".concern-index_item") ?? null;
+    const inView = (r: DOMRect) => r.width > 0 && r.bottom > 0 && r.top < innerHeight;
+
+    type Source = { box: DOMRect; img: HTMLImageElement | null; follow: HTMLElement | null };
+    /* where the photo is beside a row: the travelling frame while it shows, else the row's own (laid out, hidden) */
+    const sourceOf = (row: HTMLElement | null, travelling: boolean): Source | null => {
+      if (!row) return null;
+      const wrap = row.closest<HTMLElement>(".concern-index_wrap");
+      const follow = wrap?.querySelector<HTMLElement>(":scope > .concern-index_thumb.is-follow") ?? null;
+      const own = row.querySelector<HTMLElement>(":scope > .concern-index_thumb");
+      if (travelling && follow && wrap?.dataset.follow === "on" && !follow.classList.contains("is-empty") && Number(getComputedStyle(follow).opacity) > 0.5) {
+        const box = follow.getBoundingClientRect();
+        if (inView(box)) return { box, img: follow.querySelector("img.is-on"), follow };
+      }
+      if (!own?.querySelector("img")) return null;
+      const box = own.getBoundingClientRect();
+      return inView(box) ? { box, img: own.querySelector("img"), follow } : null;
+    };
+    /* the frame placed and cropped over a box: scaled to cover it from the top left corner, its sides cut to it */
+    const over = (box: DOMRect, frame: DOMRect) => {
+      const s = Math.max(box.width / frame.width, box.height / frame.height);
+      const cx = (frame.width - box.width / s) / 2;
+      const cy = (frame.height - box.height / s) / 2;
+      return {
+        transform: `translate(${box.left - (frame.left + cx * s)}px, ${box.top - (frame.top + cy * s)}px) scale(${s})`,
+        clipPath: `inset(${cy}px ${cx}px)`,
+      };
+    };
+    const whole = { transform: "translate(0px, 0px) scale(1)", clipPath: "inset(0px 0px)" };
+    const rise = (el: HTMLElement, delay: number) =>
+      el.animate([{ opacity: 0, translate: `0 ${token("--page-enter-shift")}` }, { opacity: 1, translate: "0 0" }], {
+        duration: ms("--page-enter-duration"),
+        easing: token("--page-enter-ease"),
+        delay,
+        fill: "backwards",
+      });
+    const away = (el: HTMLElement) =>
+      el.animate([{ opacity: 0, translate: `0 calc(${token("--page-enter-shift")} * -1)` }], {
+        duration: ms("--profile-leave-duration"),
+        easing: token("--ease-smooth"),
+        fill: "forwards",
+      });
+    /* a section's rule fades with its blocks, and comes back with them */
+    const unrule = (el: HTMLElement) =>
+      el.animate([{ borderTopColor: "transparent" }], { duration: ms("--profile-leave-duration"), easing: token("--ease-smooth"), fill: "forwards" });
+    const rerule = (el: HTMLElement) =>
+      el.animate([{ borderTopColor: "transparent", offset: 0 }], { duration: ms("--page-enter-duration"), easing: token("--page-enter-ease") });
+    const clear = (el: HTMLElement) => ["opacity", "translate", "transform", "clip-path", "border-top-color"].forEach((p) => el.style.removeProperty(p));
+    const settle = (a: Animation) => a.finished.catch(() => undefined);
+
+    type Run = { page: HTMLElement[]; rules: HTMLElement[]; anims: Animation[]; row: HTMLElement | null; follow: HTMLElement | null; lands: boolean };
+    const runs = new WeakMap<HTMLDialogElement, Run>();
+    const end = (d: HTMLDialogElement) => {
+      const run = runs.get(d);
+      if (!run) return;
+      run.anims.forEach((a) => a.cancel());
+      [...run.page, ...run.rules].forEach(clear);
+      d.querySelectorAll<HTMLElement>(".sheet_layout > *").forEach(clear);
+      d.querySelectorAll(".team-profile_stand-in").forEach((n) => n.remove());
+      if (run.follow) run.follow.style.visibility = "";
+      d.classList.remove("is-moving");
+      runs.delete(d);
+    };
+
+    document.querySelectorAll<HTMLDialogElement>(".team-profile_wrap").forEach((d) => {
+      const layout = d.querySelector<HTMLElement>(".sheet_layout")!;
+      const media = d.querySelector<HTMLElement>(".team-profile_media");
+      const picture = media?.querySelector<HTMLImageElement>("img") ?? null;
+
+      d.addEventListener(
+        "sheet:open",
+        (e) => {
+          end(d);
+          if (calm.matches) return;
+          const { trigger, from } = (e as CustomEvent<{ trigger: Element | null; from: Element | null }>).detail;
+          const row = trigger?.closest<HTMLElement>(".concern-index_item") ?? rowFor(d.id);
+          const src = picture && media ? sourceOf(row, true) : null;
+          const page = [...document.querySelectorAll<HTMLElement>(".nav_inner, main > :not(dialog) > *, body > footer > *")].filter((el) => inView(el.getBoundingClientRect()));
+          const parts = [...layout.children].filter((el): el is HTMLElement => el instanceof HTMLElement && (el !== media || !src));
+          const rules = [...document.querySelectorAll<HTMLElement>("main > .section-rule")].filter((el) => inView(el.getBoundingClientRect()));
+          const run: Run = { page, rules, anims: [], row, follow: src?.follow ?? null, lands: Boolean(from && row?.contains(from)) };
+          runs.set(d, run);
+          d.classList.add("is-moving");
+
+          const leaving = [...page.map(away), ...rules.map(unrule)];
+          run.anims.push(...leaving);
+          Promise.all(leaving.map(settle)).then(() => runs.get(d) === run && d.classList.remove("is-moving"));
+
+          if (src && media && picture) {
+            if (run.follow) run.follow.style.visibility = "hidden";
+            /* the portrait not loaded yet: the list's photo stands in under it */
+            if (!picture.complete && src.img) {
+              const stand = src.img.cloneNode() as HTMLImageElement;
+              stand.className = "team-profile_stand-in";
+              stand.removeAttribute("loading");
+              media.prepend(stand);
+              picture.addEventListener("load", () => stand.remove(), { once: true });
+            }
+            run.anims.push(media.animate([over(src.box, media.getBoundingClientRect()), whole], { duration: ms("--profile-duration"), easing: token("--profile-ease") }));
+          }
+          const wait = ms("--profile-text-wait");
+          const step = ms("--page-enter-stagger");
+          parts.forEach((el, i) => run.anims.push(rise(el, wait + i * step)));
+        },
+        { signal },
+      );
+
+      d.addEventListener(
+        "sheet:close",
+        (e) => {
+          const run = runs.get(d);
+          if (calm.matches || !run) return end(d);
+          const { wait } = (e as CustomEvent<{ wait: (p: Promise<unknown>) => void }>).detail;
+          /* whatever is still moving stops where it is and goes on from there */
+          run.anims.forEach((a) => {
+            try {
+              a.commitStyles();
+            } catch {
+              /* an element not shown */
+            }
+            a.cancel();
+          });
+          run.anims = [];
+          d.classList.add("is-moving");
+
+          let photo: Animation | null = null;
+          const dest = media && picture ? sourceOf(run.row, false) : null;
+          if (media && dest) {
+            const now = { transform: media.style.transform || whole.transform, clipPath: media.style.clipPath || whole.clipPath };
+            clear(media);
+            const frame = media.getBoundingClientRect();
+            if (inView(frame)) {
+              const to = over(dest.box, frame);
+              /* it lands on its row when the focus goes back there (its photo shows again), else it fades as it lands */
+              photo = media.animate(
+                [
+                  { ...now, opacity: 1 },
+                  { opacity: 1, offset: 0.7 },
+                  { ...to, opacity: run.lands ? 1 : 0 },
+                ],
+                { duration: ms("--profile-return-duration"), easing: token("--profile-ease"), fill: "forwards" },
+              );
+              run.anims.push(photo);
+            }
+          }
+          [...layout.children].forEach((el) => {
+            if (el instanceof HTMLElement && !(photo && el === media)) run.anims.push(away(el));
+          });
+          /* the page's blocks come back in, in reading order, as the profile goes */
+          const step = ms("--page-enter-stagger");
+          run.page.forEach((el, i) => {
+            clear(el);
+            rise(el, step * (i + 1));
+          });
+          run.rules.forEach((el) => {
+            clear(el);
+            rerule(el);
+          });
+          wait(Promise.all(run.anims.map(settle)));
+        },
+        { signal },
+      );
+
+      /* closed: everything back as the page wrote it; the photo shows on its row at once if the focus went back there */
+      d.addEventListener(
+        "close",
+        () => {
+          const follow = runs.get(d)?.follow;
+          end(d);
+          if (follow?.closest<HTMLElement>(".concern-index_wrap")?.dataset.follow === "on") {
+            follow.style.transition = "none";
+            void getComputedStyle(follow).opacity;
+            requestAnimationFrame(() => follow.style.removeProperty("transition"));
+          }
+        },
+        { signal },
+      );
+    });
+
+    /* a profile's portrait loads as its name is pointed at, so it is ready when it opens */
+    document.addEventListener(
+      "pointerover",
+      (e) => {
+        const href = (e.target as HTMLElement).closest(".concern-index_item")?.querySelector(".concern-index_link")?.getAttribute("href");
+        const img = href?.startsWith("#") ? document.getElementById(href.slice(1))?.querySelector<HTMLImageElement>(".team-profile_media img") : null;
+        if (img && img.loading !== "eager") img.loading = "eager";
+      },
+      { signal },
+    );
+  });
+</script>
