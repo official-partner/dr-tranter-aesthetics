@@ -10,6 +10,6 @@ export const SITE_URL = config.domain ? `https://${config.domain}` : "https://ex
 /** BCP 47 locale tag: the pages' `lang`, and how dates and numbers are written. */
 export const SITE_LOCALE = "en";
 /** Routes excluded from search and the sitemap. Surrounding slashes are ignored. */
-export const NOINDEX_ROUTES: string[] = ["/404", "/composantes", "/style-sheet"];
+export const NOINDEX_ROUTES: string[] = ["/404", "/composantes", "/style-sheet", "/thank-you"];
 /** The Risks and complications page: every treatment links to it (brief A5, the results-vary rule). */
 export const RISKS_PATH = "/legal/risks-and-complications";

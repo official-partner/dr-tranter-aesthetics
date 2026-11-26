@@ -1,0 +1,113 @@
+---
+interface Props {
+  /** Its id: a link to `#<id>` opens it. */
+  id: string;
+  /** Other addresses that open it (`#enquiry-careers`), each noted on it as `data-via` while open. */
+  also?: string[];
+  /** The id of its title, for screen readers. */
+  labelledby?: string;
+  /** Its ground. */
+  theme?: "dark" | "light" | "stone";
+  class?: string;
+  [key: string]: unknown;
+}
+const { id, also = [], labelledby, theme = "dark", class: className, ...rest } = Astro.props;
+---
+
+{/* A sheet over the page (a team member's profile, Send an enquiry: Figma 4001:958, 4001:265): a dialog on the whole
+    screen with its Back, on the site's grid; a link to its address opens it, Back, Escape or the browser's back close
+    it. Without the script the links stay plain anchors. */}
+<dialog class:list={["sheet_wrap", `theme-${theme}`, className]} id={id} aria-labelledby={labelledby} data-sheet-also={also.join(" ") || undefined} data-lenis-prevent {...rest}>
+  <div class="sheet_layout site-grid section-padding">
+    <button type="button" class="sheet_back text-style-action" data-sheet-close>
+      <span aria-hidden="true">←</span> Back
+    </button>
+    <slot />
+  </div>
+</dialog>
+
+<style is:global>
+  @layer components {
+    /* the sheet covers the page and fades in and out (--open-duration), the page held still under it */
+    .sheet_wrap {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      max-width: none;
+      height: 100%;
+      max-height: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      opacity: 0;
+      transition:
+        opacity var(--open-duration) var(--ease-smooth),
+        overlay var(--open-duration) allow-discrete,
+        display var(--open-duration) allow-discrete;
+      &[open] {
+        opacity: 1;
+        @starting-style {
+          opacity: 0;
+        }
+      }
+      &::backdrop {
+        background: transparent;
+      }
+    }
+    .sheet_layout {
+      row-gap: var(--space-7);
+      align-content: start;
+      min-height: 100%;
+    }
+    .sheet_back {
+      grid-column: margin / end;
+      justify-self: start;
+      display: inline-flex;
+      gap: var(--space-2);
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: color var(--hover-duration) var(--hover-ease);
+      &:hover {
+        color: var(--text);
+      }
+    }
+    @media (width >= 48rem) {
+      .sheet_back {
+        grid-row: 1;
+        grid-column: margin / main;
+        align-self: start;
+      }
+    }
+  }
+</style>
+
+<script>
+  import { onPage } from "@/utils/page";
+
+  onPage((signal) => {
+    const find = (hash: string) =>
+      [...document.querySelectorAll<HTMLDialogElement>(".sheet_wrap")].find((d) => d.id === hash || (d.dataset.sheetAlso ?? "").split(" ").includes(hash));
+    document.addEventListener(
+      "click",
+      (e) => {
+        const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
+        const hash = a?.getAttribute("href")?.slice(1);
+        const d = hash ? find(hash) : undefined;
+        if (!d || !hash) return;
+        e.preventDefault();
+        d.dataset.via = hash;
+        if (!d.open) d.showModal();
+        d.querySelector<HTMLElement>("[data-sheet-close]")?.focus();
+      },
+      { signal },
+    );
+    document.querySelectorAll<HTMLDialogElement>(".sheet_wrap").forEach((d) => {
+      d.querySelector("[data-sheet-close]")?.addEventListener("click", () => d.close(), { signal });
+    });
+  });
+</script>

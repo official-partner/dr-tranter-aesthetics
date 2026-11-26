@@ -1,0 +1,88 @@
+---
+import config from "../../../op.config.json";
+
+/* The clinic's measurement (Mia Endozo's tracking guide, Nov 21, 2026): Google Analytics 4 and the Meta pixel on every
+   page, under Google's Consent Mode; nothing is stored or sent with cookies until the visitor accepts in the consent
+   banner when op.config.json `tracking.consent` is « opt-in » (the default until Dr Sarah decides, step 10), or until
+   they decline when it is « opt-out ». The old tag (G-GLMP9QBG68) and Timely are never carried over. Bookings are
+   reported by Pabau's own page: no booking event here (step 1). Not loaded in development. */
+const tracking = (config as { tracking?: { ga4?: string; metaPixel?: string; consent?: "opt-in" | "opt-out" } }).tracking;
+const on = !!tracking && !import.meta.env.DEV;
+const ga4 = tracking?.ga4;
+const pixel = tracking?.metaPixel;
+const optIn = tracking?.consent !== "opt-out";
+---
+
+{
+  on && (
+    <>
+      <script is:inline define:vars={{ ga4, pixel, optIn }}>
+        (function () {
+          var choice = null;
+          try { choice = localStorage.getItem("dta-consent"); } catch (e) {}
+          var granted = choice ? choice === "granted" : !optIn;
+          var state = granted ? "granted" : "denied";
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function () { dataLayer.push(arguments); };
+          gtag("consent", "default", { ad_storage: state, analytics_storage: state, ad_user_data: state, ad_personalization: state, wait_for_update: 500 });
+          if (ga4) {
+            gtag("js", new Date());
+            gtag("config", ga4);
+            var g = document.createElement("script");
+            g.async = true;
+            g.src = "https://www.googletagmanager.com/gtag/js?id=" + ga4;
+            document.head.appendChild(g);
+          }
+          if (pixel) {
+            !function (f, b, e, v, n, t, s) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = []; t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+            fbq("consent", granted ? "grant" : "revoke");
+            fbq("init", pixel);
+            fbq("track", "PageView");
+          }
+          window.dtaConsent = function (yes) {
+            var v = yes ? "granted" : "denied";
+            try { localStorage.setItem("dta-consent", v); } catch (e) {}
+            gtag("consent", "update", { ad_storage: v, analytics_storage: v, ad_user_data: v, ad_personalization: v });
+            if (window.fbq) fbq("consent", yes ? "grant" : "revoke");
+          };
+        })();
+      </script>
+    </>
+  )
+}
+
+<script>
+  import { onPage } from "@/utils/page";
+
+  /* After a page change made by the site's router, the pixel counts the new page (GA4 counts it from the
+     address change itself, its enhanced measurement). And the ad's source stays on every Pabau link (step 9):
+     the utm tags and click ids the visit came with, kept for the tab, added to each booking and enquiry link. */
+  let first = true;
+  onPage(() => {
+    const w = window as unknown as { fbq?: (...a: unknown[]) => void };
+    if (!first) w.fbq?.("track", "PageView");
+    first = false;
+    const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "fbclid"];
+    const params = new URLSearchParams(location.search);
+    let saved: Record<string, string> = {};
+    try {
+      saved = JSON.parse(sessionStorage.getItem("dta_src") || "{}");
+    } catch {}
+    keys.forEach((k) => {
+      const v = params.get(k);
+      if (v) saved[k] = v;
+    });
+    try {
+      sessionStorage.setItem("dta_src", JSON.stringify(saved));
+    } catch {}
+    if (!Object.keys(saved).length) return;
+    document.querySelectorAll<HTMLAnchorElement | HTMLIFrameElement>('a[href*="booking.pabau.com"], iframe[src*="booking.pabau.com"]').forEach((el) => {
+      const attr = el instanceof HTMLIFrameElement ? "src" : "href";
+      const url = new URL(el.getAttribute(attr)!);
+      Object.entries(saved).forEach(([k, v]) => {
+        if (!url.searchParams.has(k)) url.searchParams.set(k, v);
+      });
+      el.setAttribute(attr, url.toString());
+    });
+  });
+</script>

@@ -1,5 +1,6 @@
 ---
 import Img from "@/components/media/Img.astro";
+import Sheet from "@/components/content/Sheet.astro";
 import { getItems } from "@/utils/content";
 import { pic } from "@/utils/media";
 
@@ -22,11 +23,7 @@ const people = team.map(({ id, data }) => ({
 {
   render &&
     people.map((m) => (
-      <dialog class="team-profile_wrap theme-dark" id={`team-${m.id}`} aria-labelledby={`team-${m.id}-name`} data-lenis-prevent data-op-item={m.id} data-op-source="astro:team">
-        <div class="team-profile_layout site-grid section-padding">
-          <button type="button" class="team-profile_back text-style-action" data-close>
-            <span aria-hidden="true">←</span> Back
-          </button>
+      <Sheet id={`team-${m.id}`} labelledby={`team-${m.id}-name`} class="team-profile_wrap" data-op-item={m.id} data-op-source="astro:team">
           <div class="team-profile_head">
             <h2 class="team-profile_name text-style-h2" id={`team-${m.id}-name`} data-op-field="name">{m.name}</h2>
             {(m.role || m.practice) && <p class="team-profile_role text-style-serif">{[m.role, m.practice].filter(Boolean).join(" · ")}</p>}
@@ -45,61 +42,12 @@ const people = team.map(({ id, data }) => ({
           )}
           {m.bio && <p class="team-profile_bio text-style-main" data-op-field="bio">{m.bio}</p>}
           <div class="team-profile_media media" data-op-field="photo">{m.photo && <Img {...pic(m.photo)} alt={m.photoAlt ?? ""} variant="constrained" sizes="(width >= 48rem) 40vw, 100vw" />}</div>
-        </div>
-      </dialog>
+      </Sheet>
     ))
 }
 
 <style is:global>
   @layer components {
-    /* the profile covers the page, on the dark ground; it fades in and out (--open-duration), the page held still */
-    .team-profile_wrap {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      max-width: none;
-      height: 100%;
-      max-height: none;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      opacity: 0;
-      transition:
-        opacity var(--open-duration) var(--ease-smooth),
-        overlay var(--open-duration) allow-discrete,
-        display var(--open-duration) allow-discrete;
-      &[open] {
-        opacity: 1;
-        @starting-style {
-          opacity: 0;
-        }
-      }
-      &::backdrop {
-        background: transparent;
-      }
-    }
-    .team-profile_layout {
-      row-gap: var(--space-7);
-      align-content: start;
-      min-height: 100%;
-    }
-    .team-profile_back {
-      grid-column: margin / end;
-      justify-self: start;
-      display: inline-flex;
-      gap: var(--space-2);
-      padding: 0;
-      border: 0;
-      background: none;
-      color: var(--text-2);
-      cursor: pointer;
-      transition: color var(--hover-duration) var(--hover-ease);
-      &:hover {
-        color: var(--text);
-      }
-    }
     .team-profile_head,
     .team-profile_facts,
     .team-profile_bio,
@@ -129,14 +77,9 @@ const people = team.map(({ id, data }) => ({
       max-width: 52ch;
     }
     @media (width >= 48rem) {
-      .team-profile_layout {
+      .team-profile_wrap .sheet_layout {
         grid-template-rows: auto auto 1fr auto;
         row-gap: 0;
-      }
-      .team-profile_back {
-        grid-row: 1;
-        grid-column: margin / main;
-        align-self: start;
       }
       .team-profile_head,
       .team-profile_facts,
@@ -163,31 +106,3 @@ const people = team.map(({ id, data }) => ({
     }
   }
 </style>
-
-<script>
-  import { onPage } from "@/utils/page";
-
-  /* A link to #team-<id> opens that profile over the page (its job: show one person without leaving the list); Back,
-     Escape or the browser's back close it. Without the script the links stay plain anchors. */
-  onPage((signal) => {
-    const open = (id: string) => {
-      const d = document.getElementById(id);
-      if (!(d instanceof HTMLDialogElement) || d.open) return false;
-      d.showModal();
-      d.querySelector<HTMLElement>("[data-close]")?.focus();
-      return true;
-    };
-    document.addEventListener(
-      "click",
-      (e) => {
-        const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#team-"]');
-        if (!a) return;
-        if (open(a.getAttribute("href")!.slice(1))) e.preventDefault();
-      },
-      { signal },
-    );
-    document.querySelectorAll<HTMLDialogElement>(".team-profile_wrap").forEach((d) => {
-      d.querySelector("[data-close]")?.addEventListener("click", () => d.close(), { signal });
-    });
-  });
-</script>

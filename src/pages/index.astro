@@ -13,6 +13,7 @@ import CtaBand from "@/components/section/CtaBand.astro";
 const featured = (await getItems("treatments"))
   .filter((t) => t.data.featured)
   .map((t) => ({ id: t.id, name: t.data.name, summary: t.data.summary, href: t.data.statement ? `/treatments/${t.id}` : undefined, image: t.data.image && { src: t.data.image, alt: t.data.imageAlt } }));
+import { clinic } from "@/data/clinic";
 ---
 
 <Layout title="Cosmetic medicine, Byron Bay" overlap>
@@ -33,7 +34,7 @@ const featured = (await getItems("treatments"))
       { title: "Ongoing care", text: "Continuity, so your care evolves&nbsp;as&nbsp;you&nbsp;do.", ids: ["1:105", "1:106", "1:107"] },
     ]}
     image={{ src: "/img/approach.jpg", alt: "Two women talking in the clinic, one holding a folder" }}
-    actions={{ pill: { label: "Learn more", href: "/approach", figma: "1:109" }, link: { label: "Book a consultation →", href: "#consultation", figma: "1:111" } }}
+    actions={{ pill: { label: "Learn more", href: "/approach", figma: "1:109" }, link: { label: "Book a consultation →", href: clinic.booking, figma: "1:111" } }}
     figma={{ band: "approach", top: "2156.19", title: "1:95", image: "1:94" }}
   />
   {/* Featured treatments (Figma 4001:96, Nov 25) */}

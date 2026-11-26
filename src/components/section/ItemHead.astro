@@ -36,6 +36,7 @@ interface Props {
 }
 const { render = true, name, parent = { label: "Concerns", href: "/concerns" }, theme = "inherit", variant = "item", lead, figma = false, statement, facts, image } = Astro.props;
 const f = (id: string) => (figma ? id : undefined);
+import { clinic } from "@/data/clinic";
 ---
 
 {
@@ -66,7 +67,7 @@ const f = (id: string) => (figma ? id : undefined);
             </div>
           ))}
         </dl>
-        {variant !== "article" && <Button element="link" variant="link" href="#consultation" class="at-end item-head_action" data-figma={f("1:452")}>Book a consultation →</Button>}
+        {variant !== "article" && <Button element="link" variant="link" href={clinic.booking} class="at-end item-head_action" data-figma={f("1:452")}>Book a consultation →</Button>}
       </div>
     </section>
   )

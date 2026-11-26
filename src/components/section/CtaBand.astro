@@ -22,10 +22,11 @@ const {
   theme = "stone",
   rule = false,
   label = "Where to start?",
-  action = { label: "Book a consultation", href: "#consultation" },
+  action = { label: "Book a consultation", href: clinic.booking },
   title = "Every new patient begins with<br />a <em>consultation</em>.",
   figma = { top: "6680", label: "1:161", marker: "1:162", title: "1:160", pill: "1:158" },
 } = Astro.props;
+import { clinic } from "@/data/clinic";
 ---
 
 {

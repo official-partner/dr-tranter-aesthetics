@@ -18,6 +18,7 @@ import JournalIndex from "@/components/section/JournalIndex.astro";
 import JournalMore from "@/components/section/JournalMore.astro";
 import GallerySection from "@/components/section/GallerySection.astro";
 import TeamProfiles from "@/components/section/TeamProfiles.astro";
+import Sheet from "@/components/content/Sheet.astro";
 import ArticleBody from "@/components/section/ArticleBody.astro";
 import ArticleCard from "@/components/content/ArticleCard.astro";
 import Filters from "@/components/content/Filters.astro";
@@ -97,6 +98,10 @@ const steps = [
     <ComponentSample file="section/JournalMore.astro" note="Trois autres articles sous un article, avec leur date."><JournalMore self="pigmentation-vs-redness" /></ComponentSample>
     <ComponentSample file="section/GallerySection.astro" note="Un titre, son texte et trois photos disposées comme le Journal (The space, The Clinic).">
       <GallerySection theme="mist" title="The space" text="The clinic was designed to feel considered rather than clinical." images={[{ src: "/img/clinic-space-room.jpg" }, { src: "/img/clinic-space-stool.jpg" }, { src: "/img/clinic-space-bed.jpg" }]} />
+    </ComponentSample>
+    <ComponentSample file="content/Sheet.astro" note="Une feuille par-dessus la page (la fiche d'un membre, Send an enquiry) : un lien vers son adresse l'ouvre, Back ou Échap la ferment.">
+      <p class="text-style-main"><a href="#sheet-sample">Open the sample sheet</a></p>
+      <Sheet id="sheet-sample" labelledby="sheet-sample-title"><h2 class="text-style-h2" id="sheet-sample-title">A sheet over the page</h2></Sheet>
     </ComponentSample>
     <ComponentSample file="section/TeamProfiles.astro" note="Le profil d'un membre de l'équipe, ouvert par-dessus Our team (Full profile ou son nom). Lien d'essai : #team-sarah-tranter.">
       <p class="text-style-main"><a href="#team-sarah-tranter">Open Dr Sarah Tranter's profile</a></p>

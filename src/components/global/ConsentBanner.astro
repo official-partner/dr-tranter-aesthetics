@@ -1,0 +1,81 @@
+---
+import Button from "@/components/Button.astro";
+import config from "../../../op.config.json";
+
+/* The consent banner (Mia Endozo's tracking guide, step 10): it asks once, and the visitor's choice drives GA4 and
+   the Meta pixel through Consent Mode (Tracking.astro). Shown only where the site measures, and only to a visitor who
+   has not chosen yet; without JavaScript it never shows and nothing is measured with cookies. No design in the
+   Figma: drawn from the system (a dark panel at the foot, the site's pills). */
+const on = !!(config as { tracking?: unknown }).tracking;
+---
+
+{
+  on && (
+    <aside class="consent_wrap theme-dark" aria-label="Cookies" hidden data-consent>
+      <p class="consent_text text-style-main">
+        We use cookies to understand how the site is used and to measure our advertising, only if you accept. <a href="/legal/privacy-policy">Privacy policy</a>
+      </p>
+      <Button element="button" data-consent-choice="yes">Accept</Button>
+      <Button element="button" emphasis="secondary" data-consent-choice="no">Decline</Button>
+    </aside>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* a small panel at the foot of the screen, over the page; it fades in once the page is there */
+    .consent_wrap {
+      position: fixed;
+      inset: auto var(--site-margin) var(--site-margin) var(--site-margin);
+      z-index: var(--z-overlay, 50);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-5) var(--space-4);
+      max-width: 32rem;
+      padding: var(--space-6);
+      /* a hairline, so it reads on the dark grounds too */
+      border: var(--border-width) solid var(--text-3);
+      opacity: 1;
+      transition: opacity var(--open-duration) var(--ease-smooth);
+      @starting-style {
+        opacity: 0;
+      }
+      &[hidden] {
+        display: none;
+      }
+    }
+    /* the words on their own line, the two pills under them */
+    .consent_text {
+      flex-basis: 100%;
+      & a {
+        color: inherit;
+      }
+    }
+  }
+</style>
+
+<script>
+  import { onPage } from "@/utils/page";
+
+  onPage((signal) => {
+    const banner = document.querySelector<HTMLElement>("[data-consent]");
+    if (!banner) return;
+    let chosen: string | null = null;
+    try {
+      chosen = localStorage.getItem("dta-consent");
+    } catch {}
+    if (chosen) return;
+    banner.hidden = false;
+    banner.querySelectorAll<HTMLElement>("[data-consent-choice]").forEach((b) =>
+      b.addEventListener(
+        "click",
+        () => {
+          const w = window as unknown as { dtaConsent?: (yes: boolean) => void };
+          w.dtaConsent?.(b.dataset.consentChoice === "yes");
+          banner.hidden = true;
+        },
+        { signal },
+      ),
+    );
+  });
+</script>

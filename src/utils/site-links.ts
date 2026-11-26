@@ -17,8 +17,8 @@ export const clinicLinks: SiteLink[] = [
 
 /* LinkedIn is the menu's only: the footer as drawn has four */
 export const connectLinks: SiteLink[] = [
-  { label: "Contact", href: "/" },
-  { label: "Careers", href: "/" },
+  { label: "Contact", href: "#enquiry" },
+  { label: "Careers", href: "#enquiry-careers" },
   { label: "Facebook", href: "/" },
   { label: "Instagram", href: "/" },
   { label: "LinkedIn", href: "/", footer: false },

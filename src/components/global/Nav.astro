@@ -16,6 +16,7 @@ interface Props {
 }
 
 const { render = true, theme = "dark", quiet = false } = Astro.props;
+import { clinic } from "@/data/clinic";
 ---
 
 {
@@ -25,7 +26,7 @@ const { render = true, theme = "dark", quiet = false } = Astro.props;
       <div class="nav_inner site-grid">
         <Logo class="nav_logo" data-figma="1:65" />
         <div class="nav_actions at-end">
-          <Button element="link" href="#consultation" data-figma="1:67">
+          <Button element="link" href={clinic.booking} data-figma="1:67">
             Book a consultation
           </Button>
           <button class="nav_toggle" type="button" aria-label="Open the menu" aria-expanded="false" aria-controls="site-menu" data-menu-toggle>

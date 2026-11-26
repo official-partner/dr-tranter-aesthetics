@@ -1,0 +1,71 @@
+---
+import Sheet from "@/components/content/Sheet.astro";
+import { clinic } from "@/data/clinic";
+/* Send an enquiry (Figma 4001:265), over every page: Contact, Careers, The Clinic's « Send an enquiry » and the
+   vouchers open it. The form is the clinic's Pabau form, not one of the site's (Mia Endozo's tracking guide, step 7:
+   its enquiries become leads in Pabau, which no form of the site could send). Opened from Careers, it says so first
+   (brief C5). Pabau's own embed code, once the clinic sends it, replaces the frame. */
+---
+
+<Sheet id="enquiry" also={["enquiry-careers"]} labelledby="enquiry-title" class="enquiry_wrap">
+  <h2 class="enquiry_title text-style-h2" id="enquiry-title">Send an enquiry</h2>
+  <hr class="enquiry_rule" />
+  <p class="enquiry_label text-style-label">Enquiry</p>
+  <div class="enquiry_body">
+    <p class="enquiry_careers text-style-main">We're always glad to hear from experienced practitioners who share the clinic's approach to considered, evidence-led care. Send us your details and a little about your background below.</p>
+    <iframe class="enquiry_form" src={clinic.enquiryForm} title="Enquiry form" loading="lazy"></iframe>
+  </div>
+</Sheet>
+
+<style is:global>
+  @layer components {
+    .enquiry_title,
+    .enquiry_label,
+    .enquiry_body {
+      grid-column: margin / end;
+    }
+    /* the head's hairline, edge to edge */
+    .enquiry_rule {
+      grid-column: margin / end;
+      margin: var(--space-10) calc(var(--site-margin) * -1) 0;
+      border: 0;
+      border-top: var(--border-width) solid var(--text-3);
+    }
+    .enquiry_body {
+      display: grid;
+      gap: var(--space-7);
+    }
+    .enquiry_careers {
+      display: none;
+      max-width: 52ch;
+    }
+    .enquiry_wrap[data-via="enquiry-careers"] .enquiry_careers {
+      display: block;
+    }
+    .enquiry_form {
+      width: 100%;
+      height: 44rem;
+      border: 0;
+      background: var(--background);
+    }
+    @media (width >= 48rem) {
+      .enquiry_title {
+        grid-row: 1;
+        grid-column: main / end;
+      }
+      .enquiry_rule {
+        grid-row: 2;
+      }
+      .enquiry_label,
+      .enquiry_body {
+        grid-row: 3;
+      }
+      .enquiry_label {
+        grid-column: margin / main;
+      }
+      .enquiry_body {
+        grid-column: main / end;
+      }
+    }
+  }
+</style>

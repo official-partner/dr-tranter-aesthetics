@@ -9,6 +9,9 @@ import PageTransitions from "@/components/system/PageTransitions.astro";
 import SmoothScroll from "@/components/system/SmoothScroll.astro";
 import CopyCase from "@/components/system/CopyCase.astro";
 import CutSwap from "@/components/system/CutSwap.astro";
+import Enquiry from "@/components/global/Enquiry.astro";
+import Tracking from "@/components/system/Tracking.astro";
+import ConsentBanner from "@/components/global/ConsentBanner.astro";
 import type { SeoProps } from "@/types.ts";
 import { SITE_LOCALE } from "@/consts.ts";
 import { finishes } from "@/utils/finishes.ts";
@@ -60,6 +63,7 @@ const { smoothScroll } = finish;
 >
   <head>
     <BaseHead {...seo} />
+    <Tracking />
     {loader && <Loader part="head" preset={loader} />}
     {transition && <PageTransitions part="head" preset={transition} />}
     {
@@ -81,6 +85,8 @@ const { smoothScroll } = finish;
       <slot />
     </main>
     <Footer logo={footerLogo} />
+    <Enquiry />
+    <ConsentBanner />
     <CopyCase />
     <CutSwap />
   </body>

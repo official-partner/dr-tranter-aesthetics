@@ -19,5 +19,10 @@
   "templates": {
     "concerns": "Concern"
   },
-  "loaderTheme": "dark"
+  "loaderTheme": "dark",
+  "tracking": {
+    "ga4": "G-MZGQJ0YGF3",
+    "metaPixel": "290507879678831",
+    "consent": "opt-in"
+  }
 }

@@ -1,0 +1,16 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import PageHead from "@/components/section/PageHead.astro";
+
+/* The page Pabau's enquiry form opens once sent (Mia Endozo's tracking guide, step 8): out of the menu and of search
+   engines (NOINDEX_ROUTES), it records the enquiry in GA4 (submit_lead_form) and Meta (Lead), under the visitor's
+   consent like every measure of the site. */
+---
+
+<Layout title="Thank you" description="Your enquiry has reached the clinic." navTheme="light">
+  <PageHead title="Thank you <em>for your enquiry.</em>" text="It has reached our team, and we will be in touch soon." action={{ label: "Back to the home page →", href: "/" }} />
+  <script is:inline>
+    if (window.gtag) gtag("event", "submit_lead_form");
+    if (window.fbq) fbq("track", "Lead");
+  </script>
+</Layout>

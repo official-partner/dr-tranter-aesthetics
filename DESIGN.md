@@ -180,6 +180,15 @@ StepsSection, DetailsSection; a treatment's page, Nov 25).
   CSS), role and years in practice, credentials, areas of expertise, treatments performed, bio, the portrait from the
   half rail; it fades on `--open-duration`. Opened by any link to `#team-<id>`.
 
+## Booking, enquiry and consent (Nov 25)
+- Every Book button leads to the clinic's Pabau booking page (`clinic.booking`, src/data/clinic.ts), as Mia Endozo's
+  tracking guide asks; the Figma's Book a consultation pop-up (4001:237) is not built while that holds.
+- Send an enquiry (Figma 4001:265) is a Sheet (`content/Sheet.astro`, the profiles' too) on every page, opened by
+  `#enquiry` (Contact, The Clinic, the vouchers) or `#enquiry-careers` (Careers: the brief's C5 line first); its form
+  is Pabau's Capture Form 14 in a frame, to be replaced by Pabau's own embed code.
+- The consent banner: a dark panel with a hairline at the foot of the screen, the site's two pills; no design in the
+  Figma.
+
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside
   (the Figma's 23 high at 1728), `--space-1` apart, a column under the group's name on a computer, a wrapping row on a
