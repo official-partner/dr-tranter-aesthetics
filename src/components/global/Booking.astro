@@ -37,7 +37,7 @@ const facts = [
   <hr class="sheet_rule booking_rule" />
   <p class="booking_label text-style-label">What to expect</p>
   <IndexList steps={steps} wide list="booking-steps" class="booking_steps" />
-  <div class="booking_action stack">
+  <div class="booking_action sheet_card theme-stone stack">
     <p class="text-style-main">The time is chosen on the clinic's booking page.</p>
     {/* the two ways on, side by side (Sam, Nov 26, comment 33) */}
     <div class="booking_buttons">
@@ -102,9 +102,18 @@ const facts = [
       .booking_label {
         grid-column: margin / main;
       }
+      /* the stone block edge to edge of the grid, as the Figma's booking box, its words from the main rail */
       .booking_action {
         grid-row: 4;
-        grid-column: main / end;
+        grid-column: margin / end;
+        display: grid;
+        grid-template-columns: subgrid;
+        row-gap: var(--space-5);
+        padding-inline: 0;
+        padding-block: var(--space-8);
+        & > * {
+          grid-column: main / end;
+        }
       }
     }
   }

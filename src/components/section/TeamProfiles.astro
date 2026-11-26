@@ -198,7 +198,7 @@ const people = team.map(({ id, data }) => ({
       if (!run) return;
       run.anims.forEach((a) => a.cancel());
       [...run.page, ...run.rules].forEach(clear);
-      d.querySelectorAll<HTMLElement>(".sheet_layout > *").forEach(clear);
+      d.querySelectorAll<HTMLElement>(".sheet_layout > *, .sheet_bar").forEach(clear);
       d.querySelectorAll(".team-profile_stand-in").forEach((n) => n.remove());
       if (run.follow) run.follow.style.visibility = "";
       d.classList.remove("is-moving");
@@ -219,7 +219,8 @@ const people = team.map(({ id, data }) => ({
           const row = trigger?.closest<HTMLElement>(".concern-index_item") ?? rowFor(d.id);
           const src = picture && media ? sourceOf(row, true) : null;
           const page = [...document.querySelectorAll<HTMLElement>(".registration_wrap, .nav_inner, main > :not(dialog) > *, body > footer > *")].filter((el) => inView(el.getBoundingClientRect()));
-          const parts = [...layout.children].filter((el): el is HTMLElement => el instanceof HTMLElement && (el !== media || !src));
+          const bar = d.querySelector<HTMLElement>(".sheet_bar");
+          const parts = [...(bar ? [bar] : []), ...layout.children].filter((el): el is HTMLElement => el instanceof HTMLElement && (el !== media || !src));
           const rules = [...document.querySelectorAll<HTMLElement>("main > .section-rule")].filter((el) => inView(el.getBoundingClientRect()));
           const run: Run = { page, rules, anims: [], row, follow: src?.follow ?? null };
           runs.set(d, run);

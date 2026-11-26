@@ -31,10 +31,15 @@ const panelProps = panel ? { class: `sheet_panel theme-${theme}` } : {};
     pop-up, the scrim above it close it. Without the script the links stay plain anchors. */}
 <dialog class:list={["sheet_wrap", panel ? "is-panel" : `theme-${theme}`, className]} id={id} aria-labelledby={labelledby} data-sheet-also={also.join(" ") || undefined} data-lenis-prevent data-sheet-motion={panel ? undefined : "own"} data-sheet-catch={catches} {...rest}>
   <Panel {...panelProps}>
-    <div class="sheet_layout site-grid section-padding">
+    {/* Back stays in reach while the sheet scrolls (Sam, Nov 26): a bar of no height held at the top of the scroll,
+        Back in it at its place on the grid; a stand-in of the same words keeps that place in the layout */}
+    <div class="sheet_bar site-grid">
       <button type="button" class="sheet_back text-style-action" data-sheet-close>
         <span aria-hidden="true">←</span> Back
       </button>
+    </div>
+    <div class="sheet_layout site-grid section-padding">
+      <span class="sheet_back sheet_back-space text-style-action" aria-hidden="true">← Back</span>
       <slot />
     </div>
   </Panel>
@@ -82,8 +87,9 @@ const panelProps = panel ? { class: `sheet_panel theme-${theme}` } : {};
        d'à peu près 15 vh »), in step with a page change: the scrim darkens the page (--sheet-scrim of the ink, over
        --sheet-scrim-duration) while the panel rises from the foot of the screen under its mask, as an arriving page
        does (clip-path and --page-shift, --sheet-duration on --sheet-ease), and stops --sheet-gap from the top; it
-       scrolls inside. Closing: it goes back down under its mask (--sheet-leave-duration on --sheet-leave-ease) as the
-       scrim clears. A click on the scrim closes it. Reduced motion: both fade. */
+       scrolls inside. Closing: the same gesture backwards (Sam, Nov 26: « la même transition que l'apparition »), it
+       goes back down under its mask (--sheet-leave-duration on --sheet-leave-ease, the arrival's own) as the scrim
+       clears. A click on the scrim closes it. Reduced motion: both fade. */
     .sheet_wrap.is-panel {
       overflow: hidden;
       background: transparent;
@@ -93,8 +99,9 @@ const panelProps = panel ? { class: `sheet_panel theme-${theme}` } : {};
       &[open]::backdrop {
         animation: sheet-scrim var(--sheet-scrim-duration) var(--ease-smooth) backwards;
       }
+      /* its own keyframes: the same name played in reverse would not start again, it would cut to its end */
       &[data-leaving]::backdrop {
-        animation: sheet-scrim var(--sheet-leave-duration) var(--ease-smooth) reverse forwards;
+        animation: sheet-scrim-out var(--sheet-leave-duration) var(--ease-smooth) forwards;
       }
       & .sheet_panel {
         position: absolute;
@@ -106,12 +113,14 @@ const panelProps = panel ? { class: `sheet_panel theme-${theme}` } : {};
         animation: sheet-rise var(--sheet-duration) var(--sheet-ease) backwards;
       }
       &[data-leaving] .sheet_panel {
-        animation: sheet-rise var(--sheet-leave-duration) var(--sheet-leave-ease) reverse forwards;
+        animation: sheet-sink var(--sheet-leave-duration) var(--sheet-leave-ease) forwards;
       }
       @media (prefers-reduced-motion: reduce) {
-        &[open] .sheet_panel,
-        &[data-leaving] .sheet_panel {
+        &[open] .sheet_panel {
           animation-name: sheet-scrim;
+        }
+        &[data-leaving] .sheet_panel {
+          animation-name: sheet-scrim-out;
         }
       }
     }
@@ -125,8 +134,23 @@ const panelProps = panel ? { class: `sheet_panel theme-${theme}` } : {};
         translate: 0 0;
       }
     }
+    @keyframes sheet-sink {
+      from {
+        clip-path: inset(0 0 0 0);
+        translate: 0 0;
+      }
+      to {
+        clip-path: inset(100% 0 0 0);
+        translate: 0 var(--page-shift);
+      }
+    }
     @keyframes sheet-scrim {
       from {
+        opacity: 0;
+      }
+    }
+    @keyframes sheet-scrim-out {
+      to {
         opacity: 0;
       }
     }
@@ -141,27 +165,49 @@ const panelProps = panel ? { class: `sheet_panel theme-${theme}` } : {};
       border: 0;
       border-top: var(--border-width) solid var(--text-3);
     }
+    .sheet_bar {
+      position: sticky;
+      top: 0;
+      z-index: var(--z-raised);
+      height: 0;
+      overflow: visible;
+    }
     .sheet_back {
       grid-column: margin / end;
       justify-self: start;
       display: inline-flex;
       gap: var(--space-2);
-      padding: 0;
-      border: 0;
-      background: none;
       color: var(--text-2);
+    }
+    /* the button on the sheet's ground, so what scrolls under it never shows through its words */
+    .sheet_bar .sheet_back {
+      margin-top: calc(var(--section-padding) - var(--space-2));
+      margin-left: calc(var(--space-2) * -1);
+      padding: var(--space-2);
+      border: 0;
+      background-color: var(--background);
       cursor: pointer;
       transition: color var(--hover-duration) var(--hover-ease);
       &:hover {
         color: var(--text);
       }
     }
+    .sheet_back-space {
+      visibility: hidden;
+    }
     @media (width >= 48rem) {
       .sheet_back {
-        grid-row: 1;
         grid-column: margin / main;
+      }
+      .sheet_back-space {
+        grid-row: 1;
         align-self: start;
       }
+    }
+    /* a block of the sheet set on the lighter ground (the stone), its words and its form or its way on (Send an
+       enquiry, Book a consultation; Sam, Nov 26: « un mix de light et de blanc ») */
+    .sheet_card {
+      padding: var(--space-6);
     }
   }
 </style>

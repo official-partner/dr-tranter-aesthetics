@@ -4,16 +4,19 @@ import { clinic } from "@/data/clinic";
 /* Send an enquiry (Figma 4001:265), over every page: Contact, Careers, The Clinic's « Send an enquiry » and the
    vouchers open it. The form is the clinic's Pabau form, not one of the site's (Mia Endozo's tracking guide, step 7:
    its enquiries become leads in Pabau, which no form of the site could send). Opened from Careers, it says so first
-   (brief C5). Pabau's own embed code, once the clinic sends it, replaces the frame. */
+   (brief C5). Pabau's own embed code, once the clinic sends it, replaces the frame. On the sand, the form on the
+   stone (Sam, Nov 26: « light mode, un mix de light et de blanc »). */
 ---
 
-<Sheet id="enquiry" also={["enquiry-careers"]} labelledby="enquiry-title" class="enquiry_wrap">
+<Sheet id="enquiry" also={["enquiry-careers"]} labelledby="enquiry-title" theme="light" class="enquiry_wrap">
   <h2 class="enquiry_title text-style-h2" id="enquiry-title">Send an enquiry</h2>
   <hr class="sheet_rule enquiry_rule" />
   <p class="enquiry_label text-style-label">Enquiry</p>
   <div class="enquiry_body">
     <p class="enquiry_careers text-style-main">We're always glad to hear from experienced practitioners who share the clinic's approach to considered, evidence-led care. Send us your details and a little about your background below.</p>
-    <iframe class="enquiry_form" src={clinic.enquiryForm} title="Enquiry form" loading="lazy"></iframe>
+    <div class="sheet_card theme-stone">
+      <iframe class="enquiry_form" src={clinic.enquiryForm} title="Enquiry form" loading="lazy"></iframe>
+    </div>
   </div>
 </Sheet>
 

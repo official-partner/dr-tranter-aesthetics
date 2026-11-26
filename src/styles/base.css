@@ -82,10 +82,11 @@
   --sheet-gap: 15vh;
   --sheet-duration: var(--page-arrive-duration);
   --sheet-ease: var(--page-arrive-ease);
-  --sheet-leave-duration: 700ms;
-  --sheet-leave-ease: var(--ease-curtain);
+  --sheet-leave-duration: var(--sheet-duration);
+  --sheet-leave-ease: var(--sheet-ease);
   --sheet-scrim: var(--tone-muted);
   --sheet-scrim-duration: var(--open-duration);
+  --z-raised: 2;
   --pinned-top: calc(var(--site-margin) + var(--pill-y));
   --page-dim: 0.55;
   --menu-open-duration: 1000ms;

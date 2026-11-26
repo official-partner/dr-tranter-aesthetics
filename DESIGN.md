@@ -212,7 +212,12 @@ marker rail from a tablet up, centred on its first line's capitals: PageHead, No
 - Pop-ups (Book a consultation, Send an enquiry; Sam, Nov 26: « file aux transitions de page »): the scrim darkens the
   page (`--sheet-scrim` of the ink), the panel rises from the foot under its mask as an arriving page
   (`--sheet-duration`, `--sheet-ease`, the page's own) and stops `--sheet-gap` (15vh) from the top, scrolling inside;
-  a click on the scrim, Back or Escape sends it back down (`--sheet-leave-duration`). The profile of Our team stays a
+  a click on the scrim, Back or Escape sends it back down, the same gesture backwards (`--sheet-leave-duration` and
+  `--sheet-leave-ease` are the arrival's; the leaving has keyframes of its own, `sheet-sink` and `sheet-scrim-out`: the
+  same keyframes played in reverse cut straight to their end, Sam, Nov 26: « une transition sec »). Back stays at the top
+  of a sheet as it scrolls (`sheet_bar`, sticky, of no height, Back on the sheet's ground; a stand-in keeps its place in
+  the layout). Both pop-ups are on the sand with their form or their way on in a block on the stone (`sheet_card`;
+  Sam: « un mix de light et de blanc »; the stone is the system's lightest ground, no white in the palette). The profile of Our team stays a
   whole screen (a page of its own, Sam's words), closing in a plain crossfade.
 - The cookie banner: a quiet strip at the foot, the words and the two pills on one line, close padding (Sam, Nov 26).
 - Send an enquiry (Figma 4001:265) is a Sheet (`content/Sheet.astro`, the profiles' too) on every page, opened by
