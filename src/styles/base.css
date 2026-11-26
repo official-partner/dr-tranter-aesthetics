@@ -87,6 +87,7 @@
   --sheet-scrim: var(--tone-muted);
   --sheet-scrim-duration: var(--open-duration);
   --z-raised: 2;
+  --z-strip: 11;
   --pinned-top: calc(var(--site-margin) + var(--pill-y));
   --page-dim: 0.55;
   --menu-open-duration: 1000ms;

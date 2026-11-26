@@ -88,6 +88,25 @@ const { render = true } = Astro.props;
         top: 100%;
       }
     }
+    /* The menu open while the strip shows (Sam, Nov 26): the strip is part of the menu, at the top of the screen, the
+       bar right under it and the panel under the bar, so the menu's button stays where the bar puts it and the logo and
+       Book stay in view. The strip's place in the page is kept (no jump under the scrim); its height is
+       --registration-height, written by the script below. */
+    html:is([data-menu="open"], [data-menu="closing"]) .site-top:has(> .registration_wrap:not([hidden])) {
+      min-height: var(--registration-height);
+      & > .registration_wrap {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: var(--z-strip);
+      }
+      & > .nav_wrap {
+        top: var(--registration-height);
+      }
+      & .menu_wrap {
+        top: var(--registration-height);
+        max-height: calc(100svh - var(--registration-height));
+      }
+    }
     @media (width >= 64rem) {
       .registration_row {
         grid-column: main / end;
@@ -104,6 +123,10 @@ const { render = true } = Astro.props;
      one place a height moves, once) and stays closed for the tab's session. Reduced motion: it goes at once. */
   onPage((signal) => {
     const strip = document.querySelector<HTMLElement>(".registration_wrap");
+    /* its height, for the menu opened over it */
+    const measure = () => document.documentElement.style.setProperty("--registration-height", strip && !strip.hidden ? `${strip.offsetHeight}px` : "0px");
+    measure();
+    addEventListener("resize", measure, { signal });
     strip?.querySelector("[data-registration-close]")?.addEventListener(
       "click",
       () => {
@@ -122,6 +145,7 @@ const { render = true } = Astro.props;
           .animate([{ height: `${h}px`, opacity: 1 }, { height: "0px", paddingBlock: "0px", opacity: 0 }], { duration, easing })
           .finished.then(() => {
             strip.hidden = true;
+            /* the menu's button to its new place, the strip's height to none (Nav and measure, on resize) */
             dispatchEvent(new Event("resize"));
             lift?.cancel();
           });

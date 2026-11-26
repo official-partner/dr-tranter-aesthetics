@@ -203,7 +203,8 @@ marker rail from a tablet up, centred on its first line's capitals: PageHead, No
   the link to Pabau, in place of the Figma's booking widget; « Not ready to book? » opens Send an enquiry in its place.
   Without the script a Book button goes straight to Pabau.
 - The registration banner (Figma 4001:300; `global/Registration.astro`): a strip on the sand above the bar on the home
-  only (Sam, Nov 26), its × folds it away for the visit (session), the notice from the main rail, « Read more » to Risks at the right edge; on a phone the link goes under it. The
+  only (Sam, Nov 26), its × folds it away for the visit (session); the menu opened while it shows takes it along, at the
+  top of the screen, the bar and the panel under it (`--registration-height`), the notice from the main rail, « Read more » to Risks at the right edge; on a phone the link goes under it. The
   strip and the bar are one block (`site-top` in BaseLayout): the bar lies over the page right under the strip, the
   page's own spacing unchanged. The AHPRA number is one fact (`clinic.ahpra`), read by the footer and the strip.
 - A sheet shows its address (`#book`, `#enquiry`, `#sarah-tranter`), a step the site's router makes (never the

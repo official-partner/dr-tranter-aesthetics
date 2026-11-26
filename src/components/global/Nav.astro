@@ -196,6 +196,12 @@ import { clinic } from "@/data/clinic";
   import { onPage } from "@/utils/page";
   import { pageLenis } from "@/utils/smooth-scroll";
 
+  /* a page change's motion over: the button takes the colours of what is under it now (nav:retint, below) */
+  document.addEventListener("astro:before-swap", (e) => {
+    const vt = (e as Event & { viewTransition?: { finished: Promise<void> } }).viewTransition;
+    vt?.finished.then(() => dispatchEvent(new Event("nav:retint"))).catch(() => undefined);
+  });
+
   /* The menu: opened and closed by the nav's button, closed by Escape, the scrim or a link; the page behind it inert
      and still; the nav's bar takes the menu's colours while it is open; focus goes in, then back to the button. The
      button itself stays on screen at every scroll, in the colours of the section under it. */
@@ -240,7 +246,13 @@ import { clinic } from "@/data/clinic";
         const r = toggle.getBoundingClientRect();
         const under = document.elementsFromPoint(r.x + r.width / 2, r.y + r.height / 2).find((el) => !nav.contains(el));
         const host = under?.closest('[class*="theme-"]');
-        name = [...(host?.classList ?? [])].find((c) => c.startsWith("theme-")) ?? "theme-light";
+        name = [...(host?.classList ?? [])].find((c) => c.startsWith("theme-"));
+        /* nothing themed under it (a page change's snapshot covers the page while it runs): keep its colours until
+           the page shows again, never a guess that could match the ground (Sam, Nov 26: « le menu burger... invisible ») */
+        if (!name) {
+          if (old) return;
+          name = "theme-light";
+        }
       }
       if (old === name) return;
       if (old) toggle.classList.remove(old);
@@ -252,6 +264,13 @@ import { clinic } from "@/data/clinic";
     tint();
     document.fonts?.ready.then(() => { place(); tint(); });
     window.addEventListener("scroll", follow, { signal, passive: true });
+    /* and again once a page change, the loading screen or the arriving page's motion is over: while they run, what is
+       under the button is their cover, not the page */
+    window.addEventListener("nav:retint", follow, { signal });
+    const watch = new MutationObserver(follow);
+    watch.observe(root, { attributes: true, attributeFilter: ["data-loader", "data-arrive", "data-page-transition"] });
+    signal.addEventListener("abort", () => watch.disconnect());
+    [300, 1200].forEach((t) => timers.push(window.setTimeout(follow, t)));
     window.addEventListener("resize", () => { place(); follow(); }, { signal });
     signal.addEventListener("abort", () => cancelAnimationFrame(frame));
 
