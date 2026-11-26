@@ -5,5 +5,33 @@
   "category": "Laser & light",
   "image": "../../assets/content/treatments/pico-laser.jpg",
   "imageAlt": "Skin texture, close-up",
+  "statement": "Considered for *pigmentation and sun damage* with minimal downtime.",
+  "duration": "20–30 min",
+  "downtime": "Minimal",
+  "sessions": "Course of 3–6, 4 weeks apart",
+  "device": "Pico laser platform",
+  "deviceText": "Picosecond pulse technology",
+  "how": "The laser delivers energy in picosecond pulses, breaking up pigment with little heat, which may lower the risk of pigment changes after treatment. It suits a broad range of skin tones, confirmed at consultation.",
+  "addresses": [
+    {
+      "id": "pigmentation",
+      "concern": "pigmentation"
+    },
+    {
+      "id": "melasma",
+      "concern": "melasma"
+    }
+  ],
+  "suits": "Patients with pigmentation, redness or textural concerns suited to light or laser-based treatment.",
+  "notSuitable": "Recent significant sun exposure, certain skin tones or conditions, active infection, or pregnancy.",
+  "assessed": "Skin type, sun exposure history and the specific concern are reviewed before a course is planned.",
+  "before": "Skin is cleansed and eye protection provided for the treatment.",
+  "during": "The device is passed across the treatment area in controlled passes, adjusted for your skin type.",
+  "after": "Redness and, depending on intensity, light peeling are expected for several days.",
+  "risks": "Risks may include prolonged redness, pigment changes or, rarely, scarring; discussed in full at consultation.",
+  "alongside": [
+    "co2-laser-resurfacing",
+    "cosmelan"
+  ],
   "order": 8
 }

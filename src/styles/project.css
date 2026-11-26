@@ -216,3 +216,9 @@
   padding-top: var(--section-padding);
   padding-bottom: var(--section-padding);
 }
+
+/* A band that follows another on the same ground starts on a hairline (a treatment's How it works, What it may address,
+   Tailored to your skin: Figma 4001:413), as the blocks of a concern's body do */
+.section-rule {
+  border-top: var(--border-width) solid var(--text-3);
+}

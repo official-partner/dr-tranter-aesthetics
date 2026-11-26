@@ -1,9 +1,45 @@
 {
   "name": "EMFACE",
-  "summary": "Muscle toning, no downtime",
+  "summary": "Muscle toning device",
   "intro": "Non-invasive support for facial muscle tone and underlying structure, with no downtime and no recovery period.",
   "category": "RF treatments",
   "image": "../../assets/content/treatments/emface.jpg",
   "imageAlt": "Treatment handpiece above the brow, close-up",
+  "statement": "Non-invasive support for *facial muscle tone and structure,* no downtime.",
+  "duration": "20 min",
+  "downtime": "None",
+  "sessions": "Course of 4, weekly",
+  "device": "InMode EMFACE",
+  "deviceText": "Synchronised RF and HIFES",
+  "how": "EMFACE combines radiofrequency and muscle stimulation in one applicator, with no needles and no downtime. We use it as the ongoing-maintenance step between more intensive courses.",
+  "addresses": [
+    {
+      "id": "volume-loss",
+      "concern": "volume-loss"
+    },
+    {
+      "id": "jawline-and-chin",
+      "concern": "jawline-and-chin"
+    },
+    {
+      "id": "skin-laxity",
+      "concern": "skin-laxity"
+    },
+    {
+      "id": "expression-lines",
+      "concern": "expression-lines"
+    }
+  ],
+  "suits": "Patients with mild to moderate concerns who want a considered option without surgery.",
+  "notSuitable": "Active skin infections, certain pigmentary conditions, pacemakers or implanted devices, or pregnancy.",
+  "assessed": "Skin condition, laxity and any contraindicating conditions are reviewed in consultation.",
+  "before": "Skin is cleansed and a topical anaesthetic applied to minimise discomfort.",
+  "during": "The device is passed across the treatment area, with settings adjusted to your skin and goals.",
+  "after": "Mild redness and swelling are expected for a short period afterwards.",
+  "risks": "Risks may include prolonged redness, pigment changes or, rarely, infection; discussed in full at consultation.",
+  "alongside": [
+    "cosmetic-treatments",
+    "facetite"
+  ],
   "order": 6
 }

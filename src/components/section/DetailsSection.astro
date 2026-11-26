@@ -1,0 +1,127 @@
+---
+import Button from "@/components/Button.astro";
+
+interface Detail {
+  /** Its name: « Who it suits », « Before ». */
+  title: string;
+  /** Its text. */
+  text: string;
+  /** The item's field that holds the text, for OP System's Contenu and Edit. */
+  field?: string;
+  /** A link under the text (« Read more → » to the Risks page). */
+  action?: { label: string; href: string };
+}
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Start on a hairline, after a band on the same ground. */
+  rule?: boolean;
+  /** Section title; emphasis with <em>. */
+  title: string;
+  /** The details in groups, two to a row; a hairline between groups. A group of `labels` names its details in small
+      capitals (Who it suits), a group of `names` in the index's style (Before, During). */
+  groups: { kind?: "labels" | "names"; items: Detail[] }[];
+  /** Color theme. */
+  theme?: "inherit" | "light" | "stone" | "mist";
+}
+const { render = true, rule = false, title, groups, theme = "inherit" } = Astro.props;
+const shown = groups.map((g) => ({ ...g, items: g.items.filter((i) => i.text) })).filter((g) => g.items.length > 0);
+---
+
+{/* A title, then pairs of a name and its text, two to a row on the main rail (a treatment's What to expect: Figma
+    4001:413, Nov 25). */}
+{
+  render && shown.length > 0 && (
+    <section class:list={["details-section_wrap section-padding", theme !== "inherit" && `theme-${theme}`, rule && "section-rule"]}>
+      <div class="details-section_layout site-grid">
+        <h2 class="details-section_title text-style-h2" set:html={title} />
+        {shown.map((g) => (
+          <dl class:list={["details-section_group", g.kind === "names" && "is-names"]}>
+            {g.items.map((i) => (
+              <div class="details-section_item">
+                <dt class:list={["details-section_name", g.kind === "names" ? "text-style-index" : "text-style-label"]}>{i.title}</dt>
+                <dd class="details-section_text text-style-main" data-op-field={i.field}>{i.text}</dd>
+                {i.action && (
+                  <dd class="details-section_action">
+                    <Button element="link" variant="link" href={i.action.href}>{i.action.label}</Button>
+                  </dd>
+                )}
+              </div>
+            ))}
+          </dl>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* it ends wide, on purpose, as every section that breathes */
+    .details-section_wrap {
+      padding-bottom: var(--section-padding-wide);
+    }
+    .details-section_layout {
+      row-gap: var(--space-7);
+    }
+    .details-section_title {
+      grid-column: margin / end;
+      max-width: 11ch;
+    }
+    .details-section_group {
+      grid-column: margin / end;
+      display: grid;
+      row-gap: var(--space-7);
+      margin: 0;
+      & + .details-section_group {
+        padding-top: var(--space-8);
+        border-top: var(--border-width) solid var(--text-3);
+      }
+    }
+    .details-section_item {
+      display: flex;
+      flex-direction: column;
+      max-width: 44ch;
+    }
+    .details-section_text {
+      margin: var(--space-3) 0 0;
+    }
+    .details-section_action {
+      margin: var(--space-action) 0 0;
+    }
+    @media (width >= 48rem) {
+      .details-section_layout {
+        grid-template-rows: auto;
+        align-items: start;
+      }
+      .details-section_title {
+        grid-row: 1 / span 2;
+        grid-column: margin / main;
+      }
+      .details-section_group {
+        grid-column: main / end;
+        grid-template-columns: subgrid;
+        & + .details-section_group {
+          margin-top: calc(var(--space-8) - var(--space-7));
+        }
+      }
+      .details-section_item {
+        grid-column: main / span 2;
+        &:nth-child(even) {
+          grid-column: aside / end;
+        }
+      }
+    }
+    @media (width >= 64rem) {
+      .details-section_title {
+        grid-column: margin / span 3;
+      }
+      .details-section_item {
+        grid-column: main / span 3;
+        &:nth-child(even) {
+          grid-column: third / span 3;
+        }
+      }
+    }
+  }
+</style>

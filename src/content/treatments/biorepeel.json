@@ -1,6 +1,40 @@
 {
   "name": "BioRePeel",
+  "summary": "Bio-exfoliating peel",
   "intro": "A gentler option for congestion, dullness and early texture concerns, with little or no downtime afterwards.",
   "category": "Facials & peels",
+  "statement": "A gentler option for *congestion, dullness and early texture* concerns.",
+  "duration": "30 min",
+  "downtime": "Minimal",
+  "sessions": "Course of 4–6, 1–2 weeks apart",
+  "addresses": [
+    {
+      "id": "pigmentation",
+      "concern": "pigmentation"
+    },
+    {
+      "id": "texture-and-scarring",
+      "concern": "texture-and-scarring"
+    },
+    {
+      "id": "congestion",
+      "concern": "congestion"
+    },
+    {
+      "id": "dullness",
+      "concern": "dullness"
+    }
+  ],
+  "suits": "Most skin types looking for a lower-downtime option, often as part of an ongoing plan.",
+  "notSuitable": "Active skin infection, certain sensitivities, or recent more intensive treatment in the same area.",
+  "assessed": "Skin condition and any recent treatments are reviewed to confirm suitability.",
+  "before": "Skin is cleansed and assessed before treatment begins.",
+  "during": "Your practitioner applies the treatment, adjusting pressure and product to your skin's response.",
+  "after": "Skin may appear slightly flushed immediately afterwards, settling within a few hours.",
+  "risks": "This treatment carries minimal risk; mild sensitivity or temporary redness is possible.",
+  "alongside": [
+    "morpheus8",
+    "co2-laser-resurfacing"
+  ],
   "order": 15
 }

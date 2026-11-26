@@ -14,40 +14,47 @@ interface Fact {
 interface Props {
   /** Set to `false` to omit the component. */
   render?: boolean;
-  /** The concern's name. */
+  /** The item's name (a concern, a treatment). */
   name: string;
+  /** The page it belongs to, for Back and the crumb. */
+  parent?: { label: string; href: string };
+  /** Its ground. */
+  theme?: "inherit" | "mist";
+  /** Carry the Figma ids of the Melasma frame (the measured page only). */
+  figma?: boolean;
   /** The opening statement, a formatted text (Markdown): *words* are set in the lighter cut. */
   statement: string;
   /** Consultation facts: label and value. */
   facts: Fact[];
-  /** The concern's picture. */
+  /** The item's picture. */
   image?: { src: Pic; alt?: string };
 }
-const { render = true, name, statement, facts, image } = Astro.props;
+const { render = true, name, parent = { label: "Concerns", href: "/concerns" }, theme = "inherit", figma = false, statement, facts, image } = Astro.props;
+const f = (id: string) => (figma ? id : undefined);
 ---
 
 {
   render && (
-    <section class="concern-head_wrap section-padding" data-figma-band="top" data-band-top="0">
-      <div class="concern-head_layout site-grid">
-        <a class="concern-head_back text-style-action inset-optical" href="/concerns" data-figma="1:450"><span class="concern-head_arrow" aria-hidden="true">→</span>Back</a>
-        <span class="marker concern-head_marker" data-figma="1:358" />
-        <h1 class="concern-head_name lead-marker text-style-h2" data-op-field="name" data-figma="1:434">{name}</h1>
-        <p class="concern-head_crumb text-style-action" data-figma="1:453"><a class="concern-head_up" href="/concerns">Concerns</a> / <span class="concern-head_current">{name}</span></p>
-        <p class="concern-head_statement text-style-h2" data-op-field="statement" data-figma="1:357" data-cut-swap set:html={inlineRich(statement)} />
-        {/* the frame stays, empty, while the concern's photo is still to come (DESIGN.md, Global classes: media) */}
-        <div class="concern-head_media media ratio-5-6" data-op-field="image" data-figma="1:359">
+    <section class:list={["item-head_wrap section-padding", theme !== "inherit" && `theme-${theme}`]} data-figma-band={f("top")} data-band-top={f("0")}>
+      <div class="item-head_layout site-grid">
+        <a class="item-head_back text-style-action inset-optical" href={parent.href} data-figma={f("1:450")}><span class="item-head_arrow" aria-hidden="true">→</span>Back</a>
+        <span class="marker item-head_marker" data-figma={f("1:358")} />
+        <h1 class="item-head_name lead-marker text-style-h2" data-op-field="name" data-figma={f("1:434")}>{name}</h1>
+        <p class="item-head_crumb text-style-action" data-figma={f("1:453")}><a class="item-head_up" href={parent.href}>{parent.label}</a> / <span class="item-head_current">{name}</span></p>
+        <p class="item-head_statement text-style-h2" data-op-field="statement" data-figma={f("1:357")} data-cut-swap set:html={inlineRich(statement)} />
+        {/* the frame stays, empty, while the item's photo is still to come (DESIGN.md, Global classes: media) */}
+        <div class="item-head_media media ratio-5-6" data-op-field="image" data-figma={f("1:359")}>
           {image && <Img {...pic(image.src)} alt={image.alt ?? ""} loading="eager" fetchPriority="high" variant="constrained" sizes="(width >= 48rem) 25vw, 75vw" />}
         </div>
-        <dl class="concern-head_facts">
+        <dl class="item-head_facts">
           {facts.map((f) => (
-            <div class="concern-head_fact stack">
+            <div class="item-head_fact stack">
               <dt class="text-style-label" data-figma={f.ids?.[0]}>{f.label}</dt>
               <dd class="text-style-serif" data-op-field={f.field} data-figma={f.ids?.[1]}>{f.value}</dd>
             </div>
           ))}
         </dl>
-        <Button element="link" variant="link" href="#consultation" class="at-end concern-head_action" data-figma="1:452">Book a consultation →</Button>
+        <Button element="link" variant="link" href="#consultation" class="at-end item-head_action" data-figma={f("1:452")}>Book a consultation →</Button>
       </div>
     </section>
   )
@@ -92,12 +99,12 @@ const { render = true, name, statement, facts, image } = Astro.props;
           --_swap-weight var(--swap-duration) var(--cut-ease);
       }
     }
-    .concern-head_wrap {
+    .item-head_wrap {
       display: flex;
       flex-direction: column;
       min-height: var(--band-concern);
     }
-    .concern-head_layout {
+    .item-head_layout {
       flex: 1;
       row-gap: var(--space-7);
       align-items: start;
@@ -105,7 +112,7 @@ const { render = true, name, statement, facts, image } = Astro.props;
     /* Back comes to the text's colour on hover and on focus (Sam, comment 15, Nov 24: « hover sur le back, devient
        noir »); « Concerns » in the crumb leads to the Concerns page and answers the other way, from the text's colour
        to the quieter one (comment 16: « concern cliquable »). */
-    .concern-head_back {
+    .item-head_back {
       grid-column: margin / end;
       display: inline-flex;
       gap: var(--space-3);
@@ -114,43 +121,43 @@ const { render = true, name, statement, facts, image } = Astro.props;
         color: var(--text);
       }
     }
-    .concern-head_up {
+    .item-head_up {
       color: inherit;
       text-decoration: none;
       &:focus-visible {
         color: var(--text-2);
       }
     }
-    .concern-head_back,
-    .concern-head_up {
+    .item-head_back,
+    .item-head_up {
       transition: color var(--hover-duration) var(--hover-ease);
     }
     @media (hover: hover) {
-      .concern-head_back:hover {
+      .item-head_back:hover {
         color: var(--text);
       }
-      .concern-head_up:hover {
+      .item-head_up:hover {
         color: var(--text-2);
       }
     }
-    .concern-head_arrow {
+    .item-head_arrow {
       display: inline-block;
       rotate: 180deg;
     }
-    .concern-head_marker {
+    .item-head_marker {
       display: none;
     }
-    .concern-head_name,
-    .concern-head_crumb,
-    .concern-head_statement,
-    .concern-head_media,
-    .concern-head_facts {
+    .item-head_name,
+    .item-head_crumb,
+    .item-head_statement,
+    .item-head_media,
+    .item-head_facts {
       grid-column: margin / end;
     }
-    .concern-head_current {
+    .item-head_current {
       color: var(--text-2);
     }
-    .concern-head_statement {
+    .item-head_statement {
       max-width: 24ch;
       /* on a computer it takes its six columns (Sam, comment 9, Nov 24: « prendre 1 colonne de plus pour ce texte »:
          the measure of 24 characters held it to about five) */
@@ -158,89 +165,103 @@ const { render = true, name, statement, facts, image } = Astro.props;
         max-width: none;
       }
     }
-    .concern-head_facts {
+    .item-head_facts {
       display: flex;
-      gap: var(--space-8);
+      flex-wrap: wrap;
+      gap: var(--space-5) var(--space-8);
     }
     @media (width >= 48rem) {
-      .concern-head_layout {
+      .item-head_layout {
         row-gap: 0;
         grid-template-rows: auto auto 1fr;
       }
-      .concern-head_back,
-      .concern-head_marker,
-      .concern-head_name,
-      .concern-head_crumb {
+      .item-head_back,
+      .item-head_marker,
+      .item-head_name,
+      .item-head_crumb {
         grid-row: 1;
       }
-      .concern-head_back {
+      .item-head_back {
         grid-column: margin / span 2;
       }
-      .concern-head_marker {
+      .item-head_marker {
         display: block;
         margin-top: calc((max(var(--text-action-floor), var(--text-action)) * 0.721 - var(--marker)) / 2);
       }
-      .concern-head_name {
+      .item-head_name {
         grid-column: main / span 3;
       }
-      .concern-head_crumb {
+      .item-head_crumb {
         grid-column: half / span 3;
         align-self: end;
       }
-      .concern-head_statement {
+      .item-head_statement {
         grid-row: 2;
         grid-column: main / span 6;
         margin-top: calc(131.4 * var(--u));
       }
-      .concern-head_media {
+      .item-head_media {
         grid-row: 2 / span 2;
         grid-column: margin / span 2;
         align-self: end;
       }
-      .concern-head_facts,
-      .concern-head_action {
+      .item-head_facts,
+      .item-head_action {
         grid-row: 3;
         align-self: end;
       }
-      .concern-head_facts {
+      .item-head_facts {
         grid-column: main / span 5;
         display: grid;
         grid-template-columns: calc(206 * var(--u)) auto;
         gap: 0;
+        /* three facts or more (a treatment: duration, downtime, sessions): each on its own column of the same step,
+           the last as wide as its words */
+        @media (width >= 64rem) {
+          &:has(> :nth-child(3)) {
+            grid-template-columns: repeat(2, calc(206 * var(--u))) auto;
+          }
+          &:has(> :nth-child(4)) {
+            grid-template-columns: repeat(3, calc(206 * var(--u))) auto;
+          }
+        }
       }
     }
     @media (48rem <= width < 64rem) {
-      .concern-head_back {
+      .item-head_back {
         grid-column: margin;
       }
-      .concern-head_name {
+      .item-head_name {
         grid-column: main / aside;
       }
-      .concern-head_crumb {
+      /* clear of the menu's button, which stays at the top right on a tablet */
+      .item-head_crumb {
         grid-column: aside / end;
         justify-self: end;
         text-align: end;
+        padding-inline-end: calc(var(--burger) + var(--space-5));
       }
-      .concern-head_statement {
+      .item-head_statement {
         grid-column: main / end;
         margin-top: var(--space-9);
       }
-      .concern-head_media {
+      .item-head_media {
         margin-top: var(--space-9);
       }
-      .concern-head_facts {
-        grid-column: main / end;
-        grid-template-columns: repeat(2, max-content);
-        column-gap: var(--space-8);
+      .item-head_facts {
+        grid-column: main / aside;
+        grid-template-columns: repeat(2, minmax(0, max-content));
+        margin-top: var(--space-7);
+        gap: var(--space-5) var(--space-8);
       }
     }
     @media (width < 48rem) {
-      .concern-head_media {
+      .item-head_media {
         grid-column: margin / span 3;
       }
     }
     @media (width < 48rem) {
-      .concern-head_name {
+      .item-head_name {
         --_lead-marker: inline-block;
       }
     }

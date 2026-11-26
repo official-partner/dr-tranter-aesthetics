@@ -1,6 +1,86 @@
 {
   "name": "Morpheus8",
+  "summary": "Radiofrequency microneedling",
   "intro": "Addresses structure and surface together in a single treatment, working on tightening, texture and definition simultaneously.",
   "category": "RF treatments",
+  "statement": "Addresses *structure and surface* together: *tightening, texture and definition.*",
+  "duration": "60–75 min",
+  "downtime": "2–4 days",
+  "sessions": "Course of 3, 4–6 weeks apart",
+  "device": "InMode Morpheus8",
+  "deviceText": "Fractional radiofrequency microneedling",
+  "how": "Morpheus8 combines fine needles with radiofrequency, treating structure and surface in the same pass. Needle depth and energy are adjustable, so a single device can be tuned to the layer we need to reach. It is supported by a substantial body of published research.",
+  "handpieces": [
+    {
+      "id": "morpheus8",
+      "title": "Morpheus8 (Face and neck)",
+      "text": "The original handpiece, for facial tightening, texture and definition."
+    },
+    {
+      "id": "morpheus8-body",
+      "title": "Morpheus8 Body (Body)",
+      "text": "A larger handpiece adapted for tightening and texture on the body."
+    },
+    {
+      "id": "morpheus8-eyes",
+      "title": "Morpheus8 Eyes (Under-eye)",
+      "text": "A precise handpiece for the delicate under-eye area."
+    },
+    {
+      "id": "morpheus8-burst",
+      "title": "Morpheus8 Burst (All areas)",
+      "text": "A handpiece that delivers energy in a faster burst pattern."
+    }
+  ],
+  "addresses": [
+    {
+      "id": "jawline-and-chin",
+      "concern": "jawline-and-chin",
+      "text": "A more defined jawline over a course"
+    },
+    {
+      "id": "skin-laxity",
+      "concern": "skin-laxity",
+      "text": "Improved skin tightness and contour"
+    },
+    {
+      "id": "texture-and-scarring",
+      "concern": "texture-and-scarring",
+      "text": "Reduced appearance of scarring and pores"
+    },
+    {
+      "id": "neck-chest-hands",
+      "concern": "neck-chest-hands",
+      "text": "Treated with the Morpheus8 Body handpiece"
+    }
+  ],
+  "tiers": [
+    {
+      "id": "rejuvenation",
+      "title": "Rejuvenation",
+      "text": "Lower-depth energy for general skin quality and early textural change, with the least downtime of the three."
+    },
+    {
+      "id": "corrective",
+      "title": "Corrective",
+      "text": "Targets more established texture, scarring and early laxity by working at a deeper layer beneath the surface."
+    },
+    {
+      "id": "intensive",
+      "title": "Intensive",
+      "text": "The deepest setting, for structural laxity and more established concerns, usually planned as a course."
+    }
+  ],
+  "suits": "Patients with mild to moderate concerns who want a considered option without surgery.",
+  "notSuitable": "Active skin infections, certain pigmentary conditions, pacemakers or implanted devices, or pregnancy.",
+  "assessed": "Skin condition, laxity and any contraindicating conditions are reviewed in consultation.",
+  "before": "Skin is cleansed and a topical anaesthetic applied to minimise discomfort.",
+  "during": "The device is passed across the treatment area, with settings adjusted to your skin and goals.",
+  "after": "Mild redness and swelling are expected for a short period afterwards.",
+  "risks": "Risks may include prolonged redness, pigment changes or, rarely, infection; discussed in full at consultation.",
+  "alongside": [
+    "cosmetic-treatments",
+    "facetite"
+  ],
   "order": 5
 }

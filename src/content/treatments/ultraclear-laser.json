@@ -1,6 +1,24 @@
 {
   "name": "UltraClear Laser",
+  "summary": "Multi-application laser",
   "intro": "A multi-application laser, with settings ranging from a gentle refresh through to more intensive resurfacing.",
   "category": "Laser & light",
+  "statement": "A multi-application laser platform, with settings *from a gentle refresh to more intensive resurfacing.*",
+  "duration": "30–60 min",
+  "downtime": "Varies by setting",
+  "sessions": "Confirmed at consultation",
+  "device": "UltraClear",
+  "deviceText": "Multi-application fractional laser",
+  "how": "A single platform covering several depths, from a gentle refresh to deeper resurfacing, so fewer devices are needed to cover a full range of skin concerns.",
+  "outcomes": [
+    "Improved texture and tone, tailored to the setting used"
+  ],
+  "suits": "Patients with pigmentation, redness or textural concerns suited to light or laser-based treatment.",
+  "notSuitable": "Recent significant sun exposure, certain skin tones or conditions, active infection, or pregnancy.",
+  "assessed": "Skin type, sun exposure history and the specific concern are reviewed before a course is planned.",
+  "before": "Skin is cleansed and eye protection provided for the treatment.",
+  "during": "The device is passed across the treatment area in controlled passes, adjusted for your skin type.",
+  "after": "Redness and, depending on intensity, light peeling are expected for several days.",
+  "risks": "Risks may include prolonged redness, pigment changes or, rarely, scarring; discussed in full at consultation.",
   "order": 19
 }

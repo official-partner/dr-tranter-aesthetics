@@ -7,6 +7,8 @@ import IndexList from "@/components/content/IndexList.astro";
 interface Props {
   /** Set to `false` to omit the component. */
   render?: boolean;
+  /** Start on a hairline, after a band on the same ground. */
+  rule?: boolean;
   /** Section title; emphasis with <em>. */
   title: string;
   /** The steps, in order. */
@@ -21,6 +23,8 @@ interface Props {
   tall?: boolean;
   /** The picture from the half rail to the edge (Our Approach), not on the aside's three columns. */
   wide?: boolean;
+  /** The steps' text runs to the aside rail (a list with no picture: a treatment's questions). */
+  wideText?: boolean;
   /** End wide, on purpose, as every section that breathes (--section-padding-wide). */
   endWide?: boolean;
   /** A list written in the page: its name for OP System's Modifier. */
@@ -32,15 +36,15 @@ interface Props {
   /** Figma ids for the build review: band name, band top, title, image. */
   figma?: { band: string; top: string; title: string; image: string };
 }
-const { render = true, title, steps, image, actions, theme = "inherit", tall = false, wide = false, endWide = false, list, source, imageField, figma } = Astro.props;
+const { render = true, rule = false, title, steps, image, actions, theme = "inherit", tall = false, wide = false, wideText = false, endWide = false, list, source, imageField, figma } = Astro.props;
 ---
 
 {
   render && steps?.length > 0 && (
-    <section class:list={["steps-section_wrap section-padding", theme !== "inherit" && `theme-${theme}`, tall && "is-tall", wide && "is-wide", endWide && "is-end-wide"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
+    <section class:list={["steps-section_wrap section-padding", theme !== "inherit" && `theme-${theme}`, tall && "is-tall", wide && "is-wide", endWide && "is-end-wide", rule && "section-rule"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
       <div class="steps-section_layout site-grid">
         <h2 class="steps-section_title text-style-h2" data-figma={figma?.title} set:html={title} />
-        <IndexList steps={steps} list={list} source={source} />
+        <IndexList steps={steps} list={list} source={source} wide={wideText} />
         {image && (
           <div class="steps-section_media media" data-op-field={imageField} data-figma={figma?.image}>
             <Img {...pic(image.src)} alt={image.alt ?? ""} variant="constrained" sizes="(width >= 48rem) 40vw, 75vw" />

@@ -1,6 +1,30 @@
 {
   "name": "Excel V+",
-  "intro": "A dedicated vascular laser for redness and visible vessels, treating a wider range of vessel sizes than light alone.",
+  "summary": "Vascular laser",
+  "intro": "A dedicated vascular laser for redness and visible vessels, treating a range of vessel sizes.",
   "category": "Laser & light",
+  "statement": "A dedicated vascular laser for *redness and visible vessels.*",
+  "duration": "20–30 min",
+  "downtime": "Minimal",
+  "sessions": "Course of 3, 4 weeks apart",
+  "device": "Excel V+",
+  "deviceText": "Vascular and pigment laser",
+  "how": "Excel V+ is built for vessels and redness, a dedicated complement to our broader device range, and treats a range of vessel sizes.",
+  "addresses": [
+    {
+      "id": "redness",
+      "concern": "redness"
+    }
+  ],
+  "suits": "Patients with pigmentation, redness or textural concerns suited to light or laser-based treatment.",
+  "notSuitable": "Recent significant sun exposure, certain skin tones or conditions, active infection, or pregnancy.",
+  "assessed": "Skin type, sun exposure history and the specific concern are reviewed before a course is planned.",
+  "before": "Skin is cleansed and eye protection provided for the treatment.",
+  "during": "The device is passed across the treatment area in controlled passes, adjusted for your skin type.",
+  "after": "Redness and, depending on intensity, light peeling are expected for several days.",
+  "risks": "Risks may include prolonged redness, pigment changes or, rarely, scarring; discussed in full at consultation.",
+  "alongside": [
+    "lumecca-ipl"
+  ],
   "order": 18
 }

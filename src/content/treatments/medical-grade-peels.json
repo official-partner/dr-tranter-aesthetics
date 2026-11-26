@@ -1,8 +1,50 @@
 {
   "name": "Medical-Grade Peels",
+  "summary": "Chemical peel",
   "intro": "A course-based option for pigmentation, texture and congestion, with the strength adjusted to suit your skin.",
   "category": "Facials & peels",
   "image": "../../assets/content/treatments/medical-grade-peels.jpg",
   "imageAlt": "Pigmentation around the eye",
+  "statement": "A course-based option for *pigmentation, texture and congestion.*",
+  "duration": "30–45 min",
+  "downtime": "2–5 days, depending on depth",
+  "sessions": "Course-based, discussed at consultation",
+  "addresses": [
+    {
+      "id": "pigmentation",
+      "concern": "pigmentation"
+    },
+    {
+      "id": "texture-and-scarring",
+      "concern": "texture-and-scarring"
+    },
+    {
+      "id": "congestion",
+      "concern": "congestion"
+    },
+    {
+      "id": "dullness",
+      "concern": "dullness"
+    },
+    {
+      "id": "melasma",
+      "concern": "melasma"
+    },
+    {
+      "id": "neck-chest-hands",
+      "concern": "neck-chest-hands"
+    }
+  ],
+  "suits": "Most skin types looking for a lower-downtime option, often as part of an ongoing plan.",
+  "notSuitable": "Active skin infection, certain sensitivities, or recent more intensive treatment in the same area.",
+  "assessed": "Skin condition and any recent treatments are reviewed to confirm suitability.",
+  "before": "Skin is cleansed and assessed before treatment begins.",
+  "during": "Your practitioner applies the treatment, adjusting pressure and product to your skin's response.",
+  "after": "Skin may appear slightly flushed immediately afterwards, settling within a few hours.",
+  "risks": "This treatment carries minimal risk; mild sensitivity or temporary redness is possible.",
+  "alongside": [
+    "morpheus8",
+    "co2-laser-resurfacing"
+  ],
   "order": 13
 }

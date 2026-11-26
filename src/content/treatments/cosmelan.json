@@ -5,5 +5,26 @@
   "category": "Facials & peels",
   "image": "../../assets/content/treatments/cosmelan.jpg",
   "imageAlt": "Skin texture, close-up",
+  "statement": "A structured *depigmentation protocol* developed for melasma, *combining an in-clinic mask with a staged homecare programme.*",
+  "duration": "60 min in-clinic application",
+  "downtime": "Visible peeling, 5–7 days",
+  "sessions": "One in-clinic application, followed by a structured homecare programme",
+  "addresses": [
+    {
+      "id": "melasma",
+      "concern": "melasma"
+    }
+  ],
+  "suits": "Most skin types looking for a lower-downtime option, often as part of an ongoing plan.",
+  "notSuitable": "Active skin infection, certain sensitivities, or recent more intensive treatment in the same area.",
+  "assessed": "Skin condition and any recent treatments are reviewed to confirm suitability.",
+  "before": "Skin is cleansed and assessed before treatment begins.",
+  "during": "Your practitioner applies the treatment, adjusting pressure and product to your skin's response.",
+  "after": "Skin may appear slightly flushed immediately afterwards, settling within a few hours.",
+  "risks": "This treatment carries minimal risk; mild sensitivity or temporary redness is possible.",
+  "alongside": [
+    "pico-laser",
+    "medical-grade-peels"
+  ],
   "order": 9
 }

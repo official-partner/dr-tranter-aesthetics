@@ -60,6 +60,43 @@ const treatments = defineCollection({
         featured: z.boolean().default(false).describe("Featured"),
         image: image().optional().describe("Photo"),
         imageAlt: z.string().optional().describe("Photo description"),
+        statement: z.string().optional().describe("Opening statement (words in italics are set in the lighter cut). The page shows once this is filled"),
+        duration: z.string().optional().describe("Duration"),
+        downtime: z.string().optional().describe("Downtime"),
+        sessions: z.string().optional().describe("Sessions"),
+        performedBy: z.string().optional().describe("Performed by"),
+        device: z.string().optional().describe("How it works: the device"),
+        deviceText: z.string().optional().describe("How it works: the device's technology"),
+        how: z.string().optional().describe("How it works"),
+        handpieces: z
+          .array(z.object({ id: z.string(), title: z.string().describe("Title"), text: z.string().describe("Text") }))
+          .optional()
+          .describe("How it works: the handpieces"),
+        addresses: z
+          .array(
+            z.object({
+              id: z.string(),
+              concern: reference("concerns").describe("Concern"),
+              text: z.string().optional().describe("What it may do for it (else the concern's own line)"),
+            }),
+          )
+          .optional()
+          .describe("What it may address: the concerns"),
+        outcomes: z.array(z.string()).optional().describe("What it may address, for a treatment linked to no concern"),
+        tiers: z
+          .array(z.object({ id: z.string(), title: z.string().describe("Title"), text: z.string().describe("Text") }))
+          .optional()
+          .describe("Tailored to your skin: the settings"),
+        tiersImage: image().optional().describe("Tailored to your skin: the photo"),
+        tiersImageAlt: z.string().optional().describe("Tailored to your skin: photo description"),
+        suits: z.string().optional().describe("Who it suits"),
+        notSuitable: z.string().optional().describe("When it may not be suitable"),
+        assessed: z.string().optional().describe("Assessed first"),
+        before: z.string().optional().describe("Before"),
+        during: z.string().optional().describe("During"),
+        after: z.string().optional().describe("After"),
+        risks: z.string().optional().describe("Risks"),
+        alongside: z.array(reference("treatments")).optional().describe("Often considered alongside"),
         visible: z.boolean().default(true).describe("Visible on the site"),
         draft: z.boolean().default(false).describe("Draft"),
         order: z.number().optional().describe("Order"),

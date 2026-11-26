@@ -1,7 +1,34 @@
 {
   "name": "Biostimulators",
+  "summary": "Collagen-stimulating injectable",
   "intro": "An injectable that works gradually, stimulating the skin's own collagen production over a course of treatments.",
   "category": "Injectables",
   "featured": true,
+  "statement": "An injectable that *works gradually,* stimulating the skin's own collagen *over a course* rather than restoring volume immediately.",
+  "duration": "30–45 min",
+  "downtime": "Minimal",
+  "sessions": "Course of 2–3, 4–6 weeks apart",
+  "addresses": [
+    {
+      "id": "under-eye-hollowing",
+      "concern": "under-eye-hollowing",
+      "text": "Longer-term support for volume and structure"
+    },
+    {
+      "id": "temple-hollowing",
+      "concern": "temple-hollowing",
+      "text": "Gradual improvement in skin firmness"
+    }
+  ],
+  "suits": "Patients seeking to address specific areas of volume or movement, following a full facial assessment.",
+  "notSuitable": "Pregnancy, breastfeeding, active skin infection in the treatment area, or certain allergies.",
+  "assessed": "Facial structure, movement patterns and medical history are reviewed before any treatment is recommended.",
+  "before": "Skin is cleansed and, if needed, a topical numbing cream applied.",
+  "during": "Treatment is administered by your practitioner following assessment of the area.",
+  "after": "Mild swelling, redness or bruising is possible for a few days.",
+  "risks": "Risks may include bruising, swelling, asymmetry or, rarely, more significant complications; discussed in full at consultation.",
+  "alongside": [
+    "cosmetic-treatments"
+  ],
   "order": 3
 }

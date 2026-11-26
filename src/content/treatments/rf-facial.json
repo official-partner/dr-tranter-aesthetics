@@ -1,6 +1,22 @@
 {
   "name": "RF Facial",
+  "summary": "Radiofrequency facial",
   "intro": "A lower-intensity radiofrequency facial for gentle warmth and ongoing skin quality support, with no real downtime.",
   "category": "Facials & peels",
+  "statement": "A lower-intensity radiofrequency facial for *gentle warmth and skin quality support,* no downtime.",
+  "duration": "45–60 min",
+  "downtime": "None",
+  "sessions": "As often as suits your skin",
+  "outcomes": [
+    "A refreshed, tightened feel to the skin",
+    "Support for tone and texture between more intensive courses"
+  ],
+  "suits": "Most skin types looking for a lower-downtime option, often as part of an ongoing plan.",
+  "notSuitable": "Active skin infection, certain sensitivities, or recent more intensive treatment in the same area.",
+  "assessed": "Skin condition and any recent treatments are reviewed to confirm suitability.",
+  "before": "Skin is cleansed and assessed before treatment begins.",
+  "during": "Your practitioner applies the treatment, adjusting pressure and product to your skin's response.",
+  "after": "Skin may appear slightly flushed immediately afterwards, settling within a few hours.",
+  "risks": "This treatment carries minimal risk; mild sensitivity or temporary redness is possible.",
   "order": 17
 }

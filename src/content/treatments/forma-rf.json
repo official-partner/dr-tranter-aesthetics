@@ -1,6 +1,25 @@
 {
   "name": "Forma RF",
+  "summary": "Radiofrequency skin tightening",
   "intro": "A non-invasive radiofrequency treatment for gentle, cumulative skin tightening, taken as a course with no downtime.",
   "category": "RF treatments",
+  "statement": "A non-invasive radiofrequency treatment for *gentle, cumulative skin tightening* with no downtime.",
+  "duration": "30–45 min",
+  "downtime": "None",
+  "sessions": "Course of 4–6, weekly",
+  "device": "InMode Forma",
+  "deviceText": "Dynamic radiofrequency heating",
+  "how": "Forma delivers even, controlled heating across the treated area, monitored in real time. There is no downtime, so it suits an ongoing course alongside other treatments, and it is a gentler option for patients not yet ready for more intensive devices.",
+  "outcomes": [
+    "Improved skin tightness and tone",
+    "A more even, refreshed appearance over a course"
+  ],
+  "suits": "Patients with mild to moderate concerns who want a considered option without surgery.",
+  "notSuitable": "Active skin infections, certain pigmentary conditions, pacemakers or implanted devices, or pregnancy.",
+  "assessed": "Skin condition, laxity and any contraindicating conditions are reviewed in consultation.",
+  "before": "Skin is cleansed and a topical anaesthetic applied to minimise discomfort.",
+  "during": "The device is passed across the treatment area, with settings adjusted to your skin and goals.",
+  "after": "Mild redness and swelling are expected for a short period afterwards.",
+  "risks": "Risks may include prolonged redness, pigment changes or, rarely, infection; discussed in full at consultation.",
   "order": 10
 }

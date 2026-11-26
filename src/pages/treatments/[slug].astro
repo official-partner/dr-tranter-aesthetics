@@ -1,0 +1,164 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import ItemHead from "@/components/section/ItemHead.astro";
+import TextSection from "@/components/section/TextSection.astro";
+import CardGroup from "@/components/section/CardGroup.astro";
+import StepsSection from "@/components/section/StepsSection.astro";
+import DetailsSection from "@/components/section/DetailsSection.astro";
+import CtaBand from "@/components/section/CtaBand.astro";
+import { getItems, getItem } from "@/utils/content";
+import { treatmentFaq } from "@/data/treatment-faq";
+import { RISKS_PATH } from "@/consts";
+
+/* One page per treatment (Figma « Starter (Copy) », frame 4001:413, drawn for Morpheus8), built from the sections of
+   the concern's page and the home: the opening, How it works, What it may address, Tailored to your skin, What to
+   expect, Often considered alongside, the questions and the consultation. A section shows when its fields are filled;
+   a treatment has its page once its opening statement is. */
+export async function getStaticPaths() {
+  const treatments = await getItems("treatments");
+  return treatments.filter((t) => t.data.statement).map((t) => ({ params: { slug: t.id } }));
+}
+
+const { slug } = Astro.params;
+const treatment = slug ? await getItem("treatments", slug) : undefined;
+if (!treatment || !treatment.data.statement) return Astro.rewrite("/404");
+const d = treatment.data;
+const source = `astro:treatments/${treatment.id}`;
+
+const [treatments, concerns] = await Promise.all([getItems("treatments"), getItems("concerns")]);
+const facts = [
+  d.duration && { label: "Duration", value: d.duration, field: "duration" },
+  d.downtime && { label: "Downtime", value: d.downtime, field: "downtime" },
+  d.sessions && { label: "Sessions", value: d.sessions, field: "sessions" },
+  d.performedBy && { label: "Performed by", value: d.performedBy, field: "performedBy" },
+].filter((f) => !!f);
+
+/* How it works: the device and its handpieces on the right */
+const device = [
+  ...(d.device ? [{ title: d.device, text: d.deviceText ?? "" }] : []),
+  ...(d.handpieces ?? []).map((h) => ({ title: h.title, text: h.text })),
+];
+
+/* What it may address: the concerns it is linked to, each with its line for this treatment or its own */
+const addresses = (d.addresses ?? [])
+  .map((a) => ({ a, c: concerns.find((c) => c.id === a.concern.id) }))
+  .filter((x) => x.c !== undefined)
+  .map(({ a, c }) => ({
+    id: c!.id,
+    name: c!.data.name,
+    summary: a.text ?? c!.data.summary,
+    textField: a.text ? (false as const) : undefined,
+    href: c!.data.statement ? `/concerns/${c!.id}` : undefined,
+    image: c!.data.image && { src: c!.data.image, alt: c!.data.imageAlt },
+  }));
+const note = "* Results vary between individuals and are discussed at consultation.";
+
+/* Often considered alongside: its treatments, each linked to its page once it has one */
+const alongside = (d.alongside ?? [])
+  .map((r) => treatments.find((t) => t.id === r.id))
+  .filter((t) => t !== undefined)
+  .map((t) => ({
+    id: t.id,
+    name: t.data.name,
+    summary: t.data.intro,
+    href: t.data.statement ? `/treatments/${t.id}` : undefined,
+    image: t.data.image && { src: t.data.image, alt: t.data.imageAlt },
+  }));
+
+const hasHow = !!d.how;
+const hasAddresses = addresses.length > 0 || (d.outcomes?.length ?? 0) > 0;
+const hasTiers = (d.tiers?.length ?? 0) > 0;
+---
+
+<Layout title={d.name} description={d.intro} nav="menu" navTheme="light">
+  <div data-op-item={treatment.id} data-op-source="astro:treatments">
+    {/* Head */}
+    <ItemHead
+      name={d.name}
+      parent={{ label: "Treatments", href: "/treatments" }}
+      theme="mist"
+      statement={d.statement ?? ""}
+      facts={facts}
+      image={d.image && { src: d.image, alt: d.imageAlt }}
+    />
+    {/* How it works */}
+    {hasHow && (
+      <TextSection theme="stone" title="How <em>it works</em>" text={d.how ?? ""} list={device.length > 0 ? device : undefined} />
+    )}
+    {/* What it may address */}
+    {addresses.length > 0 ? (
+      <CardGroup
+        label="What it may address"
+        title="What <em>it may</em> address"
+        theme="stone"
+        rule={hasHow}
+        collection="concerns"
+        noun="Concern"
+        link="View concern →"
+        list="addresses"
+        source={`${source}#addresses`}
+        items={addresses}
+        note={note}
+      />
+    ) : (
+      d.outcomes && d.outcomes.length > 0 && (
+        <TextSection theme="stone" rule={hasHow} title="What <em>it may</em> address" text={`${d.outcomes.join(". ")}. ${note}`} />
+      )
+    )}
+    {/* Tailored to your skin */}
+    {hasTiers && (
+      <StepsSection
+        title="Tailored to <em>your skin</em>"
+        theme="stone"
+        rule={hasHow || hasAddresses}
+        endWide
+        steps={d.tiers ?? []}
+        list="tiers"
+        source={`${source}#tiers`}
+        imageField="tiersImage"
+        image={d.tiersImage && { src: d.tiersImage, alt: d.tiersImageAlt }}
+      />
+    )}
+    {/* What to expect */}
+    <DetailsSection
+      title="What <em>to expect</em>"
+      theme="light"
+      groups={[
+        {
+          items: [
+            { title: "Who it suits", text: d.suits ?? "", field: "suits" },
+            { title: "When it may not be suitable", text: d.notSuitable ?? "", field: "notSuitable" },
+            { title: "Assessed first", text: d.assessed ?? "", field: "assessed" },
+          ],
+        },
+        {
+          kind: "names",
+          items: [
+            { title: "Before", text: d.before ?? "", field: "before" },
+            { title: "During", text: d.during ?? "", field: "during" },
+            { title: "After", text: d.after ?? "", field: "after" },
+            { title: "Risks", text: d.risks ?? "", field: "risks", action: { label: "Read more →", href: RISKS_PATH } },
+          ],
+        },
+      ]}
+    />
+    {/* Often considered alongside */}
+    <CardGroup
+      label="Often considered alongside"
+      title="Often considered <em>alongside</em>"
+      theme="stone"
+      collection="treatments"
+      noun="Treatment"
+      textField="intro"
+      link="View treatment →"
+      list="alongside"
+      source={`${source}#alongside`}
+      items={alongside}
+      action={{ label: "All treatments →", href: "/treatments" }}
+    />
+  </div>
+  {/* Questions */}
+  <StepsSection title="FAQ" theme="mist" endWide wideText steps={treatmentFaq} list="treatment-faq" source="src/data/treatment-faq.ts" />
+  {/* Consultation */}
+  <CtaBand title={`<em>Ready to talk about</em><br />${d.name}?`} figma={undefined} />
+</Layout>

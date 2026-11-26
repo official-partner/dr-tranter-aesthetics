@@ -1,6 +1,39 @@
 {
   "name": "Lumecca IPL",
+  "summary": "Intense pulsed light",
   "intro": "Addresses pigmentation and visible redness across the face, chest and hands, using targeted intense pulsed light.",
   "category": "Laser & light",
+  "statement": "Addresses *pigmentation and visible redness* across the face.",
+  "duration": "20–30 min",
+  "downtime": "Minimal",
+  "sessions": "Course of 3, 3–4 weeks apart",
+  "device": "InMode Lumecca",
+  "deviceText": "High-intensity broadband light",
+  "how": "Lumecca delivers high energy per pulse, which may mean fewer sessions overall. Its broad spectrum targets both pigment and visible vessels in the same treatment, across a wide range of skin types.",
+  "addresses": [
+    {
+      "id": "pigmentation",
+      "concern": "pigmentation"
+    },
+    {
+      "id": "redness",
+      "concern": "redness"
+    },
+    {
+      "id": "neck-chest-hands",
+      "concern": "neck-chest-hands"
+    }
+  ],
+  "suits": "Patients with pigmentation, redness or textural concerns suited to light or laser-based treatment.",
+  "notSuitable": "Recent significant sun exposure, certain skin tones or conditions, active infection, or pregnancy.",
+  "assessed": "Skin type, sun exposure history and the specific concern are reviewed before a course is planned.",
+  "before": "Skin is cleansed and eye protection provided for the treatment.",
+  "during": "The device is passed across the treatment area in controlled passes, adjusted for your skin type.",
+  "after": "Redness and, depending on intensity, light peeling are expected for several days.",
+  "risks": "Risks may include prolonged redness, pigment changes or, rarely, scarring; discussed in full at consultation.",
+  "alongside": [
+    "morpheus8",
+    "co2-laser-resurfacing"
+  ],
   "order": 11
 }

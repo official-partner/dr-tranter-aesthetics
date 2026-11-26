@@ -79,7 +79,9 @@ against the right edge), `marker` (the small square), `inset-optical` (the optic
 `media` (an image box: ratio class, the picture absolute, cover, centred; ratios 5:6, 1.45, 16:10, 9:7, 7:10, 1:1;
 a frame whose photo is still to come stays, empty, on `--background-skeleton`, so the composition holds: Nov 20),
 `link-list` (a list of plain links: no underline, on hover, on focus and for the page shown the link slides `--space-2` right and a square 0.8 marker shows before it; with a mouse one square glides from link to link and rests on the page shown, src/utils/link-marker.ts; the menu and the footer, Nov 20 and 24), `linked-card` (a block with a photo and a link is one link: its `data-card-link` stretches over it, and its photo comes forward on hover; Card, the journal's cards, a concern page's treatment cards; Sam, Nov 24), `stacked-card` (a card's picture as wide as the card, its texts stacked: Card, the journal, the products), `section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
-for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
+for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width), `section-rule` (a band that follows
+another on the same ground starts on a hairline, `--text-3`: a section's `rule` prop, TextSection, CardGroup,
+StepsSection, DetailsSection; a treatment's page, Nov 25).
 
 ## The menu's motion (Nov 20)
 - One thing at a time: the cross forms (`--hover-duration`, out curve); a curtain clips the panel open from the top
@@ -130,6 +132,16 @@ for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width).
   the screen (height less two margins; width at `--people-ratio`, at most half the screen). A portrait changes as the
   curtain does, from the bottom going down (`--people-swap-duration`, `--people-swap-ease`), and settles
   (`--media-settle-scale`). Names off the square at `--people-dim`. The title's word rolls (`--roll-duration`).
+
+## A treatment's page (Nov 25)
+- Figma « Starter (Copy) » 4001:413, drawn for Morpheus8, built from the concern's and the home's sections: ItemHead
+  (the concern's opening, made general: its parent page in the crumb, its ground; mist here), TextSection (How it
+  works, the device and its handpieces on the right), CardGroup with a title (What it may address, the concerns with
+  the results-vary note; Often considered alongside, with All treatments), StepsSection (Tailored to your skin; the
+  questions on mist, their text to the aside rail: `wideText`), DetailsSection (What to expect on sand: pairs two to a
+  row, a hairline between the suitability group and the steps), CtaBand. A section shows when its fields are filled.
+- The head's facts: three or four on a computer on the same 206 step, the last as wide as its words; on a tablet two to
+  a row from the main rail to the aside, clear of the link; the crumb clear of the menu's button on a tablet.
 
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside

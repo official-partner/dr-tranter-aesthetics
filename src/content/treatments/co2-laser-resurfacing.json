@@ -1,7 +1,35 @@
 {
   "name": "CO2 Laser Resurfacing",
+  "summary": "Ablative resurfacing",
   "intro": "Considered for deeper texture, scarring and pigmentation concerns where a more intensive approach is clinically appropriate.",
   "category": "Laser & light",
-  "order": 7,
-  "summary": "Ablative resurfacing"
+  "statement": "Considered for *deeper texture, scarring* and pigmentation concerns.",
+  "duration": "45–60 min",
+  "downtime": "5–7 days",
+  "sessions": "Typically one, course discussed at consultation",
+  "device": "CO2 laser platform",
+  "deviceText": "Ablative fractional resurfacing",
+  "how": "A long-established technology for deeper texture and scarring. Fractional delivery means only a portion of the skin is treated per pass, for controlled, predictable healing. It is reserved for concerns established enough to justify its downtime.",
+  "addresses": [
+    {
+      "id": "pigmentation",
+      "concern": "pigmentation"
+    },
+    {
+      "id": "texture-and-scarring",
+      "concern": "texture-and-scarring"
+    }
+  ],
+  "suits": "Patients with pigmentation, redness or textural concerns suited to light or laser-based treatment.",
+  "notSuitable": "Recent significant sun exposure, certain skin tones or conditions, active infection, or pregnancy.",
+  "assessed": "Skin type, sun exposure history and the specific concern are reviewed before a course is planned.",
+  "before": "Skin is cleansed and eye protection provided for the treatment.",
+  "during": "The device is passed across the treatment area in controlled passes, adjusted for your skin type.",
+  "after": "Redness and, depending on intensity, light peeling are expected for several days.",
+  "risks": "Risks may include prolonged redness, pigment changes or, rarely, scarring; discussed in full at consultation.",
+  "alongside": [
+    "morpheus8",
+    "pico-laser"
+  ],
+  "order": 7
 }

@@ -1,6 +1,45 @@
 {
   "name": "Medical Facials",
+  "summary": "Medical facial",
   "intro": "A considered, clinical alternative to spa-style facials, chosen for skin quality support between your other procedures.",
   "category": "Facials & peels",
+  "statement": "A considered, *clinical alternative to spa-style facials,* chosen for skin quality support between other procedures.",
+  "duration": "45–60 min",
+  "downtime": "None",
+  "sessions": "As often as suits your skin",
+  "addresses": [
+    {
+      "id": "dullness",
+      "concern": "dullness"
+    }
+  ],
+  "tiers": [
+    {
+      "id": "enzyme-facial",
+      "title": "Enzyme Facial",
+      "text": "A gentle enzymatic exfoliation that resurfaces without abrasion, suited to sensitive or reactive skin."
+    },
+    {
+      "id": "signature-facial",
+      "title": "Signature Facial",
+      "text": "Our considered, all-round facial: cleansing, exfoliation and hydration tailored at the time of treatment."
+    },
+    {
+      "id": "fire-and-ice-facial",
+      "title": "Fire and Ice Facial",
+      "text": "A warming and cooling dual-phase facial that calms while it resurfaces, for an immediate, visible result."
+    }
+  ],
+  "suits": "Most skin types looking for a lower-downtime option, often as part of an ongoing plan.",
+  "notSuitable": "Active skin infection, certain sensitivities, or recent more intensive treatment in the same area.",
+  "assessed": "Skin condition and any recent treatments are reviewed to confirm suitability.",
+  "before": "Skin is cleansed and assessed before treatment begins.",
+  "during": "Your practitioner applies the treatment, adjusting pressure and product to your skin's response.",
+  "after": "Skin may appear slightly flushed immediately afterwards, settling within a few hours.",
+  "risks": "This treatment carries minimal risk; mild sensitivity or temporary redness is possible.",
+  "alongside": [
+    "medical-grade-peels",
+    "biorepeel"
+  ],
   "order": 14
 }

@@ -1,6 +1,32 @@
 {
   "name": "Hydrafacial",
+  "summary": "Hydradermabrasion",
   "intro": "Deep cleansing and hydration considered for congestion and dullness, often used alongside your other ongoing treatments.",
   "category": "Facials & peels",
+  "statement": "Deep cleansing and hydration *considered for congestion and dullness.*",
+  "duration": "45 min",
+  "downtime": "None",
+  "sessions": "As often as suits your skin",
+  "addresses": [
+    {
+      "id": "congestion",
+      "concern": "congestion"
+    },
+    {
+      "id": "dullness",
+      "concern": "dullness"
+    }
+  ],
+  "suits": "Most skin types looking for a lower-downtime option, often as part of an ongoing plan.",
+  "notSuitable": "Active skin infection, certain sensitivities, or recent more intensive treatment in the same area.",
+  "assessed": "Skin condition and any recent treatments are reviewed to confirm suitability.",
+  "before": "Skin is cleansed and assessed before treatment begins.",
+  "during": "Your practitioner applies the treatment, adjusting pressure and product to your skin's response.",
+  "after": "Skin may appear slightly flushed immediately afterwards, settling within a few hours.",
+  "risks": "This treatment carries minimal risk; mild sensitivity or temporary redness is possible.",
+  "alongside": [
+    "medical-grade-peels",
+    "signature-facial"
+  ],
   "order": 16
 }

@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/BaseLayout.astro";
-import ConcernHead from "@/components/section/ConcernHead.astro";
+import ItemHead from "@/components/section/ItemHead.astro";
 import ConcernBody from "@/components/section/ConcernBody.astro";
 import StepsSection from "@/components/section/StepsSection.astro";
 import ProductsSection from "@/components/section/ProductsSection.astro";
@@ -78,7 +78,7 @@ const facts = [
 <Layout title={d.name} nav="menu" navTheme="light">
   <div data-op-item={concern.id} data-op-source="astro:concerns">
     {/* Head */}
-    <ConcernHead name={d.name} statement={d.statement ?? ""} facts={facts} image={d.image && { src: d.image, alt: d.imageAlt }} />
+    <ItemHead figma={F} name={d.name} statement={d.statement ?? ""} facts={facts} image={d.image && { src: d.image, alt: d.imageAlt }} />
     {/* What is happening, what we would consider */}
     <ConcernBody
       happening={{ text: d.happening, steps: d.factors?.map((f, i) => ({ ...f, ids: fid(factorIds[i] ?? []) })), source: `astro:concerns/${concern.id}#factors` }}

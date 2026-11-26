@@ -9,6 +9,8 @@ interface Item {
   summary?: string;
   href?: string;
   image?: { src: Pic; alt?: string };
+  /** The item's field its line comes from, when not the group's (false: the line is written elsewhere). */
+  textField?: string | false;
   /** Its filter (a category's name), when the group has filters. */
   category?: string;
   /** Hidden while no filter is chosen (it shows in a group above). */
@@ -19,11 +21,15 @@ interface Item {
 interface Props {
   /** Set to `false` to omit the component. */
   render?: boolean;
+  /** Start on a hairline, after a band on the same ground. */
+  rule?: boolean;
   /** The group's name (Structure, Surface, Featured treatments, Filter by). */
   label: string;
   /** A title in place of the name and its square (the home's Featured treatments, Nov 25): its words, `<em>` for the
       lighter cut. */
   title?: string;
+  /** A short note under the cards (« * Results vary… », a treatment's What it may address). */
+  note?: string;
   /** A pill under the cards (« All treatments → »). */
   action?: { label: string; href: string };
   /** Its ground. */
@@ -42,10 +48,13 @@ interface Props {
   filters?: { all: string; values: string[]; ids?: string[] };
   /** The list's name for OP System, when a page has two groups of the same collection. */
   list?: string;
+  /** Where the list is written, when it is an item's field and not the collection itself:
+      `astro:<collection>/<item>#<field>` (a treatment's concerns). */
+  source?: string;
   /** Figma ids for the build review: band name, band top, label, marker. */
   figma?: { band: string; top: string; label: string; marker: string };
 }
-const { render = true, label, title, action, theme = "light", collection, noun, textField = "summary", link = "View →", items, filters, list, figma } = Astro.props;
+const { render = true, rule = false, label, title, note, action, theme = "light", collection, noun, textField = "summary", link = "View →", items, filters, list, source, figma } = Astro.props;
 const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 ---
 
@@ -53,7 +62,7 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
     row from the main rail (Figma 59:602, 59:983, Nov 20). With filters, a pill per category under the name. */}
 {
   render && items.length > 0 && (
-    <section class:list={["card-group_wrap section-padding", `theme-${theme}`, title && "has-title"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
+    <section class:list={["card-group_wrap section-padding", `theme-${theme}`, title && "has-title", rule && "section-rule"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
       <div class="card-group_layout site-grid">
         <div class="card-group_head">
           {title ? (
@@ -70,13 +79,14 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
           )}
         </div>
         {!title && <span class="marker card-group_marker" data-figma={figma?.marker} />}
-        <ul class="card-group_list" data-op-list={list ?? collection} data-op-source={`astro:${collection}`} data-op-noun={noun}>
+        <ul class="card-group_list" data-op-list={list ?? collection} data-op-source={source ?? `astro:${collection}`} data-op-noun={noun}>
           {items.map((c) => (
             <li class="card-group_item" data-op-item={c.id} data-category={c.category && slug(c.category)} data-aside={c.aside ? "" : undefined} hidden={c.aside && filters ? true : undefined}>
-              <Card title={c.name} text={c.summary} href={c.href} link={link} image={c.image} item={{ collection, id: c.id, textField }} ids={c.ids} />
+              <Card title={c.name} text={c.summary} href={c.href} link={link} image={c.image} item={{ collection, id: c.id, textField: c.textField === undefined ? textField : c.textField || undefined }} ids={c.ids} />
             </li>
           ))}
         </ul>
+        {note && <p class="card-group_note text-style-note">{note}</p>}
         {action && <div class="card-group_action"><Button element="link" href={action.href}>{action.label}</Button></div>}
         {filters && <p class="sr-only" aria-live="polite" data-card-count />}
       </div>
@@ -117,8 +127,19 @@ const slug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
       }
     }
     .card-group_head,
-    .card-group_list {
+    .card-group_list,
+    .card-group_note {
       grid-column: margin / end;
+    }
+    .card-group_note {
+      @media (width >= 48rem) {
+        grid-column: main / end;
+        grid-row: 2;
+        margin-top: var(--space-10);
+        & + .card-group_action {
+          grid-row: 3;
+        }
+      }
     }
     /* the name's word rolls in its place when the next group takes over (the script below) */
     .card-group_label {

@@ -6,5 +6,48 @@
   "featured": true,
   "image": "../../assets/content/treatments/cosmetic-treatments.jpg",
   "imageAlt": "Treatment handpiece above the brow, close-up",
+  "statement": "Considered for *restoring volume* and *softening lines from facial movement,* following assessment.",
+  "duration": "Confirmed at consultation",
+  "downtime": "Confirmed at consultation",
+  "sessions": "As recommended following assessment",
+  "addresses": [
+    {
+      "id": "volume-loss",
+      "concern": "volume-loss",
+      "text": "Restored volume in specific areas"
+    },
+    {
+      "id": "jawline-and-chin",
+      "concern": "jawline-and-chin"
+    },
+    {
+      "id": "expression-lines",
+      "concern": "expression-lines",
+      "text": "Softened lines from facial movement"
+    },
+    {
+      "id": "lip-enhancement",
+      "concern": "lip-enhancement"
+    },
+    {
+      "id": "under-eye-hollowing",
+      "concern": "under-eye-hollowing"
+    },
+    {
+      "id": "temple-hollowing",
+      "concern": "temple-hollowing"
+    }
+  ],
+  "suits": "Patients seeking to address specific areas of volume or movement, following a full facial assessment.",
+  "notSuitable": "Pregnancy, breastfeeding, active skin infection in the treatment area, or certain allergies.",
+  "assessed": "Facial structure, movement patterns and medical history are reviewed before any treatment is recommended.",
+  "before": "Skin is cleansed and, if needed, a topical numbing cream applied.",
+  "during": "Treatment is administered by your practitioner following assessment of the area.",
+  "after": "Mild swelling, redness or bruising is possible for a few days.",
+  "risks": "Risks may include bruising, swelling, asymmetry or, rarely, more significant complications; discussed in full at consultation.",
+  "alongside": [
+    "biostimulators",
+    "facetite"
+  ],
   "order": 2
 }

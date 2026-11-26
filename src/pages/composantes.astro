@@ -15,12 +15,13 @@ import ResultsHome from "@/components/section/ResultsHome.astro";
 import PeopleHome from "@/components/section/PeopleHome.astro";
 import JournalHome from "@/components/section/JournalHome.astro";
 import CtaBand from "@/components/section/CtaBand.astro";
-import ConcernHead from "@/components/section/ConcernHead.astro";
+import ItemHead from "@/components/section/ItemHead.astro";
 import ConcernBody from "@/components/section/ConcernBody.astro";
 import ProductsSection from "@/components/section/ProductsSection.astro";
 import NotFound from "@/components/section/NotFound.astro";
 import PageHead from "@/components/section/PageHead.astro";
 import TextSection from "@/components/section/TextSection.astro";
+import DetailsSection from "@/components/section/DetailsSection.astro";
 import CardGroup from "@/components/section/CardGroup.astro";
 import Card from "@/components/content/Card.astro";
 import { getItems, getItem } from "@/utils/content";
@@ -76,8 +77,8 @@ const steps = [
     <ComponentSample file="section/JournalHome.astro" note="Quatre articles du journal, chacun à sa taille, dans la composition du design."><JournalHome /></ComponentSample>
     <ComponentSample file="section/CtaBand.astro" note="L'invitation de fin, sur chaque page."><CtaBand /></ComponentSample>
     {d?.statement && (
-      <ComponentSample file="section/ConcernHead.astro" note="L'ouverture d'une préoccupation (Melasma).">
-        <ConcernHead
+      <ComponentSample file="section/ItemHead.astro" note="L'ouverture d'une page de préoccupation ou de traitement : retour, nom, fil, énoncé, photo, faits (Melasma).">
+        <ItemHead
           name={d.name}
           statement={d.statement}
           facts={[{ label: "Consultation", value: d.consultation ?? "" }, { label: "Assessed by", value: d.assessedBy ?? "" }]}
@@ -97,6 +98,16 @@ const steps = [
     </ComponentSample>
     <ComponentSample file="section/PageHead.astro" note="L'ouverture d'une page sous la navigation : le petit carré, puis la phrase sur le rail principal (Our Approach).">
       <PageHead title="Every <em>treatment</em> here follows the same four stages: <em>consultation, assessment, planning, and ongoing care.</em>" />
+    </ComponentSample>
+    <ComponentSample file="section/DetailsSection.astro" note="Un titre et des paires nom et texte, deux par rangée, un filet entre les groupes (What to expect d'un traitement).">
+      <DetailsSection
+        theme="light"
+        title="What <em>to expect</em>"
+        groups={[
+          { items: [{ title: "Who it suits", text: "Patients with mild to moderate concerns who want a considered option without surgery." }, { title: "When it may not be suitable", text: "Active skin infections, certain pigmentary conditions, pacemakers or implanted devices, or pregnancy." }] },
+          { kind: "names", items: [{ title: "Before", text: "Skin is cleansed and a topical anaesthetic applied to minimise discomfort." }, { title: "Risks", text: "Risks may include prolonged redness, pigment changes or, rarely, infection; discussed in full at consultation.", action: { label: "Read more →", href: "/legal/risks-and-complications" } }] },
+        ]}
+      />
     </ComponentSample>
     <ComponentSample file="section/TextSection.astro" note="Un titre, son texte sur le rail principal, et une courte liste sans numéros ou un lien à droite (Our Approach).">
       <TextSection theme="stone" title="Where we <em>focus</em>" text="Our focus is deliberately narrow: the lower face, and how it ages." list={[{ title: "Lower-face tightening", text: "The concern we are most focused on." }, { title: "Skin rejuvenation", text: "Tone, texture and quality of the surface." }]} />

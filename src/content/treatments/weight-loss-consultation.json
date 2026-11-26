@@ -1,7 +1,19 @@
 {
   "name": "Weight Loss Consultation",
+  "summary": "Doctor-led consultation",
   "intro": "A doctor-led consultation assessing suitability for weight and body composition support, within a broader individualised plan.",
   "category": "Injectables",
   "featured": true,
+  "statement": "A *doctor-led consultation* to assess suitability for weight and body composition support, *considered as part of a broader, individualised plan.*",
+  "duration": "Confirmed at consultation",
+  "downtime": "Confirmed at consultation",
+  "sessions": "As recommended following assessment",
+  "addresses": [
+    {
+      "id": "weight-management",
+      "concern": "weight-management",
+      "text": "An individualised plan for weight and body composition, with ongoing doctor-led monitoring"
+    }
+  ],
   "order": 1
 }

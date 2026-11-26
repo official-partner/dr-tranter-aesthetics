@@ -14,6 +14,8 @@ interface Props {
   steps: Step[];
   /** Where the list sits: index on main and text on detail, or index on aside and text on aside-text. */
   variant?: "main" | "aside";
+  /** Let the text run to the aside rail, for a list with no picture beside it (a treatment's questions). */
+  wide?: boolean;
   /** Set to `false` for a list without its [01] numbers: the text then starts where the number stood. */
   numbered?: boolean;
   /** A list written in the page: its name for OP System's Modifier (items duplicated, removed, moved on the canvas). */
@@ -23,17 +25,17 @@ interface Props {
   source?: string;
   class?: string;
 }
-const { render = true, steps, variant = "main", numbered = true, list, source, class: className } = Astro.props;
+const { render = true, steps, variant = "main", wide = false, numbered = true, list, source, class: className } = Astro.props;
 ---
 
 {
   render && steps?.length > 0 && (
-    <ol class:list={["index-list_wrap", variant !== "main" && variant, !numbered && "is-plain", className]} data-op-list={list} data-op-source={list && (source ?? "page")}>
+    <ol class:list={["index-list_wrap", variant !== "main" && variant, !numbered && "is-plain", wide && "is-wide", className]} data-op-list={list} data-op-source={list && (source ?? "page")}>
       {steps.map((s, i) => (
         <li class="index-list_item" data-op-item={list && (s.id ?? String(i))}>
           {numbered && <span class="index-list_index text-style-index" data-figma={s.ids?.[0]}>[0{i + 1}]</span>}
           <div class="index-list_body stack">
-            <h3 class="text-style-index" data-op-field={source && "title"} data-figma={s.ids?.[1]}>{s.title}</h3>
+            <h3 class="index-list_title text-style-index" data-op-field={source && "title"} data-figma={s.ids?.[1]}>{s.title}</h3>
             <p class="index-list_text text-style-main" data-op-field={source && "text"} data-figma={s.ids?.[2]} set:html={s.text} />
           </div>
         </li>
@@ -80,6 +82,10 @@ const { render = true, steps, variant = "main", numbered = true, list, source, c
     .index-list_text {
       max-width: 24.7ch;
     }
+    /* a title longer than its room goes to the next line (a treatment's questions on a phone) */
+    .index-list_title {
+      text-wrap: pretty;
+    }
     /* tablet: a list on the aside goes under its text, on the main rail (a concern's factors, Our Approach's focus) */
     @media (48rem <= width < 64rem) {
       .site-grid > .index-list_wrap.aside {
@@ -106,6 +112,15 @@ const { render = true, steps, variant = "main", numbered = true, list, source, c
       }
       .index-list_body {
         grid-column: detail / span 2;
+      }
+      .index-list_wrap.is-wide {
+        grid-column: main / end;
+        & .index-list_body {
+          grid-column: detail / span 6;
+        }
+        & .index-list_text {
+          max-width: none;
+        }
       }
       .index-list_wrap.aside {
         & .index-list_index {

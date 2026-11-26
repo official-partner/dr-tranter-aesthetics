@@ -1,10 +1,45 @@
 {
   "name": "FaceTite",
   "summary": "Doctor-led device tightening",
-  "intro": "Our flagship treatment for skin laxity, tightening tissue beneath the surface without surgery.",
+  "intro": "A doctor-led option for skin laxity, tightening tissue beneath the surface without surgery.",
   "category": "RF treatments",
   "featured": true,
   "image": "../../assets/content/treatments/facetite.jpg",
   "imageAlt": "Treatment handpiece above the brow, close-up",
+  "statement": "A *doctor-led, minimally invasive* option for skin laxity, *tightening tissue beneath the surface.*",
+  "duration": "60–90 min",
+  "downtime": "3–5 days",
+  "sessions": "Typically one, reviewed at follow-up",
+  "performedBy": "Our cosmetic physicians only",
+  "device": "InMode FaceTite",
+  "deviceText": "Radiofrequency-assisted lipolysis",
+  "how": "FaceTite delivers radiofrequency energy directly beneath the skin, where tightening takes place. Our physicians selected it for its depth of effect on lower-face and neck laxity. Given the depth of tissue change involved, it is performed only by our cosmetic physicians, never by a nurse or dermal therapist.",
+  "addresses": [
+    {
+      "id": "volume-loss",
+      "concern": "volume-loss"
+    },
+    {
+      "id": "jawline-and-chin",
+      "concern": "jawline-and-chin",
+      "text": "A more defined jawline and lower face"
+    },
+    {
+      "id": "skin-laxity",
+      "concern": "skin-laxity",
+      "text": "Noticeably tighter-feeling skin"
+    }
+  ],
+  "suits": "Patients with mild to moderate concerns who want a considered option without surgery.",
+  "notSuitable": "Active skin infections, certain pigmentary conditions, pacemakers or implanted devices, or pregnancy.",
+  "assessed": "Skin condition, laxity and any contraindicating conditions are reviewed in consultation.",
+  "before": "Skin is cleansed and a topical anaesthetic applied to minimise discomfort.",
+  "during": "The device is passed across the treatment area, with settings adjusted to your skin and goals.",
+  "after": "Mild redness and swelling are expected for a short period afterwards.",
+  "risks": "Risks may include prolonged redness, pigment changes or, rarely, infection; discussed in full at consultation.",
+  "alongside": [
+    "cosmetic-treatments",
+    "morpheus8"
+  ],
   "order": 4
 }

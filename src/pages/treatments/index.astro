@@ -7,7 +7,7 @@ import { getItems } from "@/utils/content";
 
 /* The Treatments page (Figma « Tranter (Client) », frame 59:983): the featured treatments first, then every treatment
    with a filter per category, each card from its item in the collection (its photo, its name, its description). A card
-   links to the treatment's page once it has one. */
+   links to the treatment's page once it has one (its opening statement filled). */
 const treatments = await getItems("treatments");
 const categories = ["Injectables", "RF treatments", "Laser & light", "Facials & peels"];
 /* Figma node ids of each card (image, name, text, link), for the build's review tools only */
@@ -36,7 +36,7 @@ const item = (t: (typeof treatments)[number], inList = false) => ({
   id: t.id,
   name: t.data.name,
   summary: t.data.intro,
-  href: undefined,
+  href: t.data.statement ? `/treatments/${t.id}` : undefined,
   image: t.data.image && { src: t.data.image, alt: t.data.imageAlt },
   category: t.data.category,
   aside: inList && t.data.featured,

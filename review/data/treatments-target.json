@@ -1,507 +1,619 @@
 {
- "_note": "The Treatments page, Figma Tranter (Client) 59:983: the design corrected by the system (review/README.md). Nov 20, Claude, from Sam's go (« vas y avec Prêt maintenant »).",
- "59:989": {
-  "d": [
-   -0.5,
-   1.0
-  ],
-  "why": "caps at the section padding (24), as every opening"
- },
- "59:991": {
-  "d": [
-   -2,
-   -2.3
-  ],
-  "why": "caps at the section padding (24), as every opening"
- },
- "59:1052": {
-  "d": [
-   2.5,
-   -6.0
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); the name on the margin's optical inset and its square on the label's cap line, as the Concerns page's groups"
- },
- "59:992": {
-  "d": [
-   -0.8,
-   -2.2
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); the name on the margin's optical inset and its square on the label's cap line, as the Concerns page's groups"
- },
- "118:357": {
-  "d": [
-   0,
-   -3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "59:994": {
-  "d": [
-   0,
-   -11.7
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "59:1013": {
-  "d": [
-   0,
-   -13.3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "118:359": {
-  "d": [
-   0,
-   -3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "59:1004": {
-  "d": [
-   0,
-   -11.7
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "59:1023": {
-  "d": [
-   0,
-   -13.3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "118:361": {
-  "d": [
-   0,
-   -43.8
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:998": {
-  "d": [
-   0,
-   -52.5
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1017": {
-  "d": [
-   0,
-   -54.1
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:363": {
-  "d": [
-   0,
-   -43.8
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1008": {
-  "d": [
-   0,
-   -52.5
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1027": {
-  "d": [
-   0,
-   -54.1
-  ],
-  "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:672": {
-  "d": [
-   2.5,
-   -15.0
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); the name on the margin's optical inset and its square on the label's cap line, as the Concerns page's groups"
- },
- "118:673": {
-  "d": [
-   -1,
-   -18.5
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); the filters space-4 under the name, space-1 apart, their words in the buttons' style (Sam, Nov 10: the buttons' text at 14, pills tighter)"
- },
- "118:682": {
-  "d": [
-   -1,
-   -17.4
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); the filters space-4 under the name, space-1 apart, their words in the buttons' style (Sam, Nov 10: the buttons' text at 14, pills tighter)"
- },
- "118:679": {
-  "d": [
-   -1,
-   -17.3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); the filters space-4 under the name, space-1 apart, their words in the buttons' style (Sam, Nov 10: the buttons' text at 14, pills tighter)"
- },
- "118:685": {
-  "d": [
-   -1,
-   -17.2
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); the filters space-4 under the name, space-1 apart, their words in the buttons' style (Sam, Nov 10: the buttons' text at 14, pills tighter)"
- },
- "118:688": {
-  "d": [
-   -1,
-   -16.1
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); the filters space-4 under the name, space-1 apart, their words in the buttons' style (Sam, Nov 10: the buttons' text at 14, pills tighter)"
- },
- "118:671": {
-  "d": [
-   -0.8,
-   -11.2
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); the name on the margin's optical inset and its square on the label's cap line, as the Concerns page's groups"
- },
- "118:365": {
-  "d": [
-   0,
-   -13
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "59:996": {
-  "d": [
-   0,
-   -21.7
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "59:1015": {
-  "d": [
-   0,
-   -23.3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "118:367": {
-  "d": [
-   0,
-   -13
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "59:1006": {
-  "d": [
-   0,
-   -21.7
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "59:1025": {
-  "d": [
-   0,
-   -23.3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
- },
- "118:369": {
-  "d": [
-   0,
-   -80.8
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1000": {
-  "d": [
-   0,
-   -89.5
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1019": {
-  "d": [
-   0,
-   -91.1
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:371": {
-  "d": [
-   0,
-   -80.8
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1010": {
-  "d": [
-   0,
-   -89.5
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1029": {
-  "d": [
-   0,
-   -91.1
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:381": {
-  "d": [
-   0,
-   -120.6
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:995": {
-  "d": [
-   0,
-   -131.3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1014": {
-  "d": [
-   0,
-   -132.9
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:383": {
-  "d": [
-   0,
-   -120.6
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1005": {
-  "d": [
-   0,
-   -131.3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1024": {
-  "d": [
-   0,
-   -132.9
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:385": {
-  "d": [
-   0,
-   -161.3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:999": {
-  "d": [
-   0,
-   -164.1
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1018": {
-  "d": [
-   0,
-   -165.6
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:387": {
-  "d": [
-   0,
-   -161.3
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1009": {
-  "d": [
-   0,
-   -164.1
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1028": {
-  "d": [
-   0,
-   -165.6
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:389": {
-  "d": [
-   0,
-   -211.1
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:997": {
-  "d": [
-   0,
-   -215.9
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1016": {
-  "d": [
-   0,
-   -217.4
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:391": {
-  "d": [
-   0,
-   -211.1
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1007": {
-  "d": [
-   0,
-   -215.9
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1026": {
-  "d": [
-   0,
-   -217.4
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:393": {
-  "d": [
-   0,
-   -251.9
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1001": {
-  "d": [
-   0,
-   -259.6
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1020": {
-  "d": [
-   0,
-   -261.2
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:395": {
-  "d": [
-   0,
-   -251.9
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1011": {
-  "d": [
-   0,
-   -259.6
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1030": {
-  "d": [
-   0,
-   -261.2
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:397": {
-  "d": [
-   0,
-   -303.7
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1002": {
-  "d": [
-   1,
-   -312.4
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1021": {
-  "d": [
-   1,
-   -314.0
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:399": {
-  "d": [
-   0,
-   -303.7
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1012": {
-  "d": [
-   1,
-   -312.4
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1031": {
-  "d": [
-   1,
-   -314.0
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "118:401": {
-  "d": [
-   1,
-   -356.5
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1003": {
-  "d": [
-   1,
-   -366.2
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1022": {
-  "d": [
-   1,
-   -367.8
-  ],
-  "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; no treatment has its page yet, so no card has its link (a card links once its page exists, as on the Concerns page): each row about 41 shorter than the Figma's, whose rows are also unevenly spaced (57 to 84 between a link and the next photo)"
- },
- "59:1059": {
-  "d": [
-   -0.5,
-   -27.5
-  ],
-  "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
- },
- "59:1055": {
-  "d": [
-   -1.0,
-   -31.2
-  ],
-  "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
- },
- "59:1054": {
-  "d": [
-   -8,
-   -19.3
-  ],
-  "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
- },
- "59:1056": {
-  "d": [
-   21.1,
-   -21.3
-  ],
-  "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
- }
+  "_note": "The Treatments page, Figma Tranter (Client) 59:983: the design corrected by the system (review/README.md). Nov 20, Claude, from Sam's go (« vas y avec Prêt maintenant »).",
+  "59:989": {
+    "d": [
+      -0.5,
+      1.0
+    ],
+    "why": "caps at the section padding (24), as every opening"
+  },
+  "59:991": {
+    "d": [
+      -2,
+      -2.3
+    ],
+    "why": "caps at the section padding (24), as every opening"
+  },
+  "59:1052": {
+    "d": [
+      2.5,
+      -6.0
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); the name on the margin's optical inset and its square on the label's cap line, as the Concerns page's groups"
+  },
+  "59:992": {
+    "d": [
+      -0.8,
+      -2.2
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); the name on the margin's optical inset and its square on the label's cap line, as the Concerns page's groups"
+  },
+  "118:357": {
+    "d": [
+      0,
+      -3
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "59:994": {
+    "d": [
+      0,
+      -11.7
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "59:1013": {
+    "d": [
+      0,
+      -13.3
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "118:359": {
+    "d": [
+      0,
+      -3
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "59:1004": {
+    "d": [
+      0,
+      -11.7
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "59:1023": {
+    "d": [
+      0,
+      -13.3
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "118:361": {
+    "d": [
+      0.0,
+      5.6
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:998": {
+    "d": [
+      0.0,
+      -3.1
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1017": {
+    "d": [
+      0.0,
+      -4.7
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:363": {
+    "d": [
+      0.0,
+      5.6
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1008": {
+    "d": [
+      0.0,
+      -3.1
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1027": {
+    "d": [
+      0.0,
+      -4.7
+    ],
+    "why": "the group's top at the section padding (24, the Figma 28); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:672": {
+    "d": [
+      2.5,
+      -15.0
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); the name on the margin's optical inset and its square on the label's cap line, as the Concerns page's groups"
+  },
+  "118:673": {
+    "d": [
+      -1,
+      -18.5
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); the filters space-4 under the name, space-1 apart, their words in the buttons' style (Sam, Nov 10: the buttons' text at 14, pills tighter)"
+  },
+  "118:682": {
+    "d": [
+      -1,
+      -17.4
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); the filters space-4 under the name, space-1 apart, their words in the buttons' style (Sam, Nov 10: the buttons' text at 14, pills tighter)"
+  },
+  "118:679": {
+    "d": [
+      -1,
+      -17.3
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); the filters space-4 under the name, space-1 apart, their words in the buttons' style (Sam, Nov 10: the buttons' text at 14, pills tighter)"
+  },
+  "118:685": {
+    "d": [
+      -1,
+      -17.2
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); the filters space-4 under the name, space-1 apart, their words in the buttons' style (Sam, Nov 10: the buttons' text at 14, pills tighter)"
+  },
+  "118:688": {
+    "d": [
+      -1,
+      -16.1
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); the filters space-4 under the name, space-1 apart, their words in the buttons' style (Sam, Nov 10: the buttons' text at 14, pills tighter)"
+  },
+  "118:671": {
+    "d": [
+      -0.8,
+      -11.2
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); the name on the margin's optical inset and its square on the label's cap line, as the Concerns page's groups"
+  },
+  "118:365": {
+    "d": [
+      0,
+      -13
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "59:996": {
+    "d": [
+      0,
+      -21.7
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "59:1015": {
+    "d": [
+      0,
+      -23.3
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "118:367": {
+    "d": [
+      0,
+      -13
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "59:1006": {
+    "d": [
+      0,
+      -21.7
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "59:1025": {
+    "d": [
+      0,
+      -23.3
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards"
+  },
+  "118:369": {
+    "d": [
+      0.0,
+      -31.4
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1000": {
+    "d": [
+      0.0,
+      -40.1
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1019": {
+    "d": [
+      0.0,
+      -41.7
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:371": {
+    "d": [
+      0.0,
+      -31.4
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1010": {
+    "d": [
+      0.0,
+      -40.1
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1029": {
+    "d": [
+      0.0,
+      -41.7
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:381": {
+    "d": [
+      0.0,
+      -21.8
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:995": {
+    "d": [
+      0.0,
+      -32.5
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1014": {
+    "d": [
+      0.0,
+      -34.1
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:383": {
+    "d": [
+      0.0,
+      -21.8
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1005": {
+    "d": [
+      0.0,
+      -32.5
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1024": {
+    "d": [
+      0.0,
+      -34.1
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:385": {
+    "d": [
+      0.0,
+      -13.1
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:999": {
+    "d": [
+      0.0,
+      -15.9
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1018": {
+    "d": [
+      0.0,
+      -17.4
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:387": {
+    "d": [
+      0.0,
+      -13.1
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1009": {
+    "d": [
+      0.0,
+      -15.9
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1028": {
+    "d": [
+      0.0,
+      -17.4
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:389": {
+    "d": [
+      0.0,
+      -13.5
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:997": {
+    "d": [
+      0.0,
+      -18.2
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1016": {
+    "d": [
+      0.0,
+      -19.8
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:391": {
+    "d": [
+      0.0,
+      -13.5
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1007": {
+    "d": [
+      0.0,
+      -18.2
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1026": {
+    "d": [
+      0.0,
+      -19.8
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:393": {
+    "d": [
+      0.0,
+      -4.9
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1001": {
+    "d": [
+      0.0,
+      -12.6
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1020": {
+    "d": [
+      0.0,
+      -14.2
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:395": {
+    "d": [
+      0.0,
+      -4.9
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1011": {
+    "d": [
+      0.0,
+      -12.6
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1030": {
+    "d": [
+      0.0,
+      -14.2
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:397": {
+    "d": [
+      0.0,
+      -7.3
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1002": {
+    "d": [
+      1.0,
+      -16.0
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1021": {
+    "d": [
+      1.0,
+      -17.6
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:399": {
+    "d": [
+      0.0,
+      -7.3
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1012": {
+    "d": [
+      1.0,
+      -16.0
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1031": {
+    "d": [
+      1.0,
+      -17.6
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "118:401": {
+    "d": [
+      1.0,
+      -10.6
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1003": {
+    "d": [
+      1.0,
+      -20.4
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1022": {
+    "d": [
+      1.0,
+      -21.9
+    ],
+    "why": "the group's top at the section padding (24, the Figma 37); a card's name space-media under its photo, its line space-3 under the name (the Figma 24 and 28), as the Concerns page's cards; rows space-8 apart, each as tall as the tallest; every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1059": {
+    "d": [
+      -0.5,
+      -27.5
+    ],
+    "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
+  },
+  "59:1055": {
+    "d": [
+      -1.0,
+      -31.2
+    ],
+    "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
+  },
+  "59:1054": {
+    "d": [
+      -8,
+      -19.3
+    ],
+    "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
+  },
+  "59:1056": {
+    "d": [
+      21.1,
+      -21.3
+    ],
+    "why": "the closing invitation as on every page: caps at the section padding (24), as the home's (the Figma's sit 24 lower in this band); Sam, Nov 10: pills tighter, their text at 14"
+  },
+  "59:1036": {
+    "d": [
+      0.0,
+      -9.3
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1046": {
+    "d": [
+      0.0,
+      -9.3
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1034": {
+    "d": [
+      0.0,
+      -10.5
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1044": {
+    "d": [
+      0.0,
+      -10.5
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1038": {
+    "d": [
+      0.0,
+      -28.9
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1048": {
+    "d": [
+      0.0,
+      -28.9
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1033": {
+    "d": [
+      0.0,
+      -21.2
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1043": {
+    "d": [
+      0.0,
+      -21.2
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1037": {
+    "d": [
+      0.0,
+      -4.6
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1047": {
+    "d": [
+      0.0,
+      -22.0
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1035": {
+    "d": [
+      0.0,
+      -24.4
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1045": {
+    "d": [
+      0.0,
+      -7.0
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1039": {
+    "d": [
+      0.0,
+      -18.8
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1040": {
+    "d": [
+      1.0,
+      -4.7
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1050": {
+    "d": [
+      1.0,
+      -22.1
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  },
+  "59:1041": {
+    "d": [
+      1.0,
+      -26.5
+    ],
+    "why": "every card links to its treatment's page since Nov 25 (Claude, the treatment pages): its link space-action under its line, rows space-8 apart, each as tall as the tallest"
+  }
 }
