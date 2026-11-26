@@ -8,9 +8,9 @@ export type SiteLink = { label: string; href: string; footer?: boolean };
 export const clinicLinks: SiteLink[] = [
   { label: "All treatments", href: "/treatments" },
   { label: "Our approach", href: "/approach" },
-  { label: "Results", href: "/" },
+  { label: "Results", href: "/results" },
   { label: "Our team", href: "/" },
-  { label: "The Clinic", href: "/" },
+  { label: "The Clinic", href: "/the-clinic" },
   { label: "Journal", href: "/journal" },
 ];
 

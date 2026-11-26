@@ -1,6 +1,8 @@
 ---
 import Button from "@/components/Button.astro";
 import IndexList from "@/components/content/IndexList.astro";
+import Img from "@/components/media/Img.astro";
+import { pic, type Pic } from "@/utils/media";
 
 interface Item {
   title: string;
@@ -15,8 +17,11 @@ interface Props {
   rule?: boolean;
   /** Section title; emphasis with <em>. */
   title: string;
-  /** The text on the main rail. */
+  /** The text on the main rail; paragraphs apart by an empty line. */
   text: string;
+  /** A tall picture from the half rail to the edge (The Clinic's One standard of care); its link then sits under the
+      text, level with the picture's foot. */
+  image?: { src?: Pic; alt?: string };
   /** A short list on the aside rail, each a name and a line, unnumbered (Where we focus). */
   list?: Item[];
   /** A link against the right edge, level with the text's last line. */
@@ -28,7 +33,8 @@ interface Props {
   /** Figma ids for the build review: band name, band top, title, text, action. */
   figma?: { band: string; top: string; title: string; text: string; action?: string };
 }
-const { render = true, rule = false, title, text, list, action, listName, theme = "inherit", figma } = Astro.props;
+const { render = true, rule = false, title, text, image, list, action, listName, theme = "inherit", figma } = Astro.props;
+const paras = text.split(/\n{2,}/);
 const steps = list?.map((i) => ({ title: i.title, text: i.text, ids: ["", i.ids?.[0] ?? "", i.ids?.[1] ?? ""] }));
 ---
 
@@ -36,10 +42,17 @@ const steps = list?.map((i) => ({ title: i.title, text: i.text, ids: ["", i.ids?
     « What is happening » composition of a concern, reused. */}
 {
   render && (
-    <section class:list={["text-section_wrap section-padding", theme !== "inherit" && `theme-${theme}`, rule && "section-rule"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
+    <section class:list={["text-section_wrap section-padding", image && "has-image", theme !== "inherit" && `theme-${theme}`, rule && "section-rule"]} data-figma-band={figma?.band} data-band-top={figma?.top}>
       <div class="text-section_layout site-grid">
         <h2 class="text-section_title text-style-h2" data-figma={figma?.title} set:html={title} />
-        <p class="text-section_text text-style-main" data-figma={figma?.text} set:html={text} />
+        {paras.length > 1 ? (
+          <div class="text-section_text stack" data-figma={figma?.text}>{paras.map((t) => <p class="text-style-main" set:html={t} />)}</div>
+        ) : (
+          <p class="text-section_text text-style-main" data-figma={figma?.text} set:html={text} />
+        )}
+        {image && (
+          <div class="text-section_media media">{image.src && <Img {...pic(image.src)} alt={image.alt ?? ""} variant="constrained" sizes="(width >= 48rem) 45vw, 100vw" />}</div>
+        )}
         {steps && <IndexList steps={steps} variant="aside" numbered={false} list={listName} class="text-section_list" />}
         {action && (
           <div class="at-end text-section_action">
@@ -62,6 +75,30 @@ const steps = list?.map((i) => ({ title: i.title, text: i.text, ids: ["", i.ids?
     }
     .text-section_title {
       max-width: 15ch;
+    }
+    .text-section_text.stack {
+      gap: var(--space-5);
+    }
+    .text-section_media {
+      grid-column: margin / end;
+    }
+    /* with a picture (The Clinic): the text on three columns, the picture from the half rail to the edge, the link
+       under the text at the picture's foot */
+    @media (width >= 64rem) {
+      .text-section_wrap.has-image {
+        & .text-section_text {
+          grid-column: main / span 3;
+        }
+        & .text-section_media {
+          grid-row: 1 / span 2;
+          grid-column: half / end;
+        }
+        & .text-section_action {
+          grid-row: 2;
+          grid-column: main / half;
+          justify-self: start;
+        }
+      }
     }
     @media (width >= 48rem) {
       .text-section_layout {
@@ -98,6 +135,11 @@ const steps = list?.map((i) => ({ title: i.title, text: i.text, ids: ["", i.ids?
         grid-row: 2;
         grid-column: main / end;
         justify-self: start;
+        margin-top: var(--space-7);
+      }
+      .text-section_media {
+        grid-row: 3;
+        grid-column: main / end;
         margin-top: var(--space-7);
       }
     }

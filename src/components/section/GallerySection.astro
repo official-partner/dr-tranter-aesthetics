@@ -1,0 +1,100 @@
+---
+import Img from "@/components/media/Img.astro";
+import { pic, type Pic } from "@/utils/media";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Section title; emphasis with <em>. */
+  title: string;
+  /** Its text, on the main rail. */
+  text?: string;
+  /** Three pictures, set apart across the grid: tall on the left, wide on the right, upright under it. */
+  images: { src?: Pic; alt?: string }[];
+  /** Color theme. */
+  theme?: "inherit" | "mist" | "stone" | "light";
+}
+const { render = true, title, text, images, theme = "inherit" } = Astro.props;
+const shapes = ["is-a ratio-7-10", "is-b ratio-16-10", "is-c ratio-5-6"];
+---
+
+{/* A title, its text and three pictures set apart (The Clinic's The space: Figma 4001:869), the same shapes as the
+    Journal's: tall, wide, upright. A frame whose photo is still to come stays, empty. */}
+{
+  render && (
+    <section class:list={["gallery-section_wrap section-padding", theme !== "inherit" && `theme-${theme}`]}>
+      <div class="gallery-section_layout site-grid">
+        <h2 class="gallery-section_title text-style-h2" set:html={title} />
+        {text && <p class="gallery-section_text text-style-main" set:html={text} />}
+        {images.slice(0, 3).map((im, i) => (
+          <div class:list={["gallery-section_media media", shapes[i]]}>
+            {im.src && <Img {...pic(im.src)} alt={im.alt ?? ""} variant="constrained" sizes="(width >= 48rem) 35vw, 75vw" />}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .gallery-section_layout {
+      row-gap: var(--space-7);
+      align-items: start;
+    }
+    .gallery-section_title,
+    .gallery-section_text {
+      grid-column: margin / end;
+    }
+    .gallery-section_title {
+      max-width: 15ch;
+    }
+    .gallery-section_text {
+      max-width: 60ch;
+    }
+    .gallery-section_media {
+      grid-column: margin / span 3;
+      &.is-b {
+        grid-column: span 3 / end;
+      }
+    }
+    @media (width >= 48rem) {
+      .gallery-section_layout {
+        row-gap: 0;
+      }
+      .gallery-section_title,
+      .gallery-section_text {
+        grid-row: 1;
+      }
+      .gallery-section_title {
+        grid-column: margin / main;
+      }
+      .gallery-section_text {
+        grid-column: main / end;
+      }
+      .gallery-section_media {
+        margin-top: var(--space-11);
+        &.is-a {
+          grid-row: 2 / span 2;
+          grid-column: margin / span 4;
+        }
+        &.is-b {
+          grid-row: 2;
+          grid-column: aside / end;
+        }
+        &.is-c {
+          grid-row: 3;
+          grid-column: half / span 3;
+        }
+      }
+    }
+    @media (width >= 64rem) {
+      .gallery-section_title {
+        grid-column: margin / span 3;
+      }
+      .gallery-section_text {
+        grid-column: main / span 4;
+      }
+    }
+  }
+</style>

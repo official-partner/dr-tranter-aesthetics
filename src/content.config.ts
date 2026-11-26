@@ -152,6 +152,9 @@ const results = defineCollection({
     z
       .object({
         name: z.string().describe("Treatment"),
+        treatment: reference("treatments").optional().describe("The treatment (its page and its filter on Results)"),
+        before: image().optional().describe("Before photo"),
+        beforeAlt: z.string().optional().describe("Before photo description"),
         image: image().optional().describe("After photo"),
         imageAlt: z.string().optional().describe("After photo description"),
         visible: z.boolean().default(true).describe("Visible on the site"),

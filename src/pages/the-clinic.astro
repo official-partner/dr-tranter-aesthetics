@@ -1,0 +1,89 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import PageHead from "@/components/section/PageHead.astro";
+import TextSection from "@/components/section/TextSection.astro";
+import GallerySection from "@/components/section/GallerySection.astro";
+import StepsSection from "@/components/section/StepsSection.astro";
+import CtaBand from "@/components/section/CtaBand.astro";
+import { clinic } from "@/data/clinic";
+import { connectLinks } from "@/utils/site-links";
+
+/* The Clinic (Figma « Starter (Copy) » 4001:869): its opening with the clinic's details, One standard of care, The
+   space, then the four sections Sarah asked for (brief B1: the consultation, combination treatments, Essentials, the
+   membership), written from the brief until her copy comes (PROJECT.md), and the gift vouchers (brief C5). */
+const enquiry = connectLinks.find((l) => l.label === "Contact")?.href ?? "/";
+---
+
+<Layout title="The Clinic" description="A doctor-led clinic in Byron Bay: one method, one standard of care." navTheme="light">
+  {/* Opening */}
+  <PageHead
+    title="A doctor-led clinic <em>in Byron Bay, built on one method:</em> assess the face as a whole, then recommend only what it needs."
+    facts={[
+      { label: "Address", lines: clinic.address },
+      { label: "Hours", lines: clinic.hours },
+      { label: "Contact", lines: [clinic.phone, ...(clinic.email ? [clinic.email] : [])] },
+    ]}
+  />
+  {/* One standard of care */}
+  <TextSection
+    theme="stone"
+    title="One standard <em>of care</em>"
+    text={"The clinic operates under a single method: the same standards, protocols and clinical philosophy apply regardless of which practitioner you see. This is what allows a team of independently expert clinicians to deliver one consistent standard of care.\n\nFounded by Dr Sarah Tranter, the clinic considers structure, surface and cohesion as a whole rather than treating isolated concerns. Every practitioner is trained within this framework, so the standard of care never depends on any one individual."}
+    image={{ src: "/img/clinic-care.jpg", alt: "A practitioner's hands on a patient's face during a treatment" }}
+    action={{ label: "Send an enquiry →", href: enquiry }}
+  />
+  {/* The space */}
+  <GallerySection
+    theme="mist"
+    title="The space"
+    text="The clinic was designed to feel considered rather than clinical, from the materials in the waiting area through to the treatment rooms themselves. Every space is built around patient privacy and comfort, with natural light used wherever possible."
+    images={[
+      { src: "/img/clinic-space-room.jpg", alt: "A consultation room seen through its doorway, a slatted timber screen beside the desk" },
+      { src: "/img/clinic-space-stool.jpg", alt: "A dark timber stool on a woven rug beside a treatment bed" },
+      { src: "/img/clinic-space-bed.jpg", alt: "A treatment room with its bed, a basin and soft wall light" },
+    ]}
+  />
+  {/* The consultation (brief B1, written from the brief's articles until Sarah's copy) */}
+  <StepsSection
+    theme="stone"
+    title="How a first <em>visit works</em>"
+    wideText
+    list="first-visit"
+    steps={[
+      { title: "Your history", text: "We start with your medical history and any treatments you have had elsewhere, since past results and reactions are often the most reliable guide to what will suit you." },
+      { title: "Assessment", text: "Your skin and the structure beneath it are assessed together, before any treatment is discussed." },
+      { title: "What matters to you", text: "We talk about what kind of result would feel meaningful to you, rather than excessive." },
+      { title: "Your plan", text: "No treatment is proposed in the visit it is first discussed. You leave with a clear written plan and the reason behind each option; the second appointment is where it begins." },
+    ]}
+  />
+  {/* Combination treatments (brief B1) */}
+  <TextSection
+    theme="stone"
+    rule
+    title="Combination <em>treatments</em>"
+    text="Many concerns respond best to more than one treatment. Rather than combining everything into a single session, plans are usually sequenced: the main concern first, then a review before the next step. A device-led course for deeper remodelling, for example, may be followed by a gentler treatment that maintains it between courses."
+    action={{ label: "Browse treatments →", href: "/treatments" }}
+  />
+  {/* Essentials Skin Treatments (brief B1) */}
+  <TextSection
+    theme="stone"
+    rule
+    title="Essentials <em>skin treatments</em>"
+    text="A curated range of intro-level treatments, for patients starting their skin journey and for maintaining their results over time."
+    action={{ label: "All treatments →", href: "/treatments" }}
+  />
+  {/* Clinic membership (brief B1: coming soon) */}
+  <TextSection
+    theme="stone"
+    rule
+    title="Clinic <em>membership</em>"
+    text="Clinic membership is coming soon. We will share the details here once it opens."
+  />
+  {/* Gift vouchers (brief C5) */}
+  <CtaBand
+    theme="light"
+    label="Gift vouchers"
+    title="Dr Tranter Aesthetics gift vouchers <em>can be put toward any consultation or treatment, and are issued following a short conversation with our team.</em>"
+    action={{ label: "Enquire about a voucher →", href: enquiry }}
+  />
+</Layout>

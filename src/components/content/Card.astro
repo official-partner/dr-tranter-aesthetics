@@ -14,25 +14,45 @@ interface Props {
   link?: string;
   /** The photo; the frame stays, empty, while it is still to come. */
   image?: { src: Pic; alt?: string };
+  /** A before photo: the frame then holds the two side by side, before on the left (a result). */
+  before?: { src?: Pic; alt?: string };
+  /** `inline`: the name in the index's style and the link on its right, under the photo, no line (a result). */
+  caption?: "stacked" | "inline";
   /** The collection item the card shows, for OP System's Contenu and Edit. */
   item?: { collection: string; id: string; textField?: string };
   /** Figma node ids for the build review: image, name, text, link. */
   ids?: string[];
 }
-const { title, text, href, link = "View →", image, item, ids } = Astro.props;
+const { title, text, href, link = "View →", image, before, caption = "stacked", item, ids } = Astro.props;
 ---
 
 {/* A card of the site: a photo at 1.45, its name in capitals, a line, a link (the Concerns page; Nov 20) */}
-<article class:list={["card_wrap stacked-card", href && "linked-card"]} data-op-source={item && `astro:${item.collection}`} data-op-item={item?.id}>
-  <div class="media ratio-145" data-op-field={item && "image"} data-figma={ids?.[0]}>
-    {image && <Img {...pic(image.src)} alt={image.alt ?? ""} variant="constrained" sizes="(width >= 64rem) 25vw, (width >= 48rem) 25vw, 75vw" />}
+<article class:list={["card_wrap stacked-card", href && "linked-card", caption === "inline" && "is-inline"]} data-op-source={item && `astro:${item.collection}`} data-op-item={item?.id}>
+  <div class:list={["media ratio-145", before && "card_pair"]} data-op-field={item && !before ? "image" : undefined} data-figma={ids?.[0]}>
+    {before ? (
+      <>
+        {before.src && <Img {...pic(before.src)} alt={before.alt ?? ""} class="card_before" data-op-field={item && "before"} variant="constrained" sizes="(width >= 48rem) 13vw, 38vw" />}
+        {image && <Img {...pic(image.src)} alt={image.alt ?? ""} class="card_after" data-op-field={item && "image"} variant="constrained" sizes="(width >= 48rem) 13vw, 38vw" />}
+      </>
+    ) : (
+      image && <Img {...pic(image.src)} alt={image.alt ?? ""} variant="constrained" sizes="(width >= 64rem) 25vw, (width >= 48rem) 25vw, 75vw" />
+    )}
   </div>
-  <h3 class="card_title text-style-index-caps" data-op-field={item && "name"} data-figma={ids?.[1]}>{title}</h3>
-  {text && <p class="card_text text-style-main" data-op-field={item?.textField} data-figma={ids?.[2]}>{text}</p>}
-  {href && (
-    <div class="card_action">
-      <Button element="link" variant="link" href={href} data-figma={ids?.[3]} data-card-link>{link}</Button>
+  {caption === "inline" ? (
+    <div class="card_caption">
+      <h3 class="card_title text-style-index" data-op-field={item && "name"} data-figma={ids?.[1]}>{title}</h3>
+      {href && <Button element="link" variant="link" href={href} data-figma={ids?.[3]} data-card-link>{link}</Button>}
     </div>
+  ) : (
+    <>
+      <h3 class="card_title text-style-index-caps" data-op-field={item && "name"} data-figma={ids?.[1]}>{title}</h3>
+      {text && <p class="card_text text-style-main" data-op-field={item?.textField} data-figma={ids?.[2]}>{text}</p>}
+      {href && (
+        <div class="card_action">
+          <Button element="link" variant="link" href={href} data-figma={ids?.[3]} data-card-link>{link}</Button>
+        </div>
+      )}
+    </>
   )}
 </article>
 
@@ -48,6 +68,26 @@ const { title, text, href, link = "View →", image, item, ids } = Astro.props;
     }
     .card_action {
       margin-top: var(--space-action);
+    }
+    /* a before and an after, side by side in the one frame, a hairline of the ground between them */
+    .card_pair > :is(.card_before, .card_after) {
+      width: 50%;
+    }
+    .card_pair > .card_after {
+      left: 50%;
+      border-left: var(--border-width) solid var(--background);
+    }
+    /* inline: the name and its link on one line, the link against the right edge */
+    .card_caption {
+      align-self: stretch;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      column-gap: var(--space-5);
+      margin-top: var(--space-4);
+      & .card_title {
+        margin-top: 0;
+      }
     }
   }
 </style>

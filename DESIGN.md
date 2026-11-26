@@ -155,6 +155,16 @@ StepsSection, DetailsSection; a treatment's page, Nov 25).
 - ArticleCard is every article's card (home, Journal, More from the journal); Filters are the Concerns', Treatments'
   and Journal's pills (one component, one script).
 
+## The Clinic and Results (Nov 25)
+- The Clinic (Figma 4001:869, `/the-clinic`): PageHead with the clinic's facts (address, hours, contact, from
+  `src/data/clinic.ts`, also read by the hero and the footer), TextSection with a picture (One standard of care: text on
+  three columns, the picture from the half rail to the edge, the link under the text), GallerySection (The space: the
+  Journal's shapes, tall, wide, upright), then the brief's four sections from existing parts (StepsSection,
+  TextSection with `rule`), the gift vouchers as a CtaBand.
+- Results (Figma 4001:737): PageHead with a text and a link (the results-vary note, the Risks page), CardGroup of
+  results: a Card holds a before and an after side by side in one 1.45 frame (`before`, a hairline of the ground
+  between them) and an inline caption (the name, its link on the right); a pill per category that has a result.
+
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside
   (the Figma's 23 high at 1728), `--space-1` apart, a column under the group's name on a computer, a wrapping row on a

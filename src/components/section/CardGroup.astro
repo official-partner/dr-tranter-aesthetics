@@ -10,6 +10,8 @@ interface Item {
   summary?: string;
   href?: string;
   image?: { src: Pic; alt?: string };
+  /** A before photo, beside the image (a result). */
+  before?: { src?: Pic; alt?: string };
   /** The item's field its line comes from, when not the group's (false: the line is written elsewhere). */
   textField?: string | false;
   /** Its filter (a category's name), when the group has filters. */
@@ -43,6 +45,8 @@ interface Props {
   textField?: string;
   /** The words of a card's link. */
   link?: string;
+  /** `inline`: each card's name and link on one line under its photo (Results). */
+  caption?: "stacked" | "inline";
   /** The cards, two to a row. */
   items: Item[];
   /** Filters under the name: one pill per category, after « All »; a pill shows only its cards. */
@@ -55,7 +59,7 @@ interface Props {
   /** Figma ids for the build review: band name, band top, label, marker. */
   figma?: { band: string; top: string; label: string; marker: string };
 }
-const { render = true, rule = false, label, title, note, action, theme = "light", collection, noun, textField = "summary", link = "View →", items, filters, list, source, figma } = Astro.props;
+const { render = true, rule = false, label, title, note, action, theme = "light", collection, noun, textField = "summary", link = "View →", caption, items, filters, list, source, figma } = Astro.props;
 ---
 
 {/* A group of cards (the Concerns page, the Treatments page): its name at the margin with the square, its cards two to a
@@ -76,7 +80,7 @@ const { render = true, rule = false, label, title, note, action, theme = "light"
         <ul class="card-group_list" data-filter-list data-op-list={list ?? collection} data-op-source={source ?? `astro:${collection}`} data-op-noun={noun}>
           {items.map((c) => (
             <li class="card-group_item" data-op-item={c.id} data-category={c.category && slug(c.category)} data-aside={c.aside ? "" : undefined} hidden={c.aside && filters ? true : undefined}>
-              <Card title={c.name} text={c.summary} href={c.href} link={link} image={c.image} item={{ collection, id: c.id, textField: c.textField === undefined ? textField : c.textField || undefined }} ids={c.ids} />
+              <Card title={c.name} text={c.summary} href={c.href} link={link} image={c.image} before={c.before} caption={caption} item={{ collection, id: c.id, textField: c.textField === undefined ? textField : c.textField || undefined }} ids={c.ids} />
             </li>
           ))}
         </ul>

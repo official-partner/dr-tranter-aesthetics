@@ -13,6 +13,7 @@ const path = Astro.url.pathname;
 const here = (href: string, list: { href: string }[]) => (isHere(href, path, list) ? "page" : undefined);
 const { structure, surface } = await concernLinks();
 const connect = connectLinks.filter((l) => l.footer !== false);
+import { clinic } from "@/data/clinic";
 ---
 
 {
@@ -35,9 +36,9 @@ const connect = connectLinks.filter((l) => l.footer !== false);
         <p class="footer_legal text-style-list inset-optical" data-cap-offset="0.3395" data-figma="1:182">© Dr Tranter Aesthetics, {new Date().getFullYear()}<br />AHPRA registration MED0000000000</p>
         <div class="footer_group stack gap-4 is-visit">
           <p class="text-style-label" data-figma="1:168">Visit Us</p>
-          <p class="text-style-tight" data-figma="1:184">1/54 Jonson Street,<br />Byron Bay NSW 2481</p>
-          <p class="text-style-tight" data-figma="1:186">Mon 9am to 3pm<br />Tue to Fri 9am to 5pm (Thu until 6pm)<br />Sat 9am to 2pm</p>
-          <p class="text-style-tight" data-figma="1:185">(02) 6680 7819</p>
+          <p class="text-style-tight" data-figma="1:184" set:html={clinic.address.join("<br />")} />
+          <p class="text-style-tight" data-figma="1:186" set:html={clinic.hours.join("<br />")} />
+          <p class="text-style-tight" data-figma="1:185">{clinic.phone}</p>
         </div>
         <div class="footer_group stack gap-4 is-connect is-muted">
           <p class="text-style-label" data-figma="1:173">Connect</p>

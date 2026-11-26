@@ -1,0 +1,46 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import PageHead from "@/components/section/PageHead.astro";
+import CardGroup from "@/components/section/CardGroup.astro";
+import CtaBand from "@/components/section/CtaBand.astro";
+import { getItems } from "@/utils/content";
+import { RISKS_PATH } from "@/consts";
+
+/* Results (Figma « Starter (Copy) » 4001:737): the opening with the results-vary note and the Risks page, then each
+   case, its before and after side by side, a filter per category of its treatment. No before-and-after for an
+   injectable (brief A5): a result whose treatment is an injectable is left out of this page. */
+const [results, treatments] = await Promise.all([getItems("results"), getItems("treatments")]);
+/* a pill per category that has a result to show */
+const categories = ["RF treatments", "Laser & light", "Facials & peels"];
+const items = results
+  .map((r) => ({ r, t: r.data.treatment ? treatments.find((t) => t.id === r.data.treatment!.id) : undefined }))
+  .filter(({ t }) => t?.data.category !== "Injectables")
+  .map(({ r, t }) => ({
+    id: r.id,
+    name: r.data.name,
+    href: t?.data.statement ? `/treatments/${t.id}` : undefined,
+    image: r.data.image && { src: r.data.image, alt: r.data.imageAlt },
+    before: { src: r.data.before, alt: r.data.beforeAlt },
+    category: t?.data.category,
+  }));
+---
+
+<Layout title="Results" description="Results from treatments at Dr Tranter Aesthetics, each following a consultation and a plan built for that person." navTheme="light">
+  <PageHead
+    theme="mist"
+    title="<em>The results</em> below each follow a consultation and reflect <em>a plan built for that person,</em> not a standard protocol."
+    text="Individual results vary and are not guaranteed. All images are of actual patients, shown with their informed consent, and are not retouched beyond standard colour correction."
+    action={{ label: "Read about risks and complications →", href: RISKS_PATH }}
+  />
+  <CardGroup
+    label="Filter by"
+    theme="stone"
+    collection="results"
+    noun="Result"
+    caption="inline"
+    link="View treatment →"
+    items={items}
+    filters={{ all: "All treatments", values: categories.filter((c) => items.some((i) => i.category === c)) }}
+  />
+  <CtaBand theme="light" />
+</Layout>

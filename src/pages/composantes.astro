@@ -16,6 +16,7 @@ import PeopleHome from "@/components/section/PeopleHome.astro";
 import JournalHome from "@/components/section/JournalHome.astro";
 import JournalIndex from "@/components/section/JournalIndex.astro";
 import JournalMore from "@/components/section/JournalMore.astro";
+import GallerySection from "@/components/section/GallerySection.astro";
 import ArticleBody from "@/components/section/ArticleBody.astro";
 import ArticleCard from "@/components/content/ArticleCard.astro";
 import Filters from "@/components/content/Filters.astro";
@@ -93,6 +94,9 @@ const steps = [
       <ArticleBody body={"## Two mechanisms, one pass\n\nRadiofrequency microneedling works by combining two mechanisms in one device.\n\nThe result is a treatment that can address surface concerns and structural concerns in the same course."} treatment={{ name: "Morpheus8", text: "Addresses structure and surface together in a single treatment.", href: "/treatments/morpheus8" }} facts={[{ label: "Date", value: "22 January 2026" }]} />
     </ComponentSample>
     <ComponentSample file="section/JournalMore.astro" note="Trois autres articles sous un article, avec leur date."><JournalMore self="pigmentation-vs-redness" /></ComponentSample>
+    <ComponentSample file="section/GallerySection.astro" note="Un titre, son texte et trois photos disposées comme le Journal (The space, The Clinic).">
+      <GallerySection theme="mist" title="The space" text="The clinic was designed to feel considered rather than clinical." images={[{ src: "/img/clinic-space-room.jpg" }, { src: "/img/clinic-space-stool.jpg" }, { src: "/img/clinic-space-bed.jpg" }]} />
+    </ComponentSample>
     <ComponentSample file="section/JournalHome.astro" note="Quatre articles du journal, chacun à sa taille, dans la composition du design."><JournalHome /></ComponentSample>
     <ComponentSample file="section/CtaBand.astro" note="L'invitation de fin, sur chaque page."><CtaBand /></ComponentSample>
     {d?.statement && (

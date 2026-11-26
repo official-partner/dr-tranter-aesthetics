@@ -1,15 +1,23 @@
 ---
+import Button from "@/components/Button.astro";
+
 interface Props {
   /** Set to `false` to omit the component. */
   render?: boolean;
   /** The page's opening statement, its h1; emphasis with <em> (the lighter cut). */
   title: string;
+  /** Facts under the title, each a label and its lines (The Clinic: address, hours, contact). */
+  facts?: { label: string; lines: string[] }[];
+  /** A short text under the title (Results: the results-vary note). */
+  text?: string;
+  /** A link against the right edge, level with the text's last line. */
+  action?: { label: string; href: string };
   /** Its ground: the light sand (Our Approach) or stone (the Concerns page). */
   theme?: "light" | "stone" | "mist";
   /** Figma ids for the build review: band top, marker, title. */
   figma?: { top: string; marker: string; title: string };
 }
-const { render = true, title, theme = "light", figma } = Astro.props;
+const { render = true, title, facts, text, action, theme = "light", figma } = Astro.props;
 ---
 
 {/* A page's opening under the nav: the small square, then the statement on the main rail, on the sand ground (Our Approach,
@@ -20,6 +28,18 @@ const { render = true, title, theme = "light", figma } = Astro.props;
       <div class="page-head_layout site-grid">
         <span class="marker page-head_marker" data-figma={figma?.marker} />
         <h1 class="page-head_title lead-marker text-style-h2" data-figma={figma?.title} set:html={title} />
+        {facts && (
+          <dl class="page-head_facts">
+            {facts.map((f) => (
+              <div class="stack">
+                <dt class="text-style-label">{f.label}</dt>
+                <dd class="text-style-tight" set:html={f.lines.join("<br />")} />
+              </div>
+            ))}
+          </dl>
+        )}
+        {text && <p class="page-head_text text-style-main">{text}</p>}
+        {action && <Button element="link" variant="link" href={action.href} class="at-end page-head_action">{action.label}</Button>}
       </div>
     </section>
   )
@@ -41,6 +61,27 @@ const { render = true, title, theme = "light", figma } = Astro.props;
     .page-head_marker {
       display: none;
     }
+    .page-head_facts,
+    .page-head_text {
+      grid-column: margin / end;
+      margin-top: var(--space-10);
+    }
+    .page-head_facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-6) var(--space-8);
+      margin-bottom: 0;
+    }
+    .page-head_text {
+      max-width: 60ch;
+    }
+    .page-head_action {
+      align-self: end;
+      margin-top: var(--space-7);
+      @media (width >= 48rem) {
+        margin-top: 0;
+      }
+    }
     .page-head_title {
       grid-column: margin / end;
       max-width: 22ch;
@@ -56,12 +97,30 @@ const { render = true, title, theme = "light", figma } = Astro.props;
         grid-column: main / end;
         --_lead-marker: none;
       }
+      .page-head_facts,
+      .page-head_text {
+        grid-row: 2;
+        grid-column: main / end;
+        margin-top: var(--space-11);
+      }
+      .page-head_action {
+        grid-row: 2;
+      }
     }
     @media (width >= 64rem) {
       .page-head_title {
         grid-column: main / span 5;
         /* five columns, the lines balanced: the Figma's boxes differ by page (567, 600, 637 at 1728), the system keeps one */
         text-wrap: balance;
+      }
+      /* on the Figma's steps (The Clinic: 280 and 354 at 1728) */
+      .page-head_facts {
+        display: grid;
+        grid-template-columns: calc(280 * var(--u)) calc(354 * var(--u)) auto;
+        gap: 0;
+      }
+      .page-head_text {
+        grid-column: main / span 4;
       }
     }
   }

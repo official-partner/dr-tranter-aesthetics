@@ -4,6 +4,7 @@ interface Props {
   render?: boolean;
 }
 const { render = true } = Astro.props;
+import { clinic } from "@/data/clinic";
 ---
 
 {
@@ -16,14 +17,10 @@ const { render = true } = Astro.props;
           whole.
         </h1>
         <div class="hero-home_visit stack inset-optical">
-          <p class="text-style-label" data-figma="1:77">Byron Bay</p>
-          <p class="hero-home_address text-style-serif" data-figma="1:78">
-            1/54 Jonson Street,
-            <br />
-            Byron Bay NSW 2481
-          </p>
+          <p class="text-style-label" data-figma="1:77">{clinic.town}</p>
+          <p class="hero-home_address text-style-serif" data-figma="1:78" set:html={clinic.address.join("<br />")} />
         </div>
-        <p class="hero-home_phone text-style-serif" data-figma="1:79">(02) 6680 7819</p>
+        <p class="hero-home_phone text-style-serif" data-figma="1:79">{clinic.phone}</p>
         <div class="hero-home_frame">
           <div class="hero-home_media media ratio-5-6" data-figma="1:76">
             <img src="/img/hero.jpg" alt="A consultation at the clinic, two women seated at a small table by the window" width="550" height="663" />
