@@ -5,5 +5,64 @@
   "summary": "Temple volume loss slowly changes the underlying support structure for the whole upper face, often well before the change itself is ever consciously noticed.",
   "image": "../../assets/content/concerns/temple-hollowing.jpg",
   "imageAlt": "Skin with a pale line, close-up",
-  "alongside": []
+  "statement": "Temple volume loss slowly changes *the underlying support structure for the whole upper face*, often well before the change itself is ever consciously noticed.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "The temples are one of the first areas to lose volume as facial fat compartments change, and this affects the support structure for the brow and upper face more broadly. Because the change is easy to overlook in isolation, it is usually assessed alongside the rest of the face rather than as a stand-alone concern.",
+  "factors": [
+    {
+      "id": "gradual-structural-change",
+      "title": "Gradual structural change",
+      "text": "Temple hollowing typically develops gradually beneath the surface, which is why it is often noticed later than it began."
+    },
+    {
+      "id": "individual-rate-of-change",
+      "title": "Individual rate of change",
+      "text": "The pace at which temple hollowing progresses varies between patients, shaped by genetics, lifestyle and skin type."
+    },
+    {
+      "id": "compounding-factors",
+      "title": "Compounding factors",
+      "text": "Temple hollowing rarely occurs in isolation, and is usually assessed alongside related structural changes nearby."
+    }
+  ],
+  "recommended": "cosmetic-treatments",
+  "recommendedText": "Considered as the primary option for temple hollowing, restoring volume to support the upper face.",
+  "also": [
+    "biostimulators"
+  ],
+  "alongside": [
+    "volume-loss",
+    "jawline-and-chin"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We assess the temples with the brow and the upper face, since temple volume supports the whole area."
+    },
+    {
+      "id": "support-before-surface",
+      "title": "Support before surface",
+      "text": "Where the support beneath the skin has changed, that is considered before any surface concern."
+    },
+    {
+      "id": "a-gradual-approach",
+      "title": "A gradual approach",
+      "text": "Volume is restored gradually, directly or by stimulating the skin's own collagen over a course."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "Facial volume keeps changing with time, so the plan is reviewed at follow-up and adjusted as needed."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "peptide-firming-complex",
+    "daily-mineral-spf-50",
+    "barrier-repair-moisturiser"
+  ]
 }

@@ -5,5 +5,65 @@
   "summary": "Reduced elasticity means the skin no longer holds the same contours as closely as it once did, particularly through the cheeks, jawline and neck.",
   "image": "../../assets/content/concerns/skin-laxity.jpg",
   "imageAlt": "Skin texture, close-up",
-  "factors": []
+  "statement": "Reduced elasticity means the skin *no longer holds the same contours* as closely as it once did, particularly through the cheeks, jawline and neck.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "Skin holds its shape through a combination of structural support beneath it and its own elasticity. As both decline together, skin no longer sits as closely to the tissue beneath it, and gravity has a more visible effect. Laxity is usually assessed alongside the structural changes that accompany it, rather than treated as a surface concern alone.",
+  "factors": [
+    {
+      "id": "gradual-structural-change",
+      "title": "Gradual structural change",
+      "text": "Skin laxity and sagging typically develop gradually beneath the surface, which is why they are often noticed later than they began."
+    },
+    {
+      "id": "individual-rate-of-change",
+      "title": "Individual rate of change",
+      "text": "The pace at which skin laxity and sagging progress varies between patients, shaped by genetics, lifestyle and skin type."
+    },
+    {
+      "id": "compounding-factors",
+      "title": "Compounding factors",
+      "text": "Skin laxity and sagging rarely occur in isolation, and are usually assessed alongside related structural changes nearby."
+    }
+  ],
+  "recommended": "facetite",
+  "recommendedText": "Considered as a primary option for skin laxity, tightening the tissue beneath the surface where reduced elasticity is the main concern.",
+  "also": [
+    "morpheus8",
+    "emface"
+  ],
+  "alongside": [
+    "volume-loss",
+    "jawline-and-chin"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We assess laxity alongside the structural changes beneath it, rather than as a surface concern alone."
+    },
+    {
+      "id": "depth-before-surface",
+      "title": "Depth before surface",
+      "text": "Where the tissue beneath the skin has loosened, tightening at that level is usually considered first."
+    },
+    {
+      "id": "a-course-not-a-session",
+      "title": "A course, not a session",
+      "text": "Tightening builds gradually, so treatment is usually planned as a course with time between sessions."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "Elasticity keeps changing with time, so the plan is reviewed at follow-up and adjusted as needed."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "peptide-firming-complex",
+    "daily-mineral-spf-50",
+    "barrier-repair-moisturiser"
+  ]
 }

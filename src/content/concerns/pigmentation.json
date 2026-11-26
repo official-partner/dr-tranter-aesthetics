@@ -4,5 +4,68 @@
   "order": 8,
   "summary": "Years of sun exposure surface gradually, often appearing long after the exposure itself, and typically across the face, chest and the back of hands.",
   "image": "../../assets/content/concerns/pigmentation.jpg",
-  "imageAlt": "Forehead and eyes, close-up"
+  "imageAlt": "Forehead and eyes, close-up",
+  "statement": "Years of sun exposure *surface gradually, often appearing long after the exposure itself*, and typically across the face, chest and the back of hands.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "Pigment irregularities usually reflect years of cumulative sun exposure rather than a single event, surfacing gradually as melanin production becomes uneven across the skin. Hormonal factors and inflammation can also influence where and how pigment appears. Because the causes vary, the right approach depends on the pattern and depth of the pigmentation itself.",
+  "factors": [
+    {
+      "id": "cumulative-exposure",
+      "title": "Cumulative exposure",
+      "text": "Pigmentation and sun damage usually reflect cumulative exposure and skin behaviour over years, not a single recent cause."
+    },
+    {
+      "id": "barrier-and-turnover",
+      "title": "Barrier and turnover",
+      "text": "Changes to the skin barrier and cell turnover rate influence how visible pigmentation and sun damage become over time."
+    },
+    {
+      "id": "individual-variation",
+      "title": "Individual variation",
+      "text": "How pigmentation and sun damage present and respond to treatment varies meaningfully between skin types."
+    }
+  ],
+  "recommended": "pico-laser",
+  "recommendedText": "Considered as a precise option for pigmentation, targeting concentrated areas of discolouration with minimal disruption to surrounding skin.",
+  "also": [
+    "lumecca-ipl",
+    "co2-laser-resurfacing",
+    "medical-grade-peels",
+    "biorepeel"
+  ],
+  "alongside": [
+    "redness",
+    "texture-and-scarring"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We confirm the type of pigmentation before recommending anything, since sun damage and melasma respond differently."
+    },
+    {
+      "id": "depth-and-pattern",
+      "title": "Depth and pattern",
+      "text": "Where the pigment sits in the skin and how widely it is spread shape which treatment is considered."
+    },
+    {
+      "id": "protection-alongside",
+      "title": "Protection alongside",
+      "text": "Daily sun protection is part of the plan, since new exposure can undo progress."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "Pigment can return with sun exposure, so the plan is reviewed at follow-up and adjusted as needed."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "vitamin-c-antioxidant-serum",
+    "retinal-renewal-serum",
+    "daily-mineral-spf-50"
+  ]
 }

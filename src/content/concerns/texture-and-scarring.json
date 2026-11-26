@@ -4,5 +4,68 @@
   "order": 10,
   "summary": "Surface irregularity changes how light reads across the skin, which is why texture and scarring can often look far more pronounced under certain lighting.",
   "image": "../../assets/content/concerns/texture-and-scarring.jpg",
-  "imageAlt": "Skin texture, close-up"
+  "imageAlt": "Skin texture, close-up",
+  "statement": "Surface irregularity *changes how light reads across the skin*, which is why texture and scarring can often look far more pronounced under certain lighting.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "Uneven texture, enlarged pores and scarring change how light reflects across the skin, which is often what reads as tired or uneven rather than any single visible mark. These concerns usually develop from a combination of collagen changes, past breakouts and sun exposure, and are assessed together rather than treated as separate issues.",
+  "factors": [
+    {
+      "id": "cumulative-exposure",
+      "title": "Cumulative exposure",
+      "text": "Texture change and scarring usually reflect cumulative exposure and skin behaviour over years, not a single recent cause."
+    },
+    {
+      "id": "barrier-and-turnover",
+      "title": "Barrier and turnover",
+      "text": "Changes to the skin barrier and cell turnover rate influence how visible texture change and scarring become over time."
+    },
+    {
+      "id": "individual-variation",
+      "title": "Individual variation",
+      "text": "How texture change and scarring present and respond to treatment varies meaningfully between skin types."
+    }
+  ],
+  "recommended": "co2-laser-resurfacing",
+  "recommendedText": "Considered for more established texture and scarring, where a single, more intensive resurfacing treatment is likely to be effective.",
+  "also": [
+    "morpheus8",
+    "microneedling",
+    "medical-grade-peels",
+    "biorepeel"
+  ],
+  "alongside": [
+    "jawline-and-chin",
+    "skin-laxity"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We look at the type and depth of the texture or scarring, since surface irregularity and deeper scarring call for different treatments."
+    },
+    {
+      "id": "matching-the-depth",
+      "title": "Matching the depth",
+      "text": "Treatment is chosen to reach the depth at which the change sits, from gentle resurfacing to deeper remodelling."
+    },
+    {
+      "id": "a-course",
+      "title": "A course",
+      "text": "Texture improves gradually as the skin renews, so treatment is usually planned as a course."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "The plan is reviewed at follow-up and adjusted as the skin responds."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "vitamin-c-antioxidant-serum",
+    "retinal-renewal-serum",
+    "daily-mineral-spf-50"
+  ]
 }

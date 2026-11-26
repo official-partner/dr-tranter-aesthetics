@@ -2,5 +2,62 @@
   "name": "Lip enhancement",
   "group": "Structure",
   "order": 5,
-  "summary": "Lips lose volume and definition gradually, following the same structural changes as the rest of the face, with the border often softening first."
+  "summary": "Lips lose volume and definition gradually, following the same structural changes as the rest of the face, with the border often softening first.",
+  "statement": "Lips lose volume and definition gradually, *following the same structural changes as the rest of the face*, with the border often softening first.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "Lips lose volume and structural support over time, following the same underlying changes affecting the rest of the face. The lip border and cupid's bow often soften before overall volume loss becomes obvious, which is why definition is usually assessed separately from size.",
+  "factors": [
+    {
+      "id": "gradual-structural-change",
+      "title": "Gradual structural change",
+      "text": "A change in the lips typically develops gradually beneath the surface, which is why it is often noticed later than it began."
+    },
+    {
+      "id": "individual-rate-of-change",
+      "title": "Individual rate of change",
+      "text": "The pace at which a change in the lips progresses varies between patients, shaped by genetics, lifestyle and skin type."
+    },
+    {
+      "id": "compounding-factors",
+      "title": "Compounding factors",
+      "text": "A change in the lips rarely occurs in isolation, and is usually assessed alongside related structural changes nearby."
+    }
+  ],
+  "recommended": "cosmetic-treatments",
+  "recommendedText": "Considered as the primary option for lip enhancement, restoring volume and definition to a degree discussed and agreed at consultation.",
+  "alongside": [
+    "volume-loss",
+    "jawline-and-chin"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We assess the lips with the structure around them, since lip volume changes alongside the rest of the face."
+    },
+    {
+      "id": "proportion-first",
+      "title": "Proportion first",
+      "text": "The aim is lips in proportion with the face, with their border and shape considered before volume."
+    },
+    {
+      "id": "a-conservative-approach",
+      "title": "A conservative approach",
+      "text": "Volume is added in small steps, so the change stays in keeping with the face."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "The result is reviewed at follow-up and adjusted as needed."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "peptide-firming-complex",
+    "daily-mineral-spf-50",
+    "barrier-repair-moisturiser"
+  ]
 }

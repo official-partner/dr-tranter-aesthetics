@@ -173,8 +173,13 @@ const any = !!happening?.text || !!recommended || also.length > 0 || alongside.l
       .concern-body_card {
         grid-row: 1 / span 4;
         grid-column: main / span 3;
-        &:nth-of-type(2) {
+        &:nth-of-type(even) {
           grid-column: third / span 3;
+        }
+        /* a third and fourth treatment go on a second row (Pigmentation, Texture: four also considered) */
+        &:nth-of-type(n + 3) {
+          grid-row: 5 / span 4;
+          margin-top: var(--space-8);
         }
         &.is-wide {
           grid-row: 1 / span 3;

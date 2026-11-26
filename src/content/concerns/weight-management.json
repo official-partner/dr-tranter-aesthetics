@@ -2,5 +2,46 @@
   "name": "Weight and body composition",
   "group": "Surface",
   "order": 15,
-  "summary": "For patients wanting to discuss weight and body composition as part of a broader plan, assessed individually through a doctor-led consultation."
+  "summary": "For patients wanting to discuss weight and body composition as part of a broader plan, assessed individually through a doctor-led consultation.",
+  "statement": "For patients wanting to discuss weight and body composition *as part of a broader plan*, assessed individually through a doctor-led consultation.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "factors": [
+    {
+      "id": "individualised-assessment",
+      "title": "Individualised assessment",
+      "text": "Weight and body composition is assessed on an individual basis, considering health history and goals before any options are discussed."
+    }
+  ],
+  "recommended": "weight-loss-consultation",
+  "recommendedText": "A doctor-led consultation to discuss suitable options for weight and body composition, assessed individually.",
+  "steps": [
+    {
+      "id": "a-doctor-led-consultation",
+      "title": "A doctor-led consultation",
+      "text": "Weight and body composition are discussed with our doctor, as part of a broader plan."
+    },
+    {
+      "id": "suitability-first",
+      "title": "Suitability first",
+      "text": "Medical history and suitability are assessed before any option is discussed."
+    },
+    {
+      "id": "an-individual-plan",
+      "title": "An individual plan",
+      "text": "Any plan is built around the person, with ongoing doctor-led monitoring."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "Progress is reviewed at follow-up and the plan adjusted as needed."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "daily-mineral-spf-50",
+    "barrier-repair-moisturiser",
+    "hyaluronic-hydration-serum"
+  ]
 }

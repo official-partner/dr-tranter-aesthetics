@@ -2,5 +2,65 @@
   "name": "Under-eye hollowing",
   "group": "Structure",
   "order": 6,
-  "summary": "The under-eye area often hollows earlier than the rest of the face, and the shadowing from that hollowing can compound the visible effect considerably."
+  "summary": "The under-eye area often hollows earlier than the rest of the face, and the shadowing from that hollowing can compound the visible effect considerably.",
+  "statement": "The under-eye area often *hollows earlier than the rest of the face*, and the shadowing from that hollowing can compound the visible effect considerably.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "The under-eye area has some of the thinnest skin on the face and is often one of the earliest areas to show volume loss, which is frequently read as tiredness rather than a structural change. Shadowing from hollowing is often confused with pigmentation, so the two are assessed separately before any treatment is discussed.",
+  "factors": [
+    {
+      "id": "gradual-structural-change",
+      "title": "Gradual structural change",
+      "text": "Under-eye hollowing typically develops gradually beneath the surface, which is why it is often noticed later than it began."
+    },
+    {
+      "id": "individual-rate-of-change",
+      "title": "Individual rate of change",
+      "text": "The pace at which under-eye hollowing progresses varies between patients, shaped by genetics, lifestyle and skin type."
+    },
+    {
+      "id": "compounding-factors",
+      "title": "Compounding factors",
+      "text": "Under-eye hollowing rarely occurs in isolation, and is usually assessed alongside related structural changes nearby."
+    }
+  ],
+  "recommended": "cosmetic-treatments",
+  "recommendedText": "Considered for volume loss beneath the eye, using a conservative approach given the sensitivity of this area.",
+  "also": [
+    "biostimulators"
+  ],
+  "alongside": [
+    "volume-loss",
+    "jawline-and-chin"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We confirm whether the change comes from hollowing, shadowing or both, since each calls for a different approach."
+    },
+    {
+      "id": "support-around-the-eye",
+      "title": "Support around the eye",
+      "text": "The under-eye area is assessed with the cheek beneath it, since support there changes how the eye reads."
+    },
+    {
+      "id": "a-gradual-approach",
+      "title": "A gradual approach",
+      "text": "Treatment is planned in small steps, given how delicate the area is."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "The area keeps changing with time, so the plan is reviewed at follow-up and adjusted as needed."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "peptide-firming-complex",
+    "daily-mineral-spf-50",
+    "barrier-repair-moisturiser"
+  ]
 }

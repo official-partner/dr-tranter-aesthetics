@@ -2,5 +2,66 @@
   "name": "Neck, chest and hands",
   "group": "Surface",
   "order": 14,
-  "summary": "Skin on the neck, chest and hands often ages faster than the face, and is assessed and treated with the same rigour as any facial concern."
+  "summary": "Skin on the neck, chest and hands often ages faster than the face, and is assessed and treated with the same rigour as any facial concern.",
+  "statement": "Skin on the neck, chest and hands *often ages faster than the face*, and is assessed and treated with the same rigour as any facial concern.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "The neck, chest and hands are exposed to the same cumulative sun damage as the face but often receive far less care, so texture, pigmentation and laxity can appear more advanced in these areas. Treatment approaches are adapted from our facial protocols, using the same devices at settings suited to thinner or more exposed skin.",
+  "factors": [
+    {
+      "id": "cumulative-exposure",
+      "title": "Cumulative exposure",
+      "text": "Change on the neck, chest and hands usually reflects cumulative exposure and skin behaviour over years, not a single recent cause."
+    },
+    {
+      "id": "barrier-and-turnover",
+      "title": "Barrier and turnover",
+      "text": "Changes to the skin barrier and cell turnover rate influence how visible change on the neck, chest and hands becomes over time."
+    },
+    {
+      "id": "individual-variation",
+      "title": "Individual variation",
+      "text": "How change on the neck, chest and hands presents and responds to treatment varies meaningfully between skin types."
+    }
+  ],
+  "recommended": "morpheus8",
+  "recommendedText": "Considered for laxity and texture on the neck, chest or hands, using the Morpheus8 Body handpiece.",
+  "also": [
+    "lumecca-ipl",
+    "medical-grade-peels"
+  ],
+  "alongside": [
+    "jawline-and-chin",
+    "skin-laxity"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We assess the neck, chest and hands with the same rigour as any facial concern."
+    },
+    {
+      "id": "area-by-area",
+      "title": "Area by area",
+      "text": "Each area is considered on its own, since texture, laxity and pigment often differ between them."
+    },
+    {
+      "id": "protection-alongside",
+      "title": "Protection alongside",
+      "text": "Daily sun protection on these areas is part of the plan, since they are often exposed."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "The plan is reviewed at follow-up and adjusted as needed."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "vitamin-c-antioxidant-serum",
+    "retinal-renewal-serum",
+    "daily-mineral-spf-50"
+  ]
 }

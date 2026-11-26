@@ -4,5 +4,65 @@
   "order": 9,
   "summary": "Visible vessels and persistent redness often reflect a sensitivity built up over many years, and they tend to become steadily more noticeable with age.",
   "image": "../../assets/content/concerns/redness.jpg",
-  "imageAlt": "Skin with a pale line, close-up"
+  "imageAlt": "Skin with a pale line, close-up",
+  "statement": "Visible vessels and persistent redness often reflect *a sensitivity built up over many years*, and they tend to become steadily more noticeable with age.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "Visible redness and small vessels usually reflect a combination of skin sensitivity, sun exposure and the natural thinning of skin over time. Some redness is constant; some appears in response to triggers such as heat or movement. The pattern helps determine which approach is likely to be most effective.",
+  "factors": [
+    {
+      "id": "cumulative-exposure",
+      "title": "Cumulative exposure",
+      "text": "Redness and visible vessels usually reflect cumulative exposure and skin behaviour over years, not a single recent cause."
+    },
+    {
+      "id": "barrier-and-turnover",
+      "title": "Barrier and turnover",
+      "text": "Changes to the skin barrier and cell turnover rate influence how visible redness and visible vessels become over time."
+    },
+    {
+      "id": "individual-variation",
+      "title": "Individual variation",
+      "text": "How redness and visible vessels present and respond to treatment varies meaningfully between skin types."
+    }
+  ],
+  "recommended": "lumecca-ipl",
+  "recommendedText": "Considered as the primary option for visible redness and vessels, using light-based technology suited specifically to this concern.",
+  "also": [
+    "excel-v-plus"
+  ],
+  "alongside": [
+    "pigmentation",
+    "neck-chest-hands"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We look at whether the redness is diffuse or comes from visible vessels, since each responds to a different approach."
+    },
+    {
+      "id": "barrier-first",
+      "title": "Barrier first",
+      "text": "Where skin is sensitive, its barrier is supported before light or laser treatment is considered."
+    },
+    {
+      "id": "a-course",
+      "title": "A course",
+      "text": "Redness usually settles over a series of sessions rather than a single treatment."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "Sensitivity can return, so the plan is reviewed at follow-up and adjusted as needed."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "vitamin-c-antioxidant-serum",
+    "retinal-renewal-serum",
+    "daily-mineral-spf-50"
+  ]
 }

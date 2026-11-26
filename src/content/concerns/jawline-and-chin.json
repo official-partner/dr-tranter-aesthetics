@@ -4,5 +4,67 @@
   "order": 2,
   "summary": "Definition through the jawline often softens gradually over time, and is one of the more visible changes people first notice in their own photographs.",
   "image": "../../assets/content/concerns/jawline-and-chin.jpg",
-  "imageAlt": "Skin with a pale line, close-up"
+  "imageAlt": "Skin with a pale line, close-up",
+  "statement": "Definition through the jawline often *softens gradually over time*, and is one of the more visible changes people first notice in their own photographs.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "Definition through the jawline and chin depends on the balance between bone structure, soft tissue and skin tension. As support beneath the skin shifts and gravity has a longer effect, the line that once separated face from neck softens. This is usually a gradual change, and is often first noticed in photographs rather than the mirror.",
+  "factors": [
+    {
+      "id": "gradual-structural-change",
+      "title": "Gradual structural change",
+      "text": "A softer jawline typically develops gradually beneath the surface, which is why it is often noticed later than it began."
+    },
+    {
+      "id": "individual-rate-of-change",
+      "title": "Individual rate of change",
+      "text": "The pace at which a softer jawline progresses varies between patients, shaped by genetics, lifestyle and skin type."
+    },
+    {
+      "id": "compounding-factors",
+      "title": "Compounding factors",
+      "text": "A softer jawline rarely occurs in isolation, and is usually assessed alongside related structural changes nearby."
+    }
+  ],
+  "recommended": "cosmetic-treatments",
+  "recommendedText": "Considered where jawline definition has softened due to volume change, to restore contour without altering the face's overall proportions.",
+  "also": [
+    "facetite",
+    "morpheus8",
+    "emface"
+  ],
+  "alongside": [
+    "volume-loss",
+    "skin-laxity"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We look at the jawline, chin and neck together, since the line between face and neck depends on all three."
+    },
+    {
+      "id": "volume-or-laxity",
+      "title": "Volume or laxity",
+      "text": "We confirm whether the softening comes mainly from a change in volume or from laxity, since each points to a different treatment."
+    },
+    {
+      "id": "a-measured-approach",
+      "title": "A measured approach",
+      "text": "Contour is restored gradually, so the face keeps its own proportions."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "Definition keeps changing with time, so the plan is reviewed at follow-up and adjusted as needed."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "peptide-firming-complex",
+    "daily-mineral-spf-50",
+    "barrier-repair-moisturiser"
+  ]
 }

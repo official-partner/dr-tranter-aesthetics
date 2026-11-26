@@ -2,5 +2,66 @@
   "name": "Congestion and breakouts",
   "group": "Surface",
   "order": 11,
-  "summary": "Ongoing congestion is often a sign of an imbalanced routine or a compromised skin barrier, rather than a problem with the underlying skin itself."
+  "summary": "Ongoing congestion is often a sign of an imbalanced routine or a compromised skin barrier, rather than a problem with the underlying skin itself.",
+  "statement": "Ongoing congestion is often a sign of *an imbalanced routine or a compromised skin barrier*, rather than a problem with the underlying skin itself.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "Ongoing congestion usually reflects a combination of oil production, skin barrier function and the skin's own renewal cycle, rather than a single product or habit. Because the underlying cause varies between patients, an effective plan usually starts with understanding what kind of congestion is occurring before recommending a treatment.",
+  "factors": [
+    {
+      "id": "cumulative-exposure",
+      "title": "Cumulative exposure",
+      "text": "Congestion usually reflects cumulative exposure and skin behaviour over years, not a single recent cause."
+    },
+    {
+      "id": "barrier-and-turnover",
+      "title": "Barrier and turnover",
+      "text": "Changes to the skin barrier and cell turnover rate influence how visible congestion becomes over time."
+    },
+    {
+      "id": "individual-variation",
+      "title": "Individual variation",
+      "text": "How congestion presents and responds to treatment varies meaningfully between skin types."
+    }
+  ],
+  "recommended": "hydrafacial",
+  "recommendedText": "Considered as a deep-cleansing option for ongoing congestion, particularly where hydration is also a concern.",
+  "also": [
+    "biorepeel",
+    "medical-grade-peels"
+  ],
+  "alongside": [
+    "pigmentation",
+    "texture-and-scarring"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We look at the skin and the routine around it, since ongoing congestion often reflects an imbalanced routine or barrier."
+    },
+    {
+      "id": "routine-first",
+      "title": "Routine first",
+      "text": "The daily routine is adjusted before, or alongside, any in-clinic treatment."
+    },
+    {
+      "id": "gentle-clearing",
+      "title": "Gentle clearing",
+      "text": "In-clinic treatments clear congestion gently, so the barrier is supported rather than stripped."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "The plan is reviewed at follow-up and adjusted as the skin settles."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "vitamin-c-antioxidant-serum",
+    "retinal-renewal-serum",
+    "daily-mineral-spf-50"
+  ]
 }

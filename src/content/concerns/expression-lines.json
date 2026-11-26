@@ -2,5 +2,65 @@
   "name": "Lines from facial movement",
   "group": "Structure",
   "order": 4,
-  "summary": "Repeated muscle movement gradually etches lines into the skin that remain visible even at rest, long after the expression that made them has passed."
+  "summary": "Repeated muscle movement gradually etches lines into the skin that remain visible even at rest, long after the expression that made them has passed.",
+  "statement": "Repeated muscle movement gradually *etches lines into the skin* that remain visible even at rest, long after the expression that made them has passed.",
+  "consultation": "30 to 45 minutes",
+  "assessedBy": "Cosmetic Physician",
+  "happening": "Expression relies on repeated movement of the same muscles, and over time that repeated movement leaves a visible line in skin at rest. Some lines only appear during movement; others remain visible afterwards. Which category a line falls into changes what is likely to help, which is why assessment happens before any recommendation.",
+  "factors": [
+    {
+      "id": "gradual-structural-change",
+      "title": "Gradual structural change",
+      "text": "Lines from facial movement typically develop gradually beneath the surface, which is why they are often noticed later than they began."
+    },
+    {
+      "id": "individual-rate-of-change",
+      "title": "Individual rate of change",
+      "text": "The pace at which lines from facial movement progress varies between patients, shaped by genetics, lifestyle and skin type."
+    },
+    {
+      "id": "compounding-factors",
+      "title": "Compounding factors",
+      "text": "Lines from facial movement rarely occur in isolation, and are usually assessed alongside related structural changes nearby."
+    }
+  ],
+  "recommended": "cosmetic-treatments",
+  "recommendedText": "Considered for lines that remain visible at rest, where softening the underlying muscle movement is the most direct approach available.",
+  "also": [
+    "emface"
+  ],
+  "alongside": [
+    "volume-loss",
+    "jawline-and-chin"
+  ],
+  "alongsideText": "Often assessed alongside, since these concerns frequently share the same treatment options.",
+  "steps": [
+    {
+      "id": "assessment-first",
+      "title": "Assessment first",
+      "text": "We look at each line during movement and at rest, since which kind it is changes what is likely to help."
+    },
+    {
+      "id": "movement-and-rest",
+      "title": "Movement and rest",
+      "text": "Lines that appear only with expression and lines that remain at rest are considered differently."
+    },
+    {
+      "id": "a-conservative-approach",
+      "title": "A conservative approach",
+      "text": "Treatment softens lines while keeping natural expression, rather than stilling the face."
+    },
+    {
+      "id": "ongoing-review",
+      "title": "Ongoing review",
+      "text": "Lines respond over time, so the plan is reviewed at follow-up and adjusted as needed."
+    }
+  ],
+  "stepsImage": "../../assets/content/concerns/melasma-treat.jpg",
+  "stepsImageAlt": "Two women talking in the clinic",
+  "products": [
+    "peptide-firming-complex",
+    "daily-mineral-spf-50",
+    "barrier-repair-moisturiser"
+  ]
 }
