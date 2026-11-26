@@ -202,12 +202,19 @@ marker rail from a tablet up, centred on its first line's capitals: PageHead, No
   with `catches`): what a first visit is ([01] to [03]), its length (and its fee once known), then « Choose a time »,
   the link to Pabau, in place of the Figma's booking widget; « Not ready to book? » opens Send an enquiry in its place.
   Without the script a Book button goes straight to Pabau.
-- The registration banner (Figma 4001:300; `global/Registration.astro`): a strip on the sand above the bar on every
-  page, the notice from the main rail, « Read more » to Risks at the right edge; on a phone the link goes under it. The
+- The registration banner (Figma 4001:300; `global/Registration.astro`): a strip on the sand above the bar on the home
+  only (Sam, Nov 26), its × folds it away for the visit (session), the notice from the main rail, « Read more » to Risks at the right edge; on a phone the link goes under it. The
   strip and the bar are one block (`site-top` in BaseLayout): the bar lies over the page right under the strip, the
   page's own spacing unchanged. The AHPRA number is one fact (`clinic.ahpra`), read by the footer and the strip.
-- A sheet shows its address (`#book`, `#enquiry`, `#sarah-tranter`); the browser's back closes it; a link inside a
-  sheet to another takes its place.
+- A sheet shows its address (`#book`, `#enquiry`, `#sarah-tranter`), a step the site's router makes (never the
+  sheet itself: Back then read as a page change, Sam, Nov 26); the browser's back closes it; a link inside a sheet to
+  another opens that one in its place. Every link to the booking page opens in a new tab (Tracking.astro).
+- Pop-ups (Book a consultation, Send an enquiry; Sam, Nov 26: « file aux transitions de page »): the scrim darkens the
+  page (`--sheet-scrim` of the ink), the panel rises from the foot under its mask as an arriving page
+  (`--sheet-duration`, `--sheet-ease`, the page's own) and stops `--sheet-gap` (15vh) from the top, scrolling inside;
+  a click on the scrim, Back or Escape sends it back down (`--sheet-leave-duration`). The profile of Our team stays a
+  whole screen (a page of its own, Sam's words), closing in a plain crossfade.
+- The cookie banner: a quiet strip at the foot, the words and the two pills on one line, close padding (Sam, Nov 26).
 - Send an enquiry (Figma 4001:265) is a Sheet (`content/Sheet.astro`, the profiles' too) on every page, opened by
   `#enquiry` (Contact, The Clinic, the vouchers) or `#enquiry-careers` (Careers: the brief's C5 line first); its form
   is Pabau's Capture Form 14 in a frame, to be replaced by Pabau's own embed code.

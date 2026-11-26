@@ -7,7 +7,7 @@ import { clinic } from "@/data/clinic";
    booking page, which it stands in front of: without the script, the button goes straight there). What a first visit
    is, its length and fee, then the way to the clinic's booking page, where the time is chosen: the Figma's booking
    widget is that link (Mia Endozo's tracking guide, Nov 21, step 3: no booking embed, a plain link that Pabau tracks
-   itself). « Not ready to book? » opens Send an enquiry in its place. */
+   itself). « Not ready to book? », beside it, opens Send an enquiry in its place. */
 const steps = [
   { title: "Conversation", text: "We start with your concerns, your priorities and what you have already tried." },
   { title: "Assessment", text: "A careful look at your structure and surface, together." },
@@ -39,9 +39,12 @@ const facts = [
   <IndexList steps={steps} wide list="booking-steps" class="booking_steps" />
   <div class="booking_action stack">
     <p class="text-style-main">The time is chosen on the clinic's booking page.</p>
-    <Button element="link" href={clinic.booking}>Choose a time</Button>
+    {/* the two ways on, side by side (Sam, Nov 26, comment 33) */}
+    <div class="booking_buttons">
+      <Button element="link" href={clinic.booking}>Choose a time</Button>
+      <Button element="link" variant="link" href="#enquiry">Not ready to book? Send an enquiry →</Button>
+    </div>
   </div>
-  <Button element="link" variant="link" href="#enquiry" class="booking_enquiry">Not ready to book? Send an enquiry →</Button>
 </Sheet>
 
 <style is:global>
@@ -69,9 +72,11 @@ const facts = [
       align-items: start;
       margin-top: var(--space-8);
     }
-    .booking_enquiry {
-      grid-column: margin / end;
-      justify-self: end;
+    .booking_buttons {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-3) var(--space-6);
     }
     @media (width >= 48rem) {
       .booking_marker {

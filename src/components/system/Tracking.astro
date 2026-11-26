@@ -75,6 +75,11 @@ const optIn = tracking?.consent !== "opt-out";
     try {
       sessionStorage.setItem("dta_src", JSON.stringify(saved));
     } catch {}
+    /* the clinic's booking pages open in a new tab, the site left where it was (Sam, Nov 26, comment 32) */
+    document.querySelectorAll<HTMLAnchorElement>('a[href*="booking.pabau.com"]').forEach((a) => {
+      a.target = "_blank";
+      a.rel = "noopener";
+    });
     if (!Object.keys(saved).length) return;
     document.querySelectorAll<HTMLAnchorElement | HTMLIFrameElement>('a[href*="booking.pabau.com"], iframe[src*="booking.pabau.com"]').forEach((el) => {
       const attr = el instanceof HTMLIFrameElement ? "src" : "href";

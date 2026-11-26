@@ -300,7 +300,9 @@ import { clinic } from "@/data/clinic";
     menu.addEventListener("click", (e) => {
       const a = (e.target as HTMLElement).closest("a");
       if (!a) return;
-      const routed = root.dataset.pageTransition && a.origin === location.origin && !a.target && !a.hasAttribute("download") && !a.hasAttribute("data-astro-reload");
+      /* a place on this page (a pop-up: Contact, Careers) is no page change: the menu closes */
+      const here = a.pathname === location.pathname && a.search === location.search && Boolean(a.hash);
+      const routed = root.dataset.pageTransition && a.origin === location.origin && !here && !a.target && !a.hasAttribute("download") && !a.hasAttribute("data-astro-reload");
       if (routed && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) return;
       set(false);
     }, { signal });

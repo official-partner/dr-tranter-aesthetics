@@ -9,9 +9,11 @@ interface Props {
 }
 const { render = true } = Astro.props;
 /* The registration banner (Figma 4001:300): the founder's AHPRA registration, the 18+ notice and the risks, a thin
-   strip above the bar on every page, as the Figma draws it (1728 by 31), scrolling away with the page. The page under
-   it keeps its own spacing: the strip comes first and the bar sits right under it. The Figma's sentence ends with
-   « Read more » before the link of the same words: said once, as the link. */
+   strip above the bar on the home only (Sam, Nov 26, comment 30), as the Figma draws it (1728 by 31), scrolling away
+   with the page. The page under it keeps its own spacing: the strip comes first and the bar sits right under it. The
+   Figma's sentence ends with « Read more » before the link of the same words: said once, as the link. Its close
+   button folds it away and it stays closed for the visit (the tab's session): the short script right after it hides
+   it before the first paint, so the page never jumps. */
 ---
 
 {
@@ -22,10 +24,20 @@ const { render = true } = Astro.props;
         <p class="registration_text text-style-tight">
           {clinic.ahpra && <span class="registration_number">{clinic.ahpra}</span>} This website contains imagery suitable for audiences 18+. All non-surgical procedures carry risks.
         </p>
-        <Button element="link" variant="link" href={RISKS_PATH} class="registration_link">Read more →</Button>
+        <div class="registration_actions">
+          <Button element="link" variant="link" href={RISKS_PATH} class="registration_link">Read more →</Button>
+          <button type="button" class="registration_close" aria-label="Close this notice" data-registration-close>
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
         </div>
       </div>
     </aside>
+    <script is:inline>
+      try {
+        if (sessionStorage.getItem("dta-registration") === "closed") document.currentScript.previousElementSibling.hidden = true;
+      } catch {}
+    </script>
   )
 }
 
@@ -33,6 +45,7 @@ const { render = true } = Astro.props;
   @layer components {
     .registration_wrap {
       padding-block: var(--space-2);
+      overflow: hidden;
     }
     /* the notice, then its link against the right edge; on a phone the link goes under it */
     .registration_row {
@@ -49,11 +62,29 @@ const { render = true } = Astro.props;
     .registration_number {
       color: var(--text);
     }
+    .registration_actions {
+      display: inline-flex;
+      align-items: baseline;
+      gap: var(--space-5);
+    }
+    .registration_close {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--text-2);
+      font: inherit;
+      line-height: 1;
+      cursor: pointer;
+      transition: color var(--hover-duration) var(--hover-ease);
+      &:hover {
+        color: var(--text);
+      }
+    }
     /* the strip and the bar are one block at the page's top (BaseLayout's site-top): the bar, laid over the page,
        starts under the strip */
     .site-top {
       position: relative;
-      & > .registration_wrap + .nav_wrap {
+      & > .registration_wrap ~ .nav_wrap {
         top: 100%;
       }
     }
@@ -65,3 +96,37 @@ const { render = true } = Astro.props;
     }
   }
 </style>
+
+<script>
+  import { onPage } from "@/utils/page";
+
+  /* Closed: the strip folds away (its height, --open-duration on --ease-smooth: the bar and the page rise with it, the
+     one place a height moves, once) and stays closed for the tab's session. Reduced motion: it goes at once. */
+  onPage((signal) => {
+    const strip = document.querySelector<HTMLElement>(".registration_wrap");
+    strip?.querySelector("[data-registration-close]")?.addEventListener(
+      "click",
+      () => {
+        try {
+          sessionStorage.setItem("dta-registration", "closed");
+        } catch {}
+        const css = getComputedStyle(document.documentElement);
+        const v = css.getPropertyValue("--open-duration").trim();
+        const duration = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : (parseFloat(v) || 0) * (v.endsWith("ms") ? 1 : 1000);
+        const easing = css.getPropertyValue("--ease-smooth").trim();
+        const h = strip.offsetHeight;
+        /* the menu's button, fixed where the bar was, rises with it, then takes its new place (Nav, on resize) */
+        const toggle = document.querySelector<HTMLElement>(".nav_toggle[data-fixed]");
+        const lift = toggle?.animate([{ translate: "0 0" }, { translate: `0 -${h}px` }], { duration, easing, fill: "forwards" });
+        strip
+          .animate([{ height: `${h}px`, opacity: 1 }, { height: "0px", paddingBlock: "0px", opacity: 0 }], { duration, easing })
+          .finished.then(() => {
+            strip.hidden = true;
+            dispatchEvent(new Event("resize"));
+            lift?.cancel();
+          });
+      },
+      { signal },
+    );
+  });
+</script>

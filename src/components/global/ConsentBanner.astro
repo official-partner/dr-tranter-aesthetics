@@ -12,7 +12,7 @@ const on = !!(config as { tracking?: unknown }).tracking;
 {
   on && (
     <aside class="consent_wrap theme-dark" aria-label="Cookies" hidden data-consent>
-      <p class="consent_text text-style-main">
+      <p class="consent_text text-style-tight">
         We use cookies to understand how the site is used and to measure our advertising, only if you accept. <a href="/legal/privacy-policy">Privacy policy</a>
       </p>
       <Button element="button" data-consent-choice="yes">Accept</Button>
@@ -23,16 +23,18 @@ const on = !!(config as { tracking?: unknown }).tracking;
 
 <style is:global>
   @layer components {
-    /* a small panel at the foot of the screen, over the page; it fades in once the page is there */
+    /* a small, quiet strip at the foot of the screen, over the page (Sam, Nov 26, comment 35: « plus condensé, plus
+       subtil »): the words and the two pills on one line where they fit, close padding; it fades in once the page is
+       there */
     .consent_wrap {
       position: fixed;
       inset: auto var(--site-margin) var(--site-margin) var(--site-margin);
       z-index: var(--z-overlay, 50);
       display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-5) var(--space-4);
-      max-width: 32rem;
-      padding: var(--space-6);
+      align-items: center;
+      gap: var(--space-3);
+      max-width: 40rem;
+      padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
       /* a hairline, so it reads on the dark grounds too */
       border: var(--border-width) solid var(--text-3);
       opacity: 1;
@@ -44,11 +46,21 @@ const on = !!(config as { tracking?: unknown }).tracking;
         display: none;
       }
     }
-    /* the words on their own line, the two pills under them */
     .consent_text {
-      flex-basis: 100%;
+      flex: 1 1 auto;
+      margin-right: var(--space-2);
+      color: var(--text-2);
       & a {
-        color: inherit;
+        color: var(--text);
+      }
+    }
+    /* on a phone the words over the pills */
+    @media (width < 48rem) {
+      .consent_wrap {
+        flex-wrap: wrap;
+      }
+      .consent_text {
+        flex-basis: 100%;
       }
     }
   }

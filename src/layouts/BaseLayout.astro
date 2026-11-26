@@ -35,9 +35,11 @@ type Props = SeoProps & {
   footerLogo?: boolean;
   /** The nav's colours, those of the page's opening: dark (the home), light (a page opening on sand). */
   navTheme?: "dark" | "light";
+  /** The registration banner above the bar: the home only (Sam, Nov 26, comment 30). */
+  registration?: boolean;
 };
 
-const { theme = "inherit", overlap = false, nav = true, navTheme = "dark", footerLogo = true, ...seo } = Astro.props;
+const { theme = "inherit", overlap = false, nav = true, navTheme = "dark", footerLogo = true, registration = false, ...seo } = Astro.props;
 
 /* The finishing touches, each off until op.config.json turns it on (src/utils/finishes.ts): the loading screen, the
    transition between pages, the smooth scroll. A "custom" one without its file stands in as its first preset. */
@@ -83,7 +85,7 @@ const { smoothScroll } = finish;
     {transition && <PageTransitions part="body" preset={transition} />}
     <SkipLink label={SITE_LOCALE.startsWith("fr") ? "Aller au contenu" : "Skip to content"} />
     <div class="site-top">
-      <Registration render={nav !== false} />
+      <Registration render={registration && nav !== false} />
       <Nav overlap={overlap} render={nav !== false} quiet={nav === "menu"} theme={navTheme} />
     </div>
     <main id="main" tabindex="-1">

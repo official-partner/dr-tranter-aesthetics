@@ -127,8 +127,8 @@ const people = team.map(({ id, data }) => ({
        and its crop at once, `transform` and `clip-path` only); the profile's blocks come in one after the other as
        the site's pages do (--page-enter-shift, --page-enter-duration, --page-enter-stagger, after --profile-text-wait).
        The sheet's ground stays see-through until the page has gone: it is the same dark.
-     - Closing (Back, Escape, the browser's back): the reverse; the portrait goes back to its row
-       (--profile-return-duration) and the page's blocks come back in.
+     - Closing (Back, Escape, the browser's back): a crossfade, the profile out as the page comes back
+       (--profile-return-duration; Sam, Nov 26, comment 31), no name left chosen in the list.
      - No photo beside the list (a tablet, a phone, a person without one, an address opened directly): the same steps,
        the portrait coming in with the other blocks.
      - Reduced motion: the sheet's fade, nothing travels. */
@@ -176,8 +176,9 @@ const people = team.map(({ id, data }) => ({
         delay,
         fill: "backwards",
       });
+    /* the bar only fades: moving it would carry the menu's button, fixed inside it, along (comment 31) */
     const away = (el: HTMLElement) =>
-      el.animate([{ opacity: 0, translate: `0 calc(${token("--page-enter-shift")} * -1)` }], {
+      el.animate([el.matches(".nav_inner") ? { opacity: 0 } : { opacity: 0, translate: `0 calc(${token("--page-enter-shift")} * -1)` }], {
         duration: ms("--profile-leave-duration"),
         easing: token("--ease-smooth"),
         fill: "forwards",
@@ -190,7 +191,7 @@ const people = team.map(({ id, data }) => ({
     const clear = (el: HTMLElement) => ["opacity", "translate", "transform", "clip-path", "border-top-color"].forEach((p) => el.style.removeProperty(p));
     const settle = (a: Animation) => a.finished.catch(() => undefined);
 
-    type Run = { page: HTMLElement[]; rules: HTMLElement[]; anims: Animation[]; row: HTMLElement | null; follow: HTMLElement | null; lands: boolean };
+    type Run = { page: HTMLElement[]; rules: HTMLElement[]; anims: Animation[]; row: HTMLElement | null; follow: HTMLElement | null };
     const runs = new WeakMap<HTMLDialogElement, Run>();
     const end = (d: HTMLDialogElement) => {
       const run = runs.get(d);
@@ -214,13 +215,13 @@ const people = team.map(({ id, data }) => ({
         (e) => {
           end(d);
           if (calm.matches) return;
-          const { trigger, from } = (e as CustomEvent<{ trigger: Element | null; from: Element | null }>).detail;
+          const { trigger } = (e as CustomEvent<{ trigger: Element | null }>).detail;
           const row = trigger?.closest<HTMLElement>(".concern-index_item") ?? rowFor(d.id);
           const src = picture && media ? sourceOf(row, true) : null;
-          const page = [...document.querySelectorAll<HTMLElement>(".nav_inner, main > :not(dialog) > *, body > footer > *")].filter((el) => inView(el.getBoundingClientRect()));
+          const page = [...document.querySelectorAll<HTMLElement>(".registration_wrap, .nav_inner, main > :not(dialog) > *, body > footer > *")].filter((el) => inView(el.getBoundingClientRect()));
           const parts = [...layout.children].filter((el): el is HTMLElement => el instanceof HTMLElement && (el !== media || !src));
           const rules = [...document.querySelectorAll<HTMLElement>("main > .section-rule")].filter((el) => inView(el.getBoundingClientRect()));
-          const run: Run = { page, rules, anims: [], row, follow: src?.follow ?? null, lands: Boolean(from && row?.contains(from)) };
+          const run: Run = { page, rules, anims: [], row, follow: src?.follow ?? null };
           runs.set(d, run);
           d.classList.add("is-moving");
 
@@ -265,55 +266,32 @@ const people = team.map(({ id, data }) => ({
           run.anims = [];
           d.classList.add("is-moving");
 
-          let photo: Animation | null = null;
-          const dest = media && picture ? sourceOf(run.row, false) : null;
-          if (media && dest) {
-            const now = { transform: media.style.transform || whole.transform, clipPath: media.style.clipPath || whole.clipPath };
-            clear(media);
-            const frame = media.getBoundingClientRect();
-            if (inView(frame)) {
-              const to = over(dest.box, frame);
-              /* it lands on its row when the focus goes back there (its photo shows again), else it fades as it lands */
-              photo = media.animate(
-                [
-                  { ...now, opacity: 1 },
-                  { opacity: 1, offset: 0.7 },
-                  { ...to, opacity: run.lands ? 1 : 0 },
-                ],
-                { duration: ms("--profile-return-duration"), easing: token("--profile-ease"), fill: "forwards" },
-              );
-              run.anims.push(photo);
-            }
-          }
-          [...layout.children].forEach((el) => {
-            if (el instanceof HTMLElement && !(photo && el === media)) run.anims.push(away(el));
-          });
-          /* the page's blocks come back in, in reading order, as the profile goes */
-          const step = ms("--page-enter-stagger");
-          run.page.forEach((el, i) => {
+          /* a plain crossfade (Sam, Nov 26, comment 31: « plus simple, fade, ne pas bouger l'image »): the profile
+             fades out whole as the page's blocks fade back in place, nothing travels */
+          const duration = ms("--profile-return-duration");
+          const easing = token("--ease-smooth");
+          run.anims.push(d.animate([{ opacity: 1 }, { opacity: 0 }], { duration, easing, fill: "forwards" }));
+          run.page.forEach((el) => {
             clear(el);
-            rise(el, step * (i + 1));
+            el.animate([{ opacity: 0 }, { opacity: 1 }], { duration, easing });
           });
           run.rules.forEach((el) => {
             clear(el);
-            rerule(el);
+            el.animate([{ borderTopColor: "transparent", offset: 0 }], { duration, easing });
           });
           wait(Promise.all(run.anims.map(settle)));
         },
         { signal },
       );
 
-      /* closed: everything back as the page wrote it; the photo shows on its row at once if the focus went back there */
+      /* closed: everything back as the page wrote it, and no name left chosen in the list (comment 31): the focus that
+         went back to its link is let go, unless it came from the keyboard */
       d.addEventListener(
         "close",
         () => {
-          const follow = runs.get(d)?.follow;
           end(d);
-          if (follow?.closest<HTMLElement>(".concern-index_wrap")?.dataset.follow === "on") {
-            follow.style.transition = "none";
-            void getComputedStyle(follow).opacity;
-            requestAnimationFrame(() => follow.style.removeProperty("transition"));
-          }
+          const f = document.activeElement as HTMLElement | null;
+          if (f?.closest(".concern-index_wrap") && !f.matches(":focus-visible")) f.blur();
         },
         { signal },
       );

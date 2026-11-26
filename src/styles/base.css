@@ -79,6 +79,13 @@
   --profile-ease: var(--ease-osmo);
   --profile-leave-duration: 450ms;
   --profile-text-wait: 300ms;
+  --sheet-gap: 15vh;
+  --sheet-duration: var(--page-arrive-duration);
+  --sheet-ease: var(--page-arrive-ease);
+  --sheet-leave-duration: 700ms;
+  --sheet-leave-ease: var(--ease-curtain);
+  --sheet-scrim: var(--tone-muted);
+  --sheet-scrim-duration: var(--open-duration);
   --pinned-top: calc(var(--site-margin) + var(--pill-y));
   --page-dim: 0.55;
   --menu-open-duration: 1000ms;
