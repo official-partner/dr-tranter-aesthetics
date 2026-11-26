@@ -27,9 +27,9 @@ const { render = true, title, facts, text, action, theme = "light", figma } = As
     <section class:list={["page-head_wrap section-padding", `theme-${theme}`]} data-figma-band="head" data-band-top={figma?.top}>
       <div class="page-head_layout site-grid">
         <span class="marker page-head_marker" data-figma={figma?.marker} />
-        <h1 class="page-head_title lead-marker text-style-h2" data-figma={figma?.title} set:html={title} />
+        <h1 class="page-head_title lead-marker text-style-h2" data-figma={figma?.title} data-cut-swap={title.includes("<em>") ? "" : undefined} set:html={title} />
         {facts && (
-          <dl class="page-head_facts">
+          <dl class="page-head_facts fact-row">
             {facts.map((f) => (
               <div class="stack">
                 <dt class="text-style-label">{f.label}</dt>
@@ -67,10 +67,12 @@ const { render = true, title, facts, text, action, theme = "light", figma } = As
       margin-top: var(--space-10);
     }
     .page-head_facts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-6) var(--space-8);
       margin-bottom: 0;
+      @media (width < 64rem) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-6) var(--space-8);
+      }
     }
     .page-head_text {
       max-width: 60ch;
@@ -112,12 +114,6 @@ const { render = true, title, facts, text, action, theme = "light", figma } = As
         grid-column: main / span 5;
         /* five columns, the lines balanced: the Figma's boxes differ by page (567, 600, 637 at 1728), the system keeps one */
         text-wrap: balance;
-      }
-      /* on the Figma's steps (The Clinic: 280 and 354 at 1728) */
-      .page-head_facts {
-        display: grid;
-        grid-template-columns: calc(280 * var(--u)) calc(354 * var(--u)) auto;
-        gap: 0;
       }
       .page-head_text {
         grid-column: main / span 4;

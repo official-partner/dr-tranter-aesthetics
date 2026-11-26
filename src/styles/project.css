@@ -176,11 +176,12 @@
   }
 }
 
-/* An image frame: the picture fills it, centred; the ratio is one of the system's families */
+/* An image frame: the picture fills it, centred. Two ratios only (Sam, Nov 25, comment 17: « uniformiser les ratios
+   verticales et horizontales »): upright 5:6 (the default) and wide 1.45 */
 .media {
   position: relative;
   overflow: hidden;
-  aspect-ratio: var(--ratio, 4 / 5);
+  aspect-ratio: var(--ratio, 5 / 6);
   background-color: var(--background-skeleton);
   & > img {
     position: absolute;
@@ -196,18 +197,6 @@
   &.ratio-145 {
     --ratio: 1.45;
   }
-  &.ratio-16-10 {
-    --ratio: 16 / 10;
-  }
-  &.ratio-9-7 {
-    --ratio: 9 / 7;
-  }
-  &.ratio-7-10 {
-    --ratio: 7 / 10;
-  }
-  &.ratio-1-1 {
-    --ratio: 1;
-  }
 }
 
 /* Every section's padding, the same at the top and the bottom: the small one, the side margin (Sam, Nov 10, 12:54).
@@ -221,4 +210,18 @@
    Tailored to your skin: Figma 4001:413), as the blocks of a concern's body do */
 .section-rule {
   border-top: var(--border-width) solid var(--text-3);
+}
+
+/* Facts on the grid (Sam, Nov 25, comment 21: « ces blocs sont pas alignés sur la grille »): from a computer up, each
+   fact on two columns of its row, one after the other (a page's or an item's opening, an article's foot). The
+   component places the row (main to the end) and sets the facts' look on smaller screens. */
+@media (width >= 64rem) {
+  .fact-row {
+    display: grid;
+    grid-template-columns: subgrid;
+    gap: var(--space-6) var(--site-gutter);
+    & > * {
+      grid-column: span 2;
+    }
+  }
 }

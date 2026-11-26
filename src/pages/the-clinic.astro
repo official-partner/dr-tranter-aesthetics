@@ -48,6 +48,7 @@ const enquiry = connectLinks.find((l) => l.label === "Contact")?.href ?? "/";
     theme="stone"
     title="How a first <em>visit works</em>"
     wideText
+    endWide
     list="first-visit"
     steps={[
       { title: "Your history", text: "We start with your medical history and any treatments you have had elsewhere, since past results and reactions are often the most reliable guide to what will suit you." },
@@ -60,6 +61,7 @@ const enquiry = connectLinks.find((l) => l.label === "Contact")?.href ?? "/";
   <TextSection
     theme="stone"
     rule
+    endWide
     title="Combination <em>treatments</em>"
     text="Many concerns respond best to more than one treatment. Rather than combining everything into a single session, plans are usually sequenced: the main concern first, then a review before the next step. A device-led course for deeper remodelling, for example, may be followed by a gentler treatment that maintains it between courses."
     action={{ label: "Browse treatments →", href: "/treatments" }}
@@ -68,6 +70,7 @@ const enquiry = connectLinks.find((l) => l.label === "Contact")?.href ?? "/";
   <TextSection
     theme="stone"
     rule
+    endWide
     title="Essentials <em>skin treatments</em>"
     text="A curated range of intro-level treatments, for patients starting their skin journey and for maintaining their results over time."
     action={{ label: "All treatments →", href: "/treatments" }}
@@ -76,6 +79,7 @@ const enquiry = connectLinks.find((l) => l.label === "Contact")?.href ?? "/";
   <TextSection
     theme="stone"
     rule
+    endWide
     title="Clinic <em>membership</em>"
     text="Clinic membership is coming soon. We will share the details here once it opens."
   />

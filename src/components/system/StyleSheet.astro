@@ -35,7 +35,7 @@ const swatches = [["ink", "#2c0f0a"], ["cream", "#e1dcbc"], ["sand", "#ded5c2"],
 const themes = [["light", "sable (défaut)"], ["stone", "pierre"], ["mist", "brume"], ["dark", "encre, texte crème"], ["dark-sand", "encre, texte sable"]];
 const spaces = Object.keys(S.fluid).filter((k) => /^space-\d+$/.test(k)).sort((a, b) => +a.split("-")[1] - +b.split("-")[1]);
 const rails = [["margin", "c1"], ["inset", "c3"], ["marker", "c4"], ["main", "c5"], ["detail", "c6"], ["half", "c8"], ["third", "c9"], ["aside", "c10"], ["aside-text", "c11"]];
-const ratios = [["ratio-5-6", "5:6"], ["", "4:5"], ["ratio-145", "1,45"], ["ratio-16-10", "16:10"], ["ratio-9-7", "9:7"], ["ratio-7-10", "7:10"], ["ratio-1-1", "1:1"]];
+const ratios = [["ratio-5-6", "5:6"], ["ratio-145", "1,45"]];
 ---
 
 <section class="style-sheet_wrap" data-figma-band="style">

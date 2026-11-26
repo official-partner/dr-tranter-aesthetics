@@ -64,15 +64,10 @@ const posts = (await listed<"articles">("journal")).map(({ id, data }) => ({
     .journal-index_list {
       display: contents;
     }
-    /* four shapes, again and again, counted among the cards a filter shows: wide, tall, upright, wide again */
+    /* four places, again and again, counted among the cards a filter shows: wide, upright, upright, wide (the two ratios
+       of the site, comment 17) */
     .journal-index_card {
-      &:nth-child(4n + 1 of :not([hidden])) > .media {
-        --ratio: 16 / 10;
-      }
-      &:nth-child(4n + 2 of :not([hidden])) > .media {
-        --ratio: 7 / 10;
-      }
-      &:nth-child(4n + 3 of :not([hidden])) > .media {
+      &:is(:nth-child(4n + 2 of :not([hidden])), :nth-child(4n + 3 of :not([hidden]))) > .media {
         --ratio: 5 / 6;
       }
       /* the fourth, the widest: its title on one or two lines */

@@ -76,10 +76,10 @@ the theme's text at a set opacity (`--tone-*`), so it follows every ground.
 ## Global classes (`src/styles/project.css`)
 `site-grid` (the grid and its named lines), `stack` (a vertical stack, gap from a space token), `at-end` (an action
 against the right edge), `marker` (the small square), `inset-optical` (the optical indent of capitals),
-`media` (an image box: ratio class, the picture absolute, cover, centred; ratios 5:6, 1.45, 16:10, 9:7, 7:10, 1:1;
+`media` (an image box: ratio class, the picture absolute, cover, centred; two ratios only since Nov 25 (Sam, comment 17): upright 5:6, the default, and wide 1.45;
 a frame whose photo is still to come stays, empty, on `--background-skeleton`, so the composition holds: Nov 20),
 `link-list` (a list of plain links: no underline, on hover, on focus and for the page shown the link slides `--space-2` right and a square 0.8 marker shows before it; with a mouse one square glides from link to link and rests on the page shown, src/utils/link-marker.ts; the menu and the footer, Nov 20 and 24), `linked-card` (a block with a photo and a link is one link: its `data-card-link` stretches over it, and its photo comes forward on hover; Card, the journal's cards, a concern page's treatment cards; Sam, Nov 24), `stacked-card` (a card's picture as wide as the card, its texts stacked: Card, the journal, the products), `section-padding` (every section's padding; 15 uses on Nov 20, the rule's ceiling: the next page that needs it calls for a look at the class), `lead-marker` (the marker leading a text where the grid has no column
-for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width), `section-rule` (a band that follows
+for it: a tablet or a phone; Sam, Nov 10: the marker is kept at every width), `fact-row` (facts on the grid from a computer up, each on two columns from the main rail: ItemHead, PageHead, ArticleBody; Sam, Nov 25, comment 21), `section-rule` (a band that follows
 another on the same ground starts on a hairline, `--text-3`: a section's `rule` prop, TextSection, CardGroup,
 StepsSection, DetailsSection; a treatment's page, Nov 25).
 
@@ -164,6 +164,13 @@ StepsSection, DetailsSection; a treatment's page, Nov 25).
 - Results (Figma 4001:737): PageHead with a text and a link (the results-vary note, the Risks page), CardGroup of
   results: a Card holds a before and an after side by side in one 1.45 frame (`before`, a hairline of the ground
   between them) and an inline caption (the name, its link on the right); a pill per category that has a result.
+
+## The cut swap (Nov 25, comments 14, 15, 18)
+- Every important text in the h2's style at a page's opening (the home's, a page head's with a lighter cut, a concern's
+  or a treatment's statement) and every closing band's title swaps its two cuts every `--swap-every`
+  (`src/components/system/CutSwap.astro`, `data-cut-swap`). Its lines hold: the breaks are found in the wider cut and
+  held (`<br data-cut-br>`, nowrap), so no word changes line during or after the glide; found again on a new width.
+  Not under reduced motion, not while OP System edits the text.
 
 ## Filters
 - A group's filters (the Treatments page, Nov 20): pills in the buttons' text style, `--tag-y` and `--tag-x` inside

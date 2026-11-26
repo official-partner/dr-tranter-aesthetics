@@ -6,7 +6,7 @@ import { listed, ruleMarks } from "@/utils/lists";
 /* The home's journal (Figma « Starter (Copy) » 4001:2, Nov 25): four articles set apart across the grid, each its own
    size, the last with its title above its photo. The articles the list « journal-home » shows (its rule in
    src/data/lists.json: the first four, which OP System's List options changes). A fifth would follow the fourth. */
-const shapes = ["is-a ratio-16-10", "is-b ratio-7-10", "is-c ratio-5-6", "is-d ratio-145"];
+const shapes = ["is-a ratio-145", "is-b ratio-5-6", "is-c ratio-5-6", "is-d ratio-145"];
 const posts = (await listed<"articles">("journal-home")).map(({ id, data }, i) => ({
   id,
   title: data.title,

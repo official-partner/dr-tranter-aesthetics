@@ -56,9 +56,9 @@
  "1:82": {
   "d": [
    0,
-   91.0
+   94.1
   ],
-  "why": "same row as the hover item ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +123.6"
+  "why": "same row as the hover item ; Sam, 10 nov : padding de section uniformisé (texte 64, bande image 24), +16 ; Sam, 10 nov 12:54 : petit padding (24) partout, -40 ; Sam, 10 nov, commentaire 26 : la liste commence sous son titre (tablette et ordinateur), +123.6; at 5:6 since Nov 25 (Sam, comment 17: one upright ratio on the site), 7 shorter than the Figma's 4:5, centred on its row"
  },
  "1:88": {
   "d": [

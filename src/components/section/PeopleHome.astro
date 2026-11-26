@@ -76,12 +76,11 @@ const people = team.map(({ id, data }) => ({
 
 <style is:global>
   @layer components {
-    /* The portrait (Sam, Nov 25, comment 5): the portraits' ratio (--people-ratio, 5:6), as tall as the screen less the
-       margin above and below when its columns allow; else as wide as its columns (half to the end) and set at the top
-       right. The names and the words never pass under it. Its photos lie one on the other. */
+    /* The portrait: the home's approach photo exactly, on its columns and at its ratio (Sam, Nov 25, comment 16: « prendre
+       exactement ce layout pour la photo… ça ne marche pas d'avoir la photo split screen »): the aside to the end, 5:6.
+       The names and the words never pass under it. Its photos lie one on the other. */
     .people-home_media {
       position: relative;
-      width: min(100%, (100svh - var(--site-margin) * 2) * var(--people-ratio));
       aspect-ratio: var(--people-ratio);
       background-color: var(--background-skeleton);
       overflow: clip;
@@ -224,13 +223,10 @@ const people = team.map(({ id, data }) => ({
         top: var(--section-padding);
       }
       .people-home_media {
-        grid-column: half / end;
-        justify-self: end;
+        grid-column: aside / end;
         align-self: start;
         position: sticky;
-        top: var(--site-margin);
-        /* the section's own padding is the margin: the portrait starts at its top */
-        margin-top: calc(var(--section-padding) * -1 + var(--site-margin));
+        top: var(--section-padding);
       }
       /* The square holds at the middle of the screen while the names pass, and goes on with the last name (Sam,
          comment 7: « sticky jusqu'au dernier nom… ensuite il peut scroller normalement »): it spans the names' rows

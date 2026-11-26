@@ -83,7 +83,7 @@ const hasTiers = (d.tiers?.length ?? 0) > 0;
     />
     {/* How it works */}
     {hasHow && (
-      <TextSection theme="stone" title="How <em>it works</em>" text={d.how ?? ""} list={device.length > 0 ? device : undefined} />
+      <TextSection theme="stone" endWide title="How <em>it works</em>" text={d.how ?? ""} list={device.length > 0 ? device : undefined} />
     )}
     {/* What it may address */}
     {addresses.length > 0 ? (
@@ -102,7 +102,7 @@ const hasTiers = (d.tiers?.length ?? 0) > 0;
       />
     ) : (
       d.outcomes && d.outcomes.length > 0 && (
-        <TextSection theme="stone" rule={hasHow} title="What <em>it may</em> address" text={`${d.outcomes.join(". ")}. ${note}`} />
+        <TextSection theme="stone" rule={hasHow} endWide title="What <em>it may</em> address" text={`${d.outcomes.join(". ")}. ${note}`} />
       )
     )}
     {/* Tailored to your skin */}

@@ -34,7 +34,7 @@ const html = richHtml(body, classes);
           </aside>
         )}
         {facts.length > 0 && (
-          <dl class="article-body_facts">
+          <dl class="article-body_facts fact-row">
             {facts.map((f) => (
               <div class="stack">
                 <dt class="text-style-label">{f.label}</dt>
@@ -97,10 +97,12 @@ const html = richHtml(body, classes);
       margin-top: var(--space-action);
     }
     .article-body_facts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-5) var(--space-10);
       margin: 0;
+      @media (width < 64rem) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-5) var(--space-10);
+      }
     }
     @media (width >= 48rem) {
       .article-body_text {

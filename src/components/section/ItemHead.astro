@@ -58,7 +58,7 @@ const f = (id: string) => (figma ? id : undefined);
         <div class="item-head_media media ratio-5-6" data-op-field="image" data-figma={f("1:359")}>
           {image && <Img {...pic(image.src)} alt={image.alt ?? ""} loading="eager" fetchPriority="high" variant="constrained" sizes="(width >= 48rem) 25vw, 75vw" />}
         </div>
-        <dl class="item-head_facts">
+        <dl class="item-head_facts fact-row">
           {facts.map((f) => (
             <div class="item-head_fact stack">
               <dt class="text-style-label" data-figma={f.ids?.[0]}>{f.label}</dt>
@@ -73,44 +73,7 @@ const f = (id: string) => (figma ? id : undefined);
 }
 
 <style is:global>
-  /* The opening statement swaps its two cuts (Sam, Nov 25, comment 14: « ce qui est en sans va devenir en mix, ce qui est
-     en mix va devenir en sans médium… un switch smooth, loop infinie, chaque 5 s »; on the page's opening only). Two
-     registered numbers carry the cut, so the font's axes glide between them. */
-  @property --_swap-axis {
-    syntax: "<number>";
-    inherits: true;
-    initial-value: 0;
-  }
-  @property --_swap-weight {
-    syntax: "<number>";
-    inherits: true;
-    initial-value: 550;
-  }
   @layer components {
-    [data-cut-swap] {
-      --_swap-axis: var(--h2-font-axis);
-      --_swap-weight: var(--h2-font-weight);
-      & em {
-        --_swap-axis: 50;
-        --_swap-weight: 420;
-      }
-      &.is-swapped {
-        --_swap-axis: 50;
-        --_swap-weight: 420;
-        & em {
-          --_swap-axis: var(--h2-font-axis);
-          --_swap-weight: var(--h2-font-weight);
-        }
-      }
-      &,
-      & em {
-        font-weight: var(--_swap-weight);
-        font-variation-settings: "SERF" var(--_swap-axis), "wght" var(--_swap-weight);
-        transition:
-          --_swap-axis var(--swap-duration) var(--cut-ease),
-          --_swap-weight var(--swap-duration) var(--cut-ease);
-      }
-    }
     .item-head_wrap {
       display: flex;
       flex-direction: column;
@@ -177,10 +140,12 @@ const f = (id: string) => (figma ? id : undefined);
         max-width: none;
       }
     }
-    .item-head_facts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-5) var(--space-8);
+    @media (width < 48rem) {
+      .item-head_facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-5) var(--space-8);
+      }
     }
     @media (width >= 48rem) {
       .item-head_layout {
@@ -222,19 +187,12 @@ const f = (id: string) => (figma ? id : undefined);
         grid-row: 3;
         align-self: end;
       }
-      .item-head_facts {
-        grid-column: main / span 5;
-        display: grid;
-        grid-template-columns: calc(206 * var(--u)) auto;
-        gap: 0;
-        /* three facts or more (a treatment: duration, downtime, sessions): each on its own column of the same step,
-           the last as wide as its words */
-        @media (width >= 64rem) {
-          &:has(> :nth-child(3)) {
-            grid-template-columns: repeat(2, calc(206 * var(--u))) auto;
-          }
-          &:has(> :nth-child(4)) {
-            grid-template-columns: repeat(3, calc(206 * var(--u))) auto;
+      /* on a computer, on the grid (fact-row): four facts go two by two, clear of the link */
+      @media (width >= 64rem) {
+        .item-head_facts {
+          grid-column: main / end;
+          & > :nth-child(3):nth-last-child(2) {
+            grid-column: main / span 2;
           }
         }
       }
@@ -262,6 +220,7 @@ const f = (id: string) => (figma ? id : undefined);
       }
       .item-head_facts {
         grid-column: main / aside;
+        display: grid;
         grid-template-columns: repeat(2, minmax(0, max-content));
         margin-top: var(--space-7);
         gap: var(--space-5) var(--space-8);
@@ -314,28 +273,3 @@ const f = (id: string) => (figma ? id : undefined);
     }
   }
 </style>
-
-<script>
-  import { onPage } from "@/utils/page";
-
-  /* The statement's cuts swap every --swap-every (5 s), only while it is on screen and the tab is shown; never under
-     reduced motion (the statement stays as written). Its job: hold the eye on the page's opening words. */
-  onPage((signal) => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const root = document.documentElement;
-    const every = (() => {
-      const v = getComputedStyle(root).getPropertyValue("--swap-every").trim();
-      return (parseFloat(v) || 5) * (v.endsWith("ms") ? 1 : 1000);
-    })();
-    document.querySelectorAll<HTMLElement>("[data-cut-swap]").forEach((el) => {
-      let seen = false;
-      const watch = new IntersectionObserver(([e]) => (seen = e.isIntersecting));
-      watch.observe(el);
-      const timer = window.setInterval(() => {
-        if (seen && !document.hidden) el.classList.toggle("is-swapped");
-      }, every);
-      signal.addEventListener("abort", () => { window.clearInterval(timer); watch.disconnect(); });
-    });
-  });
-</script>
-
