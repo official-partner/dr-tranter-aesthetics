@@ -2,6 +2,10 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-25, Sam (19:04, « toutes les animations d'apparition d'images… enlève tout ça pour l'instant »): the photos'
+  appearance on scroll (Simon's comment 2, Reveal.astro) is removed, with its tokens; the photos simply show. What
+  still moves a picture: the page change's opening photo settling, the menu's photo, the cards' hover, the portraits'
+  cross-fade in Founder and team.
 - 2026-11-25, the home's comments (Simon 1 to 3, Sam 4 to 9):
   - Simon 2 (« des anims comme Velkei, tu fais apparaître les photos »): every photo below the page's opening appears
     once as it comes into view, its frame uncovered from the bottom (`--reveal-duration`, the curtain's curve) and the

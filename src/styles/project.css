@@ -176,27 +176,6 @@
   }
 }
 
-/* A photo appears as it comes into view (Simon, Nov 25, comment 2: « des anims comme Velkei, tu fais apparaître les
-   photos »; in place of the scroll-led settle of Nov 21): once, its frame is uncovered from the bottom, as the page's
-   curtain, and the picture settles in it from a zoom. Reveal.astro marks the frames below the page's opening (which
-   has its own entrance) and lets each go as it enters; without it, or under reduced motion, the photos simply show. */
-@media (prefers-reduced-motion: no-preference) {
-  .media[data-reveal] {
-    clip-path: inset(100% 0 0 0);
-    & > img {
-      scale: var(--reveal-scale);
-    }
-    &.is-revealed {
-      clip-path: inset(0 0 0 0);
-      transition: clip-path var(--reveal-duration) var(--reveal-ease);
-      & > img {
-        scale: 1;
-        transition: scale var(--reveal-settle-duration) var(--ease-smooth);
-      }
-    }
-  }
-}
-
 /* An image frame: the picture fills it, centred; the ratio is one of the system's families */
 .media {
   position: relative;
