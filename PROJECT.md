@@ -2,6 +2,12 @@
 
 One line per decision: the date, who asked, what was decided and why. The newest at the top.
 
+- 2026-11-25, Sam's comments 10 to 14: the founder's words on her name's column, their last sentence out (10); the
+  square's hold ends on the last name's capitals, as every square sits on its text (11; its margin below set by the
+  section's script); the journal's last article: « Read → » level with its title's last line (12), the title on four
+  of its five columns (13); a concern page's opening statement swaps its two cuts every 5 s, sans to mix and mix to
+  sans medium, gliding on the font's axes (`--swap-duration`, `--swap-every`), only while on screen and never under
+  reduced motion (14; ConcernHead, `data-cut-swap`, reusable on another opening).
 - 2026-11-25, Sam (19:04, « toutes les animations d'apparition d'images… enlève tout ça pour l'instant »): the photos'
   appearance on scroll (Simon's comment 2, Reveal.astro) is removed, with its tokens; the photos simply show. What
   still moves a picture: the page change's opening photo settling, the menu's photo, the cards' hover, the portraits'

@@ -58,7 +58,7 @@ const people = team.map(({ id, data }) => ({
         <p class="people-home_role text-style-serif">Founder &amp; Cosmetic Physician · 15+ years in practice</p>
       </div>
       <p class="people-home_bio text-style-main">
-        Dr Sarah Tranter founded the clinic on a simple premise: that treatment should follow judgement, not the other way around. Her approach considers the face as one system of structure and surface, not a list of isolated concerns. Every protocol at the clinic reflects standards she has set personally, whether or not she is the one delivering care.
+        Dr Sarah Tranter founded the clinic on a simple premise: that treatment should follow judgement, not the other way around. Her approach considers the face as one system of structure and surface, not a list of isolated concerns.
       </p>
       {/* the team */}
       <p class="people-home_team-title text-style-h2" aria-hidden="true">Meet the <em>team.</em></p>
@@ -150,7 +150,7 @@ const people = team.map(({ id, data }) => ({
       max-width: 22.8ch;
     }
     .people-home_bio {
-      max-width: 53.5ch;
+      max-width: 44ch;
       margin-top: 34svh;
     }
     /* the one at the square is lit, the others step back */
@@ -286,8 +286,9 @@ const people = team.map(({ id, data }) => ({
       .people-home_team {
         grid-column: main / half;
       }
+      /* on her name's column (Sam, comment 10) */
       .people-home_bio {
-        grid-column: marker / half;
+        grid-column: main / half;
       }
     }
   }
@@ -367,6 +368,20 @@ const people = team.map(({ id, data }) => ({
         if (shown !== 0 && photos.length) showPhoto(0);
         if (team) { team = false; words.forEach((w, n) => w.classList.toggle("is-shown", n === 0)); }
       };
+      /* the square's hold ends on the last name's capitals, as every square sits on its text (Sam, comment 11): its
+         margin below reaches from there to the end of the names' rows */
+      const stop = () => {
+        if (!line || !line.offsetParent) return;
+        const names = people.map((p) => p.querySelector<HTMLElement>("[data-people-name]")).filter(Boolean) as HTMLElement[];
+        const last = names.at(-1);
+        const rows = section.querySelector<HTMLElement>(".people-home_team");
+        if (!last || !rows) return;
+        line.style.marginBottom = "";
+        const cap = parseFloat(getComputedStyle(last).fontSize) * 0.721;
+        const center = last.getBoundingClientRect().top + cap / 2;
+        const end = rows.getBoundingClientRect().bottom;
+        line.style.marginBottom = `${Math.max(0, end - center - line.offsetHeight / 2)}px`;
+      };
       const follow = () => {
         if (!wide.matches) return plain();
         section.dataset.peopleReady = "";
@@ -387,9 +402,11 @@ const people = team.map(({ id, data }) => ({
       };
       let frame = 0;
       const ask = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; follow(); }); };
+      stop();
+      document.fonts?.ready.then(stop);
       follow();
       window.addEventListener("scroll", ask, { signal, passive: true });
-      window.addEventListener("resize", ask, { signal });
+      window.addEventListener("resize", () => { stop(); ask(); }, { signal });
       signal.addEventListener("abort", () => cancelAnimationFrame(frame));
     });
   });

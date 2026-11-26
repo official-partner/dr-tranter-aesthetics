@@ -66,6 +66,8 @@
   --roll-duration: 600ms;
   --follow-image-duration: 300ms;
   --cut-duration: 500ms;
+  --swap-duration: 1600ms;
+  --swap-every: 5s;
   --cut-ease: var(--ease-smooth);
   --people-swap-duration: 900ms;
   --people-swap-ease: var(--ease-smooth);

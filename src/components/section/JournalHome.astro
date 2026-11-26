@@ -71,18 +71,18 @@ const posts = (await listed<"articles">("journal-home")).map(({ id, data }, i) =
     .journal-home_card-title {
       max-width: 18ch;
     }
-    /* the last: its title above its photo, its « Read → » at the foot of the block, on the right (Sam, comment 9) */
-    .journal-home_card.is-d {
-      & .journal-home_meta {
-        display: contents;
-      }
+    /* the last: its title above its photo, on four of its five columns (Sam, comment 13), its « Read → » on the right,
+       level with the title's last line (comment 12) */
+    .journal-home_card.is-d .journal-home_meta {
+      order: -1;
+      margin-top: 0;
+      margin-bottom: var(--space-media);
+      align-items: last baseline;
       & .journal-home_card-title {
-        order: -1;
-        margin-bottom: var(--space-media);
-      }
-      & .button_wrap {
-        align-self: end;
-        margin-top: var(--space-media);
+        max-width: none;
+        @media (width >= 64rem) {
+          width: calc((100% + var(--site-gutter)) * 4 / 5 - var(--site-gutter));
+        }
       }
     }
     .journal-home_action {

@@ -34,7 +34,7 @@ const { render = true, name, statement, facts, image } = Astro.props;
         <span class="marker concern-head_marker" data-figma="1:358" />
         <h1 class="concern-head_name lead-marker text-style-h2" data-op-field="name" data-figma="1:434">{name}</h1>
         <p class="concern-head_crumb text-style-action" data-figma="1:453"><a class="concern-head_up" href="/concerns">Concerns</a> / <span class="concern-head_current">{name}</span></p>
-        <p class="concern-head_statement text-style-h2" data-op-field="statement" data-figma="1:357" set:html={inlineRich(statement)} />
+        <p class="concern-head_statement text-style-h2" data-op-field="statement" data-figma="1:357" data-cut-swap set:html={inlineRich(statement)} />
         {/* the frame stays, empty, while the concern's photo is still to come (DESIGN.md, Global classes: media) */}
         <div class="concern-head_media media ratio-5-6" data-op-field="image" data-figma="1:359">
           {image && <Img {...pic(image.src)} alt={image.alt ?? ""} loading="eager" fetchPriority="high" variant="constrained" sizes="(width >= 48rem) 25vw, 75vw" />}
@@ -54,7 +54,44 @@ const { render = true, name, statement, facts, image } = Astro.props;
 }
 
 <style is:global>
+  /* The opening statement swaps its two cuts (Sam, Nov 25, comment 14: « ce qui est en sans va devenir en mix, ce qui est
+     en mix va devenir en sans médium… un switch smooth, loop infinie, chaque 5 s »; on the page's opening only). Two
+     registered numbers carry the cut, so the font's axes glide between them. */
+  @property --_swap-axis {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+  }
+  @property --_swap-weight {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 550;
+  }
   @layer components {
+    [data-cut-swap] {
+      --_swap-axis: var(--h2-font-axis);
+      --_swap-weight: var(--h2-font-weight);
+      & em {
+        --_swap-axis: 50;
+        --_swap-weight: 420;
+      }
+      &.is-swapped {
+        --_swap-axis: 50;
+        --_swap-weight: 420;
+        & em {
+          --_swap-axis: var(--h2-font-axis);
+          --_swap-weight: var(--h2-font-weight);
+        }
+      }
+      &,
+      & em {
+        font-weight: var(--_swap-weight);
+        font-variation-settings: "SERF" var(--_swap-axis), "wght" var(--_swap-weight);
+        transition:
+          --_swap-axis var(--swap-duration) var(--cut-ease),
+          --_swap-weight var(--swap-duration) var(--cut-ease);
+      }
+    }
     .concern-head_wrap {
       display: flex;
       flex-direction: column;
@@ -209,3 +246,28 @@ const { render = true, name, statement, facts, image } = Astro.props;
     }
   }
 </style>
+
+<script>
+  import { onPage } from "@/utils/page";
+
+  /* The statement's cuts swap every --swap-every (5 s), only while it is on screen and the tab is shown; never under
+     reduced motion (the statement stays as written). Its job: hold the eye on the page's opening words. */
+  onPage((signal) => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const root = document.documentElement;
+    const every = (() => {
+      const v = getComputedStyle(root).getPropertyValue("--swap-every").trim();
+      return (parseFloat(v) || 5) * (v.endsWith("ms") ? 1 : 1000);
+    })();
+    document.querySelectorAll<HTMLElement>("[data-cut-swap]").forEach((el) => {
+      let seen = false;
+      const watch = new IntersectionObserver(([e]) => (seen = e.isIntersecting));
+      watch.observe(el);
+      const timer = window.setInterval(() => {
+        if (seen && !document.hidden) el.classList.toggle("is-swapped");
+      }, every);
+      signal.addEventListener("abort", () => { window.clearInterval(timer); watch.disconnect(); });
+    });
+  });
+</script>
+
