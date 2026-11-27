@@ -1,0 +1,488 @@
+
+import { useTranslate } from '../../lib/i18n/useTranslate';
+import type { RichContext } from './RichContent';
+import { dataPickerPosition } from './dataPickerPosition';
+import { useState } from 'react';
+import { ResetMenu } from '../../ui/ResetLabel';
+import type { FieldPosition } from './propBindings';
+import { TagField } from './propNodeEditors';
+import PropField from './PropField';
+import { ListPropField } from './ListPropField';
+import type { ValueChange } from './bindingTypes';
+import { AttributesSection } from './propAttributes';
+import { BindHandle, FieldDataPicker } from './propBindings';
+import AutoTextarea from '../../ui/AutoTextarea';
+import RichContent, { isInlineOnly } from './RichContent';
+import { VariableTextSizeIcon, ChevronRightIcon } from '../../ui/Icons';
+import { noLabelActivation, CommentField } from './SourcePanels';
+import { type ElementState } from './elementState';
+import { canvasDraftProp, canvasDraftValue, useCanvasTextDraft } from '../../ui/canvasTextDraft';
+import { canvasDraftInline } from './canvasDraftInline';
+import { classListOfferOf } from './classListProp';
+import { assert } from '../../../shared/core/assert';
+import type { FieldFocus } from './fieldFocus';
+import { RichTextContentField } from './ComponentEditingFields';
+import { plainChildrenHTML } from './richTextContent';
+import { CAPTION_LABEL_FOR } from '../../ui/captionLabel';
+import { provenanceResets, type PropFieldProvenance } from './propFieldExtras';
+import './propFieldExtras.css';
+
+export function ElementContent({ state }: { readonly state: ElementState }) {
+  const translate = useTranslate();
+  const draft = useCanvasTextDraft(state);
+  const { node, loopContext, bindContext, onSetInline, showContentField, isSlot, contentPicker, setContentPicker, contentInsertRef } = state;
+  const held = state.contentValue;
+  const contentSet = held === undefined ? (node.children?.length ?? 0) > 0 : held.own;
+  if (state.richTextContent === true && node.kind === 'component') {
+    return (
+      <RichTextContentField
+        label={translate('props.element.content')}
+        key={node.id}
+        provenance={held?.provenance}
+        own={held?.own}
+        onReset={held?.onReset}
+        source={state.contentSource ?? plainChildrenHTML(node.children)}
+        shown={state.contentShown}
+        onSetNodes={onSetInline}
+        onSetSource={state.onSetContentSource}
+      />
+    );
+  }
+  return (
+    <>
+      {showContentField && (
+        <div className="props-field" key="content">
+          <label htmlFor={CAPTION_LABEL_FOR} onClick={noLabelActivation}>
+            <ContentLabel
+              active={contentSet}
+              name={isSlot ? translate('props.element.fallback') : translate('props.element.content')}
+              onReset={held === undefined ? () => onSetInline([]) : held.onReset}
+              provenance={held?.provenance}
+            />
+            {}
+            <BindHandle active={!!contentPicker} onOpen={(host, focus) => elementOpenContentPicker(state, host ?? undefined, focus)} />
+          </label>
+          <RichContent
+            key={node.id}
+            nodes={held === undefined ? canvasDraftInline(isInlineOnly(node.children) ? node.children : [], draft) : isInlineOnly(held.nodes) ? held.nodes : []}
+            {...richContextProp(bindContext || loopContext)}
+            insertRef={contentInsertRef}
+            onChange={onSetInline}
+          />
+          {contentPicker && (
+            <FieldDataPicker
+              pos={contentPicker}
+              bindContext={bindContext || loopContext}
+              seed={{ fit: 'content', label: 'Text', value: plainContent(node.children) }}
+              onBindNew={(path) => {
+                setContentPicker(undefined);
+                elementPlaceContentChip(state, contentPicker.focus, path);
+              }}
+              onPick={(path) => {
+                setContentPicker(undefined);
+                elementPlaceContentChip(state, contentPicker.focus, path);
+              }}
+              onClose={() => setContentPicker(undefined)}
+            />
+          )}
+          {isSlot && (
+            <div
+              style={{
+                fontSize: 11,
+                color: 'var(--text-faint)',
+                marginTop: 6,
+                lineHeight: 1.5,
+              }}
+            >
+              {translate('props.element.fallbackNote')}
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
+function ContentLabel(props: {
+  readonly active: boolean;
+  readonly name: string;
+  readonly onReset: () => void;
+  readonly provenance?: PropFieldProvenance | undefined;
+}) {
+  const translate = useTranslate();
+  const [position, setPosition] = useState<FieldPosition>();
+  return (
+    <>
+      <span
+        className={`prop-label${props.provenance?.tone === 'inherited' ? ' inherited' : props.active ? ' set' : ''}`}
+        title={props.provenance?.tip ?? (props.active ? translate('props.element.resetHint') : undefined)}
+        onClick={(event) => {
+          event.preventDefault();
+          if (!props.active || !provenanceResets(props.provenance)) {
+            return;
+          }
+          if (event.altKey) {
+            props.onReset();
+          } else {
+            const bounds = event.currentTarget.getBoundingClientRect();
+            setPosition({ left: bounds.left, top: bounds.bottom + 4 });
+          }
+        }}
+      >
+        <VariableTextSizeIcon size={12} className="prop-label-icon" />
+        {props.name}
+      </span>
+      {position && (
+        <ResetMenu
+          position={position}
+          onReset={() => {
+            props.onReset();
+            setPosition(undefined);
+          }}
+          unbindLabel=""
+          onClose={() => setPosition(undefined)}
+        />
+      )}
+    </>
+  );
+}
+
+export function richContextProp(context: RichContext | undefined): {
+  readonly bindContext?: RichContext;
+} {
+  return context === undefined ? {} : { bindContext: context };
+}
+
+export function RichTextPropField({ state, prop }: { readonly state: ElementState; readonly prop: string }) {
+  const value = state.node.props?.[prop];
+  const literal = value === undefined || value.type === 'string';
+  const source = value === undefined ? '' : value.type === 'string' ? value.value : value.type === 'expr' ? `{${value.value}}` : `{${prop}}`;
+  const write = (html: string) => state.onSetProp(prop, { type: 'string', value: html });
+  return <RichTextContentField label={prop} source={source} onSetHTML={literal ? write : undefined} onSetSource={literal ? write : undefined} />;
+}
+
+export function ElementLooseText({ state }: { readonly state: ElementState }) {
+  const translate = useTranslate();
+  const draft = useCanvasTextDraft(state);
+  const { node, onSetContent, showLooseTextField, looseText } = state;
+  if (state.richTextContent === true && node.kind === 'component') {
+    return undefined;
+  }
+  return (
+    <>
+      {showLooseTextField && (
+        <div className="props-field" key="loose-text">
+          <label onClick={noLabelActivation}>
+            <ContentLabel active={!!looseText} name={translate('props.element.content')} onReset={() => onSetContent('')} />
+          </label>
+          <AutoTextarea
+            key={node.id}
+            minRows={1}
+            value={looseText ? canvasDraftValue(looseText, draft) : ''}
+            placeholder={translate('props.element.looseText')}
+            onChange={(event) => onSetContent(event.target.value)}
+          />
+        </div>
+      )}
+    </>
+  );
+}
+
+export function ElementSchemaFields({ state }: { readonly state: ElementState }) {
+  const draft = useCanvasTextDraft(state);
+  const {
+    node,
+    schema,
+    slotOptions,
+    projectClasses,
+    loopContext,
+    bindContext,
+    linkContext,
+    dataContext,
+    appliesNow,
+    branchDefault,
+    narrowOptions,
+    setPropCascading,
+    styleField,
+    assetContext,
+    listProps,
+    projectPath,
+  } = state;
+  return (
+    <>
+      {schema
+        .filter(appliesNow)
+        .filter((field) => field.name !== 'class' && !(styleField && field.name === 'style'))
+        .map((field) => {
+          if (state.richTextProps?.includes(field.name) === true) {
+            return <RichTextPropField key={field.name} state={state} prop={field.name} />;
+          }
+          const value = canvasDraftProp(node.id, field.name, draft) ?? node.props?.[field.name];
+          const onChange: ValueChange = (next, immediate) => setPropCascading(field.name, next, immediate);
+          const plain = (
+            <PropField
+              key={field.name}
+              nodeKey={node.id}
+              bindContext={bindContext || loopContext}
+              field={narrowOptions(field)}
+              branchDefault={branchDefault(field.name)}
+              value={value}
+              slotOptions={slotOptions}
+              projectClasses={projectClasses}
+              assetContext={assetContext}
+              linkContext={linkContext}
+              dataContext={dataContext}
+              onChange={onChange}
+            />
+          );
+          const listProp = listProps?.get(field.name);
+          return listProp !== undefined && (listProp.setting === 'filter' || listProp.setting === 'sort' || listProp.setting === 'curated') ? (
+            <ListPropField
+              key={field.name}
+              name={field.name}
+              listProp={listProp}
+              value={value}
+              projectPath={projectPath}
+              fallback={plain}
+              onChange={onChange}
+            />
+          ) : (
+            plain
+          );
+        })}
+    </>
+  );
+}
+
+export function ElementExtraFields({ state }: { readonly state: ElementState }) {
+  const { node, slotOptions, projectClasses, loopContext, bindContext, linkContext, onSetProp, dataContext, extraProps, styleField, assetContext } = state;
+  return (
+    <>
+      {extraProps
+        .filter((name) => name !== 'class' && !(styleField && name === 'style'))
+        .map((name) => (
+          <PropField
+            key={name}
+            nodeKey={node.id}
+            bindContext={bindContext || loopContext}
+            field={{ name, type: 'other' }}
+            value={node.props?.[name]}
+            slotOptions={slotOptions}
+            projectClasses={projectClasses}
+            assetContext={assetContext}
+            linkContext={linkContext}
+            dataContext={dataContext}
+            onChange={(next, immediate) => onSetProp(name, next, immediate)}
+          />
+        ))}
+    </>
+  );
+}
+
+export function ElementSettingsHeader({ state }: { readonly state: ElementState }) {
+  const translate = useTranslate();
+  const { settingsOpen, setSettingsOpen, settingsCount } = state;
+  const { hasSettings } = state;
+  return (
+    <>
+      {hasSettings && (
+        <div className={`props-group ${settingsOpen ? 'open' : ''}`}>
+          <button type="button" className="props-group-head" aria-expanded={settingsOpen} onClick={() => setSettingsOpen((open) => !open)}>
+            <span className="props-group-name">{translate('props.element.settings')}</span>
+            {}
+            {!settingsOpen && settingsCount > 0 && <span className="props-group-count">{settingsCount}</span>}
+            <ChevronRightIcon size={11} className="props-group-chevron" />
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function ElementTag({ state }: { readonly state: ElementState }) {
+  const { node, layouts, currentLayoutName, tagOptions, onChangeTag, layoutTag, changeToLayout, showTagField } = state;
+  return (
+    <>
+      {showTagField && (
+        <TagField
+          key="tag"
+          tag={layoutTag ? currentLayoutName || node.name : node.name}
+          options={layoutTag ? layouts.filter((option) => option.unlisted !== true).map((option) => ({ name: option.name, kind: 'layout' })) : tagOptions}
+          onChangeTag={layoutTag ? changeToLayout : (name) => onChangeTag?.(name)}
+        />
+      )}
+    </>
+  );
+}
+
+export function ElementClass({ state }: { readonly state: ElementState }) {
+  const { node, slotOptions, projectClasses, loopContext, bindContext, linkContext, dataContext, setPropCascading, classField, assetContext, onReplaceProps } =
+    state;
+  return (
+    <>
+      {classField && (
+        <PropField
+          key="class"
+          nodeKey={node.id}
+          bindContext={bindContext || loopContext}
+          field={classField}
+          value={node.props?.['class']}
+          slotOptions={slotOptions}
+          projectClasses={projectClasses}
+          assetContext={assetContext}
+          linkContext={linkContext}
+          dataContext={dataContext}
+          classList={classListOfferOf(
+            { kind: node.kind, name: String(node.name), props: node.props },
+            bindContext?.newProp,
+            onReplaceProps === undefined ? undefined : (props) => onReplaceProps(node.id, props),
+          )}
+          onChange={(next, immediate) => setPropCascading('class', next, immediate)}
+        />
+      )}
+    </>
+  );
+}
+
+export function ElementStyle({ state }: { readonly state: ElementState }) {
+  const { node, slotOptions, projectClasses, loopContext, bindContext, linkContext, dataContext, setPropCascading, styleField } = state;
+  return (
+    <>
+      {styleField && (
+        <PropField
+          key={`style:${node.id}`}
+          nodeKey={node.id}
+          bindContext={bindContext || loopContext}
+          field={styleField}
+          value={node.props?.['style']}
+          slotOptions={slotOptions}
+          projectClasses={projectClasses}
+          linkContext={linkContext}
+          dataContext={dataContext}
+          onChange={(next, immediate) => setPropCascading('style', next, immediate)}
+        />
+      )}
+    </>
+  );
+}
+
+export function ElementAttributes({ state }: { readonly state: ElementState }) {
+  const {
+    node,
+    allowAttrs,
+    loopContext,
+    bindContext,
+    onSetProp,
+    onSetProps,
+    onRenameProp,
+    projectPath,
+    attrNames,
+    onReplaceProps,
+    onSetFrontmatter,
+    onRenameVariable,
+    schema,
+    attributesTag,
+  } = state;
+  const element = node.kind === 'element' && /^[a-z][a-z0-9-]*$/.test(String(node.name));
+  return (
+    <>
+      {allowAttrs && (
+        <AttributesSection
+          key="attrs"
+          node={node}
+          names={attrNames}
+          tag={element ? String(node.name) : undefined}
+          reservedNames={node.kind === 'component' ? schema.map((field) => field.name) : undefined}
+          passedTo={node.kind === 'component' ? attributesTag : undefined}
+          onRenameVariable={onRenameVariable}
+          onReplaceProps={onReplaceProps === undefined || !element ? undefined : (props) => onReplaceProps(node.id, props)}
+          onReplaceAttributes={onReplaceProps === undefined ? undefined : (props) => onReplaceProps(node.id, props)}
+          onSetFrontmatter={onSetFrontmatter}
+          projectPath={projectPath}
+          bindContext={bindContext || loopContext}
+          onSetProp={onSetProp}
+          onSetProps={onSetProps}
+          onRenameProp={onRenameProp}
+        />
+      )}
+    </>
+  );
+}
+
+export function ElementSlot({ state }: { readonly state: ElementState }) {
+  const { node, slotOptions, onSetProp, showSlotField } = state;
+  return (
+    <>
+      {showSlotField && (
+        <PropField
+          key="slot"
+          field={{ name: 'slot', type: 'slot' }}
+          value={node.props?.['slot']}
+          slotOptions={slotOptions}
+          onChange={(next, immediate) => onSetProp('slot', next, immediate)}
+        />
+      )}
+    </>
+  );
+}
+
+export function ElementSettings({ state }: { readonly state: ElementState }) {
+  const { node, comment, onSetComment, settingsOpen, hasSettings } = state;
+  return (
+    <>
+      {hasSettings && settingsOpen && (
+        <>
+          {}
+          <ElementTag state={state} />
+          <ElementClass state={state} />
+          <ElementStyle state={state} />
+          <ElementAttributes state={state} />
+          {onSetComment && (node.kind === 'element' || node.kind === 'component') && <CommentField key="comment" value={comment} onCommit={onSetComment} />}
+          {}
+          <ElementSlot state={state} />
+        </>
+      )}
+    </>
+  );
+}
+
+export function elementOpenContentPicker(state: ElementState, host: Element | undefined, focus: FieldFocus): void {
+  if (state.contentPicker) {
+    state.setContentPicker(undefined);
+    return;
+  }
+  const rectangle = host?.getBoundingClientRect();
+  if (!rectangle) {
+    return;
+  }
+  state.setContentPicker({ ...dataPickerPosition(rectangle), focus });
+}
+
+export function elementPlaceContentChip(state: Pick<ElementState, 'contentInsertRef' | 'onSetInline'>, focus: FieldFocus, path: string): void {
+  assert(path.length > 0, 'A picked chip names a value');
+  switch (focus.kind) {
+    case 'focused': {
+      const insert = state.contentInsertRef.current;
+      assert(insert !== undefined, 'The Content field is mounted while its picker is open');
+      insert.insert(path);
+      return;
+    }
+    case 'unfocused':
+      state.onSetInline([{ kind: 'expr', value: `{${path}}` }]);
+      return;
+    default: {
+      const exhaustive: never = focus;
+      return exhaustive;
+    }
+  }
+}
+
+function plainContent(children: ElementState['node']['children']): string {
+  const kids = children ?? [];
+  return kids.every((child) => child.kind === 'text')
+    ? kids
+        .map((child) => (child.kind === 'text' ? String(child.value ?? '') : ''))
+        .join('')
+        .trim()
+    : '';
+}

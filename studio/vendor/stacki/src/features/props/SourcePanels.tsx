@@ -1,0 +1,357 @@
+
+import type { Attr } from '../../../shared/page/pageNode';
+import type { SourceContext } from './propBindings';
+import { resolveAssetImport, readAssetDimensions } from '../../ipc/assetBridge';
+import { MapEditor } from './propNodeEditors';
+import { assetImportOf } from './PropField';
+import { AttributesSection } from './propAttributes';
+import { ConditionExpressionField } from './ConditionExpressionEditor';
+import SegmentedControl from '../../ui/SegmentedControl';
+import React, { useEffect, useRef, useState } from 'react';
+import AutoTextarea from '../../ui/AutoTextarea';
+import ExprInput from '../../ui/ExprInput';
+import { scopeCompletions } from '../../editor/dataSuggest';
+import { CommentIcon, CodeIcon, CornerIcon } from '../../ui/Icons';
+import { type PropsPanelProps, type NodePanelProps, type SourceDimensionsOptions } from './propsPanelTypes';
+import ExprBindingField from './ExprBindingField';
+import { pureBindingPath } from '../../editor/bindingPath';
+import TextConnectField, { type TextConnectFieldProps } from './TextConnectField';
+import { useTranslate } from '../../lib/i18n/useTranslate';
+import { PanelHeader } from '../../ui/PanelHeader';
+
+export const noLabelActivation = (event: React.MouseEvent<HTMLLabelElement>) => event.preventDefault();
+export function panelDataContext(props: PropsPanelProps): SourceContext {
+  return {
+    frontmatter: props.loopContext?.frontmatter || '',
+    imports: props.frontmatterSource || '',
+    projectPath: props.projectPath,
+    filePath: props.filePath,
+    onSetFrontmatter: props.onSetFrontmatter,
+    onRenameVariable: props.onRenameVariable,
+    onOpenSymbol: props.onOpenSymbol,
+  };
+}
+
+export function CommentField({ value, onCommit }: { readonly value?: string | undefined; readonly onCommit: (text: string) => void }) {
+  const translate = useTranslate();
+  const [draft, setDraft] = useState(value ?? '');
+  const focused = useRef(false);
+  useEffect(() => {
+    if (!focused.current) {
+      setDraft(value ?? '');
+    }
+  }, [value]);
+  const commit = (text = draft) => {
+    const next = text.trim();
+    if (next !== (value ?? '').trim()) {
+      onCommit(next);
+    }
+  };
+  return (
+    <div className="props-field props-comment">
+      <label onClick={noLabelActivation}>
+        <span className="prop-label">
+          <CommentIcon size={12} className="prop-label-icon" />
+          {translate('props.sources.comment')}
+        </span>
+      </label>
+      <AutoTextarea
+        minRows={1}
+        placeholder={translate('props.sources.commentPlaceholder')}
+        value={draft}
+        onChange={(event) => {
+          setDraft(event.target.value);
+          commit(event.target.value);
+        }}
+        onFocus={() => {
+          focused.current = true;
+        }}
+        onBlur={() => {
+          focused.current = false;
+          commit();
+        }}
+      />
+    </div>
+  );
+}
+
+export function EmptyPanel(props: PropsPanelProps) {
+  const translate = useTranslate();
+  const {} = props;
+
+  return (
+    <div className="panel-section grow" style={{ flex: '1 1 50%' }}>
+      <PanelHeader title={translate('props.sources.settings')} />
+      <div className="props-empty">{translate('props.sources.selectComponent')}</div>
+    </div>
+  );
+}
+export function FrontmatterPanel(props: NodePanelProps<'frontmatter'>) {
+  const translate = useTranslate();
+  const { onOpenCode } = props;
+
+  return (
+    <div className="panel-section grow" style={{ flex: '1 1 50%', overflow: 'hidden' }}>
+      <div className="props-title">
+        <CodeIcon size={14} className="props-title-icon" />
+        {translate('props.sources.frontmatter')}
+      </div>
+      <div className="props-field" style={{ marginTop: 4 }}>
+        <button className="primary" style={{ width: '100%' }} onClick={onOpenCode}>
+          <CodeIcon size={13} /> {translate('props.sources.editCode')}
+        </button>
+        <div style={{ fontSize: 11, color: 'var(--text-faint)', marginTop: 8, lineHeight: 1.5 }}>{translate('props.sources.frontmatterNote')}</div>
+      </div>
+    </div>
+  );
+}
+export function ExprPanel(props: NodePanelProps<'expr'>) {
+  const translate = useTranslate();
+  const { node, loopContext, bindContext, onSetText } = props;
+  const scope = scopeCompletions(bindContext || loopContext || {});
+
+  return (
+    <div className="panel-section grow" style={{ flex: '1 1 50%', overflow: 'hidden' }}>
+      <PanelHeader title={translate('props.sources.expression')} />
+      {pureBindingPath(node.value) === undefined ? (
+        <div className="props-field" style={{ marginTop: 8 }}>
+          <label onClick={noLabelActivation}>
+            <span className="prop-label">{translate('props.sources.code')}</span>
+          </label>
+          <ExprInput key={node.id} value={node.value} syncValue={node.value} completions={scope} onCommit={(next) => next !== node.value && onSetText(next)} />
+        </div>
+      ) : (
+        <ExprBindingField key={node.id} nodeId={node.id} value={node.value} bindContext={bindContext || loopContext} onSetText={onSetText} />
+      )}
+    </div>
+  );
+}
+export function RawLinePanel(props: NodePanelProps<'raw-line'>) {
+  const translate = useTranslate();
+  const { node, onSetText } = props;
+
+  const isDoctype = /^<!doctype/i.test(node.value || '');
+  return (
+    <div className="panel-section grow" style={{ flex: '1 1 50%', overflow: 'hidden' }}>
+      <PanelHeader title={isDoctype ? translate('props.sources.doctype') : translate('props.sources.sourceLine')} />
+      <div className="props-field" style={{ marginTop: 8 }}>
+        <label onClick={noLabelActivation}>
+          <span className="prop-label">
+            <CodeIcon size={12} className="prop-label-icon" />
+            {translate('props.sources.line')}
+          </span>
+        </label>
+        <ExprInput
+          key={node.id}
+          language="html"
+          multiline
+          ariaLabel={isDoctype ? translate('props.sources.doctype') : translate('props.sources.sourceLine')}
+          value={node.value}
+          syncValue={node.value}
+          onChange={(next) => {
+            if (next !== node.value) {
+              onSetText(next);
+            }
+          }}
+        />
+        <div style={{ fontSize: 11, color: 'var(--text-faint)', marginTop: 6, lineHeight: 1.5 }}>
+          {isDoctype ? translate('props.sources.doctypeNote') : translate('props.sources.lineNote')}
+        </div>
+      </div>
+    </div>
+  );
+}
+export function MapPanel(props: NodePanelProps<'map'>) {
+  const translate = useTranslate();
+  const { node, loopContext, bindContext, onSetText } = props;
+
+  const buildDataContext = () => panelDataContext(props);
+
+  return (
+    <div className="panel-section grow" style={{ flex: '1 1 50%', overflow: 'hidden' }}>
+      <PanelHeader title={translate('props.sources.loop')} />
+      <MapEditor
+        key={node.id}
+        node={node}
+        loopContext={loopContext}
+        bindContext={bindContext || loopContext}
+        dataContext={buildDataContext()}
+        onSetText={onSetText}
+        imports={props.frontmatterImports}
+        projectPath={props.projectPath}
+        onCommitHead={props.onCommitLoopHead}
+        onSetLoopSource={props.onSetLoopSource}
+        onEditLoopProperty={props.onEditLoopProperty}
+      />
+    </div>
+  );
+}
+export function CondPanel(props: NodePanelProps<'cond'>) {
+  const translate = useTranslate();
+  const { node, loopContext, bindContext, onSetText, onToggleElse } = props;
+  const hasElse = (node.children || []).length > 1;
+  return (
+    <div className="panel-section grow" style={{ flex: '1 1 50%', overflow: 'hidden' }}>
+      <PanelHeader title={translate('props.sources.condition')} />
+      <ConditionExpressionField key={node.id} test={node.test} bindContext={bindContext || loopContext} onSetText={onSetText} />
+      {}
+      <div className="props-field condition-otherwise">
+        <span className="prop-label">
+          <CornerIcon size={12} className="prop-label-icon" />
+          {translate('props.condition.otherwise')}
+        </span>
+        {onToggleElse && (
+          <SegmentedControl
+            className="condition-otherwise-switch"
+            ariaLabel={translate('props.condition.otherwise')}
+            value={hasElse ? 'branch' : 'none'}
+            options={[
+              { value: 'none', label: translate('props.sources.elseNone'), tooltip: translate('props.sources.elseNoneTip') },
+              { value: 'branch', label: translate('props.sources.elseBranch'), tooltip: translate('props.sources.elseBranchTip') },
+            ]}
+            onChange={(choice) => {
+              if ((choice === 'branch') !== hasElse) {
+                onToggleElse(choice === 'branch');
+              }
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+export function BranchPanel(props: NodePanelProps<'branch'>) {
+  const translate = useTranslate();
+  const { node } = props;
+
+  const isElse = node.name === 'else';
+  return (
+    <div className="panel-section grow" style={{ flex: '1 1 50%', overflow: 'hidden' }}>
+      <div className="props-title">
+        <CornerIcon size={14} className="props-title-icon" />
+        {isElse ? translate('props.condition.otherwise') : 'then'}
+      </div>
+      <div className="props-empty">{isElse ? translate('props.sources.renderedFalse') : translate('props.sources.renderedTrue')}</div>
+    </div>
+  );
+}
+export function CommentPanel(props: NodePanelProps<'comment'>) {
+  const translate = useTranslate();
+  const { node, onSetText } = props;
+
+  return (
+    <div className="panel-section grow" style={{ flex: '1 1 50%', overflow: 'hidden' }}>
+      <PanelHeader title={translate('props.sources.comment')} />
+      <div className="props-field" style={{ marginTop: 8 }}>
+        <label onClick={noLabelActivation}>
+          <span className="prop-label">
+            <CommentIcon size={12} className="prop-label-icon" />
+            {translate('props.sources.comment')}
+          </span>
+        </label>
+        <AutoTextarea minRows={3} value={node.value} onChange={(event) => onSetText(event.target.value)} />
+      </div>
+    </div>
+  );
+}
+export function RawPanel(props: NodePanelProps<'raw'>) {
+  const translate = useTranslate();
+  const { node, loopContext, bindContext, onSetProp, onSetProps, onRenameProp, onOpenCode, projectPath } = props;
+
+  const language = node.name === 'style' ? 'css' : 'javascript';
+  const attrs = Object.keys(node.props || {});
+  return (
+    <div className="panel-section grow" style={{ flex: '1 1 50%', overflow: 'hidden' }}>
+      <div className="props-title">
+        <CodeIcon size={14} className="props-title-icon" />
+        {`<${node.name}>`}
+      </div>
+      <div style={{ flexShrink: 0 }}>
+        {}
+        <AttributesSection
+          node={node}
+          names={attrs}
+          projectPath={projectPath}
+          bindContext={bindContext || loopContext}
+          onSetProp={onSetProp}
+          onSetProps={onSetProps}
+          onRenameProp={onRenameProp}
+        />
+      </div>
+      <div className="props-field" style={{ marginTop: 4 }}>
+        <button className="primary" style={{ width: '100%' }} onClick={onOpenCode}>
+          <CodeIcon size={13} /> {translate('props.sources.editCode')}
+        </button>
+        <div style={{ fontSize: 11, color: 'var(--text-faint)', marginTop: 8, lineHeight: 1.5 }}>{translate('props.sources.rawNote', { language })}</div>
+      </div>
+    </div>
+  );
+}
+export function TextPanel(props: Omit<PropsPanelProps, 'node'> & { readonly node: TextConnectFieldProps['node'] }) {
+  const translate = useTranslate();
+  const { node, onSetText, onSetTextPieces, bindContext, loopContext } = props;
+
+  return (
+    <div className="panel-section grow" style={{ flex: '1 1 50%', overflow: 'hidden' }}>
+      <PanelHeader title={translate('props.sources.text')} />
+      <TextConnectField node={node} bindContext={bindContext || loopContext} onSetText={(value) => onSetText(value)} onSetTextPieces={onSetTextPieces} />
+    </div>
+  );
+}
+export function sourceKind(source: Attr | undefined, imports: unknown): 'svg' | 'public' | 'remote' | 'asset' | undefined {
+  if (!source || source.type === 'bare') {
+    return undefined;
+  }
+  const isSVG = (value: string) => /\.svg(\?|#|$)/i.test(value);
+  if (source.type === 'string') {
+    const value = source.value;
+    if (!value) {
+      return undefined;
+    }
+    if (isSVG(value)) {
+      return 'svg';
+    }
+    return /^(https?:)?\/\//.test(value) || value.startsWith('data:') ? 'remote' : 'public';
+  }
+  const binding = assetImportOf(source.value, imports);
+  if (!binding) {
+    return undefined;
+  }
+  return isSVG(binding.spec) ? 'svg' : 'asset';
+}
+export function useSourceDimensions({ source, projectPath, filePath, imports, setSourceDimensions }: SourceDimensionsOptions) {
+  const sourceType = source?.type;
+  const sourceValue = source?.type === 'bare' ? undefined : source?.value;
+  useEffect(() => {
+    if (!sourceValue || !projectPath) {
+      return undefined;
+    }
+    let live = true;
+    const fromRel = async (rel: string) => {
+      const result = await readAssetDimensions(projectPath, rel);
+      if (live && result.ok && result.value) {
+        setSourceDimensions(result.value);
+      }
+    };
+    if (sourceType === 'string') {
+      if (/^(https?:)?\/\//.test(sourceValue) || sourceValue.startsWith('data:')) {
+        return undefined;
+      }
+      void fromRel('public/' + sourceValue.replace(/^\//, ''));
+    } else {
+      const binding = assetImportOf(sourceValue, imports);
+      if (!binding || !filePath) {
+        return undefined;
+      }
+      void resolveAssetImport(projectPath, filePath, binding.spec).then((result) => {
+        if (live && result.ok) {
+          return fromRel(result.rel);
+        }
+        return undefined;
+      });
+    }
+    return () => {
+      live = false;
+    };
+  }, [sourceType, sourceValue, projectPath, filePath, imports, setSourceDimensions]);
+}

@@ -1,0 +1,128 @@
+
+import InfoHint from '../../ui/InfoHint';
+import { useState } from 'react';
+import PanelSheet from './components/PanelSheet';
+import type { ReactNode } from 'react';
+import { GroupLabel } from './TypographySection';
+import { serializeTrackSize, trackLabel, type TrackSize } from './model/gridTemplate';
+import { type SetProp, type LabelProps, resolvedValue, CloseIcon } from './GridSettingsKit';
+import { TrackIcon, TrackSizeEditor, TrackPopover } from './TrackEditor';
+import { useTranslate } from '../../lib/i18n/useTranslate';
+
+export interface TrackSectionProps {
+  title: string;
+  prop: string;
+  axis: 'column' | 'row';
+  setProp: SetProp;
+  labels: LabelProps;
+}
+
+export function AutoSection({ title, prop, axis, setProp, labels }: TrackSectionProps) {
+  const { read, busy, clearProp, onProvenance, onSelectSelector } = labels;
+  const translate = useTranslate();
+  const current = resolvedValue(read, prop) || 'auto';
+  const [open, setOpen] = useState(false);
+  const [anchorElement, setAnchorElement] = useState<HTMLElement | undefined>(undefined);
+  const setSize = (size: TrackSize) => {
+    const serialized = serializeTrackSize(size);
+    if (serialized && serialized.toLowerCase() !== 'auto') {
+      setProp(prop, serialized, false);
+    } else {
+      clearProp(prop);
+    }
+  };
+  return (
+    <section className="embed-editor_grid-section">
+      <div className="embed-editor_grid-section-head">
+        <span className="embed-editor_grid-section-title">
+          <GroupLabel
+            label={title}
+            props={[prop]}
+            read={read}
+            busy={busy}
+            onClear={() => clearProp(prop)}
+            onProvenance={onProvenance}
+            onSelectSelector={onSelectSelector}
+          />
+        </span>
+      </div>
+      <div className="embed-editor_grid-track-list">
+        <div className="embed-editor_grid-track">
+          <div className="embed-editor_grid-track-row">
+            <button
+              type="button"
+              className="embed-editor_grid-track-main"
+              onClick={(event) => {
+                setOpen((wasOpen) => !wasOpen);
+                setAnchorElement(event.currentTarget.closest<HTMLElement>('.embed-editor_grid-track-list') ?? event.currentTarget);
+              }}
+              disabled={busy}
+            >
+              <span className="embed-editor_grid-track-glyph" aria-hidden="true">
+                <TrackIcon track={current} axis={axis} />
+              </span>
+              <span className="embed-editor_grid-track-label">{trackLabel(current, translate)}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      {open && anchorElement ? (
+        <AutoTrackPopover anchorElement={anchorElement} track={current} axis={axis} busy={busy} onChange={setSize} onClose={() => setOpen(false)} />
+      ) : undefined}
+    </section>
+  );
+}
+
+export function AutoTrackPopover({
+  anchorElement,
+  track,
+  axis,
+  busy,
+  onChange,
+  onClose,
+}: {
+  anchorElement: HTMLElement;
+  track: string;
+  axis: 'column' | 'row';
+  busy: boolean;
+  onChange: (size: TrackSize) => void;
+  onClose: () => void;
+}) {
+  const translate = useTranslate();
+  const note = axis === 'column' ? translate('style.gridAutoSection.noteColumns') : translate('style.gridAutoSection.noteRows');
+  return (
+    <TrackPopover anchorElement={anchorElement} onClose={onClose}>
+      <TrackSizeEditor track={track} busy={busy} onChange={onChange} />
+      {}
+      <div className="embed-editor_grid-popover-actions">
+        <button type="button" className="embed-editor_grid-popover-ok" onClick={onClose}>
+          {translate('style.gridAutoSection.okGotIt')}
+        </button>
+        <InfoHint text={note} />
+      </div>
+    </TrackPopover>
+  );
+}
+
+export function Modal({ onClose, children }: { onClose: () => void; children: ReactNode }) {
+  const translate = useTranslate();
+  return (
+    <PanelSheet
+      className="style-panel-surface embed-editor_grid-modal u-surface-surface"
+      label={translate('style.gridAutoSection.gridSettings')}
+      onClose={onClose}
+    >
+      {({ close }) => (
+        <>
+          <div className="embed-editor_grid-modal-head" data-floating-drag-handle="">
+            <span className="embed-editor_grid-modal-title">{translate('style.gridAutoSection.gridSettings')}</span>
+            <button type="button" className="embed-editor_bg-modal-close" onClick={close} aria-label={translate('ui.close')}>
+              <CloseIcon />
+            </button>
+          </div>
+          <div className="embed-editor_grid-modal-body">{children}</div>
+        </>
+      )}
+    </PanelSheet>
+  );
+}

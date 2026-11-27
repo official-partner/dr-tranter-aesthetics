@@ -1,0 +1,514 @@
+import { centralIcon } from '../../ui/central/CentralIcon';
+import { more as centralMore } from '../../ui/central/centralGeometry';
+import Popup from '../../ui/Popup';
+
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import FieldLabel from './components/FieldLabel';
+import { PropTip, ProvenanceLabel } from './components/CssPropertyTip';
+import ColorSwatch from './components/ColorSwatch';
+import { useLiveColor } from './model/liveColor';
+import { useComputedValue } from './model/computedStyle';
+import { panelBounds } from './model/panelBox';
+import ProvenanceList from './ProvenanceList';
+import type { Contributor, ResolvedProp } from './model/resolved';
+import SegmentPill from './components/SegmentPill';
+import { ChevronIcon, MenuItem } from './components/MenuParts';
+import KeywordConnect, { VariableMenuItem } from './KeywordConnect';
+import { displayOf, type Display, withImportant } from './model/styleDisplay';
+import { LiveInput } from './LiveTextInput';
+import { useTranslate } from '../../lib/i18n/useTranslate';
+import { useSelectorState } from './model/selectorScope';
+export { LiveInput, type LiveInputProps, useLiveInputEditing, useDebouncedLive, stepLiveKey } from './LiveTextInput';
+
+export type SetProp = (prop: string, value: string, important: boolean) => void;
+export type ClearProp = (prop: string | string[]) => void;
+export type LiveSetProp = (prop: string, value: string | undefined, important: boolean) => void;
+export type Read = (prop: string) => ResolvedProp | undefined;
+
+export type Props = {
+  read: Read;
+  busy: boolean;
+  setProp: SetProp;
+  clearProp: ClearProp;
+  liveSetProp: LiveSetProp;
+  onProvenance: (prop: string, anchor: DOMRect) => void;
+  onSelectSelector: (selector: string, prop?: string) => void;
+};
+
+export const CUSTOM = '__custom__';
+
+
+export function PropLabel({
+  label,
+  prop,
+  tipProps,
+  display: display,
+  contributors,
+  busy,
+  onClear,
+  onProvenance,
+  onSelectSelector,
+}: {
+  label: string;
+  prop: string;
+  tipProps?: readonly string[];
+  display: Display;
+  contributors: Contributor[];
+  busy: boolean;
+  onClear: () => void;
+  onProvenance: (prop: string, anchor: DOMRect) => void;
+  onSelectSelector: (selector: string, prop?: string) => void;
+}) {
+  const translate = useTranslate();
+  const tip = tipProps ?? [prop];
+  if (display.present && !display.isSelected) {
+    return <ProvenanceLabel label={label} props={tip} anchorProp={prop} busy={busy} onProvenance={onProvenance} />;
+  }
+  return (
+    <FieldLabel
+      className={`embed-editor_size-label ${display.overridden ? 'is-overridden' : ''}`}
+      active={display.isSelected}
+      {...(display.present ? {} : { inheritedProp: prop })}
+      disabled={busy}
+      onReset={onClear}
+      resetLabel={translate('style.typographyKit.clear')}
+      tooltip={<PropTip props={tip} />}
+      {...(display.overridden ? { title: translate('style.typographyKit.overriddenBy', { selector: display.winnerSelector }) } : {})}
+      menuNote={(close) => (
+        <ProvenanceList
+          contributors={contributors}
+          prop={prop}
+          onSelect={(selector, selectorProp) => {
+            onSelectSelector(selector, selectorProp);
+            close();
+          }}
+        />
+      )}
+    >
+      {label}
+    </FieldLabel>
+  );
+}
+
+export function GroupLabel({
+  label,
+  props,
+  read,
+  busy,
+  onClear,
+  onProvenance,
+  onSelectSelector,
+}: {
+  label: string;
+  props: readonly string[];
+  read: (prop: string) => ResolvedProp | undefined;
+  busy: boolean;
+  onClear: () => void;
+  onProvenance: (prop: string, anchor: DOMRect) => void;
+  onSelectSelector: (selector: string, prop?: string) => void;
+}) {
+  const prop = props.find((name) => read(name)?.source === 'selected') ?? props.find((name) => read(name) !== undefined) ?? props[0];
+  if (prop === undefined) {
+    throw new Error('Group label requires at least one property');
+  }
+  return (
+    <PropLabel
+      label={label}
+      prop={prop}
+      tipProps={props}
+      display={displayOf(read(prop))}
+      contributors={read(prop)?.contributors ?? []}
+      busy={busy}
+      onClear={onClear}
+      onProvenance={onProvenance}
+      onSelectSelector={onSelectSelector}
+    />
+  );
+}
+
+export type TextFieldProps = {
+  prop: string;
+  label: string;
+  placeholder?: string;
+  swatch?: ReactNode;
+  swatchLabel?: string;
+} & Props;
+
+export function TextField(props: TextFieldProps) {
+  const { prop, label, placeholder, swatch, swatchLabel, read, busy } = props;
+  const { setProp, clearProp, liveSetProp, onProvenance, onSelectSelector } = props;
+  const display = displayOf(read(prop));
+  const external = display.present ? withImportant(display) : '';
+  const [shown, noteLive] = useLiveColor(external);
+  const computed = useComputedValue(swatchLabel && !shown ? prop : '');
+  const ownSwatch = swatchLabel ? (
+    <ColorSwatch
+      value={shown || computed}
+      busy={busy}
+      ariaLabel={swatchLabel}
+      onChange={(color, live) => {
+        noteLive(live ? withImportant({ value: color, important: display.important }) : undefined);
+        if (live) {
+          liveSetProp(prop, color, display.important);
+        } else {
+          setProp(prop, color, display.important);
+        }
+      }}
+    />
+  ) : undefined;
+  const input = (
+    <LiveInput
+      value={shown}
+      busy={busy}
+      {...(placeholder === undefined ? {} : { placeholder })}
+      ariaLabel={label}
+      className="u-input embed-editor_size-input"
+      dataProp={prop}
+      prop={prop}
+      onCommit={(value, important) => setProp(prop, value, important)}
+      onLiveCommit={(value, important) => liveSetProp(prop, value, important)}
+      onClear={() => clearProp(prop)}
+    />
+  );
+  const fieldSwatch = ownSwatch ?? swatch;
+  return (
+    <>
+      <PropLabel
+        label={label}
+        prop={prop}
+        display={display}
+        contributors={read(prop)?.contributors ?? []}
+        busy={busy}
+        onClear={() => clearProp(prop)}
+        onProvenance={onProvenance}
+        onSelectSelector={onSelectSelector}
+      />
+      {fieldSwatch ? (
+        <div className="embed-editor_type-field">
+          {fieldSwatch}
+          {input}
+        </div>
+      ) : (
+        input
+      )}
+    </>
+  );
+}
+
+export function StackedField({
+  prop,
+  label,
+  placeholder,
+  read,
+  busy,
+  setProp,
+  clearProp,
+  liveSetProp,
+  onProvenance,
+  onSelectSelector,
+}: {
+  prop: string;
+  label: string;
+  placeholder?: string;
+} & Props) {
+  const display = displayOf(read(prop));
+  const external = display.present ? withImportant(display) : '';
+  return (
+    <div className="embed-editor_type-cell">
+      <LiveInput
+        value={external}
+        busy={busy}
+        {...(placeholder === undefined ? {} : { placeholder })}
+        ariaLabel={label}
+        className="u-input embed-editor_size-input"
+        dataProp={prop}
+        prop={prop}
+        onCommit={(value, important) => setProp(prop, value, important)}
+        onLiveCommit={(value, important) => liveSetProp(prop, value, important)}
+        onClear={() => clearProp(prop)}
+      />
+      <PropLabel
+        label={label}
+        prop={prop}
+        display={display}
+        contributors={read(prop)?.contributors ?? []}
+        busy={busy}
+        onClear={() => clearProp(prop)}
+        onProvenance={onProvenance}
+        onSelectSelector={onSelectSelector}
+      />
+    </div>
+  );
+}
+
+
+export type Seg = { value: string; icon: ReactNode; label: string };
+
+export function SegBar(props: SegBarProps) {
+  const { segs, current, ariaLabel, busy, onCommit, moreSegment, moreValue = 'unset' } = props;
+  const supported = new Set(segs.map((segment) => segment.value));
+  const [forceCustom, setForceCustom] = useSelectorState(false);
+  const [seed, setSeed] = useSelectorState<string | undefined>(undefined);
+  const customMode = forceCustom || (current !== '' && !supported.has(current));
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const dropUp = useSegMenuClamp({ open, customMode, rootRef, menuRef });
+  const { inputRef, requestFocus } = useSegCustomFocus({ customMode, busy });
+
+  const pick = (next: string) => {
+    setForceCustom(false);
+    setSeed(undefined);
+    setOpen(false);
+    onCommit(next, false);
+  };
+  const enterCustom = (value: string) => {
+    setOpen(false);
+    requestFocus();
+    setForceCustom(true);
+    setSeed(value);
+    onCommit(value, false);
+  };
+
+  return (
+    <KeywordConnect prop={props.prop} value={current} ariaLabel={ariaLabel} disabled={busy} dot={customMode ? 'field' : 'wrapper'} onPick={pick}>
+      <div ref={rootRef} className={`embed-editor_display ${customMode ? 'is-custom' : ''}`} role="group" aria-label={ariaLabel}>
+        <SegmentPill />
+        {customMode ? (
+          <SegBarCustomInput bar={props} seed={seed} inputRef={inputRef} onSeedDone={() => setSeed(undefined)} onBackToBar={() => setForceCustom(false)} />
+        ) : (
+          <SegBarSegments
+            segs={segs}
+            current={current}
+            ariaLabel={ariaLabel}
+            busy={busy}
+            onPick={pick}
+            onMore={moreSegment ? () => enterCustom(moreValue) : undefined}
+          />
+        )}
+        <SegBarMenu
+          open={open}
+          dropUp={dropUp}
+          menuRef={menuRef}
+          ariaLabel={ariaLabel}
+          busy={busy}
+          customMode={customMode}
+          segs={segs}
+          current={current}
+          onToggle={() => setOpen((value) => !value)}
+          onPick={pick}
+          onEnterCustom={() => enterCustom(moreValue)}
+        />
+      </div>
+    </KeywordConnect>
+  );
+}
+
+export type SegBarProps = {
+  segs: readonly Seg[];
+  current: string;
+  ariaLabel: string;
+  prop: string;
+  busy: boolean;
+  onCommit: (value: string, important: boolean) => void;
+  onLiveCommit: (value: string, important: boolean) => void;
+  onClear: () => void;
+  moreSegment?: boolean;
+  moreValue?: string;
+};
+
+export function SegBarCustomInput({
+  bar,
+  seed,
+  inputRef,
+  onSeedDone,
+  onBackToBar,
+}: {
+  bar: SegBarProps;
+  seed: string | undefined;
+  inputRef: React.RefObject<HTMLInputElement>;
+  onSeedDone: () => void;
+  onBackToBar: () => void;
+}) {
+  const translate = useTranslate();
+  const supported = new Set(bar.segs.map((segment) => segment.value));
+  return (
+    <LiveInput
+      value={seed ?? bar.current}
+      busy={bar.busy}
+      placeholder={translate('style.typographyKit.customValuePlaceholder')}
+      ariaLabel={bar.ariaLabel}
+      className="embed-editor_value-input embed-editor_display-input"
+      prop={bar.prop}
+      inputRef={inputRef}
+      onCommit={(value, important) => {
+        onSeedDone();
+        if (supported.has(value.trim().toLowerCase())) {
+          onBackToBar();
+        }
+        bar.onCommit(value, important);
+      }}
+      onLiveCommit={bar.onLiveCommit}
+      onClear={() => {
+        onBackToBar();
+        onSeedDone();
+        bar.onClear();
+      }}
+    />
+  );
+}
+
+export function SegBarSegments({
+  segs,
+  current,
+  ariaLabel,
+  busy,
+  onPick,
+  onMore,
+}: {
+  segs: readonly Seg[];
+  current: string;
+  ariaLabel: string;
+  busy: boolean;
+  onPick: (value: string) => void;
+  onMore: (() => void) | undefined;
+}) {
+  const translate = useTranslate();
+  return (
+    <>
+      {segs.map((seg) => (
+        <button
+          key={seg.value}
+          type="button"
+          role="radio"
+          aria-checked={current === seg.value}
+          className={`embed-editor_display-seg ${current === seg.value ? 'is-selected' : ''}`}
+          disabled={busy}
+          aria-label={seg.label}
+          title={seg.label}
+          onClick={() => onPick(seg.value)}
+        >
+          {seg.icon}
+        </button>
+      ))}
+      {onMore ? (
+        <button
+          type="button"
+          className="embed-editor_display-seg"
+          disabled={busy}
+          aria-label={translate('style.typographyKit.customAria', { name: ariaLabel })}
+          title={translate('style.typographyKit.customAria', { name: ariaLabel })}
+          onClick={onMore}
+        >
+          <MoreIcon />
+        </button>
+      ) : undefined}
+    </>
+  );
+}
+
+export function SegBarMenu({
+  open,
+  dropUp,
+  menuRef,
+  ariaLabel,
+  busy,
+  customMode,
+  segs,
+  current,
+  onToggle,
+  onPick,
+  onEnterCustom,
+}: {
+  open: boolean;
+  dropUp: boolean;
+  menuRef: React.RefObject<HTMLDivElement>;
+  ariaLabel: string;
+  busy: boolean;
+  customMode: boolean;
+  segs: readonly Seg[];
+  current: string;
+  onToggle: () => void;
+  onPick: (value: string) => void;
+  onEnterCustom: () => void;
+}) {
+  const translate = useTranslate();
+  return (
+    <>
+      <button
+        type="button"
+        className="embed-editor_display-arrow"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={translate('style.typographyKit.moreOptions', { name: ariaLabel })}
+        disabled={busy}
+        onClick={onToggle}
+      >
+        <ChevronIcon />
+      </button>
+      {open ? (
+        <Popup mode="popover" portal={false} onClose={onToggle} ref={menuRef} className={`embed-editor_display-menu ${dropUp ? 'is-up' : ''}`} role="menu">
+          <VariableMenuItem onClose={onToggle} />
+          {customMode ? (
+            segs.map((seg) => <MenuItem key={seg.value} label={seg.label} selected={current === seg.value} onClick={() => onPick(seg.value)} />)
+          ) : (
+            <MenuItem label={translate('style.typographyKit.custom')} selected={false} onClick={onEnterCustom} />
+          )}
+        </Popup>
+      ) : undefined}
+    </>
+  );
+}
+
+export function useSegMenuClamp({
+  open,
+  customMode,
+  rootRef,
+  menuRef,
+}: {
+  open: boolean;
+  customMode: boolean;
+  rootRef: React.RefObject<HTMLDivElement>;
+  menuRef: React.RefObject<HTMLDivElement>;
+}): boolean {
+  const [dropUp, setDropUp] = useState(false);
+  useLayoutEffect(() => {
+    const menu = menuRef.current;
+    const root = rootRef.current;
+    if (!open || !menu || !root) {
+      return;
+    }
+    const margin = 8;
+    const bounds = panelBounds(root);
+    const rootRect = root.getBoundingClientRect();
+    const naturalLeft = rootRect.right - menu.offsetWidth;
+    const naturalRight = rootRect.right;
+    const shift =
+      naturalLeft < bounds.left + margin ? bounds.left + margin - naturalLeft : naturalRight > bounds.right - margin ? bounds.right - margin - naturalRight : 0;
+    menu.style.transform = shift ? `translateX(${shift}px)` : '';
+    const overflowsBelow = rootRect.bottom + menu.offsetHeight + margin > bounds.bottom;
+    setDropUp(overflowsBelow && rootRect.top - bounds.top > bounds.bottom - rootRect.bottom);
+  }, [open, customMode, rootRef, menuRef]);
+  return dropUp;
+}
+
+export function useSegCustomFocus({ customMode, busy }: { customMode: boolean; busy: boolean }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const wantFocus = useRef(false);
+  useEffect(() => {
+    if (customMode && wantFocus.current && !busy) {
+      wantFocus.current = false;
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [customMode, busy]);
+  return {
+    inputRef,
+    requestFocus: () => {
+      wantFocus.current = true;
+    },
+  };
+}
+
+export const MoreIcon = centralIcon(centralMore);

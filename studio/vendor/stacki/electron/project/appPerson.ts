@@ -1,0 +1,105 @@
+import fs from 'node:fs';
+import { createHash } from 'node:crypto';
+import { assert } from '../../shared/core/assert';
+import { APP_PERSON_LIMITS, parseAppPerson, type AppCommitAuthor, type AppPerson } from '../../shared/properties/appsRpc';
+import { git } from '../lib/nodeTools';
+
+const PERSON_LIMITS = {
+  gitTimeoutMs: 5_000,
+  authorCommitsMax: 1000,
+} as const satisfies Record<string, number>;
+
+export interface AppPersonDetails {
+  readonly name: string | undefined;
+  readonly email: string | undefined;
+  readonly github: string | undefined;
+}
+
+export function appPerson(projectKey: string, details: AppPersonDetails, fallbackPersonKey: string, options: { readonly hidden: boolean }): AppPerson {
+  const id = appPersonId(projectKey, personKeyOf(details, fallbackPersonKey));
+  const person: AppPerson = options.hidden
+    ? { id, name: undefined, email: undefined, github: undefined }
+    : { id, name: bounded(details.name), email: bounded(details.email), github: details.github };
+  assert(parseAppPerson(person).id === id, 'A person reads back as made');
+  return person;
+}
+
+export function appPersonId(projectKey: string, personKey: string): string {
+  assert(projectKey.length > 0, 'A person id names its project');
+  assert(personKey.length > 0, 'A person id names its person');
+  const id = createHash('sha256').update(`stacki-app-person/v1\n${projectKey}\n${personKey}`).digest('hex').slice(0, APP_PERSON_LIMITS.idChars);
+  assert(id.length === APP_PERSON_LIMITS.idChars, 'A person id has its full length');
+  return id;
+}
+
+function personKeyOf(details: AppPersonDetails, fallback: string): string {
+  if (details.github !== undefined) {
+    return `github:${details.github.toLowerCase()}`;
+  }
+  if (details.email !== undefined) {
+    return `email:${details.email.toLowerCase()}`;
+  }
+  return `device:${fallback}`;
+}
+
+export async function appProjectKey(projectRoot: string): Promise<string> {
+  const remote = await gitConfig(projectRoot, 'remote.origin.url');
+  if (remote !== undefined) {
+    return `remote:${normalizeRemote(remote)}`;
+  }
+  return `path:${fs.realpathSync(projectRoot)}`;
+}
+
+export function normalizeRemote(remote: string): string {
+  const trimmed = remote.trim();
+  const scp = /^[^@/\s]+@([^:/\s]+):(.+)$/.exec(trimmed);
+  const joined = scp === null ? trimmed.replace(/^[a-z+]+:\/\//i, '').replace(/^[^@/]*@/, '') : `${scp[1] ?? ''}/${scp[2] ?? ''}`;
+  return joined
+    .replace(/\.git$/i, '')
+    .replace(/\/+$/, '')
+    .toLowerCase();
+}
+
+export async function readGitPerson(projectRoot: string): Promise<{ readonly name: string | undefined; readonly email: string | undefined }> {
+  const [name, email] = await Promise.all([gitConfig(projectRoot, 'user.name'), gitConfig(projectRoot, 'user.email')]);
+  return { name, email };
+}
+
+async function gitConfig(projectRoot: string, key: string): Promise<string | undefined> {
+  try {
+    const value = (await git(projectRoot, ['config', '--get', key], { timeout: PERSON_LIMITS.gitTimeoutMs })).stdout.trim();
+    return value.length > 0 ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export async function readGitAuthors(projectRoot: string): Promise<readonly AppCommitAuthor[]> {
+  let output = '';
+  try {
+    const args = ['log', `--max-count=${PERSON_LIMITS.authorCommitsMax}`, '--format=%an%x1f%ae'];
+    output = (await git(projectRoot, args, { timeout: PERSON_LIMITS.gitTimeoutMs })).stdout;
+  } catch {
+    return [];
+  }
+  const seen = new Set<string>();
+  const authors: AppCommitAuthor[] = [];
+  for (const line of output.split('\n').slice(0, PERSON_LIMITS.authorCommitsMax)) {
+    const [name = '', email = ''] = line.split('\x1f');
+    const key = email.trim().toLowerCase() || name.trim().toLowerCase();
+    if (key === '' || seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    authors.push({ name: name.trim() || undefined, email: email.trim() || undefined });
+  }
+  assert(authors.length <= PERSON_LIMITS.authorCommitsMax, 'Authors are bounded by the commits read');
+  return authors;
+}
+
+function bounded(detail: string | undefined): string | undefined {
+  if (detail === undefined) {
+    return undefined;
+  }
+  return detail.slice(0, APP_PERSON_LIMITS.detailCharsMax);
+}

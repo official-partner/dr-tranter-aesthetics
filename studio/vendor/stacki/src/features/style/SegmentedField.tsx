@@ -1,0 +1,219 @@
+import Popup from '../../ui/Popup';
+import { useEffect, useRef, useState } from 'react';
+import { useHighlight } from './model/computedStyle';
+import type { ReactNode } from 'react';
+import { useTranslate } from '../../lib/i18n/useTranslate';
+import SegmentPill from './components/SegmentPill';
+import { ChevronIcon, MenuItem } from './components/MenuParts';
+import { useCustomFocus } from './model/fieldHooks';
+import { parseImportant, withImportant } from './model/styleDisplay';
+import VariableConnect from './VariableConnect';
+import KeywordConnect, { VariableMenuItem } from './KeywordConnect';
+import { commitInPlace } from './model/commitStyleInPlace';
+
+
+export type SegOption = { value: string; label: ReactNode; menuLabel: string; ariaLabel?: string };
+
+function CustomField({
+  prop,
+  value,
+  important,
+  busy,
+  inputRef,
+  onCommit,
+}: {
+  prop: string;
+  value: string;
+  important: boolean;
+  busy: boolean;
+  inputRef: React.RefObject<HTMLInputElement>;
+  onCommit: (value: string, important: boolean) => void;
+}) {
+  const translate = useTranslate();
+  const [draft, setDraft] = useState(withImportant({ value, important }));
+  const focused = useRef(false);
+  useEffect(() => {
+    if (!focused.current) {
+      setDraft(withImportant({ value, important }));
+    }
+  }, [value, important]);
+  const commit = () => {
+    const parsed = parseImportant(draft);
+    if (parsed.value && (parsed.value !== value.trim() || parsed.important !== important)) {
+      onCommit(parsed.value, parsed.important);
+    }
+  };
+  return (
+    <VariableConnect
+      className="is-fill"
+      prop={prop}
+      canvasProperty={prop}
+      disabled={busy}
+      ariaLabel={translate('styleModel.shared.connectVariable', { label: translate('style.segmentedField.value') })}
+      onPick={(binding) => {
+        setDraft(withImportant({ value: binding, important }));
+        onCommit(binding, important);
+      }}
+    >
+      <input
+        ref={inputRef}
+        className="embed-editor_value-input embed-editor_display-input"
+        value={draft}
+        onChange={(event) => setDraft(event.target.value)}
+        onFocus={() => {
+          focused.current = true;
+        }}
+        onBlur={() => {
+          focused.current = false;
+          commit();
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            commitInPlace(event.currentTarget);
+          }
+        }}
+        disabled={busy}
+        spellCheck={false}
+        aria-label={translate('style.segmentedField.value')}
+        placeholder={translate('style.segmentedField.customValuePlaceholder')}
+      />
+    </VariableConnect>
+  );
+}
+
+type SegmentedFieldProps = {
+  value: string;
+  important: boolean;
+  options: readonly SegOption[];
+  prop: string;
+  fallback: string;
+  busy: boolean;
+  onCommit: (value: string, important: boolean) => void;
+  ariaLabel?: string;
+  highlight?: 'computed' | 'authored';
+};
+
+export default function SegmentedField({ value, important, options, prop, fallback, busy, onCommit, ariaLabel, highlight = 'computed' }: SegmentedFieldProps) {
+  const current = value.trim().toLowerCase();
+  const supported = new Set(options.map((option) => option.value));
+  const customMode = !((supported.has(current) || !current) && !important);
+  const active = useHighlight(
+    current,
+    highlight === 'computed' ? prop : '',
+    options.map((option) => option.value),
+    fallback,
+  );
+
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const { inputRef, requestFocus } = useCustomFocus({ customMode, busy });
+
+  const pick = (next: string) => {
+    setOpen(false);
+    if (next !== current || important) {
+      onCommit(next, false);
+    }
+  };
+  const enterCustom = () => {
+    setOpen(false);
+    requestFocus();
+    onCommit('unset', false);
+  };
+
+  return (
+    <KeywordConnect
+      prop={prop}
+      value={value}
+      ariaLabel={ariaLabel ?? prop}
+      disabled={busy}
+      dot={customMode ? 'field' : 'wrapper'}
+      onPick={(binding) => onCommit(binding, important)}
+    >
+      <div ref={rootRef} className={`embed-editor_display ${customMode ? 'is-custom' : ''}`} role="group" aria-label={ariaLabel}>
+        <SegmentPill />
+        {customMode ? (
+          <CustomField prop={prop} value={value} important={important} busy={busy} inputRef={inputRef} onCommit={onCommit} />
+        ) : (
+          <SegmentButtons options={options} active={active} busy={busy} onPick={pick} />
+        )}
+        <SegmentMenu
+          open={open}
+          busy={busy}
+          customMode={customMode}
+          current={current}
+          options={options}
+          onToggle={() => setOpen((previous) => !previous)}
+          onPick={pick}
+          onEnterCustom={enterCustom}
+        />
+      </div>
+    </KeywordConnect>
+  );
+}
+
+function SegmentMenu({
+  open,
+  busy,
+  customMode,
+  current,
+  options,
+  onToggle,
+  onPick,
+  onEnterCustom,
+}: {
+  open: boolean;
+  busy: boolean;
+  customMode: boolean;
+  current: string;
+  options: readonly SegOption[];
+  onToggle: () => void;
+  onPick: (value: string) => void;
+  onEnterCustom: () => void;
+}) {
+  const translate = useTranslate();
+  return (
+    <>
+      <button
+        type="button"
+        className="embed-editor_display-arrow"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={translate('style.segmentedField.moreOptions')}
+        disabled={busy}
+        onClick={onToggle}
+      >
+        <ChevronIcon />
+      </button>
+
+      {open ? (
+        <Popup mode="popover" portal={false} onClose={onToggle} className="embed-editor_display-menu" role="menu">
+          <VariableMenuItem onClose={onToggle} />
+          {customMode ? (
+            options.map((option) => (
+              <MenuItem key={option.value} label={option.menuLabel} selected={current === option.value} onClick={() => onPick(option.value)} />
+            ))
+          ) : (
+            <MenuItem label={translate('style.segmentedField.custom')} selected={false} onClick={onEnterCustom} />
+          )}
+        </Popup>
+      ) : undefined}
+    </>
+  );
+}
+
+function SegmentButtons({ options, active, busy, onPick }: { options: readonly SegOption[]; active: string; busy: boolean; onPick: (value: string) => void }) {
+  return options.map((option) => (
+    <button
+      key={option.value}
+      type="button"
+      role="radio"
+      aria-checked={active === option.value}
+      aria-label={option.ariaLabel ?? option.menuLabel}
+      className={`embed-editor_display-seg ${active === option.value ? 'is-selected' : ''}`}
+      disabled={busy}
+      onClick={() => onPick(option.value)}
+    >
+      {option.label}
+    </button>
+  ));
+}

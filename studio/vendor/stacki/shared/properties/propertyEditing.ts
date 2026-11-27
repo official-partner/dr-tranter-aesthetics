@@ -1,0 +1,278 @@
+import { assert } from '../core/assert';
+import { boolean, count, list, object, optional, text } from '../core/boundary';
+import { LIMITS } from '../core/limits';
+import { toRecord } from '../core/record';
+import { parseOptionalMessageRef, type MessageRef } from '../core/i18n/messageReference';
+import type { Result } from '../core/result';
+import { parseRefusal, type PropertyError } from './propertyErrors';
+import { parseVariantDefaults, parseVariantGroups, parseVariantRuleEdit, type VariantDefault, type VariantGroup, type VariantRuleEdit } from './variantRules';
+
+export const PROPERTY_LIMITS = {
+  fieldsMax: LIMITS.propSchemaFieldsMax,
+  sourceCharsMax: 2 * 1024 * 1024,
+  textCharsMax: 32768,
+  nameCharsMax: 128,
+  filesMax: 10000,
+  totalCharsMax: 32 * 1024 * 1024,
+  nodesMax: 200000,
+} as const;
+
+export interface ComponentProperty {
+  readonly name: string;
+  readonly type: string;
+  readonly required: boolean;
+  readonly readonly: boolean;
+  readonly defaultValue: string;
+  readonly description: string;
+  readonly origin?: PropertyOrigin;
+  readonly editing?: PropertyEditing;
+  readonly conditions?: readonly string[];
+  readonly conditionRefs?: ReadonlyArray<MessageRef | undefined>;
+  readonly shared?: PropertyShare;
+}
+export type PropertyEditing =
+  | { readonly kind: 'editable'; readonly warning?: string; readonly warningRef?: MessageRef | undefined }
+  | { readonly kind: 'override'; readonly reason: string; readonly reasonRef?: MessageRef | undefined }
+  | { readonly kind: 'restricted'; readonly reason: string; readonly reasonRef?: MessageRef | undefined };
+export interface PropertyShare {
+  readonly typeName: string;
+  readonly path: string;
+  readonly users: readonly string[];
+  readonly instances: readonly string[];
+  readonly defaults: readonly PropertyShareDefault[];
+}
+export interface PropertyShareDefault {
+  readonly path: string;
+  readonly expression: string;
+}
+export interface PropertySource {
+  readonly label: string;
+  readonly expression: string;
+  readonly line: number;
+}
+export interface PropertyOrigin {
+  readonly declarations: readonly PropertySource[];
+  readonly defaultValue?: PropertySource;
+}
+export interface ComponentProperties {
+  readonly source: string;
+  readonly properties: readonly ComponentProperty[];
+  readonly frontmatter: string;
+  readonly advanced: boolean;
+  readonly variantGroups?: readonly VariantGroup[];
+  readonly variantDefaults?: readonly VariantDefault[];
+}
+export interface PropertyOptionRename {
+  readonly from: string;
+  readonly to: string;
+}
+export type PropertyChange =
+  | {
+      readonly kind: 'save';
+      readonly originalName: string;
+      readonly property: ComponentProperty;
+      readonly optionRenames?: readonly PropertyOptionRename[];
+    }
+  | { readonly kind: 'remove'; readonly name: string }
+  | { readonly kind: 'order'; readonly names: readonly string[] }
+  | { readonly kind: 'options'; readonly name: string; readonly type: string }
+  | { readonly kind: 'source'; readonly frontmatter: string }
+  | { readonly kind: 'variantRules'; readonly edit: VariantRuleEdit };
+
+export function propertyText(input: unknown): string {
+  const value = text(input);
+  if (value.length > PROPERTY_LIMITS.textCharsMax) {
+    throw new Error('Property text exceeds limit');
+  }
+  return value;
+}
+export function propertySource(input: unknown): string {
+  const value = text(input);
+  if (value.length > PROPERTY_LIMITS.sourceCharsMax) {
+    throw new Error('Component source exceeds limit');
+  }
+  return value;
+}
+export function propertyName(input: unknown): string {
+  const value = propertyText(input);
+  if (value.length > PROPERTY_LIMITS.nameCharsMax) {
+    throw new Error('Property name exceeds limit');
+  }
+  if (!/^[A-Za-z_$][\w$]*$/.test(value)) {
+    throw new Error('Use a TypeScript identifier for the property name');
+  }
+  return value;
+}
+export function parseComponentProperty(input: unknown): ComponentProperty {
+  return object({
+    name: propertyLabel,
+    type: propertyText,
+    required: boolean,
+    readonly: boolean,
+    defaultValue: propertyText,
+    description: propertyText,
+    origin: optional(parsePropertyOrigin),
+    editing: optional(parsePropertyEditing),
+    conditions: optional((value) => propertyList(value, propertyText)),
+    conditionRefs: optional(parseConditionRefs),
+    shared: optional(parsePropertyShare),
+  })(input);
+}
+
+function parsePropertyShare(input: unknown): PropertyShare {
+  const share = object({
+    typeName: propertyName,
+    path: propertyLabel,
+    users: (value) => propertyPaths(value),
+    instances: (value) => propertyPaths(value),
+    defaults: (value) => propertyList(value, object({ path: propertyLabel, expression: propertyText })),
+  })(input);
+  if (share.path.startsWith('/') || share.path.split('/').includes('..')) {
+    throw new Error('Shared property path must be project-relative');
+  }
+  return share;
+}
+
+function propertyPaths(input: unknown): readonly string[] {
+  const values = list(propertyLabel)(input);
+  if (values.length > PROPERTY_LIMITS.filesMax) {
+    throw new Error('Too many shared property files');
+  }
+  return values;
+}
+
+function parsePropertyEditing(input: unknown): PropertyEditing {
+  const value = toRecord(input);
+  if (value?.['kind'] === 'editable') {
+    const warning = optional(propertyText)(value['warning']);
+    const warningRef = parseOptionalMessageRef(value['warningRef']);
+    if (warning === undefined || warning.trim() === '') {
+      return { kind: 'editable' };
+    }
+    return warningRef === undefined ? { kind: 'editable', warning } : { kind: 'editable', warning, warningRef };
+  }
+  if (value?.['kind'] === 'override' || value?.['kind'] === 'restricted') {
+    const reason = propertyText(value['reason']);
+    const reasonRef = parseOptionalMessageRef(value['reasonRef']);
+    if (reason.trim()) {
+      return reasonRef === undefined ? { kind: value['kind'], reason } : { kind: value['kind'], reason, reasonRef };
+    }
+  }
+  throw new Error('Invalid property editing permission');
+}
+
+function parsePropertyOrigin(input: unknown): PropertyOrigin {
+  return object({
+    declarations: (value) => propertyList(value, parsePropertySource),
+    defaultValue: optional(parsePropertySource),
+  })(input);
+}
+
+function parsePropertySource(input: unknown): PropertySource {
+  const source = object({
+    label: propertyText,
+    expression: propertyText,
+    line: count,
+  })(input);
+  if (!source.label.trim()) {
+    throw new Error('Property source label must be nonempty');
+  }
+  if (source.line < 1 || source.line > PROPERTY_LIMITS.sourceCharsMax) {
+    throw new Error('Property source line is out of bounds');
+  }
+  return source;
+}
+export function propertyList<T>(input: unknown, parse: (input: unknown) => T): readonly T[] {
+  const values = list(parse)(input);
+  if (values.length > PROPERTY_LIMITS.fieldsMax) {
+    throw new Error('Too many component properties');
+  }
+  return values;
+}
+export function parsePropertyChange(input: unknown): PropertyChange {
+  const value = toRecord(input);
+  switch (value?.['kind']) {
+    case 'save': {
+      const saved = {
+        kind: 'save',
+        ...object({
+          originalName: propertyText,
+          property: parseEditableProperty,
+        })(input),
+      } as const;
+      const optionRenames = optional((item) => propertyList(item, parsePropertyOptionRename))(value['optionRenames']);
+      return optionRenames === undefined ? saved : { ...saved, optionRenames };
+    }
+    case 'remove':
+      return { kind: 'remove', name: propertyName(value['name']) };
+    case 'order':
+      return {
+        kind: 'order',
+        names: propertyList(value['names'], propertyName),
+      };
+    case 'options':
+      return {
+        kind: 'options',
+        name: propertyName(value['name']),
+        type: propertyText(value['type']),
+      };
+    case 'source':
+      return {
+        kind: 'source',
+        frontmatter: propertySource(value['frontmatter']),
+      };
+    case 'variantRules':
+      return { kind: 'variantRules', edit: parseVariantRuleEdit(value['edit']) };
+    default:
+      throw new Error('Unknown component property change');
+  }
+}
+
+function parsePropertyOptionRename(input: unknown): PropertyOptionRename {
+  const rename = object({ from: propertyText, to: propertyText })(input);
+  if (!rename.from.trim() || !rename.to.trim()) {
+    throw new Error('Property option rename values must be nonempty');
+  }
+  if (rename.from === rename.to) {
+    throw new Error('Property option rename must change the value');
+  }
+  return rename;
+}
+export function parseComponentProperties(input: unknown): ComponentProperties {
+  return object({
+    source: propertySource,
+    frontmatter: propertySource,
+    advanced: boolean,
+    properties: (value) => propertyList(value, parseComponentProperty),
+    variantGroups: optional(parseVariantGroups),
+    variantDefaults: optional(parseVariantDefaults),
+  })(input);
+}
+export function parsePropertiesResult<T>(input: unknown, parse: (value: unknown) => T): Result<T, PropertyError> {
+  const value = toRecord(input);
+  if (value?.['ok'] === true) {
+    return { ok: true, value: parse(value['value']) };
+  }
+  if (value?.['ok'] === false) {
+    return { ok: false, error: parseRefusal(value['error']) };
+  }
+  throw new Error('Invalid component properties result');
+}
+
+function parseConditionRefs(input: unknown): ReadonlyArray<MessageRef | undefined> {
+  const refs = list((value) => value)(input);
+  assert(refs.length <= PROPERTY_LIMITS.fieldsMax, 'Property condition references are bounded');
+  return refs.map(parseOptionalMessageRef);
+}
+
+function propertyLabel(input: unknown): string {
+  const value = propertyText(input);
+  if (value.length === 0 || value.length > PROPERTY_LIMITS.nameCharsMax) {
+    throw new Error('Property name must be nonempty and within the name limit');
+  }
+  return value;
+}
+function parseEditableProperty(input: unknown): ComponentProperty {
+  const property = parseComponentProperty(input);
+  return { ...property, name: propertyName(property.name) };
+}

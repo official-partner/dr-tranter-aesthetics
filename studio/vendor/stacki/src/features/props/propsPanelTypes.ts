@@ -1,0 +1,96 @@
+import type { PropValuePolicy } from './propValuePolicy';
+
+import type { PageNode, PairedNode, ChunkGroupNode, Attr, ValueNode, ImportDecl } from '../../../shared/page/pageNode';
+import type { LoopTarget } from '../../editor/loopQueryPlan';
+import type { PropDeclaration } from '../../editor/propDeclaration';
+import type { ListProp } from '../../editor/listProps';
+import type { LoopApplyResult } from './LoopSettings';
+import type { FieldDefinition, PropValues } from './propRules';
+import type { SetProp, SetProps } from './propAttributes';
+import type { Rename, SetText, TagOption, TagFieldProps } from './propNodeEditors';
+import type { VariableRename } from '../../../shared/engine/variableRename';
+import type { SourceContext } from './propBindings';
+import type { RichContext, InlineNode } from './RichContent';
+import type { InlineCandidate } from './richContentModel';
+import type { PropFieldProvenance } from './propFieldExtras';
+import type { TextPiece } from './textConnect';
+import type { AssetDimensions } from '../../ui/AssetThumb';
+import type { AssetReference, PickedAsset } from '../../ui/AssetField';
+import React from 'react';
+import LinkField from './LinkField';
+
+export interface ContentValue {
+  readonly nodes: readonly InlineCandidate[];
+  readonly own: boolean;
+  readonly provenance?: PropFieldProvenance | undefined;
+  readonly onReset: () => void;
+}
+export type SelectedNode = PageNode | { readonly kind: 'frontmatter'; readonly id: string };
+export type ElementNode = (PairedNode | ChunkGroupNode) & { readonly props?: PropValues };
+export interface PropsPanelProps {
+  readonly valuePolicy?: PropValuePolicy;
+  readonly node?: SelectedNode | undefined;
+  readonly focusClass?: number;
+  readonly focusContent?: number;
+  readonly isLayout?: boolean;
+  readonly layouts?: readonly TagOption[];
+  readonly currentLayoutName?: string;
+  readonly onChangeLayout?: (name: string) => void;
+  readonly schema?: readonly FieldDefinition[];
+  readonly listProps?: ReadonlyMap<string, ListProp> | undefined;
+  readonly slotOptions?: readonly string[] | undefined;
+  readonly takesSlotText?: boolean;
+  readonly contentValue?: ContentValue | undefined;
+  readonly offersStyle?: boolean | undefined;
+  readonly tagOptions?: readonly TagOption[];
+  readonly projectClasses?: readonly string[];
+  readonly allowAttrs?: boolean;
+  readonly attributesTag?: string | undefined;
+  readonly comment?: string;
+  readonly onSetComment?: (value: string) => void;
+  readonly loopContext?: RichContext | undefined;
+  readonly bindContext?: RichContext | undefined;
+  readonly linkContext?: React.ComponentProps<typeof LinkField>['context'] | undefined;
+  readonly onSetProp: SetProp;
+  readonly onSetProps?: SetProps;
+  readonly onReplaceProps?: ((nodeId: string, props: Readonly<Record<string, Attr>>) => void) | undefined;
+  readonly onSetAssetProp?: (nodeId: string, name: string, picked: PickedAsset, reference: AssetReference, also?: PropValues) => void;
+  readonly onRenameProp: (previous: string, next: string) => void;
+  readonly onChangeTag?: TagFieldProps['onChangeTag'];
+  readonly onSetText: SetText;
+  readonly onSetContent: (text: string) => void;
+  readonly onSetInline: (nodes: readonly InlineNode[]) => void;
+  readonly richTextContent?: boolean | undefined;
+  readonly richTextProps?: readonly string[] | undefined;
+  readonly onSetContentSource?: ((source: string) => void) | undefined;
+  readonly contentSource?: string | undefined;
+  readonly contentShown?: string | undefined;
+  readonly onSetTextPieces?: ((pieces: readonly TextPiece[]) => void) | undefined;
+  readonly onOpenCode?: () => void;
+  readonly onSetFrontmatter?: (source: string) => void;
+  readonly frontmatterSource?: string;
+  readonly frontmatterImports?: readonly ImportDecl[] | undefined;
+  readonly onCommitLoopHead?: ((value: string, renames: readonly Rename[]) => string | undefined) | undefined;
+  readonly onRenameVariable?: ((rename: VariableRename) => string | undefined) | undefined;
+  readonly onSetLoopSource?: (target: LoopTarget, sanityClient: 'available' | 'unavailable', declaration?: PropDeclaration) => LoopApplyResult;
+  readonly onEditLoopProperty?: (key: string, edit: { readonly name: string; readonly description: string }) => Promise<string | undefined>;
+  readonly onOpenSymbol?: (name: string) => void;
+  readonly onToggleElse?: (value: boolean) => void;
+  readonly projectPath?: string | undefined;
+  readonly filePath?: string | undefined;
+}
+export type NodePanelProps<Kind extends SelectedNode['kind']> = Omit<PropsPanelProps, 'node'> & {
+  readonly node: Extract<SelectedNode, { readonly kind: Kind }> | (Kind extends ValueNode['kind'] ? ValueNode : never);
+};
+export interface ElementPropsPanelProps extends Omit<PropsPanelProps, 'node'> {
+  readonly node: ElementNode;
+  readonly dataContext: SourceContext;
+  readonly stashRef: React.MutableRefObject<Map<string, PropValues>>;
+}
+export interface SourceDimensionsOptions {
+  readonly source: Attr | undefined;
+  readonly projectPath: string | undefined;
+  readonly filePath: string | undefined;
+  readonly imports: unknown;
+  readonly setSourceDimensions: (value: AssetDimensions) => void;
+}

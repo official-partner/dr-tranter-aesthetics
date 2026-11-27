@@ -1,0 +1,181 @@
+import { useState } from 'react';
+import { assert } from '../../../shared/core/assert';
+import { remoteObject, type RemoteSchemaField, type RemoteValue } from '../../../shared/properties/cmsRemoteSchema';
+import type { RemoteAsset } from '../../../shared/properties/cmsRemote';
+import { uploadRemoteAsset } from '../../ipc/cmsConnectionsBridge';
+import { useTranslate, useTranslateDescribed } from '../../lib/i18n/useTranslate';
+import { ErrorToast } from '../../ui/ErrorToast';
+import { TrashIcon, UploadIcon } from '../../ui/Icons';
+import { RemoteObjectEditor } from './RemoteField';
+import type { RemoteEditContext, RemoteValueProps } from './RemoteValueEditor';
+
+export function RemoteAssetInput(
+  props: RemoteValueProps & {
+    readonly kind: 'image' | 'file';
+    readonly fields: readonly RemoteSchemaField[];
+  },
+) {
+  const { kind, value, context } = props;
+  const object = remoteObject(value);
+  const reference = assetReference(value);
+  const upload = useAssetUpload(context, kind);
+  const choose = () => upload.choose((asset) => props.onChange(pointingAt(object, kind, asset)));
+  const asset = reference === undefined ? undefined : context.assets.get(reference);
+  const svg = kind === 'file' && /\.svg$/i.test(asset?.filename ?? asset?.url ?? '');
+  return (
+    <div className={`remote-cms-asset is-${kind}`}>
+      {kind === 'image' || svg ? (
+        <ImageTile
+          shape="natural"
+          vector={svg}
+          asset={asset}
+          reference={reference}
+          busy={upload.busy}
+          onChoose={choose}
+          onRemove={() => props.onChange(undefined)}
+        />
+      ) : (
+        <FileRow name={asset?.filename} reference={reference} busy={upload.busy} onChoose={choose} onRemove={() => props.onChange(undefined)} />
+      )}
+      {upload.error && <ErrorToast message={upload.error} />}
+      {props.fields.length > 0 && reference !== undefined && (
+        <RemoteObjectEditor fields={props.fields} typeName={kind} value={value} context={context} onChange={props.onChange} />
+      )}
+    </div>
+  );
+}
+
+export function useAssetUpload(context: RemoteEditContext, kind: 'image' | 'file') {
+  const translateDescribed = useTranslateDescribed();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const run = async (onUploaded: (asset: RemoteAsset) => void) => {
+    setBusy(true);
+    setError(undefined);
+    const uploaded = await uploadRemoteAsset(context.projectPath, context.connectionId, kind);
+    setBusy(false);
+    if (!uploaded.ok) {
+      setError(translateDescribed(uploaded));
+    } else if (uploaded.value !== undefined) {
+      context.addAsset(uploaded.value);
+      onUploaded(uploaded.value);
+    }
+  };
+  const choose = (onUploaded: (asset: RemoteAsset) => void) => void run(onUploaded);
+  return { busy, error, choose };
+}
+
+export function ImageTile(props: {
+  readonly asset: RemoteAsset | undefined;
+  readonly reference: string | undefined;
+  readonly shape: 'natural' | 'tile';
+  readonly vector?: boolean;
+  readonly busy: boolean;
+  readonly onChoose: () => void;
+  readonly onRemove: () => void;
+}) {
+  const translate = useTranslate();
+  const [loaded, setLoaded] = useState(false);
+  if (props.reference === undefined) {
+    return (
+      <button
+        type="button"
+        className="remote-cms-tile is-empty"
+        title={translate('cmsRemote.asset.uploadAnImage')}
+        disabled={props.busy}
+        onClick={props.onChoose}
+      >
+        {props.busy ? (
+          translate('cmsRemote.asset.uploading')
+        ) : (
+          <>
+            <UploadIcon size={16} />
+            <span>{translate('cmsRemote.asset.uploadImage')}</span>
+          </>
+        )}
+      </button>
+    );
+  }
+  const size = imageSize(props.reference);
+  const style = size ? { aspectRatio: `${size.width} / ${size.height}` } : undefined;
+  return (
+    <div
+      className={`remote-cms-tile ${loaded ? '' : 'is-loading'} ${props.vector ? 'is-vector' : ''}`}
+      title={props.asset?.filename}
+      style={props.shape === 'natural' ? style : undefined}
+    >
+      {props.asset && (
+        <img
+          ref={(image) => {
+            if (image?.complete && image.naturalWidth > 0) {
+              setLoaded(true);
+            }
+          }}
+          src={props.vector ? props.asset.url : `${props.asset.url}?w=480&fit=max&auto=format`}
+          alt={props.asset.filename}
+          draggable={false}
+          onLoad={() => setLoaded(true)}
+        />
+      )}
+      <div className="remote-cms-tile-actions">
+        <button type="button" title={translate('cmsRemote.asset.replace')} disabled={props.busy} onClick={props.onChoose}>
+          <UploadIcon size={12} />
+        </button>
+        <button type="button" className="is-remove" title={translate('ui.remove')} onClick={props.onRemove}>
+          <TrashIcon size={12} />
+        </button>
+      </div>
+      {props.busy && <span className="remote-cms-tile-busy">{translate('cmsRemote.asset.uploading')}</span>}
+    </div>
+  );
+}
+
+function FileRow(props: {
+  readonly name: string | undefined;
+  readonly reference: string | undefined;
+  readonly busy: boolean;
+  readonly onChoose: () => void;
+  readonly onRemove: () => void;
+}) {
+  const translate = useTranslate();
+  const empty = props.reference === undefined;
+  const action = translate(empty ? 'cmsRemote.asset.upload' : 'cmsRemote.asset.replace');
+  return (
+    <div className="remote-cms-asset-row">
+      <span className="remote-cms-asset-name">{empty ? translate('cmsRemote.asset.noFile') : (props.name ?? props.reference)}</span>
+      <div className="remote-cms-asset-actions">
+        <button type="button" disabled={props.busy} onClick={props.onChoose}>
+          <UploadIcon size={12} /> {props.busy ? translate('cmsRemote.asset.uploading') : action}
+        </button>
+        {!empty && (
+          <button type="button" className="ghost" title={translate('ui.remove')} onClick={props.onRemove}>
+            <TrashIcon size={12} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function imageSize(reference: string | undefined): { readonly width: number; readonly height: number } | undefined {
+  const match = reference === undefined ? undefined : (/-(\d{1,5})x(\d{1,5})-[a-z0-9]+$/.exec(reference) ?? undefined);
+  const width = Number(match?.[1]);
+  const height = Number(match?.[2]);
+  if (width > 0 && height > 0) {
+    return { width, height };
+  }
+  return undefined;
+}
+
+export function assetReference(value: RemoteValue | undefined): string | undefined {
+  const reference = remoteObject(remoteObject(value)?.['asset'])?.['_ref'];
+  return typeof reference === 'string' ? reference : undefined;
+}
+
+const REPLACED_KEYS = ['asset', 'crop', 'hotspot'];
+
+export function pointingAt(previous: { readonly [key: string]: RemoteValue } | undefined, kind: 'image' | 'file', asset: RemoteAsset): RemoteValue {
+  assert(asset.id.startsWith(`${kind}-`), 'An uploaded asset is of the field kind');
+  const own = Object.fromEntries(Object.entries(previous ?? {}).filter(([key]) => !REPLACED_KEYS.includes(key)));
+  return { ...own, _type: kind, asset: { _type: 'reference', _ref: asset.id } };
+}

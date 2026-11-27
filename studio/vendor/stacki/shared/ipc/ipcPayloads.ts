@@ -1,0 +1,747 @@
+import { parseCodeIntelRequest } from './codeIntel';
+import { FILE_EXPLORER_PAYLOADS } from './fileExplorer';
+import { DESIGN_SESSION_PAYLOADS } from './designSession';
+import { parseLocaleSet } from './localeChannel';
+import { parseMergeResolution } from './mergeResolution';
+import { parseAccountRequest } from './publishAccount';
+import { parseSyncApply, parseSyncRestore, parseSyncScan, parseUsageRequest } from '../properties/breakpointSyncPlan';
+import { parseCmsCheckRequest, parseCmsConnectionDraft, parseConnectionId, parseSanityLoginRequest } from '../properties/cmsConnections';
+import { parseConstantEdit } from '../properties/cmsConstants';
+import {
+  parseRemoteCollectionName,
+  parseRemoteColumns,
+  parseRemoteConnection,
+  parseRemoteDocumentId,
+  parseRemoteIds,
+  parseRemoteMove,
+  parseRemoteWrite,
+  parseRemoteTypes,
+  parseRemoteAssetKind,
+  parseRemoteDocumentAction,
+  parseRemoteRevisionId,
+} from '../properties/cmsRemote';
+import { parseVideoLinkURL } from '../properties/linkPreview';
+import { parseMediaAccountConnect, parseMediaAccountKey } from '../properties/mediaAccounts';
+import { parseAppId, parseAppVersion, parseGitHubSource, parseReleaseTag, parseStagedToken } from '../properties/apps';
+import { parseAppFolderName } from '../properties/appFolders';
+import { parseGitHubLogin } from '../properties/projectRoles';
+import {
+  parseAppRepositoryRef,
+  parseAppScanTarget,
+  parseAppShareRequest,
+  parseMarketplaceSubmission,
+  parseSharedReleaseSource,
+} from '../properties/appPublish';
+import { parseAppSettingValuesReply } from '../properties/appSettings';
+import { parseAppFileOperation, type AppFileOperation } from '../properties/appFiles';
+import { parseAuthProviderId } from '../properties/appAuth';
+import { parseAppNetRequest } from '../properties/appNet';
+import { parseAppStorageKey, parseAppStorageScope, parseAppStorageValue, parseAppStorageWriter } from '../properties/appStorage';
+import {
+  MEDIA_HOSTING_LIMITS,
+  parseMediaConnectionDraft,
+  parseMediaConnectionId,
+  parseMediaFolder,
+  parseMediaName,
+  parseMediaOrder,
+} from '../properties/mediaHosting';
+import { parseSecretReadIndex, parseSecretsChange, parseSecretsFileName, parseSecretsIgnorableFile, parseSecretsRevision } from '../properties/secrets';
+import { parseMcpChange, parseMcpCodexChange, parseMcpRevision, parseMcpServerName, parseMcpTextInput } from '../properties/mcp';
+import {
+  parseConnectionKeyCopy,
+  parseDataSampleRequest,
+  parseDataSource,
+  parseEnvPayloadName,
+  parsePageTemplateDraft,
+  parseSecretValue,
+} from '../properties/pageTemplate';
+import { parsePageSettingsDirection, parsePageSettingsRequest } from '../properties/pageSettings';
+import { parsePageBulkRemoveRequest } from '../properties/pageBulkRemove';
+import { renamePath } from '../properties/pageRename';
+import { parseAstroRemoteEdit, parseAstroRemoteRead } from '../properties/astroContent';
+import { parseStudioAuth } from './studioAuth';
+import { parseRepositoryRequest } from '../ipc/publishRepository';
+import { parseDevNetworkRequest } from './devNetwork';
+import { parseAstroCopyRequest } from './astroCopy';
+import { parseCanvasCreate, defaultsCanvasFile } from '../properties/defaultsCanvas';
+import { parseDiscoveryRequest } from '../properties/publishDiscovery';
+import { parseWorkerSetupRequest } from '../properties/publishWorkerSetup';
+import { parseNetlifySiteRequest } from '../properties/publishNetlify';
+import { parsePublishCommitMessage, parsePublishTarget } from '../properties/publishConfig';
+import { metadataKind, parseMetadataWrite } from '../properties/projectMetadata';
+import { parseInstructionFilePath, parseInstructionPath } from '../properties/instructions';
+import { parseComponentOpTarget, parseComponentUses } from '../properties/componentOps';
+import { parseComponentRenameRequest, parseRenameDirection } from '../properties/componentRename';
+import { parseComponentSubfolder } from '../properties/componentNaming';
+import { parseClassUsageNames } from '../properties/classUsage';
+import { parseStyleMoveJournal, parseStyleMoveTarget } from '../properties/styleMoveJournal';
+import { parseGitHubLoginQuery } from '../properties/projectRoles';
+import { parseSelectorFileChanges, parseSelectorFileDigests, parseSelectorIds } from '../properties/selectorUsage';
+import { parseCreatePackageManager } from '../properties/packageManager';
+import { parseImageFormat, parseImagePath } from './assetConversion';
+import { parseGitHubRepository } from './githubRepository';
+import { parseCommitDiffRequest } from './gitCommitDiff';
+import { parseCommitAvatarRequest } from './commitAvatars';
+import { parsePreferenceName } from './preferences';
+import { parseStudioSource } from './studioSetup';
+import { parseStudioRequestId } from './studioProgress';
+import { parseUpdateAction } from './updateState';
+import { parsePropertyChange, propertyName, propertySource } from '../properties/propertyEditing';
+import { parseEdit, parseEditBatchRequest, parseEditRequest } from '../engine/editRequest';
+import { parsePreviewRender } from '../page/previewToken';
+import { AI_PAYLOADS } from './aiChat';
+import { AGENT_PAYLOADS } from './projectAgentChannels';
+import { parseEmDashInstallRequest } from '../properties/emdashInstall';
+import { parseModelRequest } from '../properties/voice/dictationModel';
+import { object, text, pathText, boolean, count, optional, nullable, list, dictionary, data, digest, record } from '../core/boundary';
+import type { Parsed } from '../core/boundary';
+import { toArray } from '../core/record';
+
+export const APP_FILE_STAMPS_MAX = 2000;
+function appFileList(input: unknown): string[] {
+  const rels = list(pathText)(input);
+  if (rels.length > APP_FILE_STAMPS_MAX) {
+    throw new Error(`An app stamps at most ${APP_FILE_STAMPS_MAX} files at once`);
+  }
+  return rels;
+}
+
+export const TERMINAL_DIMENSION_MAX = 32_767;
+function terminalDimension(input: unknown): number {
+  const value = count(input);
+  if (value === 0) {
+    throw new Error('Terminal dimension must be positive');
+  }
+  if (value > TERMINAL_DIMENSION_MAX) {
+    throw new Error('Terminal dimension exceeds native limit');
+  }
+  return value;
+}
+
+const nothing = (input: unknown): undefined => {
+  if (input !== undefined) {
+    throw new Error('Expected no payload');
+  }
+  return undefined;
+};
+const maybeText = optional(nullable(text));
+function packageSearch(input: unknown): 'cached' | 'search' {
+  if (input === 'cached' || input === 'search') {
+    return input;
+  }
+  throw new Error('Unknown package search mode');
+}
+function removalReach(input: unknown): 'cleanup' | 'chosen' {
+  if (input === 'cleanup' || input === 'chosen') {
+    return input;
+  }
+  throw new Error('Unknown selector removal reach');
+}
+function restoreDirection(input: unknown): 'before' | 'after' {
+  if (input === 'before' || input === 'after') {
+    return input;
+  }
+  throw new Error('Unknown restore direction');
+}
+export type SampleValueSource = { readonly kind: 'call'; readonly spec: string; readonly name: string } | { readonly kind: 'scope'; readonly sinceMs: number };
+export function sampleValueSource(input: unknown): SampleValueSource {
+  const source = record(input);
+  const kind = source['kind'];
+  if (kind === 'call') {
+    return { kind, spec: pathText(source['spec']), name: text(source['name']) };
+  }
+  if (kind === 'scope') {
+    return { kind, sinceMs: count(source['sinceMs']) };
+  }
+  throw new Error('Unknown sample source');
+}
+const maybePath = optional(nullable(pathText));
+const cssTarget = (input: unknown): string | undefined => {
+  if (input === undefined) {
+    return undefined;
+  }
+  if (input === null) {
+    return undefined;
+  }
+  return text(input);
+};
+const maybeFlag = optional(boolean);
+const componentImport = object({
+  name: optional(text),
+  path: optional(text),
+  quote: optional(text),
+  named: maybeFlag,
+  imported: optional(text),
+  typeOnly: maybeFlag,
+});
+const strings = list(text);
+const project = { projectPath: pathText };
+function loopbackOrigin(input: unknown): string {
+  const value = text(input);
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error('Expected a dev server URL');
+  }
+  if (url.protocol !== 'http:' || !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)) {
+    throw new Error('Expected a loopback http dev server URL');
+  }
+  return url.origin;
+}
+function routePath(input: unknown): string {
+  const value = pathText(input);
+  if (!value.startsWith('/') || value.startsWith('//') || value.length > 2_048) {
+    throw new Error('Expected a site-relative route');
+  }
+  return value;
+}
+
+export const CANVAS_SNAPSHOT_PX_MAX = 16_384;
+export const CANVAS_SNAPSHOT_WIDTH_MAX = 800;
+
+function canvasSnapshotRequest(input: unknown): {
+  readonly rect: { readonly x: number; readonly y: number; readonly width: number; readonly height: number };
+  readonly widthMax: number;
+} {
+  const value = object({ rect: object({ x: count, y: count, width: count, height: count }), widthMax: count })(input);
+  const { rect } = value;
+  for (const side of [rect.x, rect.y, rect.x + rect.width, rect.y + rect.height]) {
+    if (side > CANVAS_SNAPSHOT_PX_MAX) {
+      throw new Error('A snapshot lies within the window');
+    }
+  }
+  if (rect.width < 1 || rect.height < 1) {
+    throw new Error('A snapshot covers at least a pixel each way');
+  }
+  if (value.widthMax < 1 || value.widthMax > CANVAS_SNAPSHOT_WIDTH_MAX) {
+    throw new Error(`A snapshot is at most ${CANVAS_SNAPSHOT_WIDTH_MAX} pixels wide`);
+  }
+  return value;
+}
+
+function appFileRequest(input: unknown): { readonly projectPath: string; readonly id: string; readonly operation: AppFileOperation } {
+  const value = record(input);
+  const id = parseAppId(value['id']);
+  return { projectPath: pathText(value['projectPath']), id, operation: parseAppFileOperation(value['operation'], id) };
+}
+const relative = { ...project, rel: pathText };
+const mediaFolder = { ...project, connectionId: parseMediaConnectionId, folder: parseMediaFolder };
+function mediaEntry(input: unknown): 'file' | 'folder' {
+  if (input === 'file' || input === 'folder') {
+    return input;
+  }
+  throw new Error('Expected a media entry kind');
+}
+function uploadPaths(input: unknown): string[] {
+  const paths = list(pathText)(input);
+  if (paths.length === 0 || paths.length > MEDIA_HOSTING_LIMITS.uploadFilesMax) {
+    throw new Error('Expected 1 to ' + String(MEDIA_HOSTING_LIMITS.uploadFilesMax) + ' files to upload');
+  }
+  return paths;
+}
+const source = { ...project, fromFile: pathText, spec: text };
+const named = { ...project, name: text };
+const reference = { ...project, ref: text };
+const branch = { ...project, branch: text };
+const location = (input: unknown): string | number => (typeof input === 'number' ? count(input) : text(input));
+const entry = object({ file: pathText, locator: optional(list(location)) });
+const edits = list(object({ path: list(location), value: data, rename: optional(text) }));
+const cssFile = { file: pathText, selector: text };
+const cssRange = { file: pathText, start: count, end: count, expect: optional(text) };
+const cssMove = (input: unknown) => {
+  const section = object({ ...cssFile, names: optional(strings), target: cssTarget })(input);
+  return section.names === undefined
+    ? object({ ...cssFile, name: text, target: cssTarget, at: optional(count) })(input)
+    : object({ ...cssFile, names: strings, target: cssTarget })(input);
+};
+
+export const CLIPBOARD_BYTES_MAX = 20 * 1024 * 1024;
+function imageBytes(input: unknown): number[] {
+  const values = input instanceof Uint8Array ? input : toArray(input);
+  if (!values) {
+    throw new Error('Expected image bytes');
+  }
+  if (values.length > CLIPBOARD_BYTES_MAX) {
+    throw new Error('Image exceeds byte limit');
+  }
+  return Array.from(values, (value) => {
+    const byte = count(value);
+    if (byte > 255) {
+      throw new Error('Expected byte in range 0..255');
+    }
+    return byte;
+  });
+}
+
+function parsePickTarget(input: unknown): 'file' {
+  if (input === 'file') {
+    return input;
+  }
+  throw new Error('Expected pick target file');
+}
+
+export const IPC_PAYLOADS = {
+  ...AI_PAYLOADS,
+  ...AGENT_PAYLOADS,
+  ...FILE_EXPLORER_PAYLOADS,
+  ...DESIGN_SESSION_PAYLOADS,
+  'codeIntel:request': parseCodeIntelRequest,
+  'instructions:create': object({ ...project, file: parseInstructionFilePath, source: text }),
+  'instructions:createFolder': object({ ...project, folder: parseInstructionPath }),
+  'instructions:list': object({ ...project }),
+  'instructions:read': object({ ...project, file: parseInstructionFilePath }),
+  'instructions:reveal': object({ ...project, file: parseInstructionPath }),
+  'instructions:write': object({ ...project, file: parseInstructionFilePath, source: text, base: text }),
+  'project:metadata': object({ ...project, kind: metadataKind }),
+  'project:createDefaultsCanvas': object({ ...project, canvas: parseCanvasCreate }),
+  'project:removeDefaultsCanvas': object({ ...project, file: defaultsCanvasFile }),
+  'project:writeMetadata': object({ ...project, write: parseMetadataWrite }),
+  'project:pickFolder': object({ ...project, target: optional(parsePickTarget) }),
+  'roles:identity': object({ ...project }),
+  'github:searchUsers': object({ ...project, query: parseGitHubLoginQuery }),
+  'studio:status': pathText,
+  'studio:install': object({
+    ...project,
+    source: parseStudioSource,
+    requestId: parseStudioRequestId,
+    auth: optional(parseStudioAuth),
+  }),
+  'studio:setAuth': object({ ...project, auth: parseStudioAuth }),
+  'studio:upgrade': object({ ...project, requestId: parseStudioRequestId }),
+  'studio:upgradeCheck': pathText,
+  'studio:restore': object({ ...project }),
+  'assets:delete': object({ ...relative }),
+  'assets:dimensions': object({ ...relative }),
+  'assets:list': pathText,
+  'assets:mkdir': object({ ...project, parentRel: pathText, name: text }),
+  'assets:move': object({ ...project, fromRel: pathText, toDirRel: pathText }),
+  'assets:pickUpload': object({ ...project, destRel: pathText }),
+  'assets:readText': object({ ...relative }),
+  'assets:convert': object({ ...project, rel: parseImagePath, format: parseImageFormat }),
+  'assets:rename': object({ ...relative, newName: text }),
+  'assets:replace': object({ ...relative }),
+  'assets:upload': object({ ...project, destRel: pathText, filePaths: optional(list(pathText)) }),
+  'assets:writeText': object({ ...relative, text }),
+  'cms:assetRef': object({ ...relative, assetRel: pathText }),
+  'cms:constants': object({ ...relative }),
+  'cms:editConstants': object({ ...relative, edit: parseConstantEdit }),
+  'cms:create': object({ ...named }),
+  'cms:delete': object({ ...relative }),
+  'cms:list': pathText,
+  'cms:meta': pathText,
+  'cms:read': object({ ...relative }),
+  'cms:setMeta': object({ ...relative, fields: optional(nullable(dictionary(data))) }),
+  'cms:usage': object({ ...relative }),
+  'cms:write': object({ ...relative, data }),
+  'component:create': object({
+    ...named,
+    pagePath: pathText,
+    nodes: list(data),
+    imports: optional(list(componentImport)),
+    props: optional(list(data)),
+    frontmatter: optional(object({ imports: list(componentImport), code: text })),
+    folder: optional(parseComponentSubfolder),
+  }),
+  'component:planRename': object({ ...project, request: parseComponentRenameRequest }),
+  'component:rename': object({ ...project, request: parseComponentRenameRequest }),
+  'component:revertRename': object({ token: text, direction: parseRenameDirection }),
+  'component:duplicate': object({ ...project, target: parseComponentOpTarget }),
+  'component:planRemove': object({ ...project, target: parseComponentOpTarget }),
+  'component:remove': object({ ...project, target: parseComponentOpTarget, uses: parseComponentUses }),
+  'component:restoreRemoved': object({ token: text }),
+  'component:discard': object({ ...project, path: pathText, checksum: digest, force: maybeFlag, folders: optional(list(pathText)) }),
+  'component:properties': object({ ...project, file: pathText }),
+  'component:revertProperties': object({ token: text }),
+  'component:editProperties': object({
+    ...project,
+    file: pathText,
+    source: propertySource,
+    change: parsePropertyChange,
+  }),
+  'component:previewPropertyRemoval': object({ ...project, file: pathText, name: propertyName }),
+  'component:usage': object({ ...named, exclude: optional(text) }),
+  'component:classUsage': object({ ...project, pagePath: pathText, classes: parseClassUsageNames }),
+  'styleMove:record': object({ ...project, journal: parseStyleMoveJournal }),
+  'styleMove:clear': object({ ...project, id: text }),
+  'styleMove:pending': object({ ...project }),
+  'styleMove:resolve': object({ ...project, id: text, target: parseStyleMoveTarget }),
+  'content:collections': pathText,
+  'content:config': object({ ...project, force: maybeFlag }),
+  'content:entries': object({ ...named }),
+  'content:rename': object({ ...named, from: text, to: text }),
+  'content:remoteEdit': object({ ...project, request: parseAstroRemoteEdit }),
+  'content:remoteRead': object({ ...project, request: parseAstroRemoteRead }),
+  'content:renamePlan': object({ ...named, from: text, to: text }),
+  'content:sampleEntry': object({ devUrl: maybeText, name: text, id: maybeText, index: optional(count) }),
+  'content:sampleValue': object({
+    ...project,
+    devUrl: maybeText,
+    pagePath: pathText,
+    source: sampleValueSource,
+  }),
+  'content:targets': object({ ...named }),
+  'content:validate': object({ ...project, collection: text, data }),
+  'content:writeEntry': object({
+    ...project,
+    entry,
+    edits: optional(edits),
+    body: optional(text),
+    expected: optional(object({ data, body: optional(text) })),
+  }),
+  'css:addSection': object({
+    ...project,
+    ...cssFile,
+    title: optional(text),
+    before: cssTarget,
+    at: optional(count),
+  }),
+  'css:addVariables': object({
+    ...project,
+    adds: optional(list(object({ ...cssFile, name: text, value: optional(text), after: cssTarget }))),
+  }),
+  'css:moveHeading': object({ ...project, ...cssRange, selector: text, before: cssTarget }),
+  'css:moveVariables': object({ ...project, moves: optional(list(cssMove)) }),
+  'css:removeSection': object({ ...project, ...cssRange }),
+  'breakpointSync:scan': parseSyncScan,
+  'breakpointSync:usage': parseUsageRequest,
+  'breakpointSync:apply': parseSyncApply,
+  'breakpointSync:restore': parseSyncRestore,
+  'css:renameVariables': object({ ...project, renames: list(object({ from: text, to: text })) }),
+  'css:setSectionTitle': object({ ...project, ...cssRange, title: optional(text) }),
+  'css:setVariable': object({
+    ...project,
+    file: pathText,
+    valueStart: count,
+    valueEnd: count,
+    expect: optional(text),
+    value: text,
+  }),
+  'css:variables': pathText,
+  'dev:diagnose': pathText,
+  'dev:inspect': pathText,
+  'dev:network': pathText,
+  'dev:probe': pathText,
+  'dev:setNetwork': parseDevNetworkRequest,
+  'dev:start': pathText,
+  'dev:stop': nothing,
+  'git:allFiles': object({ ...project }),
+  'git:checkout': object({ ...branch, create: maybeFlag, parkFirst: maybeFlag }),
+  'git:commit': object({ ...project, message: text, paths: optional(list(pathText)) }),
+  'git:commitDiff': parseCommitDiffRequest,
+  'git:avatars': parseCommitAvatarRequest,
+  'git:deleteBranch': object({ ...branch, force: maybeFlag }),
+  'git:ghStatus': pathText,
+  'git:info': pathText,
+  'git:init': pathText,
+  'git:log': object({
+    ...project,
+    ref: optional(text),
+    limit: optional(count),
+    skip: optional(count),
+    withFiles: optional(boolean),
+  }),
+  'git:merge': object({ ...branch }),
+  'git:park': object({ ...project }),
+  'git:repositories': nothing,
+  'git:clone': object({ repository: parseGitHubRepository }),
+  'git:connect': object({ ...project, repository: parseGitHubRepository }),
+  'publish:start': object({
+    ...project,
+    target: parsePublishTarget,
+    commitMessage: optional(parsePublishCommitMessage),
+  }),
+  'publish:state': pathText,
+  'publish:availability': pathText,
+  'publish:siteURL': pathText,
+  'publish:repository': object({ ...project, request: parseRepositoryRequest }),
+  'publish:discover': object({ ...project, request: parseDiscoveryRequest }),
+  'publish:account': object({ ...project, request: parseAccountRequest }),
+  'publish:workerSetup': object({ ...project, worker: parseWorkerSetupRequest }),
+  'publish:netlifySite': object({ ...project, site: parseNetlifySiteRequest }),
+  'cmsConnections:list': object({ ...project }),
+  'cmsConnections:save': object({ ...project, draft: parseCmsConnectionDraft }),
+  'cmsConnections:remove': object({ ...project, id: parseConnectionId }),
+  'cmsConnections:check': object({ ...project, request: parseCmsCheckRequest }),
+  'cmsConnections:sanityLogin': object({ ...project, request: parseSanityLoginRequest }),
+  'cmsRemote:collections': object({ ...project, connectionId: parseRemoteConnection }),
+  'cmsRemote:documents': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    collection: parseRemoteCollectionName,
+    columns: optional(parseRemoteColumns),
+  }),
+  'cmsRemote:template': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    collection: parseRemoteCollectionName,
+  }),
+  'cmsRemote:document': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    id: parseRemoteDocumentId,
+  }),
+  'cmsRemote:create': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    collection: parseRemoteCollectionName,
+  }),
+  'cmsRemote:delete': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    ids: parseRemoteIds,
+  }),
+  'cmsRemote:move': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    move: parseRemoteMove,
+  }),
+  'cmsRemote:write': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    write: parseRemoteWrite,
+  }),
+  'cmsRemote:act': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    id: parseRemoteDocumentId,
+    action: parseRemoteDocumentAction,
+  }),
+  'cmsRemote:history': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    id: parseRemoteDocumentId,
+  }),
+  'cmsRemote:restore': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    id: parseRemoteDocumentId,
+    revision: parseRemoteRevisionId,
+  }),
+  'cmsRemote:references': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    types: parseRemoteTypes,
+  }),
+  'cmsRemote:upload': object({
+    ...project,
+    connectionId: parseRemoteConnection,
+    kind: parseRemoteAssetKind,
+  }),
+  'cmsRemote:linkPreview': object({ url: parseVideoLinkURL }),
+  'apps:list': object({ ...project }),
+  'apps:pickFile': object({ ...project }),
+  'apps:stageGitHub': object({ ...project, source: parseGitHubSource, tag: optional(parseReleaseTag) }),
+  'apps:githubRepositories': object({ ...project, account: parseGitHubLogin }),
+  'apps:githubReleases': object({ ...project, source: parseGitHubSource }),
+  'apps:commit': object({ ...project, token: parseStagedToken }),
+  'apps:discard': object({ ...project, token: parseStagedToken }),
+  'apps:uninstall': object({ ...project, id: parseAppId }),
+  'apps:checkUpdates': object({ ...project, force: maybeFlag }),
+  'apps:applyUpdate': object({ ...project, id: parseAppId }),
+  'apps:folders': object({ ...project }),
+  'apps:revealFolder': object({ ...project, folder: parseAppFolderName }),
+  'apps:marketplace': object({ ...project, refresh: maybeFlag }),
+  'apps:installMarketplace': object({ ...project, id: parseAppId, version: parseAppVersion }),
+  'apps:setAutoUpdate': object({ ...project, id: parseAppId, autoUpdate: boolean }),
+  'apps:repositoryVisibility': object({ ...project, id: parseAppId }),
+  'apps:scanSecrets': object({ ...project, target: parseAppScanTarget }),
+  'apps:repositoryStatus': object({ ...project, repository: parseAppRepositoryRef }),
+  'apps:makePublic': object({ ...project, repository: parseAppRepositoryRef }),
+  'apps:addLicense': object({ ...project, repository: parseAppRepositoryRef }),
+  'apps:share': object({ ...project, share: parseAppShareRequest }),
+  'apps:switchSource': object({ ...project, id: parseAppId, source: parseSharedReleaseSource }),
+  'apps:checkMarketplace': object({ ...project, repository: parseAppRepositoryRef }),
+  'apps:submitMarketplace': object({ ...project, submission: parseMarketplaceSubmission }),
+  'apps:readSettings': object({ ...project, id: parseAppId }),
+  'apps:writeSettings': object({ ...project, id: parseAppId, values: parseAppSettingValuesReply }),
+  'apps:fileStamps': object({ ...project, rels: appFileList }),
+  'apps:storageGet': object({ ...project, id: parseAppId, scope: parseAppStorageScope, key: parseAppStorageKey }),
+  'apps:storageSet': object({
+    ...project,
+    id: parseAppId,
+    scope: parseAppStorageScope,
+    key: parseAppStorageKey,
+    value: optional(parseAppStorageValue),
+    writer: parseAppStorageWriter,
+  }),
+  'apps:storageKeys': object({ ...project, id: parseAppId, scope: parseAppStorageScope }),
+  'apps:storageWatch': object({ ...project }),
+  'apps:person': object({ ...project }),
+  'apps:people': object({ ...project }),
+  'apps:hostVersion': nothing,
+  'apps:canvasSnapshot': canvasSnapshotRequest,
+  'apps:files': appFileRequest,
+  'apps:authConnect': object({ ...project, id: parseAppId, provider: parseAuthProviderId }),
+  'apps:authStatus': object({ ...project, id: parseAppId }),
+  'apps:authToken': object({ ...project, id: parseAppId, provider: parseAuthProviderId }),
+  'apps:authDisconnect': object({ ...project, id: parseAppId, provider: parseAuthProviderId }),
+  'apps:netFetch': object({ ...project, id: parseAppId, request: parseAppNetRequest }),
+  'mediaHosting:connections': object({ ...project }),
+  'mediaHosting:save': object({ ...project, draft: parseMediaConnectionDraft }),
+  'mediaHosting:remove': object({ ...project, id: parseMediaConnectionId }),
+  'mediaHosting:discover': object({ ...project, key: parseMediaAccountKey }),
+  'mediaHosting:connectAccount': object({ ...project, connect: parseMediaAccountConnect }),
+  'mediaHosting:list': object({ ...mediaFolder }),
+  'mediaHosting:pickUpload': object({ ...mediaFolder }),
+  'mediaHosting:upload': object({ ...mediaFolder, filePaths: uploadPaths }),
+  'mediaHosting:createFolder': object({ ...mediaFolder, name: parseMediaName }),
+  'mediaHosting:rename': object({ ...mediaFolder, entry: mediaEntry, from: parseMediaName, to: parseMediaName }),
+  'mediaHosting:delete': object({ ...mediaFolder, entry: mediaEntry, name: parseMediaName }),
+  'mediaHosting:reorder': object({ ...mediaFolder, order: parseMediaOrder }),
+  'mediaHosting:replace': object({ ...mediaFolder, name: parseMediaName }),
+  'git:publish': object({ ...project, repoName: text, isPrivate: boolean }),
+  'git:push': object({ ...branch }),
+  'git:pull': object({ ...branch }),
+  'git:incoming': object({ ...branch }),
+  'git:resolveMerge': object({ ...branch, choices: optional(dictionary(parseMergeResolution)) }),
+  'git:restoreFile': object({ ...reference, path: pathText }),
+  'git:restoreProject': object({ ...reference }),
+  'git:status': object({ ...project }),
+  'git:unpark': object({ ...project }),
+  'git:worktrees': object({ ...project }),
+  'dictation:status': nothing,
+  'dictation:download': parseModelRequest,
+  'dictation:cancel': parseModelRequest,
+  'dictation:remove': parseModelRequest,
+  'dictation:reveal': parseModelRequest,
+  'locale:set': parseLocaleSet,
+  'microphone:openSettings': nothing,
+  'microphone:request': nothing,
+  'microphone:status': nothing,
+  'native:copy': nothing,
+  'native:paste': nothing,
+  'native:redo': nothing,
+  'native:undo': nothing,
+  'page:create': object({
+    ...named,
+    layout: optional(nullable(object({ name: text, path: pathText }))),
+  }),
+  'page:delete': pathText,
+  'pageTemplate:create': object({ ...project, draft: parsePageTemplateDraft, devUrl: maybeText, keyCopy: optional(parseConnectionKeyCopy) }),
+  'pageTemplate:plan': object({ ...project, draft: parsePageTemplateDraft }),
+  'pageTemplate:sample': object({ ...project, request: parseDataSampleRequest }),
+  'project:setEnv': object({ ...project, name: parseEnvPayloadName, value: parseSecretValue }),
+  'secrets:list': object({ ...project, file: parseSecretsFileName }),
+  'secrets:read': object({ ...project, file: parseSecretsFileName, revision: parseSecretsRevision, index: parseSecretReadIndex }),
+  'secrets:apply': object({ ...project, file: parseSecretsFileName, revision: parseSecretsRevision, change: parseSecretsChange }),
+  'secrets:ignore': object({ ...project, file: parseSecretsIgnorableFile }),
+  'mcp:read': object({ ...project }),
+  'mcp:readText': object({ ...project }),
+  'mcp:reveal': object({ ...project, revision: parseMcpRevision, name: parseMcpServerName }),
+  'mcp:apply': object({ ...project, revision: parseMcpRevision, change: parseMcpChange }),
+  'mcp:saveText': object({ ...project, revision: parseMcpRevision, text: parseMcpTextInput }),
+  'mcp:readCodex': object({ ...project }),
+  'mcp:revealCodex': object({ ...project, revision: parseMcpRevision, name: parseMcpServerName }),
+  'mcp:applyCodex': object({ ...project, revision: parseMcpRevision, projectRevision: parseMcpRevision, change: parseMcpCodexChange }),
+  'audit:render': object({ ...project, devUrl: loopbackOrigin, route: routePath }),
+  'audit:measure': object({ ...project, devUrl: loopbackOrigin, route: routePath }),
+  'page:dynamicPaths': object({ ...project, pagePath: pathText, devUrl: maybeText }),
+  'emdash:project': object({ ...project }),
+  'emdash:installPlan': object({ ...project }),
+  'emdash:install': parseEmDashInstallRequest,
+  'emdash:installCancel': object({ ...project }),
+  'emdash:adminUrl': object({ ...project }),
+  'page:edit': parseEditRequest,
+  'page:editBatch': parseEditBatchRequest,
+  'page:importPathFor': object({
+    pagePath: pathText,
+    targetPath: pathText,
+    projectPath: maybePath,
+  }),
+  'page:move': object({ ...project, from: pathText, to: pathText }),
+  'page:planSettings': object({ ...project, request: parsePageSettingsRequest }),
+  'page:applySettings': object({ ...project, request: parsePageSettingsRequest }),
+  'page:revertSettings': object({ token: text, direction: parsePageSettingsDirection }),
+  'page:planRemoveMany': object({ ...project, request: parsePageBulkRemoveRequest }),
+  'page:removeMany': object({ ...project, request: parsePageBulkRemoveRequest }),
+  'page:readTemplate': object({ ...project, page: renamePath }),
+  'page:retargetTemplate': object({ ...project, page: renamePath, source: parseDataSource }),
+  'page:parse': object({ pagePath: pathText, source: text }),
+  'page:previewEdit': object({
+    pagePath: pathText,
+    authoredChecksum: digest,
+    edit: parseEdit,
+    source: text,
+  }),
+  'page:read': pathText,
+  'page:rebaseImport': object({ fromPagePath: maybePath, toPagePath: maybePath, spec: text }),
+  'pagefolder:create': object({ ...project, dir: pathText }),
+  'pagefolder:delete': object({ ...project, dir: pathText }),
+  'pagefolder:rename': object({ ...project, from: pathText, to: pathText }),
+  'preview:atCommit': object({ ...reference }),
+  'preview:check': object({ ...project, render: parsePreviewRender }),
+  'preview:stop': object({ ...project }),
+  'project:classes': pathText,
+  'project:close': maybePath,
+  'project:createAstro': object({
+    parentPath: pathText,
+    name: text,
+    template: optional(text),
+    install: maybeFlag,
+    git: maybeFlag,
+    ai: maybeFlag,
+    packageManager: optional(parseCreatePackageManager),
+  }),
+  'project:createStarter': object({
+    starter: optional(text),
+    parentPath: pathText,
+    name: text,
+    packageManager: optional(parseCreatePackageManager),
+  }),
+  'project:injectedRoutes': object({ ...project }),
+  'project:openDialog': nothing,
+  'project:openSiteDialog': nothing,
+  'project:checkAstroCopy': parseAstroCopyRequest,
+  'project:createAstroCopy': parseAstroCopyRequest,
+  'project:inspectFolder': pathText,
+  'project:takeOpenedFolders': nothing,
+  'project:parentDialog': nothing,
+  'project:pending': nothing,
+  'project:resolveImport': object({ ...source }),
+  'project:scan': pathText,
+  'recents:add': pathText,
+  'recents:list': nothing,
+  'recents:refreshThumb': pathText,
+  'recents:remove': pathText,
+  'selection:copy': object({ ...project, keys: strings }),
+  'settings:get': nothing,
+  'settings:set': object({ setting: parsePreferenceName, enabled: boolean }),
+  'shell:openExternal': pathText,
+  'src:readSymbol': object({ ...source, name: text }),
+  'src:readText': object({ ...relative }),
+  'src:resolvePath': object({ ...source }),
+  'src:writeText': object({ ...relative, text }),
+  'style:listAstroStyles': pathText,
+  'style:listFiles': pathText,
+  'style:readFile': pathText,
+  'style:writeFile': object({ filePath: pathText, css: text, announce: maybeFlag, expected: optional(text) }),
+  'style:selectorUsage': object({ ...project, packages: optional(packageSearch) }),
+  'style:removeSelectors': object({ ...project, ids: parseSelectorIds, files: parseSelectorFileDigests, reach: optional(removalReach) }),
+  'style:restoreSelectors': object({ ...project, changes: parseSelectorFileChanges, to: restoreDirection }),
+  'terminal:clipboardImage': object({ bytes: imageBytes, mime: text }),
+  'terminal:close': object({ id: text }),
+  'terminal:resize': object({ id: text, cols: terminalDimension, rows: terminalDimension }),
+  'terminal:start': object({
+    id: text,
+    cwd: pathText,
+    cols: terminalDimension,
+    rows: terminalDimension,
+    autoLaunch: optional(text),
+  }),
+  'update:act': parseUpdateAction,
+  'update:read': nothing,
+  'watch:start': pathText,
+} as const;
+
+export type IpcChannel = keyof typeof IPC_PAYLOADS;
+export type IpcPayloads = { readonly [K in IpcChannel]: Parsed<(typeof IPC_PAYLOADS)[K]> };
+
+export function parseIpcPayload<K extends IpcChannel>(channel: K, input: unknown): IpcPayloads[K] {
+  return IPC_PAYLOADS[channel](input) as IpcPayloads[K];
+}
+
+export const parseTerminalInput = object({ id: text, data: text });
+export const parseTerminalAck = object({ id: text, count });
+export type TerminalInput = Parsed<typeof parseTerminalInput>;
+export type TerminalAck = Parsed<typeof parseTerminalAck>;

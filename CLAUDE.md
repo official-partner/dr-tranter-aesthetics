@@ -40,6 +40,14 @@ cover. How to build with Lumos: AGENTS.md, below.
 - Before the launch, op.config.json says `"live": false` and every build tells search engines to stay out
   (`dist/_headers`, noindex); `SITE_URL` (src/consts.ts) reads op.config.json's `domain`, a stand-in until it has one.
 
+## Stacki Studio (test, Nov 26)
+- `studio/` is Stacki Studio 1.4.20 (`npm create stacki@latest`, Google sign-in), the web editor the client may use. It is
+  Stacki's: never edit its files by hand; an update goes through Studio's own update flow. Its settings are
+  `studio/cloudflare/wrangler.jsonc` (Worker `dr-tranter-studio`, editor https://tranter.officialpartner.work/studio,
+  preview https://tranter-preview.officialpartner.work, R2 `dr-tranter-studio-drafts`). Its Publish commits to
+  `review`, so a Studio edit shows on the staging and in OP System like any other change: pull before working.
+- The site's `tsconfig.json` excludes `studio/` (astro check ran out of memory reading it).
+
 ## OP System
 - After each build, `integrations/op-system.mjs` writes `dist/site.json`: the project (op.config.json), the pages (their
   title and description, from the built HTML), the screens, the Web System (the tokens of `src/styles/base.css`, a

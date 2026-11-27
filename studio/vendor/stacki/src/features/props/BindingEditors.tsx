@@ -1,0 +1,655 @@
+import { useTranslate } from '../../lib/i18n/useTranslate';
+import { ErrorToast } from '../../ui/ErrorToast';
+import { dataPickerPosition } from './dataPickerPosition';
+import Popup from '../../ui/Popup';
+
+import { useContext, useEffect, useRef, useState } from 'react';
+import { PropValuePolicyContext } from './propValuePolicy';
+import { useCodeAccess } from '../../ui/CodeAccess';
+import type { RefObject } from 'react';
+import type { TemplateHole } from '../../editor/bindings';
+import type { ExprInputAPI } from '../../ui/ExprInput';
+import type { PickerNode } from './DataPicker';
+import { assert } from '../../../shared/core/assert';
+import { LIMITS } from '../../../shared/core/limits';
+import { definedFields } from '../../../shared/core/boundary';
+import { dataTree, findDeclaration, findImportOf, scopeChips, scopeCompletions } from '../../editor/dataSuggest';
+import { resolvePick, type PickNeed } from '../../editor/bindings';
+import { checkStatement } from './jsCheck';
+import { sourceFileLabel, type SourceFileLabel } from './sourceFileLabel';
+import { statementRename, type StatementRename } from '../../../shared/engine/variableRename';
+import { FIELD_UNFOCUSED, fieldFocusOf, fieldOfHandle, type FieldFocus } from './fieldFocus';
+import DataPicker from './DataPicker';
+import { BindOverrideWaiting, pickerPaths, useBindOverride } from './bindOverride';
+import NewPropForm from './NewPropForm';
+import './loopSettings.css';
+import { boundPath, fittingTree, newPropTitle, type NewPropHost, type NewPropSeed } from './newPropModel';
+import { CLASS_LIST_REFUSAL_KEYS, CLASS_LIST_SEED, type ClassListOffer } from './classListProp';
+import ExprInput from '../../ui/ExprInput';
+import { BranchIcon, CodeIcon, CloseIcon, ElementComponentIcon, FileIcon, PencilIcon, PlusIcon } from '../../ui/Icons';
+import {
+  type FieldPosition,
+  type SourceContext,
+  type ChipPick,
+  type SourceEditButtonProps,
+  type ExprValueFieldProps,
+  type ConditionFieldProps,
+  type ExpressionBindingFieldProps,
+  type BindHandleProps,
+  type FieldDataPickerProps,
+  type ValueCodeEditorProps,
+  type VarSourceEditorProps,
+} from './bindingTypes';
+
+export function referencedName(expr: unknown) {
+  const match = String(expr ?? '')
+    .trim()
+    .match(/^([A-Za-z_$][\w$]*)(?:\s*\.\s*[A-Za-z_$][\w$]*)*$/);
+  return match?.[1] ?? '';
+}
+
+export function symbolTarget(name: string, dataContext: SourceContext | undefined) {
+  if (!name || !dataContext) {
+    return undefined;
+  }
+  if (dataContext?.onSetFrontmatter && findDeclaration(dataContext?.frontmatter || '', name)) {
+    return 'local';
+  }
+  if (dataContext.onOpenSymbol && findImportOf(dataContext.imports || '', name)) {
+    return 'file';
+  }
+  return undefined;
+}
+
+const SOURCE_EDITOR_WIDTH_PX_MIN = 260;
+const SOURCE_EDITOR_HEIGHT_PX_MAX = 240;
+
+export function SourceEditButton({ name, dataContext, anchorRef, className = 'attr-asset-toggle' }: SourceEditButtonProps) {
+  const translate = useTranslate();
+  const [position, setPosition] = useState<FieldPosition | undefined>(undefined);
+  const target = symbolTarget(name, dataContext);
+  const allowCode = useCodeAccess();
+  if (!target || !allowCode) {
+    return undefined;
+  }
+
+  const open = () => {
+    if (target === 'file') {
+      dataContext?.onOpenSymbol?.(name);
+      return;
+    }
+    const rect = anchorRef?.current?.getBoundingClientRect();
+    setPosition(
+      dataPickerPosition(rect ?? { left: 0, bottom: 200, width: 0 }, { heightPxMax: SOURCE_EDITOR_HEIGHT_PX_MAX, widthPxMin: SOURCE_EDITOR_WIDTH_PX_MIN }),
+    );
+  };
+
+  return (
+    <>
+      <button
+        className={`${className} ${position ? 'on' : ''}`}
+        title={target === 'file' ? translate('props.binding.openDefinition', { name }) : translate('props.binding.edit', { name })}
+        onClick={() => (position ? setPosition(undefined) : open())}
+      >
+        <PencilIcon size={12} />
+      </button>
+      {position && (
+        <VarSourceEditor
+          pos={position}
+          name={name}
+          code={dataContext?.frontmatter || ''}
+          onChangeCode={dataContext?.onSetFrontmatter}
+          onRename={dataContext?.onRenameVariable}
+          filePath={dataContext?.filePath}
+          onClose={() => setPosition(undefined)}
+        />
+      )}
+    </>
+  );
+}
+
+export function ExprValueField({ value, placeholder, dataContext, onChange }: ExprValueFieldProps) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const name = referencedName(value);
+
+  return (
+    <div className="prop-expr-row" ref={wrapRef}>
+      <ExprInput
+        value={value}
+        syncValue={value}
+        placeholder={placeholder || ''}
+        onChange={(draft) => onChange({ type: 'expr', value: draft })}
+        onCommit={(committed) => committed !== value && onChange({ type: 'expr', value: committed }, true)}
+      />
+      <SourceEditButton name={name} dataContext={dataContext} anchorRef={wrapRef} />
+    </div>
+  );
+}
+
+export function ConditionField({ test, scope, chipsOf, bindContext, onSetText }: ConditionFieldProps) {
+  const translate = useTranslate();
+  const [pick, setPick] = useState<ChipPick | undefined>(undefined);
+  const apiRef = useRef<ExprInputAPI | undefined>(undefined);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  const open = (chip: TemplateHole | undefined, focus: FieldFocus) => {
+    const rect = wrapRef.current?.getBoundingClientRect();
+    if (!rect) {
+      return;
+    }
+    setPick({
+      chip: chip || undefined,
+      pos: dataPickerPosition(rect),
+      focus,
+    });
+  };
+
+  return (
+    <>
+      <div className="props-cond-field attr-value-field" ref={wrapRef}>
+        <ExprInput
+          value={test}
+          syncValue={test}
+          placeholder={translate('props.binding.exampleCondition')}
+          completions={scope}
+          apiRef={apiRef}
+          chipsOf={chipsOf}
+          onChipClick={(chip) => open(chip, FIELD_UNFOCUSED)}
+          onCommit={(committed) => committed.trim() && committed !== test && onSetText(committed.trim())}
+        />
+        {}
+        <BindHandle active={!!pick} onOpen={(_host, focus) => (pick ? setPick(undefined) : open(undefined, focus))} />
+      </div>
+      {pick ? (
+        <FieldDataPicker
+          pos={pick.pos}
+          bindContext={bindContext}
+          current={pick.chip?.path ?? undefined}
+          seed={pick.chip === undefined ? { fit: 'boolean', label: 'Visible', value: '' } : undefined}
+          onBindNew={(path) => {
+            setPick(undefined);
+            onSetText(path);
+          }}
+          onPick={(path) => {
+            const chip = pick.chip;
+            setPick(undefined);
+            if (chip === undefined && pick.focus.kind === 'unfocused') {
+              onSetText(path);
+              return;
+            }
+            const next = chip ? apiRef.current?.replaceRange(chip.from, chip.to, path) : apiRef.current?.insert(path);
+            if (next !== undefined) {
+              onSetText(next);
+            }
+          }}
+          onClose={() => setPick(undefined)}
+        />
+      ) : undefined}
+    </>
+  );
+}
+
+export function ExpressionBindingField({ value, placeholder, bindContext, onChange }: ExpressionBindingFieldProps) {
+  const [pick, setPick] = useState<ChipPick | undefined>(undefined);
+  const apiRef = useRef<ExprInputAPI | undefined>(undefined);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const scope = scopeCompletions(bindContext || {});
+  const scopeNames = new Set(scope.map((item) => item.label.split('.')[0] ?? ''));
+  const chipsOf = (text: string) => scopeChips(text, scopeNames);
+  const open = (chip: TemplateHole | undefined, focus: FieldFocus): void => {
+    const rectangle = wrapRef.current?.getBoundingClientRect();
+    if (!rectangle) {
+      return;
+    }
+    setPick({
+      chip,
+      pos: dataPickerPosition(rectangle),
+      focus,
+    });
+  };
+  return (
+    <>
+      <div className="property-expression-binding attr-value-field" ref={wrapRef}>
+        <ExprInput
+          value={value}
+          syncValue={value}
+          {...definedFields({ placeholder })}
+          multiline
+          wrap={false}
+          completions={scope}
+          apiRef={apiRef}
+          chipsOf={chipsOf}
+          onChipClick={(chip) => open(chip, FIELD_UNFOCUSED)}
+          onChange={onChange}
+        />
+        <BindHandle active={!!pick} onOpen={(_host, focus) => (pick ? setPick(undefined) : open(undefined, focus))} />
+      </div>
+      {pick ? (
+        <FieldDataPicker
+          pos={pick.pos}
+          bindContext={bindContext}
+          current={pick.chip?.path ?? undefined}
+          onPick={(path) => {
+            const chip = pick.chip;
+            setPick(undefined);
+            if (chip) {
+              apiRef.current?.replaceRange(chip.from, chip.to, path);
+            } else if (pick.focus.kind === 'focused') {
+              apiRef.current?.insert(path);
+            } else {
+              onChange(path);
+            }
+          }}
+          onClose={() => setPick(undefined)}
+        />
+      ) : undefined}
+    </>
+  );
+}
+
+export function BindHandle({ active, onOpen }: BindHandleProps) {
+  const translate = useTranslate();
+  const focusRef = useRef<FieldFocus | undefined>(undefined);
+  const code = useCodeAccess();
+  const preview = useContext(PropValuePolicyContext) === 'preview';
+  if (!code || preview) {
+    return undefined;
+  }
+  return (
+    <button
+      type="button"
+      className={`bind-handle${active ? ' on' : ''}`}
+      title={translate('props.binding.insertDataTitle')}
+      aria-label={translate('props.binding.insertData')}
+      onPointerDown={(event) => {
+        focusRef.current = fieldFocusOf(fieldOfHandle(event.currentTarget), event.currentTarget.ownerDocument.activeElement ?? undefined);
+      }}
+      onMouseDown={(event) => event.preventDefault()}
+      onClick={(event) => {
+        const focus = focusRef.current ?? fieldFocusOf(fieldOfHandle(event.currentTarget), event.currentTarget.ownerDocument.activeElement ?? undefined);
+        focusRef.current = undefined;
+        onOpen(event.currentTarget.closest('.props-field') ?? undefined, focus);
+      }}
+    >
+      <span className="bind-dot" />
+      <PlusIcon size={10} className="bind-plus" />
+    </button>
+  );
+}
+
+export function FieldDataPicker({
+  pos: position,
+  bindContext,
+  current,
+  tree,
+  seed,
+  onPick,
+  onBindNew,
+  onWrite,
+  onConditional,
+  rows,
+  classList,
+  onClose,
+}: FieldDataPickerProps) {
+  const host = bindContext?.newProp;
+  const offer = host !== undefined && seed !== undefined ? { host, seed } : undefined;
+  const pick = (path: string, need: PickNeed | undefined) => {
+    const image = offer?.host.imageProps?.get(path);
+    const bound = image === undefined ? path : boundPath(path, image, offer?.seed.reference);
+    onPick(resolvePick(bound, need, bindContext ?? undefined));
+  };
+  const [creating, setCreating] = useState(false);
+  const classOffer = host !== undefined && classList !== undefined ? { host, classList } : undefined;
+  const [creatingClassList, setCreatingClassList] = useState(false);
+  const fullTree: readonly PickerNode[] = tree || dataTree(bindContext || {});
+  const override = useBindOverride({
+    ask: () => ({ purpose: 'field', current: current ?? undefined, paths: pickerPaths(fullTree) }),
+    onPicked: (path) => pick(path, undefined),
+    onCancel: onClose,
+  });
+  if (override.kind === 'waiting') {
+    return (
+      <Popup
+        mode="popover"
+        portal={false}
+        onClose={onClose}
+        className="dd-popup bind-menu"
+        style={{ left: position.left, top: position.top, width: position.width }}
+      >
+        <BindOverrideWaiting owner={override.owner} onStacki={override.useStacki} />
+      </Popup>
+    );
+  }
+  return (
+    <Popup
+      mode="popover"
+      portal={false}
+      onClose={onClose}
+      className={(offer !== undefined && creating) || (classOffer !== undefined && creatingClassList) ? 'dd-popup bind-menu is-form' : 'dd-popup bind-menu'}
+      style={{ left: position.left, top: position.top, width: position.width }}
+    >
+      {classOffer !== undefined && creatingClassList ? (
+        <NewPropForm
+          host={classOffer.host}
+          seed={CLASS_LIST_SEED}
+          onCancel={() => setCreatingClassList(false)}
+          onCreated={(path) => classOffer.classList.onCreated(path)}
+        />
+      ) : offer !== undefined && creating ? (
+        <NewPropForm
+          host={offer.host}
+          seed={offer.seed}
+          onCancel={() => setCreating(false)}
+          onCreated={(path, declaration) => (onBindNew === undefined ? onPick(path) : onBindNew(path, declaration))}
+        />
+      ) : (
+        <DataPicker
+          tree={offer === undefined ? fullTree : fittingTree(fullTree, offer.seed.fit, offer.host.imageProps)}
+          current={current ?? undefined}
+          entries={bindContext?.entryNav ?? undefined}
+          {...definedFields({ onStepItem: bindContext?.onStepItem })}
+          onPick={pick}
+          onExpand={(node, index) => node.query && bindContext?.onNeedSample?.(node.query.collection, index)}
+          origin={bindContext?.origin}
+          {...definedFields({ onWrite })}
+          footer={!!onWrite}
+          lead={
+            offer === undefined && onConditional === undefined && classOffer === undefined ? undefined : (
+              <>
+                {offer !== undefined && <NewPropRow host={offer.host} seed={offer.seed} onOpen={() => setCreating(true)} />}
+                {classOffer !== undefined && <ClassListRow offer={classOffer.classList} onOpen={() => setCreatingClassList(true)} />}
+                {onConditional !== undefined && <ConditionalRow onOpen={onConditional} />}
+              </>
+            )
+          }
+          rows={rows ?? 'data'}
+          propSettings={host?.propSettings}
+        />
+      )}
+    </Popup>
+  );
+}
+
+function NewPropRow({ host, seed, onOpen }: { readonly host: NewPropHost; readonly seed: NewPropSeed; readonly onOpen: () => void }) {
+  const translate = useTranslate();
+  const blocked = seed.fit === 'attributes' && host.restLocal !== undefined;
+  return (
+    <>
+      <button type="button" className="dp-new-prop" disabled={blocked} onMouseDown={(event) => event.preventDefault()} onClick={onOpen}>
+        <PlusIcon size={11} />
+        {translate('props.binding.newProperty', { kind: newPropTitle(seed.fit, translate) })}
+      </button>
+      {blocked && <div className="dp-new-prop-reason">{translate('props.attributesBinding.passesOnce', { local: host.restLocal ?? '' })}</div>}
+    </>
+  );
+}
+
+function ClassListRow({ offer, onOpen }: { readonly offer: ClassListOffer; readonly onOpen: () => void }) {
+  const translate = useTranslate();
+  const refusal = offer.refusal;
+  return (
+    <>
+      <button type="button" className="dp-new-prop" disabled={refusal !== undefined} onMouseDown={(event) => event.preventDefault()} onClick={onOpen}>
+        <PlusIcon size={11} />
+        {translate('props.binding.newProperty', { kind: translate('props.newProp.title.classList') })}
+      </button>
+      {refusal !== undefined && <div className="dp-new-prop-reason">{translate(CLASS_LIST_REFUSAL_KEYS[refusal])}</div>}
+    </>
+  );
+}
+
+function ConditionalRow({ onOpen }: { readonly onOpen: () => void }) {
+  const translate = useTranslate();
+  return (
+    <button type="button" className="dp-new-prop" onMouseDown={(event) => event.preventDefault()} onClick={onOpen}>
+      <BranchIcon size={11} />
+      {translate('props.binding.createConditional')}
+    </button>
+  );
+}
+
+export function useValueCodeEditor(onClose: () => void) {
+  const ref = useRef<HTMLDivElement>(null);
+  const apiRef = useRef<ExprInputAPI | undefined>(undefined);
+  const [pick, setPick] = useState<ChipPick | undefined>(undefined);
+  useValueCodeEditorDismiss(ref, onClose);
+  const open = (chip: TemplateHole | undefined) => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) {
+      return;
+    }
+    setPick({
+      chip: chip || undefined,
+      pos: dataPickerPosition(rect),
+      focus: FIELD_UNFOCUSED,
+    });
+  };
+  return { ref, apiRef, pick, setPick, open };
+}
+export function useValueCodeEditorDismiss(ref: RefObject<HTMLElement>, onClose: () => void) {
+  useEffect(() => {
+    const onDown = (event: PointerEvent) => {
+      if (ref.current && !(event.target instanceof window.Node && ref.current.contains(event.target))) {
+        onClose();
+      }
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('pointerdown', onDown, true);
+    document.addEventListener('keydown', onKey, true);
+    return () => {
+      document.removeEventListener('pointerdown', onDown, true);
+      document.removeEventListener('keydown', onKey, true);
+    };
+  }, [onClose, ref]);
+}
+export function ValueCodeEditor(props: ValueCodeEditorProps) {
+  return useCodeAccess() ? <EditableValueCodeEditor {...props} /> : undefined;
+}
+function EditableValueCodeEditor({ pos: position, name, value, scope, chipsOf, bindContext, onChange, onClose }: ValueCodeEditorProps) {
+  const { ref, apiRef, pick, setPick, open } = useValueCodeEditor(onClose);
+
+  return (
+    <div
+      ref={ref}
+      className="attr-editor var-src"
+      style={{ top: position.top, left: position.left, width: position.width }}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          event.stopPropagation();
+          onClose();
+        }
+      }}
+    >
+      <SourceEditorHeader name={name} onClose={onClose} />
+      <ExprInput
+        multiline
+        autoFocus
+        wrap={false}
+        className="var-src-code"
+        value={value}
+        syncValue={value}
+        completions={scope}
+        apiRef={apiRef}
+        chipsOf={chipsOf}
+        onChipClick={open}
+        onChange={onChange}
+      />
+      {pick ? (
+        <FieldDataPicker
+          pos={pick.pos}
+          bindContext={bindContext}
+          current={pick.chip?.path ?? undefined}
+          onPick={(path) => {
+            const chip = pick.chip;
+            setPick(undefined);
+            const next = chip ? apiRef.current?.replaceRange(chip.from, chip.to, path) : apiRef.current?.insert(path);
+            if (next !== undefined) {
+              onChange(next);
+            }
+          }}
+          onClose={() => setPick(undefined)}
+        />
+      ) : undefined}
+    </div>
+  );
+}
+
+export function VarSourceEditor(props: VarSourceEditorProps) {
+  return useCodeAccess() ? <EditableVarSourceEditor {...props} /> : undefined;
+}
+function EditableVarSourceEditor(props: VarSourceEditorProps) {
+  const state = useVarSourceEditor(props);
+  useVarSourceEditorDismiss(state);
+  return <VarSourceEditorView state={state} />;
+}
+export function useVarSourceEditor(props: VarSourceEditorProps) {
+  const { code, name, onChangeCode, onRename } = props;
+  const ref = useRef<HTMLDivElement>(null);
+  assert(code.length <= LIMITS.ipcFieldCharsMax, 'Source editor: source limit exceeded');
+  const codeRef = useRef(code);
+  codeRef.current = code;
+  const [draft, setDraft] = useState(() => findDeclaration(code, name)?.statement ?? '');
+  const [error, setError] = useState('');
+  const [refusal, setRefusal] = useState<string | undefined>(undefined);
+  const rangeRef = useRef<{ readonly start: number; readonly end: number } | undefined>(undefined);
+
+  const apply = (text: string) => {
+    const source = codeRef.current;
+    const found = findDeclaration(source, name);
+    const range = found ? { start: found.start, end: found.end } : rangeRef.current;
+    if (!range) {
+      return;
+    }
+    assert(range.start >= 0, 'Source editor: declaration starts inside source');
+    assert(range.end <= source.length, 'Source editor: declaration ends inside source');
+    rangeRef.current = { start: range.start, end: range.start + text.length };
+    onChangeCode?.(source.slice(0, range.start) + text + source.slice(range.end));
+  };
+
+  const commit = (text: string) => {
+    if (text === draft && error) {
+      return false;
+    }
+    const verdict = checkStatement(text);
+    if (!verdict.ok) {
+      setError(verdict.message);
+      return false;
+    }
+    setError('');
+    const current = findDeclaration(codeRef.current, name)?.statement;
+    const change: StatementRename = onRename === undefined || current === undefined ? { kind: 'same' } : statementRename(name, current, text);
+    if (change.kind === 'mixed') {
+      setRefusal('Rename the variable on its own, then change the rest of the line.');
+      return false;
+    }
+    if (change.kind === 'rename') {
+      const refused = onRename?.({ from: name, to: change.to });
+      setRefusal(refused);
+      return refused === undefined;
+    }
+    setRefusal(undefined);
+    if (text !== (current ?? '')) {
+      apply(text);
+    }
+    return true;
+  };
+
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
+
+  const external = findDeclaration(code, name)?.statement;
+
+  return { ...props, ref, draft, setDraft, error, setError, refusal, setRefusal, commit, draftRef, external };
+}
+export type SourceEditorState = ReturnType<typeof useVarSourceEditor>;
+export function useVarSourceEditorDismiss({ ref, commit, draftRef, onClose }: SourceEditorState) {
+  useEffect(() => {
+    const onDown = (event: PointerEvent) => {
+      if (!ref.current || (event.target instanceof window.Node && ref.current.contains(event.target))) {
+        return;
+      }
+      if (commit(draftRef.current)) {
+        onClose();
+      }
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('pointerdown', onDown, true);
+    document.addEventListener('keydown', onKey, true);
+    return () => {
+      document.removeEventListener('pointerdown', onDown, true);
+      document.removeEventListener('keydown', onKey, true);
+    };
+  });
+}
+export function VarSourceEditorView({ state }: { readonly state: SourceEditorState }) {
+  const { ref, pos: position, onClose, name, filePath, draft, external, error, refusal, setDraft, setError, setRefusal, commit } = state;
+  return (
+    <div
+      ref={ref}
+      className="attr-editor var-src"
+      style={{ top: position.top, left: position.left, width: position.width }}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          event.stopPropagation();
+          onClose();
+        }
+      }}
+    >
+      <SourceEditorHeader name={name} file={sourceFileLabel(filePath)} onClose={onClose} />
+      <ExprInput
+        multiline
+        autoFocus
+        className="var-src-code"
+        value={draft}
+        syncValue={external ?? draft}
+        invalid={!!error || refusal !== undefined}
+        onChange={(text) => {
+          setDraft(text);
+          setRefusal(undefined);
+          if (error) {
+            setError(checkStatement(text).ok ? '' : error);
+          }
+        }}
+        onCommit={commit}
+      />
+      {error ? <ErrorToast message={error} /> : undefined}
+      <ErrorToast message={refusal} />
+    </div>
+  );
+}
+
+export function eventElement(target: unknown): Element | undefined {
+  return target instanceof window.Element ? target : undefined;
+}
+
+export function SourceEditorHeader(props: { readonly name: string; readonly file?: SourceFileLabel | undefined; readonly onClose: () => void }) {
+  const translate = useTranslate();
+  const { name, file, onClose } = props;
+  return (
+    <div className="var-src-head">
+      <CodeIcon size={12} />
+      <span className="var-src-name">{name}</span>
+      {file !== undefined && (
+        <span
+          className={`var-src-file ${file.kind}`}
+          title={file.kind === 'page' ? translate('props.binding.inPage', { name: file.name }) : translate('props.binding.inComponent', { name: file.name })}
+        >
+          {file.kind === 'page' ? <FileIcon size={11} /> : <ElementComponentIcon size={11} />}
+          <span className="var-src-file-name">{file.name}</span>
+        </span>
+      )}
+      <span style={{ flex: 1 }} />
+      <button className="ghost" title={translate('ui.close')} onClick={onClose}>
+        <CloseIcon size={12} />
+      </button>
+    </div>
+  );
+}

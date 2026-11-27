@@ -1,0 +1,109 @@
+
+import { cssLanguage } from '@codemirror/lang-css';
+import { htmlLanguage } from '@codemirror/lang-html';
+import { typescriptLanguage } from '@codemirror/lang-javascript';
+import type { Language } from '@codemirror/language';
+import { assert } from '../../shared/core/assert';
+import type { CodeLineClassifier, CodeLineRoles } from './codeIndentView';
+
+type Parser = Language['parser'];
+
+const VERBATIM_NODES: ReadonlySet<string> = new Set(['String', 'StringLiteral', 'TemplateString']);
+const COMMENT_NODES: ReadonlySet<string> = new Set(['BlockComment', 'Comment']);
+
+export function codeLineClassifier(language: string | undefined): CodeLineClassifier {
+  const parser = parserFor(language);
+  if (parser === undefined) {
+    return noRoles;
+  }
+  const markup = language === 'astro' || language === 'html';
+  return (text) => (markup ? withPreserved(rolesFrom(parser, text), text) : rolesFrom(parser, text));
+}
+
+const PRESERVED_ELEMENT = /<(pre|textarea)(?=[\s/>])[\s\S]*?(?:<\/\1\s*>|$)/gi;
+
+function withPreserved(roles: CodeLineRoles, text: string): CodeLineRoles {
+  const starts = lineStarts(text);
+  const verbatim = new Set(roles.verbatim);
+  for (const match of text.matchAll(PRESERVED_ELEMENT)) {
+    addInnerLines(verbatim, starts, { from: match.index, to: match.index + match[0].length });
+  }
+  assert(verbatim.size < starts.length, 'withPreserved: the first line never starts inside an element');
+  return { verbatim, comment: roles.comment };
+}
+
+function parserFor(language: string | undefined): Parser | undefined {
+  switch (language) {
+    case 'css':
+      return cssLanguage.parser;
+    case 'astro':
+    case 'html':
+      return htmlLanguage.parser;
+    case 'javascript':
+    case 'typescript':
+    case undefined:
+      return typescriptLanguage.parser;
+    default:
+      return undefined;
+  }
+}
+
+function noRoles(): CodeLineRoles {
+  return { verbatim: new Set(), comment: new Set() };
+}
+
+function rolesFrom(parser: Parser, text: string): CodeLineRoles {
+  const starts = lineStarts(text);
+  const verbatim = new Set<number>();
+  const comment = new Set<number>();
+  parser.parse(text).iterate({
+    enter: (node) => {
+      if (VERBATIM_NODES.has(node.name)) {
+        addInnerLines(verbatim, starts, node);
+        return false;
+      }
+      if (COMMENT_NODES.has(node.name)) {
+        addInnerLines(comment, starts, node);
+      }
+      return undefined;
+    },
+  });
+  assert(verbatim.size < starts.length, 'rolesFrom: the first line never starts inside anything');
+  assert(comment.size < starts.length, 'rolesFrom: the first line never starts inside a comment');
+  return { verbatim, comment };
+}
+
+function lineStarts(text: string): readonly number[] {
+  const starts = [0];
+  let at = text.indexOf('\n');
+  while (at >= 0) {
+    starts.push(at + 1);
+    at = text.indexOf('\n', at + 1);
+  }
+  return starts;
+}
+
+function addInnerLines(lines: Set<number>, starts: readonly number[], node: { readonly from: number; readonly to: number }): void {
+  for (let index = lineIndexAt(starts, node.from) + 1; index < starts.length; index += 1) {
+    const start = starts[index];
+    assert(start !== undefined, 'addInnerLines: a line index is in range');
+    if (start >= node.to) {
+      return;
+    }
+    lines.add(index);
+  }
+}
+
+function lineIndexAt(starts: readonly number[], offset: number): number {
+  let low = 0;
+  let high = starts.length - 1;
+  while (low < high) {
+    const middle = Math.ceil((low + high) / 2);
+    if ((starts[middle] ?? 0) <= offset) {
+      low = middle;
+    } else {
+      high = middle - 1;
+    }
+  }
+  return low;
+}

@@ -1,0 +1,177 @@
+import { createRequire } from 'node:module';
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
+import path from 'node:path';
+import { assert } from '../../shared/core/assert';
+import { record, text } from '../../shared/core/boundary';
+import { mergeToolPaths, pathEnvironmentValue, setPathEnvironment } from '../lib/platform';
+import type { PublishCommand } from '../../shared/properties/publishCommands';
+import type { PackageManager } from '../../shared/properties/packageManager';
+import { described } from '../../shared/properties/i18n/messageRef';
+import { DescribedError } from '../../shared/properties/describedError';
+import { appToolsDirectory, checkPinnedTool, pinnedToolRoot, NETLIFY_PIN, WRANGLER_PIN, type ToolPin } from './publishToolInstall';
+
+export function projectHasWrangler(root: string): boolean {
+  const resolver = createRequire(path.join(root, 'package.json'));
+  try {
+    return existsSync(resolver.resolve('wrangler/package.json'));
+  } catch (error: unknown) {
+    if (error instanceof Error && 'code' in error && error.code === 'MODULE_NOT_FOUND') {
+      return false;
+    }
+    throw error;
+  }
+}
+
+const PUBLISH_TOOLS: Readonly<Record<'wrangler' | 'vercel' | 'netlify', { readonly package: string; readonly pin?: ToolPin }>> = {
+  wrangler: { package: 'wrangler', pin: WRANGLER_PIN },
+  vercel: { package: 'vercel' },
+  netlify: { package: 'netlify-cli', pin: NETLIFY_PIN },
+};
+export type PublishTool = keyof typeof PUBLISH_TOOLS;
+
+function publishTool(executable: string): (typeof PUBLISH_TOOLS)[PublishTool] | undefined {
+  if (executable === 'wrangler' || executable === 'vercel' || executable === 'netlify') {
+    return PUBLISH_TOOLS[executable];
+  }
+  return undefined;
+}
+
+export function publishToolInstalled(root: string, executable: PublishTool): boolean {
+  if (existsSync(path.join(root, 'node_modules', '.bin', executable))) {
+    return true;
+  }
+  if (installedPublishTool(root, executable) !== undefined) {
+    return true;
+  }
+  return pathTool(executable, pathEnvironmentValue(process.env)) !== undefined;
+}
+
+export function wranglerAvailableWithoutPATH(root: string): boolean {
+  if (projectHasWrangler(root)) {
+    return true;
+  }
+  return installedPublishTool(root, 'wrangler') !== undefined;
+}
+
+export function netlifyAvailableWithoutPATH(root: string): boolean {
+  return installedPublishTool(root, 'netlify') !== undefined;
+}
+
+export function vercelInstallPrefix(home: string): string {
+  assert(path.isAbsolute(home), 'The install prefix starts from an absolute home');
+  return path.join(home, '.local');
+}
+
+export function addPublishToolDirectory(home: string): void {
+  const directory = process.platform === 'win32' ? '' : path.join(vercelInstallPrefix(home), 'bin');
+  if (directory) {
+    setPathEnvironment(process.env, mergeToolPaths(pathEnvironmentValue(process.env), [directory]));
+  }
+  assert(directory === '' || pathEnvironmentValue(process.env).includes(directory), 'The install directory is on PATH');
+}
+
+function pathTool(executable: string, pathValue: string): string | undefined {
+  const names = process.platform === 'win32' ? [`${executable}.cmd`, `${executable}.exe`] : [executable];
+  const directories = pathValue.split(path.delimiter).filter((directory) => directory.length > 0);
+  assert(directories.length <= 4096, 'A PATH is bounded');
+  for (const directory of directories) {
+    for (const name of names) {
+      const candidate = path.join(directory, name);
+      if (existsSync(candidate)) {
+        return candidate;
+      }
+    }
+  }
+  return undefined;
+}
+
+export interface ExecutableCommand extends Omit<PublishCommand, 'executable'> {
+  readonly executable: PublishCommand['executable'] | PackageManager;
+}
+
+export function resolvePublishExecutable(
+  root: string,
+  command: ExecutableCommand,
+  platform: NodeJS.Platform = process.platform,
+): {
+  readonly executable: string;
+  readonly arguments: readonly string[];
+} {
+  if (platform === 'win32') {
+    if (command.executable === 'bun') {
+      return { executable: 'bun.exe', arguments: command.arguments };
+    }
+  }
+  const local = path.join(root, 'node_modules', '.bin', command.executable);
+  if (platform !== 'win32' && existsSync(local)) {
+    return { executable: local, arguments: command.arguments };
+  }
+  const installed = installedPublishTool(root, command.executable);
+  if (installed) {
+    return {
+      executable: platform === 'win32' ? 'node.exe' : 'node',
+      arguments: [installed, ...command.arguments],
+    };
+  }
+  if (platform !== 'win32') {
+    return {
+      executable: existsSync(local) ? local : command.executable,
+      arguments: command.arguments,
+    };
+  }
+  const directories = (process.env['PATH'] ?? process.env['Path'] ?? '').split(path.delimiter);
+  if (directories.length > 256) {
+    throw new Error('Tool search path exceeds 256 directories.');
+  }
+  const packageName = publishTool(command.executable)?.package ?? command.executable;
+  const candidates = [path.join(root, 'node_modules', packageName), ...directories.map((directory) => path.join(directory, 'node_modules', packageName))];
+  for (const directory of candidates) {
+    const manifest = path.join(directory, 'package.json');
+    if (existsSync(manifest)) {
+      return { executable: 'node.exe', arguments: [publishEntry(directory, command.executable), ...command.arguments] };
+    }
+  }
+  throw new DescribedError(described('publish.command.installTool', { executable: command.executable }));
+}
+
+function publishEntry(directory: string, executable: string): string {
+  const source = readFileSync(path.join(directory, 'package.json'), 'utf8');
+  if (source.length > 65_536) {
+    throw new Error('CLI package metadata exceeds 64 KiB.');
+  }
+  const input: unknown = JSON.parse(source);
+  const metadata = record(input);
+  const bin = metadata['bin'];
+  const relative = text(typeof bin === 'string' ? bin : record(bin)[executable]);
+  const canonical = realpathSync(directory);
+  const entry = realpathSync(path.join(directory, relative));
+  const within = path.relative(canonical, entry);
+  if (path.isAbsolute(within) || within.startsWith('..')) {
+    throw new Error('CLI entry must stay inside its installed package.');
+  }
+  return entry;
+}
+
+function installedPublishTool(root: string, executable: string): string | undefined {
+  const tool = publishTool(executable);
+  if (tool === undefined) {
+    return undefined;
+  }
+  const resolver = createRequire(path.join(process.cwd(), 'package.json'));
+  const pin = tool.pin;
+  const tools = pin !== undefined && checkPinnedTool(appToolsDirectory(), pin).kind === 'ready' ? [pinnedToolRoot(appToolsDirectory(), pin)] : [];
+  const directories = [root, ...tools, process.cwd(), path.join(process.cwd(), 'studio'), path.dirname(process.argv[1] ?? process.cwd())];
+  for (const directory of directories) {
+    let manifest: string;
+    try {
+      manifest = resolver.resolve(`${tool.package}/package.json`, { paths: [directory] });
+    } catch {
+      continue;
+    }
+    if (!existsSync(manifest)) {
+      continue;
+    }
+    return publishEntry(path.dirname(manifest), executable);
+  }
+  return undefined;
+}

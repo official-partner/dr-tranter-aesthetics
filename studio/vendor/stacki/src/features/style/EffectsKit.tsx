@@ -1,0 +1,557 @@
+
+import { useEffect, useRef, useState } from 'react';
+import { type Hideable } from './model/hideable';
+import FieldLabel from './components/FieldLabel';
+import { PropTip, ProvenanceLabel } from './components/CssPropertyTip';
+import type { SelectOption } from './components/Select';
+import { VariableSelect, variableIn } from './KeywordConnect';
+import useScrub from './components/useScrub';
+import { type SegOption } from './SegmentedField';
+import { CURSOR_ICONS } from './cursorIcons';
+import { useStyleHint, useHighlight } from './model/computedStyle';
+import { handleArrowStep } from './model/numberStep';
+import ProvenanceList from './ProvenanceList';
+import VariableConnect from './VariableConnect';
+import type { Contributor, ResolvedProp } from './model/resolved';
+import { commitInPlace } from './model/commitStyleInPlace';
+import { openAfterRemoval, useExternalDraft } from './model/fieldHooks';
+import { displayOf, displayText, keepImportant, parseImportant } from './model/styleDisplay';
+import ImportantMark from './components/ImportantMark';
+import { useTranslate } from '../../lib/i18n/useTranslate';
+import type { MessageKey, Translator } from '../../lib/i18n/localeContext';
+import { useHoverPreview } from './connectFieldHelpers';
+
+export type SetProp = (prop: string, value: string, important: boolean) => void;
+export type ClearProp = (prop: string | string[]) => void;
+export type LiveSetProp = (prop: string, value: string | undefined, important: boolean) => void;
+export type Read = (prop: string) => ResolvedProp | undefined;
+
+export type Props = {
+  read: Read;
+  busy: boolean;
+  setProp: SetProp;
+  clearProp: ClearProp;
+  liveSetProp: LiveSetProp;
+  onProvenance: (prop: string, anchor: DOMRect) => void;
+  onSelectSelector: (selector: string, prop?: string) => void;
+};
+
+export interface WriteOptions {
+  readonly live: boolean;
+}
+
+export function useLiveTimer(liveNow: (text: string) => void) {
+  const timer = useRef<number | undefined>(undefined);
+  const cancel = () => {
+    if (timer.current !== undefined) {
+      window.clearTimeout(timer.current);
+      timer.current = undefined;
+    }
+  };
+  useEffect(() => cancel, []);
+  const live = (text: string) => {
+    cancel();
+    timer.current = window.setTimeout(() => liveNow(text), 100);
+  };
+  return { live, cancel };
+}
+
+export function stepInPlace(event: React.KeyboardEvent<HTMLInputElement>): string | undefined {
+  const input = event.currentTarget;
+  if (event.key === 'Enter') {
+    commitInPlace(input);
+    return undefined;
+  }
+  const stepped = handleArrowStep(event);
+  if (!stepped) {
+    return undefined;
+  }
+  event.preventDefault();
+  input.value = stepped.text;
+  input.setSelectionRange(stepped.caret, stepped.caret);
+  return stepped.text;
+}
+
+export function draftInputHandlers({
+  focusedRef,
+  setDraft,
+  live,
+  cancel,
+  commit,
+}: {
+  focusedRef: React.MutableRefObject<boolean>;
+  setDraft: (draft: string) => void;
+  live: (text: string) => void;
+  cancel: () => void;
+  commit: () => void;
+}) {
+  return {
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+      setDraft(event.target.value);
+      live(event.target.value);
+    },
+    onFocus: () => {
+      focusedRef.current = true;
+    },
+    onBlur: () => {
+      focusedRef.current = false;
+      cancel();
+      commit();
+    },
+    onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
+      const stepped = stepInPlace(event);
+      if (stepped !== undefined) {
+        setDraft(stepped);
+        live(stepped);
+      }
+    },
+  };
+}
+
+export function writeValue(prop: string, value: string, options: WriteOptions, writers: Pick<Props, 'read' | 'setProp' | 'clearProp' | 'liveSetProp'>) {
+  const kept = keepImportant(value, displayOf(writers.read(prop)));
+  if (options.live) {
+    if (kept.value) {
+      writers.liveSetProp(prop, kept.value, kept.important);
+    }
+    return;
+  }
+  if (kept.value) {
+    writers.setProp(prop, kept.value, kept.important);
+  } else {
+    writers.clearProp(prop);
+  }
+}
+
+export function useLayerRows<T>({
+  rows,
+  blank,
+  write,
+}: {
+  rows: Array<Hideable<T>>;
+  blank: () => T;
+  write: (next: Array<Hideable<T>>, options: WriteOptions) => void;
+}) {
+  const [openIndex, setOpenIndex] = useState<number | undefined>(undefined);
+  const [anchorElement, setAnchorElement] = useState<HTMLElement | undefined>(undefined);
+  const add = () => {
+    const next = [...rows, { item: blank(), hidden: false }];
+    write(next, { live: false });
+    setOpenIndex(next.length - 1);
+    setAnchorElement(undefined);
+  };
+  const remove = (i: number) => {
+    write(
+      rows.filter((_, other) => other !== i),
+      { live: false },
+    );
+    setOpenIndex((previous) => openAfterRemoval(previous, i));
+  };
+  const reorder = (from: number, to: number) => {
+    if (from === to) {
+      return;
+    }
+    const next = [...rows];
+    const [moved] = next.splice(from, 1);
+    if (moved === undefined) {
+      return;
+    }
+    next.splice(to, 0, moved);
+    write(next, { live: false });
+    setOpenIndex((previous) => (previous === from ? to : previous));
+  };
+  const update = (i: number, options: WriteOptions, change: (item: T) => T) =>
+    write(
+      rows.map((row, other) => (other === i ? { ...row, item: change(row.item) } : row)),
+      options,
+    );
+  const toggle = (i: number) =>
+    write(
+      rows.map((row, other) => (other === i ? { ...row, hidden: !row.hidden } : row)),
+      { live: false },
+    );
+  const open = (i: number, element: HTMLElement) => {
+    const showing = openIndex === i && anchorElement === element;
+    setOpenIndex(showing ? undefined : i);
+    setAnchorElement(element);
+  };
+  const close = () => setOpenIndex(undefined);
+  const isHidden = (i: number) => rows[i]?.hidden ?? false;
+  return { openIndex, anchorElement, add, remove, reorder, update, toggle, open, close, isHidden };
+}
+
+export function EffLabel({ label, prop, props }: { label: string; prop: string; props: Props }) {
+  const translate = useTranslate();
+  const { read, busy, clearProp, onProvenance, onSelectSelector } = props;
+  const display = displayOf(read(prop));
+  const contributors: Contributor[] = read(prop)?.contributors ?? [];
+  if (display.present && !display.isSelected) {
+    return <ProvenanceLabel label={label} props={[prop]} busy={busy} onProvenance={onProvenance} />;
+  }
+  return (
+    <FieldLabel
+      className={`embed-editor_size-label ${display.overridden ? 'is-overridden' : ''}`}
+      active={display.isSelected}
+      {...(display.present ? {} : { inheritedProp: prop })}
+      disabled={busy}
+      onReset={() => clearProp(prop)}
+      resetLabel={translate('style.effectsKit.clear')}
+      tooltip={<PropTip props={[prop]} />}
+      {...(display.overridden ? { title: translate('style.effectsKit.overriddenBy', { selector: display.winnerSelector }) } : {})}
+      menuNote={(close) => (
+        <ProvenanceList
+          contributors={contributors}
+          prop={prop}
+          onSelect={(selector, selectedProp) => {
+            onSelectSelector(selector, selectedProp);
+            close();
+          }}
+        />
+      )}
+    >
+      {label}
+    </FieldLabel>
+  );
+}
+
+export function LiveText({ prop, placeholder, props, dragging }: { prop: string; placeholder: string; props: Props; dragging?: string }) {
+  const translate = useTranslate();
+  const { read, busy, setProp, clearProp, liveSetProp } = props;
+  const display = displayOf(read(prop));
+  const external = dragging ?? displayText(display);
+  const computed = useStyleHint(external ? '' : prop);
+  const { draft, setDraft, focused } = useExternalDraft(external);
+  const liveNow = (text: string) => {
+    const trimmed = text.trim();
+    if (trimmed) {
+      const parsed = parseImportant(trimmed);
+      liveSetProp(prop, parsed.value, parsed.important);
+    }
+  };
+  const { live, cancel } = useLiveTimer(liveNow);
+  const commit = (text = draft) => {
+    const trimmed = text.trim();
+    if (!trimmed) {
+      clearProp(prop);
+      return;
+    }
+    const parsed = parseImportant(trimmed);
+    setProp(prop, parsed.value, parsed.important);
+  };
+  const commitScrub = (text: string) => {
+    setDraft(text);
+    commit(text);
+  };
+  const scrub = useScrub({
+    value: draft,
+    disabled: busy,
+    onPreview: setDraft,
+    onInput: liveNow,
+    onCommit: commitScrub,
+  });
+  return (
+    <VariableConnect
+      code
+      className="is-fill"
+      ariaLabel={translate('style.effectsKit.connect', { name: prop })}
+      disabled={busy}
+      prop={prop}
+      canvasProperty={prop}
+      onPick={(binding) => {
+        const kept = keepImportant(binding, display);
+        setProp(prop, kept.value, kept.important);
+      }}
+    >
+      <input
+        {...scrub.input}
+        className="u-input embed-editor_size-input embed-editor_eff-value"
+        data-prop={prop}
+        value={draft}
+        {...draftInputHandlers({ focusedRef: focused, setDraft, live, cancel, commit })}
+        disabled={busy}
+        spellCheck={false}
+        placeholder={computed || placeholder}
+        aria-label={prop}
+      />
+    </VariableConnect>
+  );
+}
+
+
+export const BLEND_MODES: SelectOption<string>[] = [
+  'normal',
+  'darken',
+  'multiply',
+  'color-burn',
+  'lighten',
+  'screen',
+  'color-dodge',
+  'overlay',
+  'soft-light',
+  'hard-light',
+  'difference',
+  'exclusion',
+  'hue',
+  'saturation',
+  'color',
+  'luminosity',
+].map((mode) => ({
+  value: mode,
+  label:
+    mode === 'color-burn'
+      ? 'Color burn'
+      : mode === 'color-dodge'
+        ? 'Color dodge'
+        : mode === 'soft-light'
+          ? 'Soft light'
+          : mode === 'hard-light'
+            ? 'Hard light'
+            : (mode[0] ?? '').toUpperCase() + mode.slice(1),
+}));
+
+export const CURSOR_GROUPS: ReadonlyArray<{ id: string; headingKey: MessageKey; values: string[] }> = [
+  { id: 'general', headingKey: 'style.effectsKit.cursorGeneral', values: ['auto', 'default', 'none'] },
+  {
+    id: 'links',
+    headingKey: 'style.effectsKit.cursorLinks',
+    values: ['pointer', 'not-allowed', 'wait', 'progress', 'help', 'context-menu'],
+  },
+  { id: 'selection', headingKey: 'style.effectsKit.cursorSelection', values: ['cell', 'crosshair', 'text', 'vertical-text'] },
+  { id: 'drag', headingKey: 'style.effectsKit.cursorDrag', values: ['grab', 'grabbing', 'alias', 'copy', 'move'] },
+  { id: 'zoom', headingKey: 'style.effectsKit.cursorZoom', values: ['zoom-in', 'zoom-out'] },
+  {
+    id: 'resize',
+    headingKey: 'style.effectsKit.cursorResize',
+    values: [
+      'col-resize',
+      'row-resize',
+      'nesw-resize',
+      'nwse-resize',
+      'ew-resize',
+      'ns-resize',
+      'n-resize',
+      'w-resize',
+      's-resize',
+      'e-resize',
+      'nw-resize',
+      'ne-resize',
+      'sw-resize',
+      'se-resize',
+    ],
+  },
+];
+export const cursorOptions = (translate: Translator): SelectOption<string>[] =>
+  CURSOR_GROUPS.flatMap((group) => [
+    { value: `__${group.id}`, label: translate(group.headingKey), heading: true },
+    ...group.values.map((cursor) => ({
+      value: cursor,
+      label: cursor,
+      icon: CURSOR_ICONS[cursor],
+      indent: true,
+    })),
+  ]);
+
+export const outlineOptions = (translate: Translator): readonly SegOption[] => [
+  { value: 'none', label: '✕', menuLabel: translate('style.effectsKit.outlineNone'), ariaLabel: translate('style.effectsKit.outlineNone') },
+  {
+    value: 'solid',
+    label: <span className="embed-editor_border-style-line is-solid" />,
+    menuLabel: translate('style.effectsKit.outlineSolid'),
+    ariaLabel: translate('style.effectsKit.outlineSolid'),
+  },
+  {
+    value: 'dashed',
+    label: <span className="embed-editor_border-style-line is-dashed" />,
+    menuLabel: translate('style.effectsKit.outlineDashed'),
+    ariaLabel: translate('style.effectsKit.outlineDashed'),
+  },
+  {
+    value: 'dotted',
+    label: <span className="embed-editor_border-style-line is-dotted" />,
+    menuLabel: translate('style.effectsKit.outlineDotted'),
+    ariaLabel: translate('style.effectsKit.outlineDotted'),
+  },
+];
+export const eventsOptions = (translate: Translator): readonly SegOption[] => [
+  { value: 'auto', label: translate('style.effectsKit.eventsAuto'), menuLabel: translate('style.effectsKit.eventsAuto') },
+  { value: 'none', label: translate('style.effectsKit.eventsNone'), menuLabel: translate('style.effectsKit.eventsNone') },
+];
+
+export const CUSTOM = '__custom__';
+export const BLEND_SET = new Set(BLEND_MODES.map((option) => option.value));
+export const CURSOR_SET = new Set(CURSOR_GROUPS.flatMap((group) => group.values));
+
+export interface CustomInputProps {
+  prop: string;
+  value: string;
+  placeholder: string;
+  busy: boolean;
+  autoFocus: boolean;
+  setProp: SetProp;
+  liveSetProp: LiveSetProp;
+  clearProp: ClearProp;
+  onExit: () => void;
+}
+export function CustomInput(props: CustomInputProps) {
+  const translate = useTranslate();
+  const { prop, value, placeholder, busy, setProp, liveSetProp, clearProp, onExit } = props;
+  const computed = useStyleHint(value ? '' : prop);
+  const { draft, setDraft, focused } = useExternalDraft(value);
+  const { live, cancel } = useLiveTimer((text) => {
+    const trimmed = text.trim();
+    if (trimmed) {
+      const parsed = parseImportant(trimmed);
+      liveSetProp(prop, parsed.value, parsed.important);
+    }
+  });
+  const commit = () => {
+    const trimmed = draft.trim();
+    if (!trimmed) {
+      clearProp(prop);
+      onExit();
+      return;
+    }
+    const parsed = parseImportant(trimmed);
+    setProp(prop, parsed.value, parsed.important);
+  };
+  return (
+    <VariableConnect
+      ariaLabel={translate('style.effectsKit.connect', { name: prop })}
+      disabled={busy}
+      prop={prop}
+      canvasProperty={prop}
+      onPick={(binding) => {
+        const kept = keepImportant(binding, parseImportant(value));
+        setProp(prop, kept.value, kept.important);
+      }}
+    >
+      <input
+        className="u-input u-select-custom-input"
+        value={draft}
+        autoFocus={props.autoFocus}
+        onChange={(event) => {
+          setDraft(event.target.value);
+          live(event.target.value);
+        }}
+        onFocus={() => {
+          focused.current = true;
+        }}
+        onBlur={() => {
+          focused.current = false;
+          cancel();
+          commit();
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            commitInPlace(event.currentTarget);
+          }
+        }}
+        disabled={busy}
+        spellCheck={false}
+        placeholder={computed || placeholder}
+        aria-label={prop}
+      />
+    </VariableConnect>
+  );
+}
+
+export interface PresetSelectRowProps {
+  prop: string;
+  label: string;
+  options: SelectOption<string>[];
+  presets: Set<string>;
+  fallback: string;
+  placeholder: string;
+  props: Props;
+  allowCustom?: boolean;
+}
+export function PresetSelectRow(row: PresetSelectRowProps) {
+  const hoverPreview = useHoverPreview();
+  const { prop, label, options, presets, props, allowCustom = true } = row;
+  const translate = useTranslate();
+  const { read, busy, setProp, liveSetProp, clearProp } = props;
+  const display = displayOf(read(prop));
+  const current = display.present ? display.value.trim() : '';
+  const shown = useHighlight(
+    current,
+    prop,
+    options.map((option) => option.value),
+    row.fallback,
+  );
+  const isPreset = !current || presets.has(current);
+  const [forceCustom, setForceCustom] = useState(false);
+  const customMode = (allowCustom && (forceCustom || (display.present && !isPreset) || display.important)) || variableIn(current) !== undefined;
+  const keptImportant = !allowCustom && display.important;
+  const pick = (choice: string) => {
+    if (choice === CUSTOM) {
+      setForceCustom(true);
+      return;
+    }
+    setForceCustom(false);
+    setProp(prop, choice, keptImportant);
+  };
+  const preview = (option: string | undefined) => hoverPreview(prop, option === CUSTOM ? undefined : option, keptImportant);
+  const inputValue = forceCustom && isPreset && !display.important ? '' : displayText(display);
+  const selectOptions = presetSelectOptions({
+    options,
+    allowCustom,
+    translate,
+    stray: display.present && !isPreset && variableIn(current) === undefined ? current : undefined,
+  });
+  return (
+    <div className="embed-editor_size-row">
+      <EffLabel label={label} prop={prop} props={props} />
+      <ImportantMark important={keptImportant}>
+        <VariableSelect
+          prop={prop}
+          rawValue={current}
+          onVariable={(binding) => {
+            setForceCustom(false);
+            setProp(prop, binding, display.important);
+          }}
+          value={customMode ? CUSTOM : shown}
+          options={selectOptions}
+          onChange={pick}
+          onPreview={(option) => preview(option ?? undefined)}
+          ariaLabel={label}
+          disabled={busy}
+          customInput={
+            customMode ? (
+              <CustomInput
+                prop={prop}
+                value={inputValue}
+                placeholder={row.placeholder}
+                busy={busy}
+                autoFocus={forceCustom}
+                setProp={setProp}
+                liveSetProp={liveSetProp}
+                clearProp={clearProp}
+                onExit={() => setForceCustom(false)}
+              />
+            ) : undefined
+          }
+        />
+      </ImportantMark>
+    </div>
+  );
+}
+
+export function presetSelectOptions({
+  options,
+  allowCustom,
+  stray,
+  translate,
+}: {
+  options: SelectOption<string>[];
+  allowCustom: boolean;
+  translate: Translator;
+  stray: string | undefined;
+}): SelectOption<string>[] {
+  if (allowCustom) {
+    return [...options, { value: CUSTOM, label: translate('style.effectsKit.custom') }];
+  }
+  if (stray !== undefined) {
+    return [...options, { value: stray, label: stray }];
+  }
+  return options;
+}

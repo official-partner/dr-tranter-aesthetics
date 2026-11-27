@@ -1,0 +1,716 @@
+import { centralIcon } from '../../ui/central/CentralIcon';
+import { close as centralClose } from '../../ui/central/centralGeometry';
+
+import { useEffect, useId, useState } from 'react';
+import SegmentedControl, { type SegmentedOption } from '../../ui/SegmentedControl';
+import useScrub from './components/useScrub';
+import { colorOverlayImage, colorOverlayOf, serializeLayers, splitTopLevelSpaces, type BgLayer, type LayerKind } from './model/background';
+import VariableConnect from './VariableConnect';
+import { chooseAsset } from '../../ui/assetPick';
+import { OverrideNote } from '../../ui/OverrideNote';
+import { assetValueFor } from '../../ui/assetPath';
+import { sourceCandidates } from '../../ui/AssetThumb';
+import { getHost } from './model/host';
+import ColorSwatch from './components/ColorSwatch';
+import { commitInPlace } from './model/commitStyleInPlace';
+import { useExternalDraft } from './model/fieldHooks';
+import { useTranslate } from '../../lib/i18n/useTranslate';
+import type { Translator } from '../../lib/i18n/localeContext';
+import { type SetProp, type ClearProp, type LiveSetProp, type WriteOptions, replaceLayer, stepInPlace } from './BackgroundKit';
+
+
+export function LayerLonghandField({
+  field,
+  prop,
+  label,
+  placeholder,
+  ...fieldProps
+}: LayerFieldProps & {
+  field: keyof BgLayer;
+  prop: string;
+  label: string;
+  placeholder: string;
+}) {
+  const translate = useTranslate();
+  const { layers, index, busy, setProp } = fieldProps;
+  const { draft, setDraft, focused } = useExternalDraft(layers[index]?.[field] ?? '');
+
+  const commit = (options: WriteOptions, text = draft) => {
+    const trimmed = text.trim();
+    const next = layers.map((layer, i) => (i === index ? { ...layer, [field]: trimmed } : layer));
+    const list = serializeLayers(next)[field === 'image' ? 'image' : field];
+    writeLayerList(prop, list, options, fieldProps);
+  };
+  const commitScrub = (text: string) => {
+    setDraft(text);
+    commit({ live: false }, text);
+  };
+  const scrub = useScrub({
+    value: draft,
+    disabled: busy,
+    onPreview: setDraft,
+    onInput: (text) => commit({ live: true }, text),
+    onCommit: commitScrub,
+  });
+
+  return (
+    <VariableConnect
+      code
+      ariaLabel={translate('style.backgroundLayerFields.connect', { name: label })}
+      disabled={busy}
+      prop={prop}
+      canvasProperty={prop}
+      onPick={(binding) => setProp(prop, binding, false)}
+    >
+      <input
+        {...scrub.input}
+        className="u-input embed-editor_size-input"
+        value={draft}
+        onChange={(event) => {
+          setDraft(event.target.value);
+          commit({ live: true }, event.target.value);
+        }}
+        onFocus={() => {
+          focused.current = true;
+        }}
+        onBlur={() => {
+          focused.current = false;
+          commit({ live: false });
+        }}
+        onKeyDown={(event) => {
+          const stepped = stepInPlace(event);
+          if (stepped !== undefined) {
+            setDraft(stepped);
+          }
+        }}
+        disabled={busy}
+        spellCheck={false}
+        placeholder={placeholder}
+        aria-label={label}
+      />
+    </VariableConnect>
+  );
+}
+
+export function writeLayerList(prop: string, list: string, options: WriteOptions, writers: Pick<LayerFieldProps, 'setProp' | 'clearProp' | 'liveSetProp'>) {
+  if (options.live) {
+    if (list) {
+      writers.liveSetProp(prop, list, false);
+    }
+    return;
+  }
+  if (list) {
+    writers.setProp(prop, list, false);
+  } else {
+    writers.clearProp(prop);
+  }
+}
+
+export const BACKGROUND_IMAGE_ICON_FIRST_PATH = 'M6 7C6.55228 7 7 6.55228 7 6C7 5.44772 6.55228 5 6 5C5.44772 5 5 5.44772 5 6' + 'C5 6.55228 5.44772 7 6 7Z';
+export const BACKGROUND_IMAGE_ICON_SECOND_PATH =
+  'M2 3C2 2.44772 2.44772 2 3 2H13C13.5523 2 14 2.44772 14 3V13C14 13.5523 13.5523 14 13 14H3' +
+  'C2.44772 14 2 13.5523 2 13V3ZM13 3L3 3V12.2929L8 7.29289L13 12.2929V3ZM8 8.70711' +
+  'L12.2929 13H3.70711L8 8.70711Z';
+
+export function BgImageIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d={BACKGROUND_IMAGE_ICON_FIRST_PATH} fill="currentColor" />
+      <path fillRule="evenodd" clipRule="evenodd" d={BACKGROUND_IMAGE_ICON_SECOND_PATH} fill="currentColor" />
+    </svg>
+  );
+}
+export const BACKGROUND_LINEAR_ICON_PATH =
+  'M2 3C2 2.44772 2.44772 2 3 2H13C13.5523 2 14 2.44772 14 3V13C14 13.5523 13.5523 14 13 14H3' + 'C2.44772 14 2 13.5523 2 13V3Z';
+
+export function BgLinearIcon() {
+  const id = useId();
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d={BACKGROUND_LINEAR_ICON_PATH} fill={`url(#${id})`} />
+      <defs>
+        <linearGradient id={id} x1="14" y1="2" x2="14" y2="14" gradientUnits="userSpaceOnUse">
+          <stop stopColor="currentColor" />
+          <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+export const BACKGROUND_RADIAL_ICON_PATH =
+  'M2 3C2 2.44772 2.44772 2 3 2H13C13.5523 2 14 2.44772 14 3V13C14 13.5523 13.5523 14 13 14H3' + 'C2.44772 14 2 13.5523 2 13V3Z';
+
+export function BgRadialIcon() {
+  const id = useId();
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d={BACKGROUND_RADIAL_ICON_PATH} fill={`url(#${id})`} />
+      <defs>
+        <radialGradient id={id} cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(8 8) rotate(90) scale(6)">
+          <stop stopColor="currentColor" stopOpacity="0" />
+          <stop offset="0.166246" stopColor="currentColor" stopOpacity="0" />
+          <stop offset="1" stopColor="currentColor" />
+        </radialGradient>
+      </defs>
+    </svg>
+  );
+}
+export const BACKGROUND_COLOR_ICON_PATH =
+  'M2 3C2 2.44772 2.44772 2 3 2H13C13.5523 2 14 2.44772 14 3V13C14 13.5523 13.5523 14 13 14H3' + 'C2.44772 14 2 13.5523 2 13V3Z';
+
+export function BgColorIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d={BACKGROUND_COLOR_ICON_PATH} fill="currentColor" />
+    </svg>
+  );
+}
+
+export const typeOptions = (translate: Translator): ReadonlyArray<SegmentedOption<LayerKind>> => [
+  {
+    value: 'image',
+    label: <BgImageIcon />,
+    ariaLabel: translate('style.backgroundLayerFields.typeImage'),
+    tooltip: translate('style.backgroundLayerFields.typeImage'),
+  },
+  {
+    value: 'linear',
+    label: <BgLinearIcon />,
+    ariaLabel: translate('style.backgroundLayerFields.typeLinear'),
+    tooltip: translate('style.backgroundLayerFields.typeLinear'),
+  },
+  {
+    value: 'radial',
+    label: <BgRadialIcon />,
+    ariaLabel: translate('style.backgroundLayerFields.typeRadial'),
+    tooltip: translate('style.backgroundLayerFields.typeRadial'),
+  },
+  {
+    value: 'color',
+    label: <BgColorIcon />,
+    ariaLabel: translate('style.backgroundLayerFields.typeColor'),
+    tooltip: translate('style.backgroundLayerFields.typeColor'),
+  },
+];
+
+const AUTO_KEYWORD = 'Auto';
+const OVERLAY_PLACEHOLDER = 'rgba(0, 0, 0, 0.5)';
+
+export type LayerFieldProps = {
+  layers: BgLayer[];
+  index: number;
+  busy: boolean;
+  setProp: SetProp;
+  clearProp: ClearProp;
+  liveSetProp: LiveSetProp;
+};
+
+export function BgPartInput({
+  prop,
+  value,
+  placeholder,
+  label,
+  busy,
+  disabled,
+  onLive,
+  onCommit,
+}: {
+  prop: string;
+  value: string;
+  placeholder: string;
+  label: string;
+  busy: boolean;
+  disabled?: boolean;
+  onLive: (value: string) => void;
+  onCommit: (value: string) => void;
+}) {
+  const { draft, setDraft, focused } = useExternalDraft(value);
+  const commitScrub = (text: string) => {
+    setDraft(text);
+    onCommit(text.trim());
+  };
+  const scrub = useScrub({
+    value: draft,
+    disabled: busy || disabled === true,
+    onPreview: setDraft,
+    onInput: (text) => onLive(text.trim()),
+    onCommit: commitScrub,
+  });
+  const translate = useTranslate();
+  return (
+    <VariableConnect
+      className="is-fill"
+      prop={prop}
+      disabled={busy || disabled === true}
+      ariaLabel={translate('styleModel.shared.connectVariable', { label })}
+      onPick={(binding) => {
+        setDraft(binding);
+        onCommit(binding);
+      }}
+    >
+      <input
+        {...scrub.input}
+        className={`u-input embed-editor_size-input ${disabled ? 'is-inactive' : ''}`}
+        value={draft}
+        placeholder={placeholder}
+        aria-label={label}
+        disabled={busy || disabled}
+        spellCheck={false}
+        onChange={(event) => {
+          setDraft(event.target.value);
+          onLive(event.target.value.trim());
+        }}
+        onFocus={() => {
+          focused.current = true;
+        }}
+        onBlur={() => {
+          focused.current = false;
+          onCommit(draft.trim());
+        }}
+        onKeyDown={(event) => {
+          const stepped = stepInPlace(event);
+          if (stepped !== undefined) {
+            setDraft(stepped);
+            onLive(stepped.trim());
+          }
+        }}
+      />
+    </VariableConnect>
+  );
+}
+
+export type SizeMode = 'custom' | 'cover' | 'contain';
+export function parseSize(size: string): { mode: SizeMode; width: string; height: string } {
+  const normalized = size.trim().toLowerCase();
+  if (normalized === 'cover') {
+    return { mode: 'cover', width: '', height: '' };
+  }
+  if (normalized === 'contain') {
+    return { mode: 'contain', width: '', height: '' };
+  }
+  const parts = splitTopLevelSpaces(size.trim());
+  return { mode: 'custom', width: parts[0] ?? '', height: parts[1] ?? '' };
+}
+export function serializeSize(mode: SizeMode, width: string, height: string): string {
+  if (mode === 'cover') {
+    return 'cover';
+  }
+  if (mode === 'contain') {
+    return 'contain';
+  }
+  const widthPart = width.trim();
+  const heightPart = height.trim();
+  if (!widthPart && !heightPart) {
+    return '';
+  }
+  return `${widthPart || 'auto'} ${heightPart || 'auto'}`;
+}
+export const sizeModeOptions = (translate: Translator): ReadonlyArray<SegmentedOption<SizeMode>> => [
+  { value: 'custom', label: translate('style.backgroundLayerFields.sizeCustom') },
+  { value: 'cover', label: translate('style.backgroundLayerFields.sizeCover') },
+  { value: 'contain', label: translate('style.backgroundLayerFields.sizeContain') },
+];
+export function LayerSizeField({ layers, index, busy, setProp, clearProp, liveSetProp }: LayerFieldProps) {
+  const translate = useTranslate();
+  const parsed = parseSize(layers[index]?.size ?? '');
+  const writeSize = (value: string, options: WriteOptions) => {
+    const list = serializeLayers(replaceLayer(layers, index, { size: value })).size;
+    writeLayerList('background-size', list, options, { setProp, clearProp, liveSetProp });
+  };
+  const isCustom = parsed.mode === 'custom';
+  return (
+    <div className="embed-editor_bg-stack">
+      <SegmentedControl
+        options={sizeModeOptions(translate)}
+        value={parsed.mode}
+        onChange={(mode) => writeSize(serializeSize(mode, parsed.width, parsed.height), { live: false })}
+        ariaLabel={translate('style.backgroundLayerFields.backgroundSize')}
+        disabled={busy}
+      />
+      <div className="embed-editor_bg-pair">
+        <label className="embed-editor_bg-pair-field">
+          <BgPartInput
+            prop="background-size"
+            value={parsed.width}
+            placeholder={AUTO_KEYWORD}
+            label={translate('style.backgroundLayerFields.width')}
+            busy={busy}
+            disabled={!isCustom}
+            onLive={(next) => writeSize(serializeSize('custom', next, parsed.height), { live: true })}
+            onCommit={(next) => writeSize(serializeSize('custom', next, parsed.height), { live: false })}
+          />
+          <span className="embed-editor_bg-pair-cap">{translate('style.backgroundLayerFields.width')}</span>
+        </label>
+        <label className="embed-editor_bg-pair-field">
+          <BgPartInput
+            prop="background-size"
+            value={parsed.height}
+            placeholder={AUTO_KEYWORD}
+            label={translate('style.backgroundLayerFields.height')}
+            busy={busy}
+            disabled={!isCustom}
+            onLive={(next) => writeSize(serializeSize('custom', parsed.width, next), { live: true })}
+            onCommit={(next) => writeSize(serializeSize('custom', parsed.width, next), { live: false })}
+          />
+          <span className="embed-editor_bg-pair-cap">{translate('style.backgroundLayerFields.height')}</span>
+        </label>
+      </div>
+    </div>
+  );
+}
+
+export function axisIndex(token: string): number {
+  const normalized = token.trim().toLowerCase();
+  if (normalized === '' || normalized === 'left' || normalized === 'top' || normalized === '0' || normalized === '0%' || normalized === '0px') {
+    return 0;
+  }
+  if (normalized === 'center' || normalized === '50%') {
+    return 1;
+  }
+  if (normalized === 'right' || normalized === 'bottom' || normalized === '100%') {
+    return 2;
+  }
+  return -1;
+}
+export const AXIS_PERCENTS = ['0%', '50%', '100%'];
+export function LayerPositionField({ layers, index, busy, setProp, clearProp, liveSetProp }: LayerFieldProps) {
+  const translate = useTranslate();
+  const parts = splitTopLevelSpaces((layers[index]?.position ?? '').trim());
+  const x = parts[0] ?? '';
+  const y = parts[1] ?? '';
+  const writePosition = (value: string, options: WriteOptions) => {
+    const list = serializeLayers(replaceLayer(layers, index, { position: value })).position;
+    writeLayerList('background-position', list, options, { setProp, clearProp, liveSetProp });
+  };
+  const offset = (left: string, top: string) => `${left || '0%'} ${top || '0%'}`;
+  return (
+    <div className="embed-editor_bg-position">
+      <PositionPresets x={x} y={y} busy={busy} writePosition={writePosition} />
+      <div className="embed-editor_bg-posfields">
+        <label className="embed-editor_bg-posfield">
+          <span className="embed-editor_bg-posfield-cap">{translate('style.backgroundLayerFields.left')}</span>
+          <BgPartInput
+            prop="background-position"
+            value={x}
+            placeholder="0px"
+            label={translate('style.backgroundLayerFields.left')}
+            busy={busy}
+            onLive={(next) => writePosition(offset(next, y), { live: true })}
+            onCommit={(next) => writePosition(next || y ? offset(next, y) : '', { live: false })}
+          />
+        </label>
+        <label className="embed-editor_bg-posfield">
+          <span className="embed-editor_bg-posfield-cap">{translate('style.backgroundLayerFields.top')}</span>
+          <BgPartInput
+            prop="background-position"
+            value={y}
+            placeholder="0px"
+            label={translate('style.backgroundLayerFields.top')}
+            busy={busy}
+            onLive={(next) => writePosition(offset(x, next), { live: true })}
+            onCommit={(next) => writePosition(x || next ? offset(x, next) : '', { live: false })}
+          />
+        </label>
+      </div>
+    </div>
+  );
+}
+
+export function PositionPresets({
+  x,
+  y,
+  busy,
+  writePosition,
+}: {
+  x: string;
+  y: string;
+  busy: boolean;
+  writePosition: (value: string, options: WriteOptions) => void;
+}) {
+  const translate = useTranslate();
+  const columnLabels = [
+    translate('style.backgroundLayerFields.cellLeft'),
+    translate('style.backgroundLayerFields.cellCenter'),
+    translate('style.backgroundLayerFields.cellRight'),
+  ];
+  const rowLabels = [
+    translate('style.backgroundLayerFields.cellTop'),
+    translate('style.backgroundLayerFields.cellMiddle'),
+    translate('style.backgroundLayerFields.cellBottom'),
+  ];
+  const activeCol = axisIndex(x);
+  const activeRow = axisIndex(y);
+  return (
+    <div className="embed-editor_bg-posgrid" role="group" aria-label={translate('style.backgroundLayerFields.positionPreset')}>
+      {[0, 1, 2].flatMap((row) =>
+        [0, 1, 2].map((col) => (
+          <button
+            key={`${row}-${col}`}
+            type="button"
+            className={'embed-editor_bg-poscell ' + (activeCol === col && activeRow === row ? 'is-active' : '')}
+            disabled={busy}
+            aria-label={translate('style.backgroundLayerFields.positionCell', { horizontal: columnLabels[col] ?? '', vertical: rowLabels[row] ?? '' })}
+            onClick={() => writePosition(`${AXIS_PERCENTS[col]} ${AXIS_PERCENTS[row]}`, { live: false })}
+          />
+        )),
+      )}
+    </div>
+  );
+}
+
+export const TileAllIcon = () => (
+  <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    <rect x="2" y="2" width="5" height="5" rx="1" />
+    <rect x="9" y="2" width="5" height="5" rx="1" />
+    <rect x="2" y="9" width="5" height="5" rx="1" />
+    <rect x="9" y="9" width="5" height="5" rx="1" />
+  </svg>
+);
+export const TileXIcon = () => (
+  <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    <rect x="1" y="5.5" width="4" height="5" rx="1" />
+    <rect x="6" y="5.5" width="4" height="5" rx="1" />
+    <rect x="11" y="5.5" width="4" height="5" rx="1" />
+  </svg>
+);
+export const TileYIcon = () => (
+  <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    <rect x="5.5" y="1" width="5" height="4" rx="1" />
+    <rect x="5.5" y="6" width="5" height="4" rx="1" />
+    <rect x="5.5" y="11" width="5" height="4" rx="1" />
+  </svg>
+);
+export const TileNoneIcon = centralIcon(centralClose);
+export const tileOptions = (translate: Translator): ReadonlyArray<SegmentedOption<string>> => [
+  { value: 'repeat', label: <TileAllIcon />, ariaLabel: translate('style.backgroundLayerFields.tile'), tooltip: translate('style.backgroundLayerFields.tile') },
+  {
+    value: 'repeat-x',
+    label: <TileXIcon />,
+    ariaLabel: translate('style.backgroundLayerFields.tileHorizontally'),
+    tooltip: translate('style.backgroundLayerFields.tileX'),
+  },
+  {
+    value: 'repeat-y',
+    label: <TileYIcon />,
+    ariaLabel: translate('style.backgroundLayerFields.tileVertically'),
+    tooltip: translate('style.backgroundLayerFields.tileY'),
+  },
+  {
+    value: 'no-repeat',
+    label: <TileNoneIcon />,
+    ariaLabel: translate('style.backgroundLayerFields.noTile'),
+    tooltip: translate('style.backgroundLayerFields.tileNone'),
+  },
+];
+export const fixedOptions = (translate: Translator): ReadonlyArray<SegmentedOption<string>> => [
+  { value: 'fixed', label: translate('style.backgroundLayerFields.fixed') },
+  { value: 'scroll', label: translate('style.backgroundLayerFields.notFixed') },
+];
+
+export function imageUrlOf(image: string): string | undefined {
+  const match = image.match(/url\(\s*['"]?([^'")]+?)['"]?\s*\)/i);
+  return match?.[1];
+}
+
+export function assetSourceCandidates(url: string | undefined): string[] {
+  if (!url) {
+    return [];
+  }
+  const clean = url.split(/[?#]/)[0] ?? '';
+  if (/^(https?:)?\/\//.test(clean) || clean.startsWith('data:')) {
+    return [clean];
+  }
+  const root = getHost().projectPath;
+  if (!root) {
+    return [clean];
+  }
+  const rel = clean.replace(/^\/+/, '');
+  const base = root.replace(/[\\/]+$/, '');
+  return [`${base}/public/${rel}`, `${base}/${rel}`].flatMap((abs) => sourceCandidates(abs));
+}
+
+export function FallbackImg({ srcs, alt = '', onLoad }: { srcs: string[]; alt?: string; onLoad?: (size: { w: number; h: number }) => void }) {
+  const [sourceIndex, setSourceIndex] = useState(0);
+  const sourcesKey = srcs.join('|');
+  useEffect(() => {
+    setSourceIndex(0);
+  }, [sourcesKey]);
+  if (!srcs.length || sourceIndex >= srcs.length) {
+    return undefined;
+  }
+  return (
+    <img
+      src={srcs[sourceIndex]}
+      alt={alt}
+      draggable={false}
+      onLoad={(event) => onLoad?.({ w: event.currentTarget.naturalWidth, h: event.currentTarget.naturalHeight })}
+      onError={() => setSourceIndex((previous) => previous + 1)}
+    />
+  );
+}
+
+export function LayerImageField({
+  layers,
+  index,
+  busy,
+  applyLayers,
+}: {
+  layers: BgLayer[];
+  index: number;
+  busy: boolean;
+  applyLayers: (layers: BgLayer[]) => void;
+}) {
+  const translate = useTranslate();
+  const image = layers[index]?.image ?? '';
+  const url = imageUrlOf(image);
+  const name = url ? (url.split('?')[0] ?? '').split(/[\\/]/).pop() || url : '';
+  const [dims, setDims] = useState('');
+  const srcs = assetSourceCandidates(url);
+  useEffect(() => {
+    setDims('');
+  }, [url]);
+  const pick = (assetUrl: string) => {
+    applyLayers(replaceLayer(layers, index, { image: `url("${assetUrl}")` }));
+  };
+  return (
+    <div className="embed-editor_bg-image">
+      <div className="embed-editor_bg-image-row">
+        <span className="embed-editor_bg-thumb">
+          <FallbackImg srcs={srcs} onLoad={(size) => setDims(`${size.w} × ${size.h}`)} />
+        </span>
+        <div className="embed-editor_bg-image-meta">
+          <span className="embed-editor_bg-image-name" title={url ?? ''}>
+            {name || translate('style.backgroundLayerFields.noImage')}
+          </span>
+          {dims ? <span className="embed-editor_bg-image-dim">{dims}</span> : undefined}
+        </div>
+      </div>
+      {}
+      <button
+        type="button"
+        className="u-button is-small embed-editor_bg-choose"
+        disabled={busy}
+        onClick={(event) =>
+          void chooseAsset(
+            {
+              mediaKind: 'image',
+              current: url ?? '',
+              onPick: (pickedRel: string) => pick(assetValueFor(pickedRel)),
+            },
+            { bypass: event.altKey, target: undefined },
+          )
+        }
+      >
+        {url ? translate('style.backgroundLayerFields.replaceImage') : translate('style.backgroundLayerFields.chooseImage')}
+      </button>
+      <OverrideNote point="assets.pick" />
+    </div>
+  );
+}
+
+export function LayerColorField({
+  layers,
+  index,
+  busy,
+  setProp,
+  liveSetProp,
+}: {
+  layers: BgLayer[];
+  index: number;
+  busy: boolean;
+  setProp: SetProp;
+  liveSetProp: LiveSetProp;
+}) {
+  const translate = useTranslate();
+  const { draft, setDraft, focused } = useExternalDraft(colorOverlayOf(layers[index]?.image ?? '') ?? '');
+
+  const listFor = (color: string): string => serializeLayers(replaceLayer(layers, index, { image: colorOverlayImage(color) })).image;
+  const write = (color: string, options: WriteOptions) => {
+    const value = listFor(color.trim() || 'rgba(0, 0, 0, 0.5)');
+    if (options.live) {
+      liveSetProp('background-image', value, false);
+    } else {
+      setProp('background-image', value, false);
+    }
+  };
+
+  return (
+    <div className="embed-editor_bg-inline">
+      <ColorSwatch
+        value={draft}
+        busy={busy}
+        ariaLabel={translate('style.backgroundLayerFields.overlayColor')}
+        onChange={(color, live) => {
+          setDraft(color);
+          write(color, { live });
+        }}
+      />
+      <VariableConnect
+        ariaLabel={translate('style.backgroundLayerFields.connectOverlayColor')}
+        disabled={busy}
+        className="is-fill"
+        prop="background-color"
+        canvasProperty="background-color"
+        onPick={(binding) => {
+          setDraft(binding);
+          setProp('background-image', listFor(binding), false);
+        }}
+      >
+        <OverlayColorInput draft={draft} busy={busy} focusedRef={focused} setDraft={setDraft} write={write} />
+      </VariableConnect>
+    </div>
+  );
+}
+
+export function OverlayColorInput({
+  draft,
+  busy,
+  focusedRef,
+  setDraft,
+  write,
+}: {
+  draft: string;
+  busy: boolean;
+  focusedRef: React.MutableRefObject<boolean>;
+  setDraft: (draft: string) => void;
+  write: (color: string, options: WriteOptions) => void;
+}) {
+  const translate = useTranslate();
+  return (
+    <VariableConnect
+      className="is-fill"
+      prop="color"
+      disabled={busy}
+      ariaLabel={translate('styleModel.shared.connectVariable', { label: translate('style.backgroundLayerFields.overlayColor') })}
+      onPick={(binding) => {
+        setDraft(binding);
+        write(binding, { live: false });
+      }}
+    >
+      <input
+        className="u-input embed-editor_size-input"
+        value={draft}
+        onChange={(event) => {
+          setDraft(event.target.value);
+          write(draft, { live: true });
+        }}
+        onFocus={() => {
+          focusedRef.current = true;
+        }}
+        onBlur={() => {
+          focusedRef.current = false;
+          write(draft, { live: false });
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            commitInPlace(event.currentTarget);
+          }
+        }}
+        disabled={busy}
+        spellCheck={false}
+        placeholder={OVERLAY_PLACEHOLDER}
+        aria-label={translate('style.backgroundLayerFields.overlayColor')}
+      />
+    </VariableConnect>
+  );
+}

@@ -1,0 +1,1129 @@
+import { assert } from '../core/assert';
+import { err, ok, type Result } from '../core/result';
+import { record } from '../core/boundary';
+import {
+  defaultAssetUses,
+  heldDefaults,
+  isAssetDefaultFile,
+  parseHeldDefaults,
+  relinkDefaultAssets,
+  type AssetDefaultUse,
+  type HeldDefaults,
+  type AssetDefault,
+  type AssetDefaults,
+  type LiteralDefault,
+  type LiteralDefaults,
+} from './componentDefaultValues';
+import type { PropField, PropUnion } from './propSchema';
+
+export const COMPONENT_CANVAS_FILE = '.stacki/component-canvas.json';
+
+export const CANVAS_LIMITS = {
+  sourceCharsMax: 256 * 1024,
+  componentsMax: 500,
+  splitPropsMax: 4,
+  entriesMax: 256,
+  valuesMax: 64,
+  valueCharsMax: 16_384,
+  contentCharsMax: 16_384,
+  propNameCharsMax: 100,
+  keyCharsMax: 1_024,
+  backgroundCharsMax: 256,
+  rootClassesMax: 32,
+  classNameCharsMax: 128,
+  sizePxMin: 1,
+  sizePxMax: 10_000,
+  framesMax: 64,
+  combinationsMax: 4_096,
+  valuesPerPropMax: 64,
+} as const satisfies Record<string, number>;
+
+export type CanvasValue = string | number | boolean;
+export type FrameLength = number | 'hug';
+
+export interface FrameEntry {
+  readonly props?: Readonly<Record<string, CanvasValue>>;
+  readonly unset?: readonly string[];
+  readonly assets?: AssetDefaults;
+  readonly literals?: LiteralDefaults;
+  readonly content?: string;
+  readonly width?: FrameLength;
+  readonly height?: FrameLength;
+  readonly background?: string;
+}
+
+export interface CanvasRoot {
+  readonly background?: string;
+  readonly classes?: readonly string[];
+}
+
+export const CANVAS_ARRANGEMENTS = ['row', 'column', 'wrap'] as const;
+export type CanvasArrangement = (typeof CANVAS_ARRANGEMENTS)[number];
+export const DEFAULT_ARRANGEMENT = 'row' as const satisfies CanvasArrangement;
+
+export interface ComponentCanvas {
+  readonly split?: readonly string[];
+  readonly frames?: Readonly<Record<string, FrameEntry>>;
+  readonly root?: CanvasRoot;
+  readonly arrange?: Exclude<CanvasArrangement, typeof DEFAULT_ARRANGEMENT>;
+}
+
+export interface ComponentCanvasFile {
+  readonly version: 1;
+  readonly background?: string;
+  readonly classes?: readonly string[];
+  readonly components: Readonly<Record<string, ComponentCanvas>>;
+  readonly later?: Readonly<Record<string, unknown>>;
+}
+
+const FILE_FIELDS: ReadonlySet<string> = new Set(['version', 'background', 'classes', 'components']);
+
+export const EMPTY_CANVAS_FILE: ComponentCanvasFile = { version: 1, components: {} };
+
+
+const PROP_NAME = /^[A-Za-z_$][\w$-]*$/;
+const COMPONENT_FILE = /^(?:src\/|node_modules\/)[^\0]*\.astro$/;
+const ENTRY_FIELDS = new Set(['props', 'unset', 'assets', 'literals', 'content', 'width', 'height', 'background']);
+const COMPONENT_FIELDS = new Set(['split', 'frames', 'root', 'arrange']);
+const ROOT_FIELDS = new Set(['background', 'classes']);
+const CLASS_NAME = /^-?[A-Za-z_][\w-]*$/;
+
+export function parseComponentCanvasSource(source: string): Result<ComponentCanvasFile> {
+  if (source.length > CANVAS_LIMITS.sourceCharsMax) {
+    return err({ code: 'invalid-canvas', message: 'Component canvas settings exceed 256 KiB.' });
+  }
+  try {
+    const input: unknown = JSON.parse(source);
+    return ok(parseComponentCanvasFile(input));
+  } catch (error: unknown) {
+    return err({ code: 'invalid-canvas', message: error instanceof Error ? error.message : 'Invalid component canvas settings' });
+  }
+}
+
+export function parseComponentCanvasFile(input: unknown): ComponentCanvasFile {
+  const value = record(input);
+  if (value['version'] !== 1) {
+    throw new Error('Component canvas: unsupported version');
+  }
+  const entries = Object.entries(record(value['components']));
+  if (entries.length > CANVAS_LIMITS.componentsMax) {
+    throw new Error(`Component canvas: more than ${CANVAS_LIMITS.componentsMax} components`);
+  }
+  const components: Record<string, ComponentCanvas> = {};
+  for (const [file, settings] of entries) {
+    components[canvasComponentFile(file)] = parseComponentSettings(settings, file);
+  }
+  assert(Object.keys(components).length === entries.length, 'Component canvas: every component is kept');
+  const background = value['background'] === undefined ? undefined : canvasBackground(value['background']);
+  assert((background?.length ?? 0) <= CANVAS_LIMITS.backgroundCharsMax, 'Component canvas: the project background is bounded');
+  const classes = value['classes'] === undefined ? undefined : canvasRootClasses(value['classes']);
+  const later = Object.entries(value).filter(([key]) => !FILE_FIELDS.has(key));
+  return canvasFileOf({ background, classes, later: later.length === 0 ? undefined : Object.fromEntries(later) }, components);
+}
+
+function canvasFileOf(
+  project: {
+    readonly background: string | undefined;
+    readonly classes: readonly string[] | undefined;
+    readonly later?: Readonly<Record<string, unknown>> | undefined;
+  },
+  components: Readonly<Record<string, ComponentCanvas>>,
+): ComponentCanvasFile {
+  assert(Object.keys(components).length <= CANVAS_LIMITS.componentsMax, 'The canvas file keeps settings for a bounded number of components');
+  return {
+    version: 1,
+    ...(project.background === undefined ? {} : { background: project.background }),
+    ...(project.classes === undefined ? {} : { classes: project.classes }),
+    components,
+    ...(project.later === undefined ? {} : { later: project.later }),
+  };
+}
+
+export function canvasRootClasses(input: unknown): readonly string[] {
+  if (!Array.isArray(input) || input.length > CANVAS_LIMITS.rootClassesMax) {
+    throw new Error(`Component canvas: the root's classes are a list of at most ${CANVAS_LIMITS.rootClassesMax} names`);
+  }
+  const names = input.map((name: unknown): string => {
+    if (typeof name !== 'string' || name.length > CANVAS_LIMITS.classNameCharsMax || !CLASS_NAME.test(name)) {
+      throw new Error(`Component canvas: ${String(name)} is not a class name of at most ${CANVAS_LIMITS.classNameCharsMax} characters`);
+    }
+    if (name.startsWith('stacki-')) {
+      throw new Error(`Component canvas: ${name} is a class the canvas keeps for itself`);
+    }
+    return name;
+  });
+  if (new Set(names).size !== names.length) {
+    throw new Error('Component canvas: the root names a class twice');
+  }
+  return names;
+}
+
+function parseCanvasRoot(input: unknown, file: string): CanvasRoot {
+  const value = record(input);
+  for (const key of Object.keys(value)) {
+    if (!ROOT_FIELDS.has(key)) {
+      throw new Error(`Component canvas: ${file}'s root has an unknown key ${key}`);
+    }
+  }
+  const background = value['background'] === undefined ? undefined : canvasBackground(value['background']);
+  const classes = value['classes'] === undefined ? undefined : canvasRootClasses(value['classes']);
+  return { ...(background === undefined ? {} : { background }), ...(classes === undefined ? {} : { classes }) };
+}
+
+export function canvasComponentFile(input: unknown): string {
+  if (typeof input !== 'string' || input.length === 0 || input.length > 500) {
+    throw new Error('Component canvas: a component is a path of 1 to 500 characters');
+  }
+  if (!COMPONENT_FILE.test(input) || input.includes('\\') || input.split('/').includes('..')) {
+    throw new Error(`Component canvas: ${input} is not a project .astro component`);
+  }
+  return input;
+}
+
+function parseComponentSettings(input: unknown, file: string): ComponentCanvas {
+  const value = record(input);
+  for (const key of Object.keys(value)) {
+    if (!COMPONENT_FIELDS.has(key)) {
+      throw new Error(`Component canvas: ${file} has an unknown key ${key}`);
+    }
+  }
+  const split = value['split'] === undefined ? undefined : parseSplit(value['split'], file);
+  const framesInput = value['frames'] === undefined ? undefined : record(value['frames']);
+  const frameEntries = Object.entries(framesInput ?? {});
+  if (frameEntries.length > CANVAS_LIMITS.entriesMax) {
+    throw new Error(`Component canvas: ${file} stores more than ${CANVAS_LIMITS.entriesMax} frame settings`);
+  }
+  const frames: Record<string, FrameEntry> = {};
+  for (const [key, entry] of frameEntries) {
+    frames[parseFrameKey(key)] = parseFrameEntry(entry, file);
+  }
+  const root = value['root'] === undefined ? undefined : parseCanvasRoot(value['root'], file);
+  const arrange = value['arrange'] === undefined ? undefined : parseArrangement(value['arrange'], file);
+  return {
+    ...(split === undefined ? {} : { split }),
+    ...(framesInput === undefined ? {} : { frames }),
+    ...(root === undefined ? {} : { root }),
+    ...(arrange === undefined ? {} : { arrange }),
+  };
+}
+
+function parseArrangement(input: unknown, file: string): ComponentCanvas['arrange'] {
+  if (input === 'column' || input === 'wrap') {
+    return input;
+  }
+  if (input === DEFAULT_ARRANGEMENT) {
+    return undefined;
+  }
+  throw new Error(`Component canvas: ${file} arranges its frames as row, column or wrap`);
+}
+
+function parseSplit(input: unknown, file: string): readonly string[] {
+  if (!Array.isArray(input) || input.length > CANVAS_LIMITS.splitPropsMax) {
+    throw new Error(`Component canvas: ${file} splits by a list of at most ${CANVAS_LIMITS.splitPropsMax} props`);
+  }
+  const names = input.map((name: unknown) => propName(name));
+  if (new Set(names).size !== names.length) {
+    throw new Error(`Component canvas: ${file} names a split prop twice`);
+  }
+  return names;
+}
+
+function propName(input: unknown): string {
+  if (typeof input !== 'string' || input.length > CANVAS_LIMITS.propNameCharsMax || !PROP_NAME.test(input)) {
+    throw new Error('Component canvas: a prop name is a JavaScript identifier of at most 100 characters');
+  }
+  return input;
+}
+
+function parseFrameEntry(input: unknown, file: string): FrameEntry {
+  const value = record(input);
+  for (const key of Object.keys(value)) {
+    if (!ENTRY_FIELDS.has(key)) {
+      throw new Error(`Component canvas: a frame of ${file} has an unknown key ${key}`);
+    }
+  }
+  const entry: { -readonly [K in keyof FrameEntry]: FrameEntry[K] } = {};
+  if (value['props'] !== undefined) {
+    const props = Object.entries(record(value['props']));
+    if (props.length > CANVAS_LIMITS.valuesMax) {
+      throw new Error(`Component canvas: a frame holds at most ${CANVAS_LIMITS.valuesMax} values`);
+    }
+    entry.props = Object.fromEntries(props.map(([name, held]) => [propName(name), canvasValue(held)]));
+  }
+  if (value['unset'] !== undefined) {
+    const unset = value['unset'];
+    if (!Array.isArray(unset) || unset.length > CANVAS_LIMITS.valuesMax) {
+      throw new Error(`Component canvas: unset is a list of at most ${CANVAS_LIMITS.valuesMax} props`);
+    }
+    entry.unset = unset.map((name: unknown) => propName(name));
+    if (entry.unset.some((name) => entry.props?.[name] !== undefined)) {
+      throw new Error('Component canvas: a prop is either given a value or unset, not both');
+    }
+  }
+  const held = parseHeldDefaults(value, entry.props ?? {});
+  const heldNames = [...Object.keys(held.assets ?? {}), ...Object.keys(held.literals ?? {})];
+  heldNames.forEach((name) => propName(name));
+  if (heldNames.some((name) => entry.unset?.includes(name) === true)) {
+    throw new Error('Component canvas: a prop is either given a value or unset, not both');
+  }
+  if (heldNames.length + Object.keys(entry.props ?? {}).length > CANVAS_LIMITS.valuesMax) {
+    throw new Error(`Component canvas: a frame holds at most ${CANVAS_LIMITS.valuesMax} values`);
+  }
+  if (held.assets !== undefined) {
+    entry.assets = held.assets;
+  }
+  if (held.literals !== undefined) {
+    entry.literals = held.literals;
+  }
+  if (value['content'] !== undefined) {
+    entry.content = canvasContent(value['content']);
+  }
+  if (value['width'] !== undefined) {
+    entry.width = frameLength(value['width']);
+  }
+  if (value['height'] !== undefined) {
+    entry.height = frameLength(value['height']);
+  }
+  if (value['background'] !== undefined) {
+    entry.background = canvasBackground(value['background']);
+  }
+  return entry;
+}
+
+export function canvasValue(input: unknown): CanvasValue {
+  if (typeof input === 'boolean') {
+    return input;
+  }
+  if (typeof input === 'number') {
+    if (!Number.isFinite(input)) {
+      throw new Error('Component canvas: a number value is finite');
+    }
+    return input;
+  }
+  if (typeof input === 'string') {
+    if (input.length > CANVAS_LIMITS.valueCharsMax) {
+      throw new Error(`Component canvas: a text value is at most ${CANVAS_LIMITS.valueCharsMax} characters`);
+    }
+    return input;
+  }
+  throw new Error('Component canvas: a value is text, a number or true or false');
+}
+
+const CONTENT_REFUSED = /<\s*\/?\s*(?:script|style|iframe|object|embed|slot|template|link|meta|base)\b|<[^>]*[\s/"']on[a-z]+\s*=|javascript:/i;
+
+export function canvasContent(input: unknown): string {
+  if (typeof input !== 'string' || input.length > CANVAS_LIMITS.contentCharsMax) {
+    throw new Error(`Component canvas: content is text of at most ${CANVAS_LIMITS.contentCharsMax} characters`);
+  }
+  if (CONTENT_REFUSED.test(input)) {
+    throw new Error('Component canvas: content is words and plain markup, with no script, style or event handler');
+  }
+  return input;
+}
+
+export function frameLength(input: unknown): FrameLength {
+  if (input === 'hug') {
+    return input;
+  }
+  if (typeof input !== 'number' || !Number.isInteger(input)) {
+    throw new Error('Component canvas: a frame side is "hug" or a whole number of pixels');
+  }
+  if (input < CANVAS_LIMITS.sizePxMin || input > CANVAS_LIMITS.sizePxMax) {
+    throw new Error(`Component canvas: a frame side is ${CANVAS_LIMITS.sizePxMin} to ${CANVAS_LIMITS.sizePxMax} pixels`);
+  }
+  return input;
+}
+
+export function canvasBackground(input: unknown): string {
+  if (typeof input !== 'string' || input.trim().length === 0 || input.length > CANVAS_LIMITS.backgroundCharsMax) {
+    throw new Error(`Component canvas: a background is a CSS colour of at most ${CANVAS_LIMITS.backgroundCharsMax} characters`);
+  }
+  if (/[;{}<>"'\\]|\/\*/.test(input)) {
+    throw new Error('Component canvas: a background is one CSS colour value');
+  }
+  return input.trim();
+}
+
+export function parseFrameKey(input: unknown): string {
+  if (typeof input !== 'string' || input.length > CANVAS_LIMITS.keyCharsMax) {
+    throw new Error('Component canvas: a frame key is text of at most 1024 characters');
+  }
+  if (input === '') {
+    return input;
+  }
+  const pairs = input.split('&');
+  if (pairs.length > CANVAS_LIMITS.splitPropsMax) {
+    throw new Error(`Component canvas: a frame key names at most ${CANVAS_LIMITS.splitPropsMax} props`);
+  }
+  const names = pairs.map((pair) => {
+    const at = pair.indexOf('=');
+    const name = at < 0 ? pair : pair.slice(0, at);
+    propName(name);
+    if (at >= 0) {
+      decodeKeyValue(pair.slice(at + 1));
+    }
+    return name;
+  });
+  for (let index = 1; index < names.length; index++) {
+    const previous = names[index - 1] ?? '';
+    const name = names[index] ?? '';
+    if (previous < name) {
+      continue;
+    }
+    throw new Error('Component canvas: a frame key names its props once each, sorted by name');
+  }
+  return input;
+}
+
+function decodeKeyValue(text: string): string {
+  try {
+    return decodeURIComponent(text);
+  } catch {
+    throw new Error('Component canvas: a frame key value is URI-encoded');
+  }
+}
+
+export function serializeComponentCanvas(file: ComponentCanvasFile): string {
+  const components = Object.fromEntries(
+    Object.keys(file.components)
+      .sort()
+      .map((name) => [name, sortedSettings(file.components[name] ?? {})]),
+  );
+  const { later, ...known } = canvasFileOf({ background: file.background, classes: file.classes, later: file.later }, components);
+  const text = JSON.stringify({ ...known, ...later }, undefined, 2) + '\n';
+  assert(parseComponentCanvasSource(text).ok, 'A serialised canvas file parses');
+  return text;
+}
+
+function sortedSettings(settings: ComponentCanvas): ComponentCanvas {
+  const frames = settings.frames;
+  return {
+    ...(settings.split === undefined ? {} : { split: settings.split }),
+    ...(frames === undefined
+      ? {}
+      : {
+          frames: Object.fromEntries(
+            Object.keys(frames)
+              .sort()
+              .map((key) => [key, sortedEntry(frames[key] ?? {})]),
+          ),
+        }),
+    ...(settings.root === undefined ? {} : { root: settings.root }),
+    ...(settings.arrange === undefined ? {} : { arrange: settings.arrange }),
+  };
+}
+
+function sortedEntry(entry: FrameEntry): FrameEntry {
+  const props = entry.props;
+  return {
+    ...(props === undefined
+      ? {}
+      : {
+          props: Object.fromEntries(
+            Object.keys(props)
+              .sort()
+              .map((name) => [name, props[name] ?? '']),
+          ),
+        }),
+    ...(entry.unset === undefined ? {} : { unset: [...entry.unset].sort() }),
+    ...(entry.assets === undefined ? {} : { assets: byName(entry.assets) }),
+    ...(entry.literals === undefined ? {} : { literals: byName(entry.literals) }),
+    ...(entry.content === undefined ? {} : { content: entry.content }),
+    ...(entry.width === undefined ? {} : { width: entry.width }),
+    ...(entry.height === undefined ? {} : { height: entry.height }),
+    ...(entry.background === undefined ? {} : { background: entry.background }),
+  };
+}
+
+function byName<T>(held: Readonly<Record<string, T>>): Readonly<Record<string, T>> {
+  return Object.fromEntries(Object.entries(held).sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0)));
+}
+
+
+export type SplitValue = { readonly kind: 'value'; readonly value: string | boolean } | { readonly kind: 'unset' };
+
+export interface SplitCandidate {
+  readonly name: string;
+  readonly values: readonly SplitValue[];
+}
+
+export interface FramePart {
+  readonly prop: string;
+  readonly value: SplitValue;
+}
+
+export interface CanvasFrame {
+  readonly key: string;
+  readonly parts: readonly FramePart[];
+  readonly row: number;
+  readonly column: number;
+}
+
+export interface CanvasFrames {
+  readonly frames: readonly CanvasFrame[];
+  readonly total: number;
+}
+
+export function splitCandidates(schema: readonly PropField[]): readonly SplitCandidate[] {
+  const candidates: SplitCandidate[] = [];
+  for (const field of schema) {
+    if (!PROP_NAME.test(field.name) || field.name.length > CANVAS_LIMITS.propNameCharsMax) {
+      continue;
+    }
+    const unset: readonly SplitValue[] = field.optional && field.default === undefined ? [{ kind: 'unset' }] : [];
+    if (field.type === 'boolean') {
+      candidates.push({
+        name: field.name,
+        values: [
+          { kind: 'value', value: true },
+          { kind: 'value', value: false },
+        ],
+      });
+      continue;
+    }
+    const options = field.options ?? [];
+    if (options.length > 0 && options.length < CANVAS_LIMITS.valuesPerPropMax) {
+      candidates.push({ name: field.name, values: [...options.map((option): SplitValue => ({ kind: 'value', value: option })), ...unset] });
+    }
+  }
+  assert(candidates.length <= schema.length, 'Each field is at most one candidate');
+  return candidates;
+}
+
+const VARIANT_NAMES = ['variant', 'kind', 'appearance', 'style', 'type'] as const;
+
+export function defaultSplit(schema: readonly PropField[]): readonly string[] {
+  const candidates = splitCandidates(schema).filter((candidate) => candidate.values.some((value) => value.kind === 'value' && typeof value.value === 'string'));
+  const named = (name: string) => candidates.find((candidate) => candidate.name === name);
+  const variant = named('variant');
+  if (variant !== undefined) {
+    return [variant.name];
+  }
+  const unions = schema.find((field) => field.unions !== undefined)?.unions ?? [];
+  const controllers = new Set(unions.flatMap((union) => union.branches.flatMap((branch) => Object.keys(branch.pins))));
+  const controller = candidates.find((candidate) => controllers.has(candidate.name));
+  if (controller !== undefined) {
+    return [controller.name];
+  }
+  const word = VARIANT_NAMES.map(named).find((candidate) => candidate !== undefined);
+  return word === undefined ? [] : [word.name];
+}
+
+export function effectiveSplit(settings: ComponentCanvas | undefined, schema: readonly PropField[]): readonly string[] {
+  if (settings?.split === undefined) {
+    return defaultSplit(schema);
+  }
+  const names = new Set(splitCandidates(schema).map((candidate) => candidate.name));
+  return settings.split.filter((name) => names.has(name));
+}
+
+export function splitValueText(value: SplitValue): string | undefined {
+  return value.kind === 'unset' ? undefined : String(value.value);
+}
+
+export function frameKey(parts: readonly FramePart[]): string {
+  const pairs = [...parts]
+    .sort((left, right) => (left.prop < right.prop ? -1 : left.prop > right.prop ? 1 : 0))
+    .map((part) => (part.value.kind === 'unset' ? part.prop : `${part.prop}=${encodeURIComponent(String(part.value.value))}`));
+  const key = pairs.join('&');
+  assert(new Set(parts.map((part) => part.prop)).size === parts.length, 'A frame names each split prop once');
+  return key;
+}
+
+export function keyPairs(key: string): readonly string[] {
+  return key === '' ? [] : key.split('&');
+}
+
+export function canvasFrames(split: readonly SplitCandidate[], applies: (prop: string, chosen: readonly FramePart[]) => boolean): CanvasFrames {
+  assert(split.length <= CANVAS_LIMITS.splitPropsMax, 'A split has a bounded number of props');
+  const frames: CanvasFrame[] = [];
+  const seen = new Set<string>();
+  let total = 0;
+  let combinations = 1;
+  for (const candidate of split) {
+    assert(candidate.values.length > 0, 'A split prop has a value');
+    combinations = Math.min(combinations * candidate.values.length, CANVAS_LIMITS.combinationsMax);
+  }
+  let indexes: readonly number[] = split.map(() => 0);
+  const rows = new Map<string, number>();
+  const columns = new Map<number, number>();
+  for (let step = 0; step < combinations; step++) {
+    const parts: FramePart[] = [];
+    split.forEach((candidate, at) => {
+      const value = candidate.values[indexes[at] ?? 0];
+      assert(value !== undefined, 'A combination picks one of the prop values');
+      if (at === 0 || applies(candidate.name, parts)) {
+        parts.push({ prop: candidate.name, value });
+      }
+    });
+    indexes = advance(indexes, split);
+    const key = frameKey(parts);
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    total += 1;
+    if (frames.length < CANVAS_LIMITS.framesMax) {
+      const rowKey = split.length < 2 || parts[0] === undefined ? '' : frameKey([parts[0]]);
+      const row = rows.get(rowKey) ?? rows.size;
+      rows.set(rowKey, row);
+      const column = columns.get(row) ?? 0;
+      columns.set(row, column + 1);
+      frames.push({ key, parts, row, column });
+    }
+  }
+  assert(frames.length >= 1, 'A canvas has at least one frame');
+  assert(frames.length <= CANVAS_LIMITS.framesMax, 'A canvas draws a bounded number of frames');
+  return { frames, total };
+}
+
+function advance(indexes: readonly number[], split: readonly SplitCandidate[]): readonly number[] {
+  const next = [...indexes];
+  for (let at = split.length - 1; at >= 0; at--) {
+    const value = (next[at] ?? 0) + 1;
+    if (value < (split[at]?.values.length ?? 0)) {
+      next[at] = value;
+      return next;
+    }
+    next[at] = 0;
+  }
+  return next;
+}
+
+export function unionAllows(unions: readonly PropUnion[], prop: string, held: (name: string) => string | undefined): boolean {
+  for (const union of unions) {
+    if (!union.names.includes(prop)) {
+      continue;
+    }
+    const fitting = union.branches.filter((branch) =>
+      Object.entries(branch.pins).every(([name, wanted]) => {
+        const value = held(name);
+        return value === undefined || wanted.includes(value);
+      }),
+    );
+    const branches = fitting.length > 0 ? fitting : union.branches;
+    if (branches.length > 0 && branches.every((branch) => branch.forbids.includes(prop))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+export type FrameField = 'width' | 'height' | 'background';
+
+export interface ResolvedFrame {
+  readonly props: Readonly<Record<string, CanvasValue>>;
+  readonly unset: ReadonlySet<string>;
+  readonly assets: AssetDefaults;
+  readonly literals: LiteralDefaults;
+  readonly content: string | undefined;
+  readonly width: FrameLength;
+  readonly height: FrameLength;
+  readonly background: string | undefined;
+  readonly origins: ReadonlyMap<string, string>;
+}
+
+export function matchingEntries(settings: ComponentCanvas | undefined, key: string): readonly (readonly [string, FrameEntry])[] {
+  const pairs = new Set(keyPairs(key));
+  const matches = Object.entries(settings?.frames ?? {}).filter(([stored]) => keyPairs(stored).every((pair) => pairs.has(pair)));
+  matches.sort(([left], [right]) => keyPairs(left).length - keyPairs(right).length || (left < right ? -1 : left > right ? 1 : 0));
+  assert(matches.length <= CANVAS_LIMITS.entriesMax, 'A frame merges a bounded number of entries');
+  return matches;
+}
+
+export function resolveFrame(settings: ComponentCanvas | undefined, key: string): ResolvedFrame {
+  const values: HeldMaps = { props: new Map(), assets: new Map(), literals: new Map(), unset: new Set() };
+  const origins = new Map<string, string>();
+  let width: FrameLength = 'hug';
+  let height: FrameLength = 'hug';
+  let background: string | undefined;
+  let content: string | undefined;
+  for (const [stored, entry] of matchingEntries(settings, key)) {
+    for (const name of layEntry(values, entry)) {
+      origins.set('prop:' + name, stored);
+    }
+    if (entry.content !== undefined) {
+      content = entry.content;
+      origins.set('content', stored);
+    }
+    if (entry.width !== undefined) {
+      width = entry.width;
+      origins.set('width', stored);
+    }
+    if (entry.height !== undefined) {
+      height = entry.height;
+      origins.set('height', stored);
+    }
+    if (entry.background !== undefined) {
+      background = entry.background;
+      origins.set('background', stored);
+    }
+  }
+  return {
+    props: Object.fromEntries(values.props),
+    assets: Object.fromEntries(values.assets),
+    literals: Object.fromEntries(values.literals),
+    unset: values.unset,
+    content,
+    width,
+    height,
+    background,
+    origins,
+  };
+}
+
+interface HeldMaps {
+  readonly props: Map<string, CanvasValue>;
+  readonly assets: Map<string, AssetDefault>;
+  readonly literals: Map<string, LiteralDefault>;
+  readonly unset: Set<string>;
+}
+
+function layEntry(values: HeldMaps, entry: FrameEntry): readonly string[] {
+  const drop = (name: string): void => {
+    values.props.delete(name);
+    values.assets.delete(name);
+    values.literals.delete(name);
+    values.unset.delete(name);
+  };
+  const lay = <T>(held: Readonly<Record<string, T>> | undefined, into: Map<string, T>): readonly string[] =>
+    Object.entries(held ?? {}).map(([name, value]) => {
+      drop(name);
+      into.set(name, value);
+      return name;
+    });
+  const props = entry.props === undefined ? undefined : Object.fromEntries(Object.entries(entry.props).filter(([, value]) => value !== ''));
+  const names = [...lay(props, values.props), ...lay(entry.assets, values.assets), ...lay(entry.literals, values.literals)];
+  for (const name of entry.unset ?? []) {
+    drop(name);
+    values.unset.add(name);
+  }
+  return [...names, ...(entry.unset ?? [])];
+}
+
+export function entryHolds(entry: FrameEntry | undefined, name: string): boolean {
+  if (entry === undefined) {
+    return false;
+  }
+  const valued = Object.hasOwn(entry.props ?? {}, name) || Object.hasOwn(entry.assets ?? {}, name) || Object.hasOwn(entry.literals ?? {}, name);
+  return valued || entry.unset?.includes(name) === true;
+}
+
+export type FrameSetting = `prop:${string}` | 'content' | 'width' | 'height' | 'background';
+
+export type SettingLevel =
+  | { readonly kind: 'own' }
+  | { readonly kind: 'none' }
+  | { readonly kind: 'inherited'; readonly from: string }
+  | { readonly kind: 'overridden'; readonly by: string };
+
+export function settingLevel(settings: ComponentCanvas | undefined, frame: string, scope: string, setting: FrameSetting): SettingLevel {
+  const winner = resolveFrame(settings, frame).origins.get(setting);
+  const atScope = resolveFrame(settings, scope).origins.get(setting);
+  if (winner !== undefined && winner !== atScope) {
+    return { kind: 'overridden', by: winner };
+  }
+  if (atScope === undefined) {
+    return { kind: 'none' };
+  }
+  return atScope === scope ? { kind: 'own' } : { kind: 'inherited', from: atScope };
+}
+
+
+export type FrameEdit =
+  | { readonly kind: 'prop'; readonly name: string; readonly value: CanvasValue }
+  | { readonly kind: 'asset'; readonly name: string; readonly asset: AssetDefault }
+  | { readonly kind: 'literal'; readonly name: string; readonly literal: LiteralDefault }
+  | { readonly kind: 'content'; readonly value: string | undefined }
+  | { readonly kind: 'unset'; readonly name: string }
+  | { readonly kind: 'inherit'; readonly name: string }
+  | { readonly kind: 'field'; readonly field: 'width' | 'height'; readonly value: FrameLength | undefined }
+  | { readonly kind: 'background'; readonly value: string | undefined };
+
+export function withFrameEdit(file: ComponentCanvasFile, component: string, scope: string, edit: FrameEdit): ComponentCanvasFile {
+  canvasComponentFile(component);
+  parseFrameKey(scope);
+  const settings = file.components[component] ?? {};
+  const entry = settings.frames?.[scope] ?? {};
+  const next = editedEntry(entry, edit);
+  const frames: Record<string, FrameEntry> = { ...settings.frames };
+  if (isEmptyEntry(next)) {
+    delete frames[scope];
+  } else {
+    frames[scope] = next;
+  }
+  if (Object.keys(frames).length > CANVAS_LIMITS.entriesMax) {
+    throw new Error(`A component keeps at most ${CANVAS_LIMITS.entriesMax} frame settings`);
+  }
+  const result = withComponentSettings(file, component, { ...settings, frames });
+  assert(parseComponentCanvasSource(serializeComponentCanvas(result)).ok, 'An edited canvas file parses');
+  return result;
+}
+
+function editedEntry(entry: FrameEntry, edit: FrameEdit): FrameEntry {
+  switch (edit.kind) {
+    case 'prop':
+    case 'asset':
+    case 'literal':
+    case 'unset':
+    case 'inherit':
+      return editedValues(entry, edit);
+    case 'content':
+      return withoutAbsent({ ...entry, content: edit.value === undefined ? undefined : canvasContent(edit.value) });
+    case 'field':
+      return withoutAbsent({ ...entry, [edit.field]: edit.value === undefined ? undefined : frameLength(edit.value) });
+    case 'background':
+      return withoutAbsent({ ...entry, background: edit.value === undefined ? undefined : canvasBackground(edit.value) });
+    default: {
+      const exhaustive: never = edit;
+      return exhaustive;
+    }
+  }
+}
+
+function editedValues(entry: FrameEntry, edit: Extract<FrameEdit, { readonly kind: 'prop' | 'asset' | 'literal' | 'unset' | 'inherit' }>): FrameEntry {
+  propName(edit.name);
+  const without = <T>(held: Readonly<Record<string, T>> | undefined): Record<string, T> =>
+    Object.fromEntries(Object.entries(held ?? {}).filter(([name]) => name !== edit.name));
+  const props = without(entry.props);
+  const assets = without(entry.assets);
+  const literals = without(entry.literals);
+  const unset = (entry.unset ?? []).filter((name) => name !== edit.name);
+  if (edit.kind === 'prop') {
+    props[edit.name] = canvasValue(edit.value);
+  } else if (edit.kind === 'asset') {
+    assert(isAssetDefaultFile(edit.asset.file), 'An asset value is a media file under src/');
+    assets[edit.name] = edit.asset;
+  } else if (edit.kind === 'literal') {
+    literals[edit.name] = edit.literal;
+  } else if (edit.kind === 'unset') {
+    unset.push(edit.name);
+  }
+  const valued = Object.keys(props).length + Object.keys(assets).length + Object.keys(literals).length;
+  if (valued > CANVAS_LIMITS.valuesMax || unset.length > CANVAS_LIMITS.valuesMax) {
+    throw new Error(`A frame holds at most ${CANVAS_LIMITS.valuesMax} values`);
+  }
+  const some = <T>(held: Record<string, T>): Record<string, T> | undefined => (Object.keys(held).length === 0 ? undefined : held);
+  return withoutAbsent({ ...entry, props: some(props), assets: some(assets), literals: some(literals), unset: unset.length === 0 ? undefined : unset });
+}
+
+type EntryDraft = { [K in keyof FrameEntry]?: FrameEntry[K] | undefined };
+
+function withoutAbsent(draft: EntryDraft): FrameEntry {
+  const entry: FrameEntry = Object.fromEntries(Object.entries(draft).filter(([, value]) => value !== undefined));
+  assert(
+    Object.keys(entry).every((key) => ENTRY_FIELDS.has(key)),
+    'An edited entry keeps known keys',
+  );
+  return entry;
+}
+
+function isEmptyEntry(entry: FrameEntry): boolean {
+  return Object.keys(entry).length === 0;
+}
+
+export function scopeHolds(scope: string, key: string): boolean {
+  const pairs = new Set(keyPairs(key));
+  return keyPairs(scope).every((pair) => pairs.has(pair));
+}
+
+export function overridesIn(
+  settings: ComponentCanvas | undefined,
+  frames: readonly string[],
+  scope: string,
+  setting: FrameSetting,
+): readonly { readonly frame: string; readonly from: string }[] {
+  assert(frames.length <= CANVAS_LIMITS.framesMax, 'A canvas has a bounded number of frames');
+  const found = frames.flatMap((frame) => {
+    if (!scopeHolds(scope, frame)) {
+      return [];
+    }
+    const from = resolveFrame(settings, frame).origins.get(setting);
+    return from !== undefined && from !== scope && scopeHolds(scope, from) ? [{ frame, from }] : [];
+  });
+  assert(
+    found.every((entry) => entry.from !== scope),
+    'An override is never the scope itself',
+  );
+  return found;
+}
+
+export function withoutOverrides(file: ComponentCanvasFile, component: string, scope: string, setting: FrameSetting): ComponentCanvasFile {
+  parseFrameKey(scope);
+  const settings = file.components[component];
+  const entries = Object.keys(settings?.frames ?? {}).filter(
+    (key) => key !== scope && scopeHolds(scope, key) && resolveFrame(settings, key).origins.get(setting) === key,
+  );
+  assert(entries.length <= CANVAS_LIMITS.entriesMax, 'A component keeps a bounded number of entries');
+  assert(!entries.includes(scope), "The scope's own entry is never cleared");
+  const edit = clearingEdit(setting);
+  return entries.reduce((next, key) => withFrameEdit(next, component, key, edit), file);
+}
+
+function clearingEdit(setting: FrameSetting): FrameEdit {
+  if (setting === 'width' || setting === 'height') {
+    return { kind: 'field', field: setting, value: undefined };
+  }
+  if (setting === 'background') {
+    return { kind: 'background', value: undefined };
+  }
+  if (setting === 'content') {
+    return { kind: 'content', value: undefined };
+  }
+  const name = setting.slice('prop:'.length);
+  assert(name.length > 0, 'A prop setting names its prop');
+  return { kind: 'inherit', name };
+}
+
+export function settingMixed(settings: ComponentCanvas | undefined, frames: readonly string[], scope: string, setting: FrameSetting): boolean {
+  assert(frames.length <= CANVAS_LIMITS.framesMax, 'A canvas has a bounded number of frames');
+  const shown = new Set(frames.filter((frame) => scopeHolds(scope, frame)).map((frame) => settingText(resolveFrame(settings, frame), setting)));
+  assert(shown.size <= frames.length, 'A frame shows one value for a setting');
+  return shown.size > 1;
+}
+
+function settingText(frame: ResolvedFrame, setting: FrameSetting): string {
+  if (setting === 'width' || setting === 'height' || setting === 'background' || setting === 'content') {
+    return JSON.stringify({ value: frame[setting] });
+  }
+  const name = setting.slice('prop:'.length);
+  assert(name.length > 0, 'A prop setting names its prop');
+  return JSON.stringify({ prop: frame.props[name], asset: frame.assets[name], literal: frame.literals[name], unset: frame.unset.has(name) });
+}
+
+export function withSplit(file: ComponentCanvasFile, component: string, split: readonly string[] | undefined): ComponentCanvasFile {
+  canvasComponentFile(component);
+  if (split !== undefined) {
+    parseSplit(split, component);
+  }
+  return withComponentSettings(file, component, { ...file.components[component], split });
+}
+
+export function withArrangement(file: ComponentCanvasFile, component: string, arrange: CanvasArrangement): ComponentCanvasFile {
+  canvasComponentFile(component);
+  assert(CANVAS_ARRANGEMENTS.includes(arrange), 'An arrangement is one of the canvas’s choices');
+  const next = withComponentSettings(file, component, { ...file.components[component], arrange: arrange === DEFAULT_ARRANGEMENT ? undefined : arrange });
+  assert(arrangementOf(next.components[component]) === arrange, 'The arrangement written is the one read back');
+  return next;
+}
+
+export function arrangementOf(settings: ComponentCanvas | undefined): CanvasArrangement {
+  return settings?.arrange ?? DEFAULT_ARRANGEMENT;
+}
+
+function withComponentSettings(
+  file: ComponentCanvasFile,
+  component: string,
+  settings: { readonly [K in keyof ComponentCanvas]: ComponentCanvas[K] | undefined },
+): ComponentCanvasFile {
+  const components: Record<string, ComponentCanvas> = { ...file.components };
+  const kept: ComponentCanvas = Object.fromEntries(Object.entries(settings).filter(([key, value]) => keepsSetting(key, value)));
+  if (Object.keys(kept).length === 0) {
+    delete components[component];
+  } else {
+    components[component] = kept;
+  }
+  if (Object.keys(components).length > CANVAS_LIMITS.componentsMax) {
+    throw new Error(`The canvas keeps settings for at most ${CANVAS_LIMITS.componentsMax} components`);
+  }
+  return { ...file, components };
+}
+
+function keepsSetting(key: string, value: unknown): boolean {
+  if (value === undefined) {
+    return false;
+  }
+  if (key === 'split' || key === 'arrange') {
+    return true;
+  }
+  return Object.values(value as object).some((held) => held !== undefined);
+}
+
+export function withProjectBackground(file: ComponentCanvasFile, background: string | undefined): ComponentCanvasFile {
+  return withRootEdit(file, PROJECT_ROOT, { kind: 'background', value: background });
+}
+
+export const PROJECT_ROOT = { kind: 'project' } as const;
+export type RootTarget = typeof PROJECT_ROOT | { readonly kind: 'component'; readonly file: string };
+
+export type RootEdit =
+  { readonly kind: 'background'; readonly value: string | undefined } | { readonly kind: 'classes'; readonly value: readonly string[] | undefined };
+
+export function withRootEdit(file: ComponentCanvasFile, target: RootTarget, edit: RootEdit): ComponentCanvasFile {
+  const background = edit.kind === 'background' && edit.value !== undefined ? canvasBackground(edit.value) : undefined;
+  const classes = edit.kind === 'classes' && edit.value !== undefined ? canvasRootClasses(edit.value) : undefined;
+  const edited = (root: CanvasRoot): CanvasRoot => {
+    const next = edit.kind === 'background' ? { ...root, background } : { ...root, classes };
+    return {
+      ...(next.background === undefined ? {} : { background: next.background }),
+      ...(next.classes === undefined ? {} : { classes: next.classes }),
+    };
+  };
+  if (target.kind === 'project') {
+    const root = edited({
+      ...(file.background === undefined ? {} : { background: file.background }),
+      ...(file.classes === undefined ? {} : { classes: file.classes }),
+    });
+    const next = canvasFileOf({ background: root.background, classes: root.classes, later: file.later }, file.components);
+    assert(edit.kind !== 'background' || next.background === background, 'The project background is what was set');
+    return next;
+  }
+  canvasComponentFile(target.file);
+  const settings = file.components[target.file] ?? {};
+  const next = withComponentSettings(file, target.file, { ...settings, root: edited(settings.root ?? {}) });
+  assert(edit.kind !== 'background' || next.components[target.file]?.root?.background === background, 'The component’s own background is what was set');
+  return next;
+}
+
+export type RootSource = 'component' | 'project' | 'none';
+
+export function canvasRoot(
+  file: ComponentCanvasFile,
+  component: string,
+): {
+  readonly background: string | undefined;
+  readonly backgroundSource: RootSource;
+  readonly classes: readonly string[];
+  readonly classesSource: RootSource;
+} {
+  const own = file.components[component]?.root;
+  const background = own?.background ?? file.background;
+  const classes = own?.classes ?? file.classes ?? [];
+  assert(classes.length <= CANVAS_LIMITS.rootClassesMax, 'The canvas root carries a bounded number of classes');
+  return {
+    background,
+    backgroundSource: own?.background !== undefined ? 'component' : file.background !== undefined ? 'project' : 'none',
+    classes,
+    classesSource: own?.classes !== undefined ? 'component' : file.classes !== undefined ? 'project' : 'none',
+  };
+}
+
+export type BackgroundSource =
+  { readonly kind: 'entry'; readonly key: string } | { readonly kind: 'root' } | { readonly kind: 'project' } | { readonly kind: 'none' };
+
+export function frameBackground(
+  file: ComponentCanvasFile,
+  resolved: ResolvedFrame,
+  component: string,
+): { readonly value: string | undefined; readonly source: BackgroundSource } {
+  const key = resolved.origins.get('background');
+  assert(resolved.background === undefined || key !== undefined, 'A frame’s own background says which entry set it');
+  if (resolved.background !== undefined && key !== undefined) {
+    return { value: resolved.background, source: { kind: 'entry', key } };
+  }
+  const root = canvasRoot(file, component);
+  if (root.background !== undefined) {
+    return { value: root.background, source: { kind: root.backgroundSource === 'component' ? 'root' : 'project' } };
+  }
+  return { value: undefined, source: { kind: 'none' } };
+}
+
+const VARIABLE_REFERENCE = /var\(\s*(--[^\s,()]+)/g;
+
+export function renameCanvasVariables(file: ComponentCanvasFile, rename: (name: string) => string): ComponentCanvasFile {
+  let changed = false;
+  const next = (value: string): string => {
+    const renamed = value.replace(VARIABLE_REFERENCE, (match: string, name: string) => match.slice(0, match.length - name.length) + rename(name));
+    changed ||= renamed !== value;
+    return renamed;
+  };
+  const components = Object.fromEntries(
+    Object.entries(file.components).map(([component, settings]): [string, ComponentCanvas] => {
+      const frames = settings.frames;
+      const root = settings.root?.background === undefined ? settings.root : { ...settings.root, background: next(settings.root.background) };
+      const renamed =
+        frames === undefined
+          ? undefined
+          : Object.fromEntries(
+              Object.entries(frames).map(([key, entry]): [string, FrameEntry] => [
+                key,
+                entry.background === undefined ? entry : { ...entry, background: next(entry.background) },
+              ]),
+            );
+      return [component, { ...settings, ...(renamed === undefined ? {} : { frames: renamed }), ...(root === undefined ? {} : { root }) }];
+    }),
+  );
+  const background = file.background === undefined ? undefined : next(file.background);
+  if (!changed) {
+    return file;
+  }
+  const project = { background: background === undefined ? undefined : canvasBackground(background), classes: file.classes, later: file.later };
+  const result = canvasFileOf(project, components);
+  assert(Object.keys(result.components).length === Object.keys(file.components).length, 'A rename keeps every component');
+  assert((result.background === undefined) === (file.background === undefined), 'A rename neither adds nor drops the project background');
+  return result;
+}
+
+
+export function canvasAssetUses(file: ComponentCanvasFile): readonly AssetDefaultUse[] {
+  const uses = defaultAssetUses({ version: 1, components: canvasRecipes(file) });
+  assert(uses.length <= CANVAS_LIMITS.componentsMax * CANVAS_LIMITS.entriesMax * CANVAS_LIMITS.valuesMax * 32, 'Asset uses are bounded');
+  return uses.map((use) => ({ ...use, owner: use.owner.slice(use.owner.indexOf('\u0000') + 1) }));
+}
+
+function canvasRecipes(file: ComponentCanvasFile): Record<string, HeldDefaults> {
+  const recipes: Record<string, HeldDefaults> = {};
+  for (const [component, settings] of Object.entries(file.components)) {
+    for (const [key, entry] of Object.entries(settings.frames ?? {})) {
+      recipes[`${key}\u0000${component}`] = heldDefaults({
+        ...(entry.assets === undefined ? {} : { assets: entry.assets }),
+        ...(entry.literals === undefined ? {} : { literals: entry.literals }),
+      });
+    }
+  }
+  return recipes;
+}
+
+export function relinkCanvasAssets(file: ComponentCanvasFile, from: string, to: string): ComponentCanvasFile {
+  const before = { version: 1 as const, components: canvasRecipes(file) };
+  const moved = relinkDefaultAssets(before, from, to);
+  if (moved === before) {
+    return file;
+  }
+  const components = Object.fromEntries(
+    Object.entries(file.components).map(([component, settings]): [string, ComponentCanvas] => {
+      if (settings.frames === undefined) {
+        return [component, settings];
+      }
+      const frames = Object.fromEntries(
+        Object.entries(settings.frames).map(([key, entry]): [string, FrameEntry] => {
+          const held = moved.components[`${key}\u0000${component}`];
+          return [key, withoutAbsent({ ...entry, assets: held?.assets, literals: held?.literals })];
+        }),
+      );
+      return [component, { ...settings, frames }];
+    }),
+  );
+  assert(Object.keys(components).length === Object.keys(file.components).length, 'A relink keeps every component');
+  return { ...file, components };
+}
+
+export function relinkComponentCanvas(file: ComponentCanvasFile, from: string, to: string): ComponentCanvasFile {
+  canvasComponentFile(to);
+  const settings = file.components[from];
+  if (settings === undefined || file.components[to] !== undefined) {
+    return file;
+  }
+  const components: Record<string, ComponentCanvas> = {};
+  for (const [name, held] of Object.entries(file.components)) {
+    components[name === from ? to : name] = held;
+  }
+  assert(Object.keys(components).length === Object.keys(file.components).length, 'A relink keeps every component');
+  return { ...file, components };
+}
+
+export function dropComponentCanvas(file: ComponentCanvasFile, owns: (component: string) => boolean): ComponentCanvasFile {
+  const components = Object.fromEntries(Object.entries(file.components).filter(([name]) => !owns(name)));
+  assert(Object.keys(components).length <= Object.keys(file.components).length, 'A drop never adds a component');
+  return { ...file, components };
+}
+
+export function canvasIssues(file: ComponentCanvasFile, componentFiles: readonly string[]): readonly string[] {
+  const known = new Set(componentFiles);
+  const issues = Object.keys(file.components)
+    .filter((component) => !known.has(component))
+    .map((component) => `${COMPONENT_CANVAS_FILE} names ${component}, which is not a component in this project.`);
+  assert(issues.length <= Object.keys(file.components).length, 'At most one issue per component');
+  return issues;
+}

@@ -1,0 +1,287 @@
+export interface BuiltinField {
+  readonly name: string;
+  readonly type: 'enum' | 'boolean' | 'string' | 'number' | 'other';
+  readonly options?: readonly string[];
+  readonly default?: string | number | boolean;
+}
+
+
+const SCHEMAS: Readonly<Record<string, readonly BuiltinField[]>> = {
+  button: [
+    { name: 'type', type: 'enum', options: ['submit', 'button', 'reset'], default: 'submit' },
+    { name: 'disabled', type: 'boolean', default: false },
+  ],
+  slot: [{ name: 'name', type: 'string' }],
+  a: [
+    { name: 'href', type: 'string' },
+    {
+      name: 'target',
+      type: 'enum',
+      options: ['_self', '_blank', '_parent', '_top'],
+      default: '_self',
+    },
+    { name: 'rel', type: 'string' },
+  ],
+  input: [
+    {
+      name: 'type',
+      type: 'enum',
+      options: ['text', 'email', 'password', 'number', 'search', 'tel', 'url', 'checkbox', 'radio', 'date', 'time', 'file', 'hidden', 'range', 'color'],
+      default: 'text',
+    },
+    { name: 'name', type: 'string' },
+    { name: 'value', type: 'string' },
+    { name: 'placeholder', type: 'string' },
+    { name: 'required', type: 'boolean', default: false },
+    { name: 'disabled', type: 'boolean', default: false },
+  ],
+  textarea: [
+    { name: 'name', type: 'string' },
+    { name: 'placeholder', type: 'string' },
+    { name: 'rows', type: 'number', default: 2 },
+    { name: 'required', type: 'boolean', default: false },
+    { name: 'disabled', type: 'boolean', default: false },
+  ],
+  select: [
+    { name: 'name', type: 'string' },
+    { name: 'multiple', type: 'boolean', default: false },
+    { name: 'required', type: 'boolean', default: false },
+    { name: 'disabled', type: 'boolean', default: false },
+  ],
+  form: [
+    { name: 'action', type: 'string' },
+    { name: 'method', type: 'enum', options: ['get', 'post', 'dialog'], default: 'get' },
+  ],
+  img: [
+    { name: 'src', type: 'string' },
+    { name: 'alt', type: 'string' },
+    { name: 'width', type: 'number' },
+    { name: 'height', type: 'number' },
+    { name: 'loading', type: 'enum', options: ['eager', 'lazy'], default: 'eager' },
+    { name: 'decoding', type: 'enum', options: ['auto', 'sync', 'async'], default: 'auto' },
+  ],
+  iframe: [
+    { name: 'src', type: 'string' },
+    { name: 'title', type: 'string' },
+    { name: 'loading', type: 'enum', options: ['eager', 'lazy'], default: 'eager' },
+  ],
+  video: [
+    { name: 'src', type: 'string' },
+    { name: 'controls', type: 'boolean', default: false },
+    { name: 'autoplay', type: 'boolean', default: false },
+    { name: 'loop', type: 'boolean', default: false },
+    { name: 'muted', type: 'boolean', default: false },
+    { name: 'playsinline', type: 'boolean', default: false },
+    { name: 'preload', type: 'enum', options: ['auto', 'metadata', 'none'], default: 'auto' },
+  ],
+  audio: [
+    { name: 'src', type: 'string' },
+    { name: 'controls', type: 'boolean', default: false },
+    { name: 'autoplay', type: 'boolean', default: false },
+    { name: 'loop', type: 'boolean', default: false },
+    { name: 'muted', type: 'boolean', default: false },
+  ],
+  label: [{ name: 'for', type: 'string' }],
+  ol: [
+    { name: 'type', type: 'enum', options: ['1', 'a', 'A', 'i', 'I'], default: '1' },
+    { name: 'start', type: 'number', default: 1 },
+    { name: 'reversed', type: 'boolean', default: false },
+  ],
+  th: [
+    { name: 'scope', type: 'enum', options: ['col', 'row', 'colgroup', 'rowgroup'] },
+    { name: 'colspan', type: 'number', default: 1 },
+    { name: 'rowspan', type: 'number', default: 1 },
+  ],
+  td: [
+    { name: 'colspan', type: 'number', default: 1 },
+    { name: 'rowspan', type: 'number', default: 1 },
+  ],
+};
+
+export function getElementSchema(tag: unknown): readonly BuiltinField[] {
+  return SCHEMAS[String(tag).toLowerCase()] || [];
+}
+
+export const HTML_TAGS = [
+  'a',
+  'abbr',
+  'address',
+  'area',
+  'article',
+  'aside',
+  'audio',
+  'b',
+  'base',
+  'bdi',
+  'bdo',
+  'blockquote',
+  'body',
+  'br',
+  'button',
+  'canvas',
+  'caption',
+  'cite',
+  'code',
+  'col',
+  'colgroup',
+  'data',
+  'datalist',
+  'dd',
+  'del',
+  'details',
+  'dfn',
+  'dialog',
+  'div',
+  'dl',
+  'dt',
+  'em',
+  'embed',
+  'fieldset',
+  'figcaption',
+  'figure',
+  'footer',
+  'form',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'head',
+  'header',
+  'hgroup',
+  'hr',
+  'html',
+  'i',
+  'iframe',
+  'img',
+  'input',
+  'ins',
+  'kbd',
+  'label',
+  'legend',
+  'li',
+  'link',
+  'main',
+  'map',
+  'mark',
+  'menu',
+  'meta',
+  'meter',
+  'nav',
+  'noscript',
+  'object',
+  'ol',
+  'optgroup',
+  'option',
+  'output',
+  'p',
+  'picture',
+  'pre',
+  'progress',
+  'q',
+  'rp',
+  'rt',
+  'ruby',
+  's',
+  'samp',
+  'script',
+  'search',
+  'section',
+  'select',
+  'small',
+  'source',
+  'span',
+  'strong',
+  'style',
+  'sub',
+  'summary',
+  'sup',
+  'table',
+  'tbody',
+  'td',
+  'template',
+  'textarea',
+  'tfoot',
+  'th',
+  'thead',
+  'time',
+  'title',
+  'tr',
+  'track',
+  'u',
+  'ul',
+  'var',
+  'video',
+  'wbr',
+];
+
+export { HTML_VOID_TAGS as VOID_TAGS } from '../../shared/page/htmlTags';
+import { HTML_VOID_TAGS as VOID_TAGS } from '../../shared/page/htmlTags';
+
+export { HTML_PHRASING_TAGS as PHRASING_TAGS } from '../../shared/page/htmlTags';
+import { HTML_PHRASING_TAGS as PHRASING_TAGS, HTML_TEXT_ONLY_PARENTS as TEXT_ONLY_PARENTS } from '../../shared/page/htmlTags';
+
+const ONLY_CHILDREN: Readonly<Record<string, readonly string[] | undefined>> = {
+  ul: ['li', 'script', 'template'],
+  ol: ['li', 'script', 'template'],
+  menu: ['li', 'script', 'template'],
+  dl: ['dt', 'dd', 'div', 'script', 'template'],
+  table: ['caption', 'colgroup', 'thead', 'tbody', 'tfoot', 'tr', 'script', 'template'],
+  thead: ['tr', 'script', 'template'],
+  tbody: ['tr', 'script', 'template'],
+  tfoot: ['tr', 'script', 'template'],
+  tr: ['td', 'th', 'script', 'template'],
+  colgroup: ['col', 'template'],
+  select: ['option', 'optgroup', 'hr', 'script', 'template'],
+  optgroup: ['option', 'script', 'template'],
+  picture: ['source', 'img'],
+  video: ['source', 'track'],
+  audio: ['source', 'track'],
+  figure: undefined,
+};
+
+export function canContainTag(parentTag: unknown, childTag: unknown): boolean {
+  const parent = String(parentTag || '').toLowerCase();
+  const child = String(childTag || '').toLowerCase();
+  if (!parent || !child) {
+    return true;
+  }
+  if (VOID_TAGS.has(parent)) {
+    return false;
+  }
+
+  const only = ONLY_CHILDREN[parent];
+  if (only !== undefined) {
+    return only.includes(child);
+  }
+
+  if (TEXT_ONLY_PARENTS.has(parent)) {
+    return PHRASING_TAGS.has(child);
+  }
+  if (parent === 'a') {
+    return child !== 'a' && child !== 'button';
+  }
+  if (parent === 'button') {
+    return PHRASING_TAGS.has(child) && child !== 'button' && child !== 'a';
+  }
+  return !['li', 'dt', 'dd', 'tr', 'td', 'th', 'thead', 'tbody', 'tfoot', 'option', 'optgroup'].includes(child);
+}
+
+export const GLOBAL_ATTRS = new Set([
+  'class',
+  'id',
+  'style',
+  'slot',
+  'title',
+  'role',
+  'tabindex',
+  'hidden',
+  'dir',
+  'lang',
+  'draggable',
+  'is',
+  'part',
+  'autofocus',
+  'inert',
+]);

@@ -1,0 +1,54 @@
+import * as fs from 'node:fs';
+import { englishText, messageRef } from '../../shared/properties/i18n/messageRef';
+import * as path from 'node:path';
+import { assert } from '../../shared/core/assert';
+import {
+  PROJECT_FOLDERS_FILE,
+  PROJECT_FOLDER_LIMITS,
+  configOf,
+  foldersFor,
+  readProjectFoldersSource,
+  type ProjectFolderKind,
+  type ProjectFoldersRead,
+} from '../../shared/properties/projectFolders';
+
+export function readProjectFolders(projectPath: string): ProjectFoldersRead {
+  assert(projectPath.length > 0, 'readProjectFolders: the project is named');
+  const file = path.join(projectPath, PROJECT_FOLDERS_FILE);
+  let stat: fs.Stats;
+  try {
+    stat = fs.lstatSync(file);
+  } catch (error: unknown) {
+    if (isMissing(error)) {
+      return { kind: 'absent' };
+    }
+    return { kind: 'invalid', message: error instanceof Error ? error.message : String(error) };
+  }
+  if (stat.isSymbolicLink()) {
+    return { kind: 'invalid', message: englishText(messageRef('error.folderSettings.symlink')) };
+  }
+  if (!stat.isFile()) {
+    return { kind: 'invalid', message: englishText(messageRef('error.folderSettings.notFile')) };
+  }
+  if (stat.size > PROJECT_FOLDER_LIMITS.fileCharsMax * 4) {
+    return { kind: 'invalid', message: englishText(messageRef('error.folderSettings.tooLong', { limit: PROJECT_FOLDER_LIMITS.fileCharsMax })) };
+  }
+  let source: string;
+  try {
+    source = fs.readFileSync(file, 'utf8');
+  } catch (error: unknown) {
+    if (isMissing(error)) {
+      return { kind: 'absent' };
+    }
+    return { kind: 'invalid', message: error instanceof Error ? error.message : String(error) };
+  }
+  return readProjectFoldersSource(source);
+}
+
+export function projectFoldersFor(projectPath: string, kind: ProjectFolderKind): readonly string[] {
+  return foldersFor(kind, configOf(readProjectFolders(projectPath)));
+}
+
+function isMissing(error: unknown): boolean {
+  return error instanceof Error && 'code' in error && (error.code === 'ENOENT' || error.code === 'ENOTDIR');
+}

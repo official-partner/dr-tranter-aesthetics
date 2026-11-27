@@ -1,0 +1,301 @@
+import path from 'node:path';
+import { englishText, messageRef } from '../../shared/properties/i18n/messageRef';
+
+import { definedFields, record } from '../../shared/core/boundary';
+import { assert } from '../../shared/core/assert';
+import { parseValidationResult, parseContentConfig, parseSampleEntry, parseSampleValue } from '../app/mainValidation';
+import { resolveImport } from '../content/cmsRefs';
+import { readContentConfig, validateEntry } from '../content/contentConfig';
+import { listEntriesSliced, writeEntry, countEntriesSliced, coveredPathsSliced } from '../content/contentEntries';
+import { createSliceClock } from '../lib/slicedWork';
+import { planRename, applyRename } from '../content/contentRefs';
+import { astroRemoteService, firstImageField, type AstroRemoteService } from '../content/astroRemoteService';
+import { entryImage } from '../content/astroRecordReferences';
+import type { AstroRemoteEdit, AstroRemoteEditAnswer, AstroRemoteRead, AstroRemoteReadAnswer } from '../../shared/properties/astroContent';
+import type { RemoteResult } from '../../shared/properties/cmsRemote';
+import { DescribedError } from '../../shared/properties/describedError';
+import { described } from '../../shared/properties/i18n/messageRef';
+import { errorMessage, toPosix } from '../lib/mainHelpers';
+import { collectionOf } from './cmsFiles';
+import type { MainHost } from '../../../../src/features/cms/cmsHost';
+
+export interface ContentPreview {
+  readonly restartForNewContentConfig: (devUrl: string) => Promise<boolean>;
+}
+
+export function registerContentHandlers(host: Pick<MainHost, 'ipcMain' | 'noteAppWrite' | 'send' | 'shell'>, preview: ContentPreview): void {
+  registerContentConfigHandlers(host);
+  registerContentRenameHandlers(host, preview);
+  registerContentRemoteHandlers(host);
+}
+
+function registerContentRemoteHandlers({ ipcMain, noteAppWrite, send, shell }: Pick<MainHost, 'ipcMain' | 'noteAppWrite' | 'send' | 'shell'>): void {
+  const service = (projectPath: string) =>
+    astroRemoteService(projectPath, {
+      readConfig: async () => parseContentConfig(await readContentConfig(projectPath)),
+      trash: (file) => shell.trashItem(file),
+    });
+  ipcMain.handle('content:remoteRead', async (_event, { projectPath, request }) => answered(() => readRemote(service(projectPath), request)));
+  ipcMain.handle('content:remoteEdit', async (_event, { projectPath, request }) => {
+    const result = await answered(() => editRemote(service(projectPath), request));
+    noteAppWrite();
+    send('cms:changed', {});
+    return result;
+  });
+}
+
+function readRemote(service: AstroRemoteService, request: AstroRemoteRead): Promise<AstroRemoteReadAnswer> {
+  switch (request.operation) {
+    case 'collections':
+      return service.collections();
+    case 'documents':
+      return service.documents(request.collection, request.columns);
+    case 'document':
+      return service.document(request.id);
+    case 'template':
+      return service.template(request.collection);
+    case 'settings':
+      return service.settings(request.collection);
+    default: {
+      const exhaustive: never = request;
+      return exhaustive;
+    }
+  }
+}
+
+function editRemote(service: AstroRemoteService, request: AstroRemoteEdit): Promise<AstroRemoteEditAnswer> {
+  switch (request.operation) {
+    case 'write':
+      return service.write(request.write);
+    case 'rename':
+      return service.rename(request.id, request.slug);
+    case 'create':
+      return service.create(request.collection);
+    case 'delete':
+      return service.remove(request.ids);
+    case 'createCollection':
+      return service.createCollection(request.name);
+    case 'settings':
+      return service.changeSettings(request.collection, request.change);
+    default: {
+      const exhaustive: never = request;
+      return exhaustive;
+    }
+  }
+}
+
+async function answered<T>(run: () => Promise<T>): Promise<RemoteResult<T>> {
+  try {
+    return { ok: true, value: await run() };
+  } catch (error: unknown) {
+    if (error instanceof DescribedError) {
+      return {
+        ok: false,
+        message: error.problem.message.slice(0, 900),
+        ...(error.problem.messageRef === undefined ? {} : { messageRef: error.problem.messageRef }),
+      };
+    }
+    const message = errorMessage(error).slice(0, 900);
+    return message ? { ok: false, message } : { ok: false, ...described('cmsBackend.content.unreadable') };
+  }
+}
+
+function registerContentConfigHandlers({ ipcMain, noteAppWrite, send }: Pick<MainHost, 'ipcMain' | 'noteAppWrite' | 'send'>): void {
+  ipcMain.handle('content:config', async (_event, { projectPath, force }) => parseContentConfig(await readContentConfig(projectPath, { force: !!force })));
+
+  ipcMain.handle('content:collections', async (_event, projectPath) => {
+    const config = parseContentConfig(await readContentConfig(projectPath));
+    if (config.missing || config.error) {
+      return { ...config, collections: [] };
+    }
+    const collections = [];
+    for (const collection of config.collections || []) {
+      collections.push({
+        name: collection.name,
+        editable: collection.editable,
+        loader: collection.loader,
+        hasSchema: !!collection.schema,
+        freeform: !!collection.freeform,
+        error: collection.error || undefined,
+        count: await countEntriesSliced(projectPath, collection),
+      });
+    }
+    return {
+      collections,
+      covered: await coveredPathsSliced(projectPath, config.collections || []),
+      configPath: config.configPath,
+    };
+  });
+
+  ipcMain.handle('content:entries', async (_event, { projectPath, name }) => {
+    const { collection } = await collectionOf(projectPath, name);
+    const listed = await listEntriesSliced(projectPath, collection);
+    const imageField = firstImageField(collection);
+    const clock = createSliceClock();
+    const entries = [];
+    for (const entry of listed.entries) {
+      const imageFile = entryImage(projectPath, entry, imageField);
+      entries.push(imageFile === undefined ? entry : { ...entry, imageFile });
+      await clock.yieldIfDue();
+    }
+    assert(entries.length === listed.entries.length, 'Every entry is listed');
+    return { collection, ...listed, entries };
+  });
+
+  ipcMain.handle('content:writeEntry', async (_event, { projectPath, entry, edits, body, expected }) => {
+    const result = writeEntry(projectPath, entry, edits || [], definedFields({ body, expected }));
+    noteAppWrite();
+    send('cms:changed', {});
+    return result;
+  });
+
+  ipcMain.handle('content:validate', async (_event, { projectPath, collection, data }) =>
+    parseValidationResult(await validateEntry(projectPath, { collection, data })),
+  );
+
+  ipcMain.handle('content:renamePlan', async (_event, { projectPath, name, from, to }) => {
+    const config = parseContentConfig(await readContentConfig(projectPath));
+    const plan = planRename(
+      projectPath,
+      config.collections.map((collection) => ({
+        ...collection,
+        loader: collection.loader ?? { kind: 'none' },
+      })),
+      { collection: name, from, to },
+    );
+    return { ...plan, entry: { id: plan.entry.id, file: plan.entry.file } };
+  });
+}
+
+function registerContentRenameHandlers({ ipcMain, noteAppWrite, send }: Pick<MainHost, 'ipcMain' | 'noteAppWrite' | 'send'>, preview: ContentPreview): void {
+  ipcMain.handle('content:rename', async (_event, { projectPath, name, from, to }) => {
+    const config = parseContentConfig(await readContentConfig(projectPath));
+    const plan = planRename(
+      projectPath,
+      config.collections.map((collection) => ({
+        ...collection,
+        loader: collection.loader ?? { kind: 'none' },
+      })),
+      { collection: name, from, to },
+    );
+    const result = applyRename(projectPath, plan);
+    if (result.files.length > 0) {
+      noteAppWrite();
+    }
+    send('cms:changed', {});
+    return result;
+  });
+
+  ipcMain.handle('content:targets', async (_event, { projectPath, name }) => {
+    const { collection } = await collectionOf(projectPath, name);
+    const { entries } = await listEntriesSliced(projectPath, collection);
+    return { targets: entries.map((entry) => ({ id: entry.id, title: entry.title })) };
+  });
+
+  ipcMain.handle('content:sampleEntry', async (_event, { devUrl, name, id, index }) => {
+    if (!devUrl || !name) {
+      return { entry: undefined };
+    }
+    try {
+      const query = `c=${encodeURIComponent(name)}${id ? `&id=${encodeURIComponent(id)}` : ''}${index === undefined ? '' : `&i=${index}`}`;
+      const first = await fetchSampleEntry(`${devUrl}/__avb/data?${query}`);
+      if (first.error !== undefined) {
+        return first;
+      }
+      if (first.entry !== undefined && first.entry !== null) {
+        return first;
+      }
+      const refreshed = await fetch(`${devUrl}/__avb/refresh`, { method: 'POST' });
+      if (!refreshed.ok) {
+        return first;
+      }
+      const refreshError = optionalText(record(await refreshed.json())['error']);
+      if (refreshError !== undefined) {
+        return { entry: undefined, error: refreshError };
+      }
+      const synced = await fetchSampleEntry(`${devUrl}/__avb/data?${query}`);
+      if (synced.error !== undefined || (synced.entry !== undefined && synced.entry !== null)) {
+        return synced;
+      }
+      if (await preview.restartForNewContentConfig(devUrl)) {
+        return await fetchSampleEntry(`${devUrl}/__avb/data?${query}`);
+      }
+      return synced;
+    } catch (error: unknown) {
+      return { entry: undefined, error: errorMessage(error) };
+    }
+  });
+
+  ipcMain.handle('content:sampleValue', async (_event, { projectPath, devUrl, pagePath, source }) => {
+    if (!devUrl) {
+      return { value: undefined };
+    }
+    switch (source.kind) {
+      case 'call':
+        return sampleCall(devUrl, projectPath, pagePath, source);
+      case 'scope':
+        return sampleScope(devUrl, projectPath, pagePath, source.sinceMs);
+      default: {
+        const exhaustive: never = source;
+        return exhaustive;
+      }
+    }
+  });
+
+  ipcMain.handle('project:resolveImport', async (_event, { projectPath, fromFile, spec }) => ({
+    path: resolveImport(projectPath, fromFile, spec) ?? undefined,
+  }));
+}
+
+const SAMPLE_VALUE_MS_MAX = 15_000;
+
+async function sampleCall(
+  devUrl: string,
+  projectPath: string,
+  pagePath: string,
+  call: { readonly spec: string; readonly name: string },
+): Promise<ReturnType<typeof parseSampleValue>> {
+  const target = resolveImport(projectPath, pagePath, call.spec);
+  const rel = target ? toPosix(path.relative(projectPath, target)) : '';
+  if (!rel.startsWith('src/')) {
+    return { value: undefined };
+  }
+  const query = `m=${encodeURIComponent('/' + rel)}&f=${encodeURIComponent(call.name)}`;
+  return fetchSampleValue(`${devUrl}/__avb/value?${query}`);
+}
+
+async function sampleScope(devUrl: string, projectPath: string, pagePath: string, sinceMs: number): Promise<ReturnType<typeof parseSampleValue>> {
+  const rel = toPosix(path.relative(projectPath, path.resolve(projectPath, pagePath)));
+  if (!rel.startsWith('src/') || !rel.endsWith('.astro')) {
+    return { value: undefined };
+  }
+  return fetchSampleValue(`${devUrl}/__avb/value?p=${encodeURIComponent(rel)}&since=${sinceMs}`);
+}
+
+async function fetchSampleValue(url: string): Promise<ReturnType<typeof parseSampleValue>> {
+  assert(url.includes('/__avb/value?'), 'A value is read from the value route');
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(SAMPLE_VALUE_MS_MAX) });
+    if (!response.ok) {
+      return { value: undefined, error: englishText(messageRef('error.pages.devServerStatus', { status: response.status })) };
+    }
+    const input: unknown = await response.json();
+    return parseSampleValue(input);
+  } catch (error: unknown) {
+    return { value: undefined, error: errorMessage(error) };
+  }
+}
+
+async function fetchSampleEntry(url: string): Promise<ReturnType<typeof parseSampleEntry>> {
+  assert(url.includes('/__avb/data?'), 'A sample is read from the data route');
+  const response = await fetch(url);
+  if (!response.ok) {
+    return { entry: undefined, error: englishText(messageRef('error.pages.devServerStatus', { status: response.status })) };
+  }
+  const input: unknown = await response.json();
+  return parseSampleEntry(input);
+}
+
+function optionalText(input: unknown): string | undefined {
+  return typeof input === 'string' && input.length > 0 ? input : undefined;
+}

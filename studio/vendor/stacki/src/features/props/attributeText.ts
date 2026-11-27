@@ -1,0 +1,151 @@
+
+import type { Attr } from '../../../shared/page/pageNode';
+import { assert } from '../../../shared/core/assert';
+import { LIMITS } from '../../../shared/core/limits';
+import { described, type Described } from '../../../shared/properties/i18n/messageRef';
+import { isReferencePath } from '../../editor/conditionalValue';
+
+export interface AttributePair {
+  readonly name: string;
+  readonly value: string;
+}
+export interface ObjectEntry {
+  readonly key: string;
+  readonly raw: string;
+}
+
+export const decodeAttr = (attribute: Attr | undefined) =>
+  attribute === undefined || attribute.type === 'bare' ? '' : attribute.type === 'expr' ? `{${attribute.value}}` : String(attribute.value);
+
+export type SpreadName = { readonly kind: 'none' } | { readonly kind: 'spread'; readonly path: string } | ({ readonly kind: 'invalid' } & Described);
+
+const SPREAD_NAME = /^\{?\s*\.\.\.\s*([^{}]*?)\s*\}?$/;
+
+export function spreadOfName(text: string): SpreadName {
+  const trimmed = text.trim();
+  if (!trimmed.startsWith('{') && !trimmed.startsWith('...')) {
+    return { kind: 'none' };
+  }
+  if (trimmed.length > LIMITS.attrCharsMax) {
+    return { kind: 'invalid', ...described('props.attributeText.spreadTooLong') };
+  }
+  const match = SPREAD_NAME.exec(trimmed);
+  const path = match?.[1] ?? '';
+  if (path === '') {
+    return { kind: 'invalid', ...described('props.attributeText.spreadEmpty') };
+  }
+  if (!isReferencePath(path)) {
+    return { kind: 'invalid', ...described('props.attributeText.spreadNotName') };
+  }
+  return { kind: 'spread', path };
+}
+
+export function typedAttributeName(text: string): string {
+  const trimmed = text.trimStart();
+  if (trimmed.startsWith('{') || trimmed.startsWith('.')) {
+    return text.replace(/[^\w$.{}]/g, '');
+  }
+  return text.replace(/[^\w@:.-]/g, '');
+}
+
+export const encodeAttr = (text: string): Attr => {
+  if (text === '') {
+    return { type: 'bare' };
+  }
+  const match = text.match(/^\{([\s\S]*)\}$/);
+  if (match) {
+    return { type: 'expr', value: (match[1] ?? '').trim() };
+  }
+  return { type: 'string', value: text };
+};
+
+export const ATTR_PASTE_RE = /([\w@:.-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|(\{(?:[^{}]|\{[^{}]*\})*\})|([^\s]+)))?/g;
+
+export function parseAttrPaste(text: string): readonly AttributePair[] {
+  if (text.length > LIMITS.attrCharsMax) {
+    return [];
+  }
+  const out: AttributePair[] = [];
+  ATTR_PASTE_RE.lastIndex = 0;
+  let match;
+  while ((match = ATTR_PASTE_RE.exec(text)) !== null) {
+    if (!match[0].trim()) {
+      continue;
+    }
+    const value = match[2] ?? match[3] ?? match[4] ?? match[5];
+    if (out.length === LIMITS.attrsPerNodeMax) {
+      return [];
+    }
+    out.push({ name: match[1] ?? '', value: value === undefined ? '' : value });
+  }
+  return out;
+}
+
+export function parseObjectLiteral(input: unknown): readonly ObjectEntry[] | undefined {
+  const text = String(input ?? '').trim();
+  if (text.length > LIMITS.attrCharsMax) {
+    return undefined;
+  }
+  const match = text.match(/^\{([\s\S]*)\}$/);
+  if (!match) {
+    return text === '' ? [] : undefined;
+  }
+  const inner = (match[1] ?? '').trim();
+  if (!inner) {
+    return [];
+  }
+  if (/[{}]|\.\.\./.test(inner)) {
+    return undefined;
+  }
+  const entries = [];
+  const re = new RegExp(
+    /\s*(?:"([^"]*)"|'([^']*)'|([\w$@:.-]+))\s*:\s*/.source + /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|[^,]+?)\s*(?:,|$)/.source,
+    'y',
+  );
+  let position = 0;
+  while (position < inner.length) {
+    re.lastIndex = position;
+    const em = re.exec(inner);
+    if (!em) {
+      return undefined;
+    }
+    if (entries.length === LIMITS.attrsPerNodeMax) {
+      return undefined;
+    }
+    entries.push({ key: em[1] ?? em[2] ?? em[3] ?? '', raw: (em[4] ?? '').trim() });
+    position = re.lastIndex;
+  }
+  return entries;
+}
+
+export function serializeObjectLiteral(entries: readonly ObjectEntry[]) {
+  assert(entries.length <= LIMITS.attrsPerNodeMax, 'Object attributes: entry limit exceeded');
+  const body = entries
+    .map((entry) => {
+      const key = /^[A-Za-z_$][\w$]*$/.test(entry.key) ? entry.key : JSON.stringify(entry.key);
+      return `${key}: ${entry.raw}`;
+    })
+    .join(', ');
+  const text = `{ ${body} }`;
+  assert(text.length <= LIMITS.attrCharsMax, 'Object attributes: output limit exceeded');
+  return text;
+}
+
+export const decodeRaw = (raw: string) => {
+  const match = String(raw).match(/^"((?:[^"\\]|\\.)*)"$|^'((?:[^'\\]|\\.)*)'$/);
+  if (match) {
+    return (match[1] ?? match[2] ?? '').replace(/\\(.)/g, '$1');
+  }
+  return raw === 'true' ? '' : `{${raw}}`;
+};
+
+export const encodeRaw = (text: string) => {
+  if (text === '') {
+    return 'true';
+  }
+  const match = text.match(/^\{([\s\S]*)\}$/);
+  if (match) {
+    return (match[1] ?? '').trim() || 'true';
+  }
+  return `"${text.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+};

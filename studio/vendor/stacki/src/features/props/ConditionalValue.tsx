@@ -1,0 +1,1185 @@
+
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { tooltipHost, useDelayedTooltip } from '../../ui/delayedTooltip';
+import FittedTooltip from '../../ui/FittedTooltip';
+import type { HTMLAttributes, KeyboardEvent, ReactNode, RefCallback, RefObject } from 'react';
+import useListReorder from '../../ui/useListReorder';
+import { DropLine } from '../../ui/DropLine';
+import { assert } from '../../../shared/core/assert';
+import { useTranslate } from '../../lib/i18n/useTranslate';
+import type { Attr } from '../../../shared/page/pageNode';
+import {
+  CONDITIONAL_LIMITS,
+  emitConditionalExpression,
+  isPlainResult,
+  isReferencePath,
+  readConditionalExpression,
+  type ConditionalResult,
+  type ReadShapes,
+  type ValueResult,
+  type ConditionLiteral,
+  type ConditionalValue,
+  type GroupMatch,
+  type TemplatePart,
+} from '../../editor/conditionalValue';
+import { templateHoles, type TemplateHole } from '../../editor/bindings';
+import { FIELD_UNFOCUSED } from './fieldFocus';
+import ExprInput, { type ExprInputAPI, type ExprInputProps } from '../../ui/ExprInput';
+import { useCssFieldChips } from '../../ui/cssFieldChips';
+import { isExpression } from './jsCheck';
+import { CodeInline, CodeTokens } from '../../ui/CodeBlock';
+import type { CodeLine, CodeToken } from '../../ui/codeHighlight';
+import { declarationTokens, styleDeclarations } from './StyleEditor';
+import Dropdown from '../../ui/Dropdown';
+import { ValueChoiceSwitch, type ValueChoice } from './ValueChoices';
+import MultiSelect from '../../ui/MultiSelect';
+import { BracesIcon, BranchIcon, CloseIcon, CodeIcon, SyncIcon, CornerIcon, DragIcon, PlusIcon, TrashIcon, UnlinkIcon } from '../../ui/Icons';
+import { BindHandle, FieldDataPicker } from './BindingEditors';
+import type { FieldPickerAt, InsertAPI } from './bindingTypes';
+import { BindField } from './propBindings';
+import { ConditionCodeBox, ConditionCodeToggle } from './ConditionCodeToggle';
+import { appliedCode, CONTROLS_DECISION, decideConditionView, type ConditionView } from './conditionViewDecision';
+import {
+  appliedAttr,
+  appliedStart,
+  writeOptionsFor,
+  attrOfResult,
+  bodyOfResult,
+  resultOfBody,
+  resultOfAttr,
+  resultWords,
+  draftOf,
+  draftUnchanged,
+  conditionProps,
+  conditionWords,
+  plainerCondition,
+  presentedModel,
+  literalOfInput,
+  literalWords,
+  matchOptions,
+  modelOf,
+  operatorsFor,
+  propOf,
+  summaryLines,
+  takesValues,
+  withCondition,
+  withConditionAdded,
+  withConditionRemoved,
+  withGroup,
+  withGroupAdded,
+  withGroupMoved,
+  withGroupRemoved,
+  withSubject,
+  type ConditionDraft,
+  type ConditionProp,
+  type ConditionalDraft,
+  type ConditionReach,
+  type DraftOperator,
+  type GroupDraft,
+  type ValueLanguage,
+} from './conditionalModel';
+import type { Translator } from '../../../shared/properties/i18n/messageRef';
+import { dataPickerPosition } from './dataPickerPosition';
+import { reportCodeCleared } from './codeCleared';
+import { FieldTypeIcon } from './FieldTypeIcon';
+import { RowPopup } from './LoopRows';
+import type { RichContext } from './RichContent';
+import './conditionalValue.css';
+
+const EDITOR_HEIGHT_PX_MAX = 640;
+const EDITOR_WIDTH_PX_MIN = 520;
+const MENU_WIDTH_PX_MIN = 200;
+
+const readableIn =
+  (shapes: ReadShapes) =>
+  (source: string): boolean =>
+    readConditionalExpression(source, { shapes }) !== undefined;
+
+const NO_VALUE: ConditionalResult = { kind: 'none', word: 'undefined' };
+
+const FIELD_TYPES: Readonly<Record<ConditionProp['kind'], string>> = { option: 'enum', switch: 'boolean', text: 'string', number: 'number' };
+
+export function useConditionCatalog(bindContext: RichContext | undefined, reach: ConditionReach = 'props'): readonly ConditionProp[] {
+  const frontmatter = bindContext?.frontmatter ?? '';
+  const schema = bindContext?.propsSchema;
+  return useMemo(() => conditionProps(frontmatter, schema ?? [], reach), [frontmatter, schema, reach]);
+}
+
+export function ConditionalBadge({ label, tone }: { readonly label?: string; readonly tone?: 'computed' | undefined }) {
+  const translate = useTranslate();
+  return (
+    <span
+      className={`conditional-badge${tone === 'computed' ? ' conditional-badge-computed' : ''}`}
+      title={label === undefined ? translate('props.conditional.value') : label}
+    >
+      <BranchIcon size={11} />
+      {label ?? translate('props.conditional.chip')}
+    </span>
+  );
+}
+
+export function ComputedField(props: { readonly code: string; readonly onEditCode: () => void }) {
+  const translate = useTranslate();
+  return (
+    <div className="conditional-field conditional-computed-field">
+      <span className="conditional-chip conditional-chip-computed" title={translate('props.conditional.computedTitle')}>
+        <BranchIcon size={11} />
+        {translate('props.conditional.computed')}
+      </span>
+      <CodeInline text={props.code} language="typescript" className="conditional-computed-code" />
+      <button
+        type="button"
+        className="prop-expr-toggle conditional-computed-toggle"
+        aria-label={translate('props.condition.writeCode')}
+        title={translate('props.condition.writeCode')}
+        onClick={props.onEditCode}
+      >
+        <BracesIcon size={12} />
+      </button>
+    </div>
+  );
+}
+
+export interface ConditionalFieldProps {
+  readonly model: ConditionalValue;
+  readonly value: Attr | undefined;
+  readonly bindContext: RichContext | undefined;
+  readonly onApply: (value: Attr | undefined) => void;
+  readonly language: ValueLanguage;
+}
+
+export function ConditionalField(props: ConditionalFieldProps) {
+  const translate = useTranslate();
+  const catalog = useConditionCatalog(props.bindContext, 'template');
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  return (
+    <div className="conditional-field" ref={ref}>
+      <button type="button" className="conditional-chip" aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <BranchIcon size={11} />
+        {translate('props.conditional.chip')}
+      </button>
+      <button type="button" className="conditional-summary" title={translate('props.conditional.edit')} onClick={() => setOpen(true)}>
+        <ConditionalSummary model={presentedModel(props.model)} catalog={catalog} language={props.language} />
+      </button>
+      {open && (
+        <ConditionalEditor
+          anchorRef={ref}
+          start={undefined}
+          model={props.model}
+          value={props.value}
+          bindContext={props.bindContext}
+          language={props.language}
+          shapes="rich"
+          onApply={props.onApply}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+export function ConditionalSummary(props: { readonly model: ConditionalValue; readonly catalog: readonly ConditionProp[]; readonly language: ValueLanguage }) {
+  const translate = useTranslate();
+  const { model, catalog } = props;
+  const lines = summaryLines(model, catalog, translate);
+  return (
+    <span className="conditional-lines">
+      {lines.map((line, index) => (
+        <span key={index} className="conditional-line">
+          <span className="conditional-heading">{line.heading}</span>
+          {line.bullets.map((bullet, at) => (
+            <span key={at} className="conditional-bullet">
+              {bullet}
+            </span>
+          ))}
+          <span className="conditional-result">
+            <CornerIcon size={11} />
+            <ResultWords result={line.value} language={props.language} />
+          </span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+export function ResultWords({ result, language }: { readonly result: ConditionalResult; readonly language: ValueLanguage }) {
+  if (result.kind === 'fallback') {
+    return (
+      <span className="conditional-fallback" title={resultWords(result)}>
+        {result.operands.map((operand, index) => (
+          <span key={index} className="conditional-fallback-operand">
+            {index > 0 && <span className="conditional-fallback-operator">{result.operator}</span>}
+            <ValueWords result={operand} language={language} />
+          </span>
+        ))}
+      </span>
+    );
+  }
+  return <ValueWords result={result} language={language} />;
+}
+
+function ValueWords({ result, language }: { readonly result: ValueResult; readonly language: ValueLanguage }) {
+  const translate = useTranslate();
+  switch (result.kind) {
+    case 'text':
+      if (result.text === '') {
+        return <span className="conditional-empty">{translate('props.conditional.empty')}</span>;
+      }
+      return language === 'css' ? (
+        <code className="code-inline conditional-text conditional-css">
+          <CodeTokens line={declarationTokens(result.text)} />
+        </code>
+      ) : (
+        <span className="conditional-text">{result.text}</span>
+      );
+    case 'reference':
+      return <span className="loop-bind-chip">{result.path}</span>;
+    case 'template':
+      return <TemplateWords parts={result.parts} language={language} />;
+    case 'none':
+      return <span className="conditional-empty">{translate('props.conditional.leftOutNote')}</span>;
+    case 'lookup':
+      return <span className="loop-bind-chip">{`${result.table}[${result.key}]`}</span>;
+    case 'computed':
+      return <CodeInline text={result.code} language="typescript" className="conditional-computed-code" />;
+    default: {
+      const exhaustive: never = result;
+      return exhaustive;
+    }
+  }
+}
+
+function TemplateWords({ parts, language }: { readonly parts: readonly TemplatePart[]; readonly language: ValueLanguage }) {
+  const runs =
+    language === 'css' ? highlightedRuns(parts) : parts.map((part) => (part.kind === 'text' ? { kind: 'text' as const, line: [{ text: part.text }] } : part));
+  return (
+    <code className={`code-inline conditional-text${language === 'css' ? ' conditional-css' : ''}`} title={resultWords({ kind: 'template', parts })}>
+      {runs.map((run, index) =>
+        run.kind === 'text' ? (
+          <CodeTokens key={index} line={run.line} />
+        ) : (
+          <span key={index} className="loop-bind-chip">
+            {run.path}
+          </span>
+        ),
+      )}
+    </code>
+  );
+}
+
+type Run = { readonly kind: 'text'; readonly line: CodeLine } | { readonly kind: 'reference'; readonly path: string };
+
+function highlightedRuns(parts: readonly TemplatePart[]): readonly Run[] {
+  const stand = parts.map((part) => (part.kind === 'text' ? part.text : '0'.repeat(Math.max(part.path.length, 1))));
+  const tokens = declarationTokens(stand.join(''));
+  const runs: Run[] = [];
+  let start = 0;
+  for (const [index, part] of parts.entries()) {
+    const length = stand[index]?.length ?? 0;
+    if (part.kind === 'reference') {
+      runs.push(part);
+    } else {
+      runs.push({ kind: 'text', line: sliceTokens(tokens, start, start + length) });
+    }
+    start += length;
+  }
+  assert(runs.length === parts.length, 'highlightedRuns: one run per part');
+  return runs;
+}
+
+function sliceTokens(tokens: CodeLine, from: number, to: number): CodeLine {
+  const out: CodeToken[] = [];
+  let at = 0;
+  for (const token of tokens) {
+    const end = at + token.text.length;
+    const left = Math.max(at, from);
+    const right = Math.min(end, to);
+    if (left < right) {
+      const text = token.text.slice(left - at, right - at);
+      out.push(token.style === undefined ? { text } : { text, style: token.style });
+    }
+    at = end;
+  }
+  return out;
+}
+
+export interface ConditionalEditorProps {
+  readonly anchorRef: RefObject<HTMLElement>;
+  readonly start: ConditionalDraft | undefined;
+  readonly model: ConditionalValue | undefined;
+  readonly value: Attr | undefined;
+  readonly bindContext: RichContext | undefined;
+  readonly language: ValueLanguage;
+  readonly onApply: (value: Attr | undefined) => void;
+  readonly onClose: () => void;
+  readonly valueChoices?: readonly ValueChoice[] | undefined;
+  readonly title?: string | undefined;
+  readonly shapes?: ReadShapes | undefined;
+}
+
+export function ConditionalEditor(props: ConditionalEditorProps) {
+  const translate = useTranslate();
+  const shapes = props.shapes ?? 'plain';
+  const catalog = useConditionCatalog(props.bindContext, shapes === 'rich' ? 'template' : 'props');
+  const [opened] = useState<ConditionalDraft>(() => {
+    if (props.start !== undefined) {
+      return props.start;
+    }
+    assert(props.model !== undefined, 'ConditionalEditor: opened on a draft or a model');
+    return draftOf(props.valueChoices === undefined ? presentedModel(props.model) : props.model);
+  });
+  const [draft, setDraft] = useState<ConditionalDraft>(opened);
+  const written = useRef(false);
+  const frontmatter = props.bindContext?.frontmatter ?? '';
+  const [view, setView] = useState<ConditionView>('visual');
+  const [code, setCode] = useState('');
+  const [codeSeed, setCodeSeed] = useState('');
+  const latest = useRef({ draft, value: props.value, onApply: props.onApply, frontmatter, view, code });
+  latest.current = { draft, value: props.value, onApply: props.onApply, frontmatter, view, code };
+  const apply = (from: ConditionalDraft): void => {
+    if (written.current) {
+      return;
+    }
+    written.current = true;
+    if (latest.current.view === 'code') {
+      const typed = appliedCode(latest.current.code, latest.current.value);
+      if (typed.kind === 'write') {
+        latest.current.onApply(typed.value);
+      }
+      return;
+    }
+    if (props.start === undefined && draftUnchanged(from, opened)) {
+      return;
+    }
+    const write = props.start === undefined ? appliedAttr : appliedStart;
+    const next = write(from, latest.current.value, writeOptionsFor(latest.current.value, latest.current.frontmatter));
+    if (next.kind === 'write') {
+      latest.current.onApply(next.value);
+    }
+  };
+  const applyRef = useRef(apply);
+  applyRef.current = apply;
+  useEffect(() => () => applyRef.current(latest.current.draft), []);
+  const [anchor, setAnchor] = useState<HTMLElement | undefined>(undefined);
+  const { anchorRef } = props;
+  useLayoutEffect(() => setAnchor(anchorRef.current ?? undefined), [anchorRef]);
+  const close = (): void => {
+    apply(draft);
+    props.onClose();
+  };
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const revealAdded = useRef(false);
+  const groupCount = draft.groups.length;
+  useEffect(() => {
+    if (!revealAdded.current) {
+      return;
+    }
+    revealAdded.current = false;
+    const groups = bodyRef.current?.querySelectorAll('.conditional-group[role="group"]');
+    groups?.item(groups.length - 1).scrollIntoView?.({ block: 'nearest' });
+  }, [groupCount]);
+  const decision = view === 'code' ? decideConditionView({ source: code, readable: readableIn(shapes), chosen: 'code' }) : CONTROLS_DECISION;
+  const choose = (next: ConditionView): void => {
+    if (next === 'code') {
+      const model = modelOf(draft);
+      const before = latest.current.value;
+      const text =
+        model.groups.length > 0 ? emitConditionalExpression(model, writeOptionsFor(before, frontmatter)) : before?.type === 'expr' ? before.value : '';
+      setCode(text);
+      setCodeSeed(text);
+      setView('code');
+      return;
+    }
+    const model = readConditionalExpression(code, { shapes });
+    if (model !== undefined) {
+      setDraft(draftOf(model));
+      setView('visual');
+    }
+  };
+  const unlink = (): void => {
+    written.current = true;
+    const before = latest.current.value;
+    const onApply = latest.current.onApply;
+    onApply(undefined);
+    reportCodeCleared(translate, () => onApply(before));
+    props.onClose();
+  };
+  return (
+    <RowPopup
+      anchor={anchor}
+      heightPxMax={EDITOR_HEIGHT_PX_MAX}
+      widthPxMin={EDITOR_WIDTH_PX_MIN}
+      label={props.title ?? translate('props.conditional.editorTitle')}
+      onClose={close}
+    >
+      <div className="conditional-editor">
+        <div className="loop-property-head">
+          <span className="loop-bind-title">{props.title ?? translate('props.conditional.editorTitle')}</span>
+          <ConditionCodeToggle decision={decision} onChoose={choose} />
+          <button
+            type="button"
+            className="loop-settings-remove"
+            aria-label={translate('props.conditional.remove')}
+            title={translate('props.conditional.remove')}
+            onClick={unlink}
+          >
+            <UnlinkIcon size={12} />
+          </button>
+        </div>
+        {view === 'code' ? (
+          <>
+            <ConditionCodeBox code={code} seed={codeSeed} context={props.bindContext} onChange={setCode} />
+          </>
+        ) : (
+          <div className="conditional-editor-body" ref={bodyRef} tabIndex={-1}>
+            <GroupList
+              draft={draft}
+              catalog={catalog}
+              bindContext={props.bindContext}
+              language={props.language}
+              shapes={shapes}
+              valueChoices={props.valueChoices}
+              setDraft={setDraft}
+            />
+            <AddGroupRow
+              disabled={draft.groups.length >= CONDITIONAL_LIMITS.groupsMax}
+              onAdd={() => {
+                setDraft((current) => withGroupAdded(current, catalog));
+                revealAdded.current = true;
+              }}
+            />
+            <div className="conditional-group conditional-else">
+              <div className="conditional-group-head">{translate('props.conditional.summary.else')}</div>
+              {props.valueChoices === undefined ? (
+                <ResultField
+                  label={translate('props.conditional.elseValue')}
+                  result={draft.otherwise}
+                  bindContext={props.bindContext}
+                  language={props.language}
+                  shapes={shapes}
+                  onChange={(otherwise) => setDraft((current) => ({ ...current, otherwise }))}
+                />
+              ) : (
+                <ChoiceResult
+                  label={translate('props.conditional.elseValue')}
+                  result={draft.otherwise}
+                  choices={props.valueChoices}
+                  onChange={(otherwise) => setDraft((current) => ({ ...current, otherwise }))}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </RowPopup>
+  );
+}
+
+function GroupList(props: {
+  readonly draft: ConditionalDraft;
+  readonly catalog: readonly ConditionProp[];
+  readonly bindContext: RichContext | undefined;
+  readonly language: ValueLanguage;
+  readonly shapes: ReadShapes;
+  readonly valueChoices: readonly ValueChoice[] | undefined;
+  readonly setDraft: (change: (draft: ConditionalDraft) => ConditionalDraft) => void;
+}) {
+  const { draft, setDraft } = props;
+  const count = draft.groups.length;
+  const move = (source: number, target: number): void => {
+    if (target !== source && target !== source + 1) {
+      setDraft((current) => withGroupMoved(current, source, target));
+    }
+  };
+  const reorder = useListReorder({ count, onMove: move });
+  const gap = reorder.dragIndex === undefined ? undefined : reorder.dropIndex;
+  assert(gap === undefined || gap <= count, 'GroupList: the drop gap is within the list');
+  return draft.groups.map((group, groupIndex) => {
+    const row = reorder.rowProps(groupIndex);
+    return (
+      <GroupEditor
+        key={groupIndex}
+        group={group}
+        groupIndex={groupIndex}
+        catalog={props.catalog}
+        bindContext={props.bindContext}
+        language={props.language}
+        shapes={props.shapes}
+        valueChoices={props.valueChoices}
+        row={{
+          ...row,
+          onPointerDown: (event) => {
+            if (event.target instanceof Element && event.target.closest('.conditional-grip') !== null) {
+              row.onPointerDown?.(event);
+            }
+          },
+          onKeyDown: (event) => {
+            if (!event.altKey || event.target !== event.currentTarget) {
+              return;
+            }
+            if (event.key === 'ArrowUp' && groupIndex > 0) {
+              event.preventDefault();
+              move(groupIndex, groupIndex - 1);
+            } else if (event.key === 'ArrowDown' && groupIndex < count - 1) {
+              event.preventDefault();
+              move(groupIndex, groupIndex + 2);
+            }
+          },
+        }}
+        dragging={reorder.dragIndex === groupIndex}
+        gap={gap === groupIndex ? 'before' : gap === count && groupIndex === count - 1 ? 'after' : undefined}
+        onChange={(change) => setDraft((current) => withGroup(current, groupIndex, change))}
+        onRemove={() => setDraft((current) => withGroupRemoved(current, groupIndex))}
+      />
+    );
+  });
+}
+
+function GroupEditor(props: {
+  readonly group: GroupDraft;
+  readonly groupIndex: number;
+  readonly catalog: readonly ConditionProp[];
+  readonly bindContext: RichContext | undefined;
+  readonly language: ValueLanguage;
+  readonly shapes: ReadShapes;
+  readonly valueChoices: readonly ValueChoice[] | undefined;
+  readonly row: HTMLAttributes<HTMLElement> & { readonly ref: RefCallback<HTMLElement> };
+  readonly dragging: boolean;
+  readonly gap: 'before' | 'after' | undefined;
+  readonly onChange: (change: (group: GroupDraft) => GroupDraft) => void;
+  readonly onRemove: () => void;
+}) {
+  const translate = useTranslate();
+  const { group, catalog, onChange } = props;
+  return (
+    <>
+      {props.groupIndex > 0 && <div className="conditional-or">{translate('props.conditional.or')}</div>}
+      <div
+        {...props.row}
+        className={`conditional-group${props.dragging ? ' is-dragging' : ''}`}
+        role="group"
+        tabIndex={0}
+        aria-label={translate('props.conditional.group', { number: props.groupIndex + 1 })}
+      >
+        {props.gap !== undefined && (
+          <span className={`conditional-gap is-${props.gap}`}>
+            <DropLine />
+          </span>
+        )}
+        <ConditionGroupBody
+          match={group.match}
+          conditions={group.conditions}
+          catalog={catalog}
+          conditionsMax={CONDITIONAL_LIMITS.conditionsPerGroupMax}
+          dragGroupLabel={translate('props.conditional.dragGroup', { number: props.groupIndex + 1 })}
+          removeLabel={translate('props.conditional.removeGroup')}
+          onMatch={(match) => onChange((current) => ({ ...current, match }))}
+          onCondition={(conditionIndex, next) => onChange((current) => withCondition(current, conditionIndex, next))}
+          onConditionRemove={(conditionIndex) => {
+            if (group.conditions.length === 1) {
+              props.onRemove();
+            } else {
+              onChange((current) => withConditionRemoved(current, conditionIndex));
+            }
+          }}
+          onConditionAdd={() => onChange((current) => withConditionAdded(current, catalog))}
+          onRemove={props.onRemove}
+          value={
+            props.valueChoices === undefined ? (
+              <ResultField
+                label={translate('props.conditional.valueLabel')}
+                result={group.value}
+                bindContext={props.bindContext}
+                language={props.language}
+                shapes={props.shapes}
+                onChange={(value) => onChange((current) => ({ ...current, value }))}
+              />
+            ) : (
+              <ChoiceResult
+                label={translate('props.conditional.valueLabel')}
+                result={group.value}
+                choices={props.valueChoices}
+                onChange={(value) => onChange((current) => ({ ...current, value }))}
+              />
+            )
+          }
+        />
+      </div>
+    </>
+  );
+}
+
+export function ConditionGroupBody(props: {
+  readonly match: GroupMatch;
+  readonly conditions: readonly ConditionDraft[];
+  readonly catalog: readonly ConditionProp[];
+  readonly conditionsMax: number;
+  readonly dragGroupLabel?: string | undefined;
+  readonly removeLabel: string;
+  readonly onMatch: (match: GroupMatch) => void;
+  readonly onCondition: (conditionIndex: number, condition: ConditionDraft) => void;
+  readonly onConditionRemove: (conditionIndex: number) => void;
+  readonly onConditionAdd: () => void;
+  readonly onRemove: () => void;
+  readonly value: ReactNode;
+}) {
+  assert(props.conditions.length <= props.conditionsMax, 'ConditionGroupBody: the conditions are bounded');
+  return (
+    <>
+      <GroupHeading
+        match={props.match}
+        always={props.conditions.length === 0}
+        onMatch={props.onMatch}
+        onRemove={props.onRemove}
+        removeLabel={props.removeLabel}
+        dragGroupLabel={props.dragGroupLabel}
+      />
+      {props.conditions.map((condition, conditionIndex) => (
+        <ConditionRow
+          key={conditionIndex}
+          condition={condition}
+          catalog={props.catalog}
+          onChange={(next) => props.onCondition(conditionIndex, next)}
+          onRemove={() => props.onConditionRemove(conditionIndex)}
+        />
+      ))}
+      <AddConditionButton disabled={props.conditions.length >= props.conditionsMax} onAdd={props.onConditionAdd} />
+      <div className="conditional-divider" />
+      {props.value}
+    </>
+  );
+}
+
+export function ConditionRow(props: {
+  readonly condition: ConditionDraft;
+  readonly catalog: readonly ConditionProp[];
+  readonly onChange: (condition: ConditionDraft) => void;
+  readonly onRemove: () => void;
+}) {
+  const translate = useTranslate();
+  const { condition, catalog } = props;
+  if (condition.code !== undefined) {
+    return <LockedConditionLine code={condition.code} onRemove={props.onRemove} />;
+  }
+  const prop = condition.subject === undefined ? undefined : propOf(catalog, condition.subject);
+  const listed = prop === undefined || catalog.some((entry) => entry.name === prop.name) ? catalog : [...catalog, prop];
+  const subjects = [...listed.filter((entry) => entry.computed === undefined), ...listed.filter((entry) => entry.computed !== undefined)];
+  const operators = operatorsWith(prop?.kind ?? 'text', condition.operator, translate);
+  const plainer = plainerCondition(condition, catalog);
+  return (
+    <ConditionLine
+      onRemove={props.onRemove}
+      subject={
+        <Dropdown
+          ariaLabel={translate('props.conditional.property')}
+          className="conditional-subject"
+          value={condition.subject ?? ''}
+          placeholder={translate('props.conditional.property')}
+          menuWidthMin={MENU_WIDTH_PX_MIN}
+          options={subjects.map((entry) =>
+            entry.computed === undefined
+              ? { value: entry.name, label: entry.label, icon: <FieldTypeIcon type={FIELD_TYPES[entry.kind]} name={entry.name} /> }
+              : {
+                  value: entry.name,
+                  label: entry.label,
+                  group: translate('props.conditional.computedGroup'),
+                  icon: <CodeIcon size={14} />,
+                  title: computedTitle(entry, catalog, translate),
+                },
+          )}
+          onChange={(subject) => props.onChange(withSubject(condition, catalog, subject))}
+        />
+      }
+      offer={
+        plainer === undefined || prop === undefined ? undefined : (
+          <PlainerSuggestion
+            why={computedWhy(prop, catalog, translate)}
+            words={draftWords(plainer, catalog, translate)}
+            onSwitch={() => props.onChange(plainer)}
+          />
+        )
+      }
+      operator={
+        <Dropdown
+          ariaLabel={translate('props.conditional.operator.label')}
+          className="conditional-operator"
+          value={condition.operator}
+          options={operators}
+          onChange={(operator) => props.onChange({ ...condition, operator, values: takesValues(operator) ? condition.values : [] })}
+        />
+      }
+      values={takesValues(condition.operator) && prop !== undefined ? <ValuesInput condition={condition} prop={prop} onChange={props.onChange} /> : undefined}
+    />
+  );
+}
+
+export function LockedConditionLine(props: { readonly code: string; readonly onRemove: () => void; readonly onCommit?: ((code: string) => void) | undefined }) {
+  const translate = useTranslate();
+  const [draft, setDraft] = useState<string | undefined>(undefined);
+  const { onCommit } = props;
+  const chip = (
+    <span className="conditional-chip conditional-chip-computed">
+      <BranchIcon size={11} />
+      {translate('props.conditional.computed')}
+    </span>
+  );
+  if (draft !== undefined && onCommit !== undefined) {
+    const valid = isExpression(draft);
+    const commit = (text: string): void => {
+      if (!isExpression(text)) {
+        return;
+      }
+      setDraft(undefined);
+      if (text.trim() !== props.code.trim()) {
+        onCommit(text.trim());
+      }
+    };
+    return (
+      <ConditionLine
+        onRemove={props.onRemove}
+        subject={
+          <span
+            className="conditional-code-condition is-editing"
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') {
+                event.stopPropagation();
+                setDraft(undefined);
+              }
+            }}
+            onBlur={(event) => {
+              if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) {
+                return;
+              }
+              if (isExpression(draft)) {
+                commit(draft);
+              } else {
+                setDraft(undefined);
+              }
+            }}
+          >
+            {chip}
+            <ExprInput
+              value={draft}
+              autoFocus
+              singleLine
+              invalid={!valid}
+              language="typescript"
+              ariaLabel={translate('props.conditional.computed')}
+              onChange={setDraft}
+              onCommit={commit}
+            />
+          </span>
+        }
+        operator={undefined}
+        values={undefined}
+      />
+    );
+  }
+  const open = onCommit === undefined ? undefined : () => setDraft(props.code);
+  return (
+    <ConditionLine
+      onRemove={props.onRemove}
+      subject={
+        <span
+          className={`conditional-code-condition${open === undefined ? '' : ' is-editable'}`}
+          title={props.code}
+          {...(open === undefined
+            ? {}
+            : {
+                role: 'button',
+                tabIndex: 0,
+                onClick: open,
+                onKeyDown: (event: KeyboardEvent<HTMLSpanElement>) => {
+                  if (event.key === 'Enter') {
+                    open();
+                  }
+                },
+              })}
+        >
+          {chip}
+          <CodeInline text={props.code.replace(/\s+/g, ' ')} language="typescript" className="conditional-code-condition-code" />
+          {open !== undefined && (
+            <span className="prop-expr-toggle conditional-code-condition-edit" aria-hidden="true">
+              <BracesIcon size={12} />
+            </span>
+          )}
+        </span>
+      }
+      operator={undefined}
+      values={undefined}
+    />
+  );
+}
+
+export function GroupHeading(props: {
+  readonly match: GroupMatch;
+  readonly onMatch: (match: GroupMatch) => void;
+  readonly onRemove: () => void;
+  readonly dragGroupLabel?: string | undefined;
+  readonly removeLabel?: string | undefined;
+  readonly always?: boolean | undefined;
+}) {
+  const translate = useTranslate();
+  const removeLabel = props.removeLabel ?? translate('props.conditional.removeGroup');
+  return (
+    <div className="conditional-group-head">
+      {props.dragGroupLabel !== undefined && (
+        <button type="button" className="conditional-grip" aria-label={props.dragGroupLabel} data-drag-through tabIndex={-1}>
+          <DragIcon size={12} />
+        </button>
+      )}
+      {props.always === true ? (
+        <span className="conditional-phrase">{translate('props.conditional.always')}</span>
+      ) : (
+        <>
+          {translate('props.conditional.if')}
+          <Dropdown
+            ariaLabel={translate('props.conditional.match')}
+            className="conditional-match"
+            menuClassName="conditional-match-menu"
+            value={props.match}
+            options={matchOptions(translate)}
+            onChange={props.onMatch}
+          />
+          <span className="conditional-phrase">{translate('props.conditional.groupPhrase')}</span>
+        </>
+      )}
+      <button type="button" className="loop-settings-remove" aria-label={removeLabel} title={removeLabel} onClick={props.onRemove}>
+        <TrashIcon size={12} />
+      </button>
+    </div>
+  );
+}
+
+export function ConditionLine(props: {
+  readonly subject: ReactNode;
+  readonly operator: ReactNode;
+  readonly values: ReactNode;
+  readonly onRemove: () => void;
+  readonly offer?: ReactNode;
+}) {
+  const translate = useTranslate();
+  return (
+    <>
+      <div className="conditional-condition">
+        {props.subject}
+        {props.operator}
+        {}
+        {props.values ?? <span className="conditional-values-none" />}
+        <button
+          type="button"
+          className="loop-settings-remove"
+          aria-label={translate('props.conditional.removeCondition')}
+          title={translate('props.conditional.removeCondition')}
+          onClick={props.onRemove}
+        >
+          <CloseIcon size={12} />
+        </button>
+      </div>
+      {props.offer}
+    </>
+  );
+}
+
+export function PlainerSuggestion(props: { readonly why: string; readonly words: string; readonly onSwitch: () => void }) {
+  const translate = useTranslate();
+  const rowTip = useDelayedTooltip();
+  const switchTip = useDelayedTooltip();
+  const tip = translate('props.conditional.switchPlainerTip', { condition: props.words });
+  return (
+    <div className="conditional-plainer" onMouseEnter={rowTip.show} onMouseLeave={rowTip.hide}>
+      <BranchIcon size={12} />
+      <span className="conditional-plainer-words">{translate('props.conditional.sameAs', { condition: props.words })}</span>
+      <button
+        type="button"
+        className="conditional-plainer-switch"
+        aria-label={tip}
+        onMouseEnter={(event) => {
+          rowTip.hide();
+          switchTip.show(event);
+        }}
+        onMouseLeave={switchTip.hide}
+        onClick={props.onSwitch}
+      >
+        <SyncIcon size={11} />
+        {translate('props.conditional.switchPlainer')}
+      </button>
+      {rowTip.value !== undefined &&
+        createPortal(
+          <FittedTooltip role="tooltip" anchor={rowTip.value}>
+            {props.why}
+          </FittedTooltip>,
+          tooltipHost(undefined),
+        )}
+      {switchTip.value !== undefined &&
+        createPortal(
+          <FittedTooltip role="tooltip" anchor={switchTip.value}>
+            {tip}
+          </FittedTooltip>,
+          tooltipHost(undefined),
+        )}
+    </div>
+  );
+}
+
+function computedWhy(entry: ConditionProp, catalog: readonly ConditionProp[], translate: Translator): string {
+  const equivalent = entry.computed?.equivalent;
+  const definition = equivalent === undefined ? (entry.computed?.code ?? '') : conditionWords(equivalent, catalog, translate);
+  return translate('props.conditional.computedWhy', { name: entry.label, definition });
+}
+
+function computedTitle(entry: ConditionProp, catalog: readonly ConditionProp[], translate: Translator): string {
+  const equivalent = entry.computed?.equivalent;
+  const code = entry.computed?.code ?? '';
+  const words = equivalent === undefined ? code : conditionWords(equivalent, catalog, translate);
+  return translate('props.conditional.computedDefinition', { name: entry.label, definition: words, code });
+}
+
+function draftWords(condition: ConditionDraft, catalog: readonly ConditionProp[], translate: Translator): string {
+  const [finished] = modelOf({ groups: [{ match: 'all', conditions: [condition], value: NO_VALUE }], otherwise: NO_VALUE }).groups;
+  const [only] = finished?.conditions ?? [];
+  return only === undefined ? '' : conditionWords(only, catalog, translate);
+}
+
+export function AddConditionButton(props: { readonly disabled: boolean; readonly onAdd: () => void }) {
+  const translate = useTranslate();
+  return (
+    <button type="button" className="conditional-add" disabled={props.disabled} onClick={props.onAdd}>
+      <PlusIcon size={11} />
+      {translate('props.conditional.newCondition')}
+    </button>
+  );
+}
+
+export function AddGroupRow(props: { readonly disabled: boolean; readonly onAdd: () => void }) {
+  const translate = useTranslate();
+  return (
+    <div className="conditional-add-group-row">
+      <button type="button" className="conditional-add-group" disabled={props.disabled} onClick={props.onAdd}>
+        <PlusIcon size={11} />
+        {translate('props.conditional.newGroup')}
+      </button>
+    </div>
+  );
+}
+
+function operatorsWith(
+  kind: ConditionProp['kind'],
+  operator: DraftOperator,
+  translate: Translator,
+): readonly { readonly value: DraftOperator; readonly label: string }[] {
+  const offered = operatorsFor(kind, translate);
+  if (offered.some((option) => option.value === operator)) {
+    return offered;
+  }
+  const extra = operatorsFor('text', translate).find((option) => option.value === operator);
+  assert(extra !== undefined, 'operatorsWith: every operator has words');
+  return [...offered, extra];
+}
+
+function ValuesInput(props: { readonly condition: ConditionDraft; readonly prop: ConditionProp; readonly onChange: (condition: ConditionDraft) => void }) {
+  const translate = useTranslate();
+  const { condition, prop } = props;
+  const options = prop.options.map((option) => ({
+    value: literalKey({ kind: 'string', value: option }),
+    label: literalWords({ kind: 'string', value: option }, prop.kind),
+  }));
+  const byKey = new Map(condition.values.map((value) => [literalKey(value), value]));
+  return (
+    <MultiSelect
+      ariaLabel={translate('props.conditional.values')}
+      values={condition.values.map(literalKey)}
+      options={options}
+      placeholder={prop.kind === 'option' ? translate('ui.choose') : translate('props.conditional.typeValue')}
+      valuesMax={CONDITIONAL_LIMITS.valuesPerConditionMax}
+      labelOf={(key) => {
+        const literal = byKey.get(key) ?? literalOfKey(key);
+        return literal === undefined ? key : literalWords(literal, prop.kind);
+      }}
+      valueOfText={
+        prop.kind === 'option'
+          ? undefined
+          : (text) => {
+              const literal = literalOfInput(prop.kind, text);
+              return literal === undefined ? undefined : literalKey(literal);
+            }
+      }
+      onChange={(keys) =>
+        props.onChange({
+          ...condition,
+          values: keys.flatMap((key) => {
+            const literal = byKey.get(key) ?? literalOfKey(key);
+            return literal === undefined ? [] : [literal];
+          }),
+        })
+      }
+    />
+  );
+}
+
+function literalKey(literal: ConditionLiteral): string {
+  return `${literal.kind}:${String(literal.value)}`;
+}
+
+function literalOfKey(key: string): ConditionLiteral | undefined {
+  if (key.startsWith('string:')) {
+    return { kind: 'string', value: key.slice('string:'.length) };
+  }
+  const value = Number(key.slice('number:'.length));
+  return key.startsWith('number:') && Number.isFinite(value) ? { kind: 'number', value } : undefined;
+}
+
+export function ResultField(props: {
+  readonly label: string;
+  readonly placeholder?: string | undefined;
+  readonly result: ConditionalResult;
+  readonly bindContext: RichContext | undefined;
+  readonly language: ValueLanguage;
+  readonly shapes?: ReadShapes | undefined;
+  readonly onChange: (result: ConditionalResult) => void;
+}) {
+  const translate = useTranslate();
+  const { result } = props;
+  const shapes = props.shapes ?? 'plain';
+  const wrap = useRef<HTMLDivElement>(null);
+  const apiRef = useRef<InsertAPI | undefined>(undefined);
+  const codeApiRef = useRef<ExprInputAPI | undefined>(undefined);
+  const [picker, setPicker] = useState<(FieldPickerAt & { readonly chip: TemplateHole | undefined }) | undefined>(undefined);
+  const openOnChip = (hole: TemplateHole | undefined): void => {
+    if (hole === undefined) {
+      return;
+    }
+    const index = templateHoles(bodyOfResult(result)).findIndex((candidate) => candidate.from === hole.from);
+    const chip = wrap.current?.querySelectorAll('.expr-chip').item(index);
+    const bounds = (chip ?? wrap.current)?.getBoundingClientRect();
+    if (bounds !== undefined) {
+      setPicker({ ...dataPickerPosition(bounds), focus: FIELD_UNFOCUSED, chip: hole });
+    }
+  };
+  const shown = attrOfResult(result) ?? { type: 'string', value: '' };
+  return (
+    <div className="conditional-value-row">
+      <CornerIcon size={12} />
+      <span className="conditional-value-label">{translate('props.conditional.valueLabel')}</span>
+      <div className="attr-value-field" ref={wrap} aria-label={props.label} role="group">
+        {props.language === 'css' && isPlainResult(result) ? (
+          <CssBodyInput
+            value={bodyOfResult(result)}
+            syncValue={bodyOfResult(result)}
+            syntax={styleDeclarations}
+            className="conditional-css-input"
+            ariaLabel={props.label}
+            placeholder={props.placeholder ?? translate('props.conditional.leaveOut')}
+            chipsOf={templateHoles}
+            onChipClick={openOnChip}
+            apiRef={codeApiRef}
+            onChange={(text) => takeBody(text, props.onChange)}
+          />
+        ) : (
+          <BindField
+            value={shown.type === 'bare' ? { type: 'string', value: '' } : shown}
+            placeholder={props.placeholder ?? translate('props.conditional.leaveOut')}
+            bindContext={props.bindContext}
+            apiRef={apiRef}
+            onChange={(next) => {
+              const read = next === undefined ? NO_VALUE : resultOfAttr(next, { shapes });
+              if (read !== undefined) {
+                props.onChange(read);
+              }
+            }}
+          />
+        )}
+        <BindHandle
+          active={picker !== undefined}
+          onOpen={(_host, focus) => {
+            const bounds = wrap.current?.getBoundingClientRect();
+            setPicker(picker !== undefined || bounds === undefined ? undefined : { ...dataPickerPosition(bounds), focus, chip: undefined });
+          }}
+        />
+      </div>
+      {picker !== undefined && (
+        <FieldDataPicker
+          pos={picker}
+          bindContext={props.bindContext}
+          current={picker.chip?.path ?? (result.kind === 'reference' ? result.path : undefined)}
+          seed={{ fit: 'text', label: 'value', value: result.kind === 'text' ? result.text : '' }}
+          onBindNew={(path) => {
+            setPicker(undefined);
+            pickReference(path, props.onChange);
+          }}
+          onPick={(path) => {
+            setPicker(undefined);
+            if (picker.chip !== undefined && codeApiRef.current !== undefined && isReferencePath(path)) {
+              const next = codeApiRef.current.replaceRange(picker.chip.from, picker.chip.to, `\${${path}}`);
+              if (next !== undefined) {
+                takeBody(next, props.onChange);
+              }
+              return;
+            }
+            if (picker.focus.kind === 'focused' && props.language === 'css' && codeApiRef.current !== undefined && isReferencePath(path)) {
+              const next = codeApiRef.current.insert(`\${${path}}`);
+              if (next !== undefined) {
+                takeBody(next, props.onChange);
+              }
+              return;
+            }
+            if (picker.focus.kind === 'focused' && apiRef.current !== undefined) {
+              apiRef.current.insert(path);
+              return;
+            }
+            pickReference(path, props.onChange);
+          }}
+          onClose={() => setPicker(undefined)}
+        />
+      )}
+    </div>
+  );
+}
+
+function CssBodyInput(props: ExprInputProps) {
+  const codeChips = useCssFieldChips();
+  return (
+    <>
+      <ExprInput {...props} extensions={codeChips.extension} />
+      {codeChips.overlay}
+    </>
+  );
+}
+
+function ChoiceResult(props: {
+  readonly label: string;
+  readonly result: ConditionalResult;
+  readonly choices: readonly ValueChoice[];
+  readonly onChange: (result: ConditionalResult) => void;
+}) {
+  const translate = useTranslate();
+  const value = props.result.kind === 'text' ? props.result.text : '';
+  return (
+    <div className="conditional-value-row">
+      <CornerIcon size={12} />
+      <span className="conditional-value-label">{translate('props.conditional.valueLabel')}</span>
+      <ValueChoiceSwitch
+        label={props.label}
+        className="conditional-value-choice"
+        value={value}
+        choices={props.choices}
+        onChange={(text) => props.onChange({ kind: 'text', text })}
+      />
+    </div>
+  );
+}
+
+function takeBody(text: string, onChange: (result: ConditionalResult) => void): void {
+  const read = text === '' ? NO_VALUE : resultOfBody(text);
+  if (read !== undefined) {
+    onChange(read);
+  }
+}
+
+function pickReference(path: string, onChange: (result: ConditionalResult) => void): void {
+  if (isReferencePath(path)) {
+    onChange({ kind: 'reference', path });
+  }
+}

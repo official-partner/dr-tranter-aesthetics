@@ -1,0 +1,657 @@
+import { ErrorToast } from '../../ui/ErrorToast';
+import React, { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+  orderReleases,
+  releaseAssetChoice,
+  type AppGitHubSource,
+  type AppRelease,
+  type AppRepository,
+  type AppRepositoryListing,
+  type AppStaged,
+} from '../../../shared/properties/apps';
+import { assert } from '../../../shared/core/assert';
+import type { Translator } from '../../../shared/properties/i18n/messageRef';
+import type { Formatters } from '../../../shared/core/i18n/format';
+import type { MessageRef } from '../../../shared/core/i18n/messageReference';
+import { useFormat, useTranslate, useTranslateDescribed, useTranslateRef, useTranslateRich } from '../../lib/i18n/useTranslate';
+import { discoverPublishing } from '../../ipc/publishDiscoveryBridge';
+import { listAppReleases, listAppRepositories, stageGitHubApp } from '../../ipc/appsBridge';
+import Dropdown from '../../ui/Dropdown';
+import Popup from '../../ui/Popup';
+import { AppsIcon, ClockIcon, GitHubIcon, RefreshIcon, SearchIcon, WarningTriangleIcon } from '../../ui/Icons';
+import { CodeInline } from '../../ui/CodeBlock';
+import { useScrollEdges } from '../../ui/useScrollEdges';
+import { AppTile } from './AppTile';
+import { chooserPickables, chooserRows, hasStackiApps, moveChooserActive, type ChooserPickable, type ChooserRow } from './repositoryChooser';
+
+export type Load<T> =
+  | { readonly kind: 'idle' }
+  | { readonly kind: 'loading' }
+  | { readonly kind: 'failed'; readonly message: string; readonly messageRef?: MessageRef | undefined }
+  | { readonly kind: 'ready'; readonly value: T };
+
+export interface ConnectGitHubProps {
+  readonly projectPath: string;
+  readonly renderSignIn?: ((done: () => void, cancel: () => void) => ReactNode) | undefined;
+  readonly renderAvatar: (login: string | undefined, name: string) => ReactNode;
+  readonly onClose: () => void;
+  readonly onStaged: (staged: AppStaged) => void;
+}
+
+interface Pick {
+  readonly owner: string;
+  readonly repository: string;
+  readonly account: string | undefined;
+}
+
+export const STACKI_APP_TOPIC_HELP_URL = 'https://stacki.build/docs/apps#publishing-through-github-releases';
+
+export function sinceLabel(iso: string, nowMs: number, formatRelativeTime: Formatters['formatRelativeTime']): string {
+  const publishedMs = Date.parse(iso);
+  return formatRelativeTime(Number.isFinite(publishedMs) ? publishedMs : nowMs, nowMs);
+}
+
+export function ConnectGitHub(props: ConnectGitHubProps) {
+  const translate = useTranslate();
+  const [signingIn, setSigningIn] = useState(false);
+  const [pick, setPick] = useState<Pick | undefined>(undefined);
+  const [discovery, setDiscovery] = useState(0);
+  const { accounts, account, setAccount } = usePublishAccounts(props.projectPath, discovery);
+  const listAccount = props.renderSignIn === undefined ? undefined : account;
+  const [attempt, setAttempt] = useState(0);
+  const repositories = useRepositories(props.projectPath, listAccount, attempt);
+
+  if (signingIn && props.renderSignIn !== undefined) {
+    return props.renderSignIn(
+      () => {
+        setSigningIn(false);
+        setDiscovery((count) => count + 1);
+      },
+      () => setSigningIn(false),
+    );
+  }
+  const renderSignIn = props.renderSignIn;
+  const list = chooserList({
+    accounts,
+    account: listAccount,
+    repositories,
+    signIn: renderSignIn === undefined ? undefined : () => setSigningIn(true),
+    retry: () => setAttempt((count) => count + 1),
+  });
+  return (
+    <Popup className="modal apps-connect" label={translate('apps.loadFromGitHub')} onClose={props.onClose} dismissible={true}>
+      {({ close }) => (
+        <ConnectFrame onCancel={close}>
+          {pick === undefined ? (
+            <RepositoryChooser
+              accounts={accounts.kind === 'ready' ? accounts.value : []}
+              account={listAccount}
+              list={list}
+              onAccount={setAccount}
+              renderAvatar={props.renderAvatar}
+              onPick={(chosen) => setPick(chosen)}
+            />
+          ) : (
+            <ReleaseStep projectPath={props.projectPath} pick={pick} onBack={() => setPick(undefined)} onStaged={props.onStaged} />
+          )}
+        </ConnectFrame>
+      )}
+    </Popup>
+  );
+}
+
+export function usePublishAccounts(
+  projectPath: string,
+  discovery: number,
+): { readonly accounts: Load<readonly string[]>; readonly account: string | undefined; readonly setAccount: (account: string) => void } {
+  const [accounts, setAccounts] = useState<Load<readonly string[]>>({ kind: 'loading' });
+  const [account, setAccount] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    let active = true;
+    void discoverPublishing(projectPath, { provider: 'github', account: '' }).then(
+      (answer) => {
+        if (!active) {
+          return;
+        }
+        const names = answer.kind === 'ready' ? answer.accounts.map((entry) => entry.id) : [];
+        setAccounts({ kind: 'ready', value: names });
+        setAccount((current) => current ?? names[0]);
+      },
+      () => active && setAccounts({ kind: 'ready', value: [] }),
+    );
+    return () => {
+      active = false;
+    };
+  }, [projectPath, discovery]);
+  return { accounts, account, setAccount };
+}
+
+export function useRepositories(projectPath: string, account: string | undefined, attempt: number): Load<AppRepositoryListing> {
+  const [load, setLoad] = useState<Load<AppRepositoryListing>>({ kind: 'idle' });
+  useEffect(() => {
+    if (account === undefined) {
+      setLoad({ kind: 'idle' });
+      return undefined;
+    }
+    let active = true;
+    setLoad({ kind: 'loading' });
+    void listAppRepositories(projectPath, account).then(
+      (listing) => active && setLoad({ kind: 'ready', value: listing }),
+      (error: unknown) => active && setLoad({ kind: 'ready', value: { kind: 'failed', message: String(error) } }),
+    );
+    return () => {
+      active = false;
+    };
+  }, [projectPath, account, attempt]);
+  return load;
+}
+
+export type ChooserList =
+  | { readonly kind: 'loading' }
+  | { readonly kind: 'ready'; readonly account: string; readonly repositories: readonly AppRepository[] }
+  | { readonly kind: 'failed'; readonly message: string; readonly messageRef?: MessageRef | undefined; readonly retry: () => void }
+  | { readonly kind: 'rate-limited'; readonly resetAtMs: number | undefined; readonly retry: () => void }
+  | { readonly kind: 'restart' }
+  | { readonly kind: 'signed-out'; readonly signIn: (() => void) | undefined };
+
+export function chooserList(input: {
+  readonly accounts: Load<readonly string[]>;
+  readonly account: string | undefined;
+  readonly repositories: Load<AppRepositoryListing>;
+  readonly signIn: (() => void) | undefined;
+  readonly retry: () => void;
+}): ChooserList {
+  if (input.signIn === undefined) {
+    return { kind: 'signed-out', signIn: undefined };
+  }
+  if (input.accounts.kind !== 'ready') {
+    return { kind: 'loading' };
+  }
+  if (input.account === undefined) {
+    return { kind: 'signed-out', signIn: input.signIn };
+  }
+  switch (input.repositories.kind) {
+    case 'idle':
+    case 'loading':
+      return { kind: 'loading' };
+    case 'failed':
+      return { kind: 'failed', message: input.repositories.message, messageRef: input.repositories.messageRef, retry: input.retry };
+    case 'ready':
+      return listingState(input.repositories.value, input.account, input.retry);
+    default: {
+      const exhaustive: never = input.repositories;
+      return exhaustive;
+    }
+  }
+}
+
+function listingState(listing: AppRepositoryListing, account: string, retry: () => void): ChooserList {
+  switch (listing.kind) {
+    case 'ready':
+      return { kind: 'ready', account, repositories: listing.repositories };
+    case 'failed':
+      return { kind: 'failed', message: listing.message, messageRef: listing.messageRef, retry };
+    case 'rate-limited':
+      return { kind: 'rate-limited', resetAtMs: listing.resetAtMs, retry };
+    case 'restart':
+      return { kind: 'restart' };
+    default: {
+      const exhaustive: never = listing;
+      return exhaustive;
+    }
+  }
+}
+
+export function rateLimitWait(resetAtMs: number | undefined, nowMs: number, translate: Translator): string {
+  if (resetAtMs === undefined) {
+    return translate('apps.connect.tryAgainSoon');
+  }
+  const minutes = Math.max(1, Math.ceil((resetAtMs - nowMs) / 60_000));
+  assert(Number.isSafeInteger(minutes), 'A wait is whole minutes');
+  assert(minutes >= 1, 'A wait is at least a minute');
+  return translate('apps.connect.tryAgainIn', { count: minutes });
+}
+
+export function ConnectFrame(props: {
+  readonly onCancel: () => void;
+  readonly title?: ReactNode;
+  readonly icon?: ReactNode;
+  readonly actions?: ReactNode;
+  readonly cancelLabel?: string;
+  readonly cancel?: 'enabled' | 'disabled' | 'hidden';
+  readonly children: ReactNode;
+}) {
+  const translate = useTranslate();
+  const cancel = props.cancel ?? 'enabled';
+  return (
+    <>
+      <div className="modal-header apps-connect-header">
+        {props.icon ?? <GitHubIcon size={16} />}
+        {props.title ?? translate('apps.loadFromGitHub')}
+      </div>
+      <div className="modal-body apps-connect-body">{props.children}</div>
+      <div className="modal-footer apps-connect-footer">
+        {cancel === 'hidden' ? undefined : (
+          <button type="button" disabled={cancel === 'disabled'} onClick={props.onCancel}>
+            {props.cancelLabel ?? translate('ui.cancel')}
+          </button>
+        )}
+        {props.actions}
+      </div>
+    </>
+  );
+}
+
+export interface RepositoryChooserProps {
+  readonly accounts: readonly string[];
+  readonly account: string | undefined;
+  readonly list: ChooserList;
+  readonly onAccount: (account: string) => void;
+  readonly renderAvatar: ConnectGitHubProps['renderAvatar'];
+  readonly onPick: (pick: Pick) => void;
+  readonly initialQuery?: string;
+}
+
+const SKELETON_ROWS = 5;
+const LISTBOX_ID = 'apps-connect-repositories';
+
+export function RepositoryChooser(props: RepositoryChooserProps) {
+  const { list } = props;
+  const translate = useTranslate();
+  const [query, setQuery] = useState(props.initialQuery ?? '');
+  const [active, setActive] = useState(0);
+  const scroll = useRef<HTMLDivElement>(null);
+  const { edges } = useScrollEdges(scroll);
+  const rows = chooserRows({ query, repositories: list.kind === 'ready' ? list.repositories : undefined });
+  const pickables = chooserPickables(rows);
+  const highlighted = Math.min(active, Math.max(0, pickables.length - 1));
+  const now = Date.now();
+  const choose = (row: ChooserPickable) => {
+    if (row.kind === 'use') {
+      props.onPick({ owner: row.owner, repository: row.repository, account: undefined });
+    } else {
+      props.onPick({ owner: row.repository.owner, repository: row.repository.name, account: props.account });
+    }
+  };
+  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const next = moveChooserActive(highlighted, event.key === 'ArrowDown' ? 1 : -1, pickables.length);
+      setActive(next);
+      document.getElementById(optionId(next))?.scrollIntoView({ block: 'nearest' });
+      return;
+    }
+    if (event.key === 'Enter') {
+      const row = pickables[highlighted];
+      if (row !== undefined) {
+        event.preventDefault();
+        choose(row);
+      }
+    }
+  };
+  const activeKey = pickables[highlighted]?.key;
+  const pickableIndex = new Map(pickables.map((row, index) => [row.key, index]));
+  return (
+    <div className="apps-connect-chooser">
+      <div className="apps-connect-field">
+        {props.account === undefined ? (
+          <SearchIcon size={14} className="apps-connect-field-icon" />
+        ) : (
+          <Dropdown
+            ariaLabel={translate('apps.connect.account')}
+            className="apps-connect-account"
+            value={props.account}
+            options={props.accounts.map((login) => ({ value: login, label: login, icon: props.renderAvatar(login, login) }))}
+            onChange={props.onAccount}
+          />
+        )}
+        <input
+          type="search"
+          role="combobox"
+          aria-label={translate('apps.connect.searchLabel')}
+          aria-expanded={true}
+          aria-controls={LISTBOX_ID}
+          aria-activedescendant={activeKey === undefined ? undefined : optionId(highlighted)}
+          aria-autocomplete="list"
+          placeholder={translate('apps.connect.searchLabel')}
+          spellCheck={false}
+          autoComplete="off"
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setActive(0);
+          }}
+          onKeyDown={onKeyDown}
+        />
+      </div>
+      <div ref={scroll} className="apps-connect-scroll" data-edge-top={edges.top} data-edge-bottom={edges.bottom}>
+        <ul className="apps-choice-list" id={LISTBOX_ID} role="listbox" aria-label={translate('apps.connect.repositories')}>
+          {rows.map((row) => (
+            <ChooserRowView
+              key={row.key}
+              row={row}
+              optionIndex={pickableIndex.get(row.key)}
+              on={row.key === activeKey}
+              now={now}
+              renderAvatar={props.renderAvatar}
+              onHover={() => setActive(pickableIndex.get(row.key) ?? 0)}
+              onChoose={choose}
+            />
+          ))}
+        </ul>
+        <ChooserListState list={list} />
+      </div>
+    </div>
+  );
+}
+
+export function ChooserListState(props: { readonly list: ChooserList }) {
+  const { list } = props;
+  const translate = useTranslate();
+  const translateRich = useTranslateRich();
+  const translateDescribed = useTranslateDescribed();
+  switch (list.kind) {
+    case 'ready':
+      return hasStackiApps(list.repositories) ? undefined : (
+        <ChooserEmpty
+          icon={<AppsIcon size={20} />}
+          title={translate('apps.connect.noApps', { account: list.account })}
+          action={
+            <a className="apps-connect-empty-link" href={STACKI_APP_TOPIC_HELP_URL} target="_blank" rel="noreferrer">
+              {translate('apps.connect.howToAdd')}
+            </a>
+          }
+          hint={translate('apps.connect.orPaste')}
+        >
+          {translateRich('apps.connect.addTopic', { topic: <CodeInline text="stacki-app" /> })}
+        </ChooserEmpty>
+      );
+    case 'loading':
+      return (
+        <div className="apps-connect-skeletons" aria-label={translate('apps.connect.loading')} role="status">
+          {Array.from({ length: SKELETON_ROWS }, (_, index) => (
+            <div key={index} className="apps-skeleton apps-connect-skeleton">
+              <span className="apps-skeleton-tile" />
+              <span className="apps-skeleton-lines">
+                <span />
+                <span />
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+    case 'failed':
+      return (
+        <ChooserEmpty
+          icon={<WarningTriangleIcon size={20} />}
+          title={translate('apps.connect.loadFailed')}
+          action={<RetryButton onRetry={list.retry} />}
+          failure={translateDescribed(list)}
+        />
+      );
+    case 'rate-limited':
+      return (
+        <ChooserEmpty
+          icon={<ClockIcon size={20} />}
+          title={translate('apps.connect.rateLimited')}
+          action={<RetryButton onRetry={list.retry} />}
+          failure={rateLimitWait(list.resetAtMs, Date.now(), translate)}
+        />
+      );
+    case 'restart':
+      return <ChooserEmpty icon={<RefreshIcon size={20} />} title={translate('apps.connect.restartTitle')} failure={translate('apps.connect.restartDetail')} />;
+    case 'signed-out':
+      return list.signIn === undefined ? (
+        <ChooserEmpty icon={<GitHubIcon size={20} />} title={translate('apps.connect.pasteTitle')}>
+          {translate('apps.connect.pasteDetail')}
+        </ChooserEmpty>
+      ) : (
+        <ChooserEmpty
+          icon={<GitHubIcon size={20} />}
+          title={translate('apps.connect.signInTitle')}
+          action={
+            <button type="button" className="apps-button primary" onClick={list.signIn}>
+              <GitHubIcon size={14} /> {translate('apps.connect.signIn')}
+            </button>
+          }
+        >
+          {translate('apps.connect.signInDetail')}
+        </ChooserEmpty>
+      );
+    default: {
+      const exhaustive: never = list;
+      return exhaustive;
+    }
+  }
+}
+
+export function ChooserEmpty(props: {
+  readonly icon: ReactNode;
+  readonly title: string;
+  readonly action?: ReactNode;
+  readonly failure?: string;
+  readonly hint?: string;
+  readonly children?: ReactNode;
+}) {
+  assert(props.title.length > 0, 'An empty state has a title');
+  return (
+    <div className="apps-connect-empty">
+      <ErrorToast message={props.failure} />
+      <span className="apps-empty-icon" aria-hidden="true">
+        {props.icon}
+      </span>
+      <p className="apps-connect-empty-title">{props.title}</p>
+      {props.children !== undefined && <p className="apps-connect-empty-detail">{props.children}</p>}
+      {props.action}
+      {props.hint !== undefined && <p className="apps-connect-empty-hint">{props.hint}</p>}
+    </div>
+  );
+}
+
+export function RetryButton(props: { readonly onRetry: () => void }) {
+  const translate = useTranslate();
+  return (
+    <button type="button" className="apps-button" onClick={props.onRetry}>
+      {translate('ui.retry')}
+    </button>
+  );
+}
+
+export function ChooserRowView(props: {
+  readonly row: ChooserRow;
+  readonly optionIndex: number | undefined;
+  readonly on: boolean;
+  readonly now: number;
+  readonly renderAvatar: ConnectGitHubProps['renderAvatar'];
+  readonly onHover: () => void;
+  readonly onChoose: (row: ChooserPickable) => void;
+}) {
+  const { row } = props;
+  const translate = useTranslate();
+  const translateRef = useTranslateRef();
+  const { formatRelativeTime } = useFormat();
+  switch (row.kind) {
+    case 'section':
+      return (
+        <li className="dp-section apps-connect-section" role="presentation">
+          <span className="dp-section-heading">{translateRef(row.labelRef)}</span>
+        </li>
+      );
+    case 'notice':
+      return (
+        <li className="apps-connect-notice" role="presentation">
+          {translate('apps.connect.noMatch')}
+        </li>
+      );
+    case 'use':
+    case 'repository': {
+      const owner = row.kind === 'use' ? row.owner : row.repository.owner;
+      const name = row.kind === 'use' ? row.repository : row.repository.name;
+      assert(owner.length > 0, 'A chooser row names its owner');
+      assert(props.optionIndex !== undefined, 'A pickable row has a position');
+      return (
+        <li role="presentation">
+          <button
+            type="button"
+            id={optionId(props.optionIndex)}
+            role="option"
+            aria-selected={props.on}
+            tabIndex={-1}
+            className={`apps-choice${props.on ? ' on' : ''}${row.kind === 'use' ? ' apps-connect-use' : ''}`}
+            onMouseMove={props.onHover}
+            onClick={() => props.onChoose(row)}
+          >
+            <span className="apps-choice-avatar">{props.renderAvatar(owner, owner)}</span>
+            <span className="apps-choice-text">
+              <span className="apps-choice-title">
+                {row.kind === 'use' ? `${translate('apps.connect.use')} ` : ''}
+                {owner}/{name}
+              </span>
+              <span className="apps-choice-meta">
+                {row.kind === 'use'
+                  ? translate('apps.connect.publicRepository')
+                  : translate('apps.connect.updated', { when: sinceLabel(row.repository.updatedAt, props.now, formatRelativeTime) })}
+              </span>
+            </span>
+            {row.kind === 'repository' && (
+              <span className="apps-badge muted">{row.repository.private ? translate('apps.visibility.private') : translate('apps.visibility.public')}</span>
+            )}
+          </button>
+        </li>
+      );
+    }
+    default: {
+      const exhaustive: never = row;
+      return exhaustive;
+    }
+  }
+}
+
+export function optionId(index: number): string {
+  return `apps-connect-option-${index}`;
+}
+
+function ReleaseStep(props: {
+  readonly projectPath: string;
+  readonly pick: Pick;
+  readonly onBack: () => void;
+  readonly onStaged: (staged: AppStaged) => void;
+}) {
+  const { pick } = props;
+  const translate = useTranslate();
+  const translateDescribed = useTranslateDescribed();
+  const { formatRelativeTime } = useFormat();
+  const [load, setLoad] = useState<Load<readonly AppRelease[]>>({ kind: 'loading' });
+  const [tag, setTag] = useState<string | undefined>(undefined);
+  const [chosenAsset, setChosenAsset] = useState<string | undefined>(undefined);
+  const [check, setCheck] = useState<Load<AppStaged>>({ kind: 'idle' });
+  const lookup = useMemo<AppGitHubSource>(
+    () => ({ kind: 'github', owner: pick.owner, repository: pick.repository, asset: 'app.zip', account: pick.account }),
+    [pick],
+  );
+  useEffect(() => {
+    let active = true;
+    void listAppReleases(props.projectPath, lookup).then(
+      (answer) => {
+        if (!active) {
+          return;
+        }
+        if (!answer.ok) {
+          setLoad({ kind: 'failed', message: answer.message, messageRef: answer.messageRef });
+          return;
+        }
+        const ordered = orderReleases(answer.value);
+        setLoad({ kind: 'ready', value: ordered });
+        setTag(ordered[0]?.tag);
+      },
+      (error: unknown) => active && setLoad({ kind: 'failed', message: String(error) }),
+    );
+    return () => {
+      active = false;
+    };
+  }, [props.projectPath, lookup]);
+  const releases = load.kind === 'ready' ? load.value : [];
+  const release = releases.find((entry) => entry.tag === tag);
+  const choice = release === undefined ? undefined : releaseAssetChoice(release);
+  const asset = choice?.kind === 'single' ? choice.asset.name : choice?.kind === 'choose' ? (chosenAsset ?? choice.assets[0]?.name) : undefined;
+  const now = Date.now();
+  const runCheck = () => {
+    if (release === undefined || asset === undefined) {
+      return;
+    }
+    setCheck({ kind: 'loading' });
+    void stageGitHubApp(props.projectPath, { ...lookup, asset }, release.tag).then(
+      (answer) => setCheck(answer.ok ? { kind: 'ready', value: answer.value } : { kind: 'failed', message: answer.message, messageRef: answer.messageRef }),
+      (error: unknown) => setCheck({ kind: 'failed', message: String(error) }),
+    );
+  };
+  return (
+    <div className="apps-connect-releases">
+      <button type="button" className="apps-link" onClick={props.onBack}>
+        ← {pick.owner}/{pick.repository}
+      </button>
+      {load.kind === 'loading' && <p className="apps-note">{translate('apps.connect.loadingReleases')}</p>}
+      <ErrorToast message={load.kind === 'failed' ? translateDescribed(load) : undefined} />
+      {load.kind === 'ready' && releases.length === 0 && <p className="apps-note">{translate('apps.connect.noReleases')}</p>}
+      <ul className="apps-choice-list" aria-label={translate('apps.connect.releases')}>
+        {releases.map((entry) => (
+          <li key={entry.tag}>
+            <button
+              type="button"
+              className={`apps-choice${entry.tag === tag ? ' on' : ''}`}
+              aria-pressed={entry.tag === tag}
+              onClick={() => {
+                setTag(entry.tag);
+                setChosenAsset(undefined);
+                setCheck({ kind: 'idle' });
+              }}
+            >
+              <span className="apps-choice-text">
+                <span className="apps-choice-title">{entry.name || entry.tag}</span>
+                <span className="apps-choice-meta">
+                  {entry.tag} · {sinceLabel(entry.publishedAt, now, formatRelativeTime)}
+                </span>
+              </span>
+              {entry.prerelease && <span className="apps-badge muted">{translate('apps.connect.prerelease')}</span>}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <ErrorToast message={choice?.kind === 'none' ? translate('apps.connect.noBundle') : undefined} />
+      {choice?.kind === 'choose' && (
+        <Dropdown
+          ariaLabel={translate('apps.connect.bundle')}
+          value={asset ?? ''}
+          options={choice.assets.map((entry) => ({ value: entry.name, label: entry.name }))}
+          onChange={(value) => {
+            setChosenAsset(value);
+            setCheck({ kind: 'idle' });
+          }}
+        />
+      )}
+      {check.kind === 'ready' && (
+        <div className="apps-card-head apps-connect-found">
+          <AppTile manifest={check.value.manifest} size={32} />
+          <span className="apps-card-title">
+            <strong>{check.value.manifest.name}</strong>
+            <span>
+              {check.value.manifest.version} · {asset}
+            </span>
+          </span>
+        </div>
+      )}
+      <ErrorToast message={check.kind === 'failed' ? translateDescribed(check) : undefined} />
+      <div className="apps-actions">
+        {check.kind === 'ready' ? (
+          <button type="button" className="apps-button primary" onClick={() => props.onStaged(check.value)}>
+            {translate('apps.panel.install')}
+          </button>
+        ) : (
+          <button type="button" className="apps-button primary" disabled={asset === undefined || check.kind === 'loading'} onClick={runCheck}>
+            {check.kind === 'loading' ? translate('apps.connect.checking') : translate('apps.connect.checkRelease')}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}

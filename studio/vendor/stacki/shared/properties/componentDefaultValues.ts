@@ -1,0 +1,470 @@
+import { assert } from '../core/assert';
+import { record, text } from '../core/boundary';
+import type { ComponentDefaults, ComponentRecipe, DefaultValue, RecipeChild, ResolvedNode } from './componentDefaults';
+
+export const DEFAULT_VALUE_LIMITS = {
+  entriesMax: 64,
+  pathCharsMax: 500,
+  literalCharsMax: 16_384,
+  literalDepthMax: 12,
+  literalTokensMax: 4096,
+  literalImportsMax: 32,
+  walkDepthMax: 13,
+  walkNodesMax: 4096,
+} as const satisfies Record<string, number>;
+
+const PROP_NAME = /^[A-Za-z_][\w:-]{0,99}$/;
+const ASSET_EXTENSION = /\.(png|jpe?g|gif|webp|avif|svg|ico|bmp|tiff?|mp4|webm|mov|m4v|ogv|ogg|mp3|wav|m4a|flac|aac)$/i;
+
+export interface AssetDefault {
+  readonly file: string;
+  readonly url?: true;
+}
+export type AssetDefaults = Readonly<Record<string, AssetDefault>>;
+export type LiteralDefault = string | { readonly source: string; readonly imports: Readonly<Record<string, string>> };
+export type LiteralDefaults = Readonly<Record<string, LiteralDefault>>;
+export interface HeldDefaults {
+  readonly assets?: AssetDefaults;
+  readonly literals?: LiteralDefaults;
+}
+
+export const isAssetSpecifier = (specifier: string): boolean => ASSET_EXTENSION.test(specifier);
+
+export function isAssetDefaultFile(file: string): boolean {
+  if (file.length > DEFAULT_VALUE_LIMITS.pathCharsMax || !file.startsWith('src/') || !ASSET_EXTENSION.test(file)) {
+    return false;
+  }
+  if (/[\x00-\x1f\\?#]/.test(file)) {
+    return false;
+  }
+  return file.split('/').every((segment) => segment !== '' && !segment.startsWith('.'));
+}
+
+function parseAsset(input: unknown): AssetDefault {
+  const value = record(input);
+  if (Object.keys(value).some((key) => key !== 'file' && key !== 'url')) {
+    throw new Error('An asset default holds a file, and url when the page reads its address');
+  }
+  const file = text(value['file']);
+  if (!isAssetDefaultFile(file)) {
+    throw new Error('An asset default names a media file under src/');
+  }
+  if (value['url'] !== undefined && value['url'] !== true) {
+    throw new Error('Asset default url is true or left out');
+  }
+  return value['url'] === true ? { file, url: true } : { file };
+}
+
+function parseEntries<T>(input: unknown, parse: (value: unknown) => T): Readonly<Record<string, T>> {
+  const entries = Object.entries(record(input));
+  if (entries.length > DEFAULT_VALUE_LIMITS.entriesMax) {
+    throw new Error('Too many default props');
+  }
+  const parsed = Object.fromEntries(
+    entries.map(([name, value]) => {
+      if (!PROP_NAME.test(name)) {
+        throw new Error('Invalid default prop name');
+      }
+      return [name, parse(value)] as const;
+    }),
+  );
+  assert(Object.keys(parsed).length === entries.length, 'parseEntries: every entry is kept under its own name');
+  return parsed;
+}
+
+function parseLiteral(input: unknown): LiteralDefault {
+  if (typeof input === 'string') {
+    if (!isLiteralSource(input)) {
+      throw new Error('A literal default is a list, object or other literal value');
+    }
+    return input;
+  }
+  const value = record(input);
+  if (Object.keys(value).some((key) => key !== 'source' && key !== 'imports')) {
+    throw new Error('A literal default with imports holds source and imports');
+  }
+  const source = text(value['source']);
+  const entries = Object.entries(record(value['imports']));
+  if (entries.length === 0 || entries.length > DEFAULT_VALUE_LIMITS.literalImportsMax) {
+    throw new Error('A literal default names between one and 32 imports');
+  }
+  const imports = Object.fromEntries(
+    entries.map(([name, input]) => {
+      const file = text(input);
+      if (!/^[A-Za-z_$][\w$]{0,99}$/.test(name) || RESERVED.has(name) || LITERAL_WORDS.has(name) || !isAssetDefaultFile(file)) {
+        throw new Error('A literal default imports media files under src/ by name');
+      }
+      return [name, file];
+    }),
+  );
+  const used = literalReferences(source, new Set(Object.keys(imports)));
+  if (used === undefined || new Set(used.map((reference) => reference.name)).size !== entries.length) {
+    throw new Error('A literal default is literal data naming each of its imports');
+  }
+  return { source, imports };
+}
+
+export function parseHeldDefaults(value: Readonly<Record<string, unknown>>, props: Readonly<Record<string, DefaultValue>>): HeldDefaults {
+  const assets = value['assets'] === undefined ? undefined : parseEntries(value['assets'], parseAsset);
+  const literals = value['literals'] === undefined ? undefined : parseEntries(value['literals'], parseLiteral);
+  const names = [...Object.keys(props), ...Object.keys(assets ?? {}), ...Object.keys(literals ?? {})];
+  if (new Set(names).size !== names.length) {
+    throw new Error('A default prop is set once: in props, assets or literals');
+  }
+  return heldDefaults({ ...(assets === undefined ? {} : { assets }), ...(literals === undefined ? {} : { literals }) });
+}
+
+export function heldDefaults(value: HeldDefaults): HeldDefaults {
+  const { assets, literals } = value;
+  return {
+    ...(assets === undefined || Object.keys(assets).length === 0 ? {} : { assets }),
+    ...(literals === undefined || Object.keys(literals).length === 0 ? {} : { literals }),
+  };
+}
+
+type Values = HeldDefaults & { readonly props?: Readonly<Record<string, DefaultValue>> };
+
+export function mergeDefaultValues(base: Values, override: Values): Values & { readonly props: Readonly<Record<string, DefaultValue>> } {
+  const taken = new Set([...Object.keys(override.props ?? {}), ...Object.keys(override.assets ?? {}), ...Object.keys(override.literals ?? {})]);
+  const kept = <T>(held: Readonly<Record<string, T>> | undefined, own: Readonly<Record<string, T>> | undefined): Readonly<Record<string, T>> => ({
+    ...Object.fromEntries(Object.entries(held ?? {}).filter(([name]) => !taken.has(name))),
+    ...own,
+  });
+  const props = kept(base.props, override.props);
+  assert(
+    Object.keys(override.props ?? {}).every((name) => Object.hasOwn(props, name)),
+    'mergeDefaultValues: every override prop is kept',
+  );
+  return { props, ...heldDefaults({ assets: kept(base.assets, override.assets), literals: kept(base.literals, override.literals) }) };
+}
+
+export function defaultAttributes(
+  node: Values,
+  binding: (file: string) => string,
+): readonly (readonly [string, { readonly type: 'string' | 'expr'; readonly value: string }])[] {
+  const assets = Object.entries(node.assets ?? {}).map(([name, asset]) => {
+    const local = binding(asset.file);
+    assert(local.length > 0, 'defaultAttributes: an asset is written by the name of its import');
+    return [name, { type: 'expr' as const, value: asset.url === true ? `${local}.src` : local }] as const;
+  });
+  const props = Object.entries(node.props ?? {}).map(
+    ([name, value]) => [name, { type: typeof value === 'string' ? ('string' as const) : ('expr' as const), value: String(value) }] as const,
+  );
+  const literals = Object.entries(node.literals ?? {}).map(([name, value]) => [name, { type: 'expr' as const, value: literalText(value, binding) }] as const);
+  return [...assets, ...props, ...literals];
+}
+
+const literalImports = (literal: LiteralDefault): Readonly<Record<string, string>> => (typeof literal === 'string' ? {} : literal.imports);
+
+function literalText(literal: LiteralDefault, binding: (file: string) => string): string {
+  if (typeof literal === 'string') {
+    return literal;
+  }
+  const references = literalReferences(literal.source, new Set(Object.keys(literal.imports)));
+  assert(references !== undefined, 'literalText: a parsed literal reads as one');
+  let written = literal.source;
+  for (const reference of [...references].reverse()) {
+    const file = literal.imports[reference.name];
+    assert(file !== undefined, 'literalText: every reference has its import');
+    written = written.slice(0, reference.start) + binding(file) + written.slice(reference.start + reference.name.length);
+  }
+  assert(written.length > 0, 'literalText: a literal is never written as nothing');
+  return written;
+}
+
+const RESERVED = new Set(
+  (
+    'arguments await break case catch class const continue debugger default delete do else enum eval export extends false finally for function if ' +
+    'implements import in instanceof interface let new null package private protected public return static super switch this throw true try ' +
+    'typeof var void while with yield'
+  ).split(' '),
+);
+
+export function assetBindingName(file: string, taken: ReadonlySet<string>): string {
+  const base =
+    file
+      .split('/')
+      .pop()
+      ?.replace(/\.[^.]+$/, '') ?? '';
+  const cleaned = base.replace(/[^A-Za-z0-9_$]/g, '_').replace(/^(\d)/, '_$1') || 'asset';
+  const first = RESERVED.has(cleaned) ? `_${cleaned}` : cleaned;
+  let candidate = first;
+  for (let suffix = 2; taken.has(candidate); suffix += 1) {
+    assert(suffix <= taken.size + 2, 'assetBindingName: a free name is found');
+    candidate = `${first}${suffix}`;
+  }
+  assert(!taken.has(candidate), 'assetBindingName: the name is free');
+  assert(!RESERVED.has(candidate), 'assetBindingName: the name can name an import');
+  return candidate;
+}
+
+
+export const BUILTIN_MODULES = {
+  'astro:components': ['Code', 'Debug'],
+  'astro:assets': ['Image', 'Picture', 'Font'],
+} as const satisfies Record<string, readonly string[]>;
+export type BuiltinModule = keyof typeof BUILTIN_MODULES;
+export interface WrittenTag {
+  readonly tag?: string;
+  readonly from?: BuiltinModule;
+}
+const SVG_TAG = /^[a-z][a-z0-9-]{0,60}[A-Z][A-Za-z0-9-]{0,60}$/;
+
+export function builtinModuleOf(path: string, name: string): BuiltinModule | undefined {
+  const modules: readonly BuiltinModule[] = ['astro:components', 'astro:assets'];
+  return modules.find((module) => module === path && (BUILTIN_MODULES[module] as readonly string[]).includes(name));
+}
+
+export const isFragmentTag = (tag: string | undefined): boolean => tag === 'Fragment' || tag === '<>';
+export const isSVGTag = (tag: string): boolean => SVG_TAG.test(tag);
+
+export function parseWrittenTag(value: Readonly<Record<string, unknown>>): WrittenTag {
+  const { tag, from } = value;
+  if (tag === undefined) {
+    if (from !== undefined) {
+      throw new Error('A default child with from names the tag it imports');
+    }
+    return {};
+  }
+  const name = text(tag);
+  if (from === undefined) {
+    if (!isFragmentTag(name) && !isSVGTag(name)) {
+      throw new Error('A default child tag is Fragment, <>, an SVG element or a built-in with its module');
+    }
+    return { tag: name };
+  }
+  const module = builtinModuleOf(text(from), name);
+  if (module === undefined) {
+    throw new Error('A default child from a module is one of Astro’s built-ins');
+  }
+  return { tag: name, from: module };
+}
+
+export function writtenTag(node: WrittenTag): WrittenTag {
+  return { ...(node.tag === undefined ? {} : { tag: node.tag }), ...(node.from === undefined ? {} : { from: node.from }) };
+}
+
+export function elementMarkup(name: string, props: string, children: string | undefined): string {
+  assert(name.length > 0, 'elementMarkup: a tag has a name');
+  const tag = name === '<>' && props !== '' ? 'Fragment' : name;
+  if (tag === '<>') {
+    return `<>${children ?? ''}</>`;
+  }
+  return children === undefined ? `<${tag}${props} />` : `<${tag}${props}>${children}</${tag}>`;
+}
+
+
+
+export function isStaticMarkup(markup: string): boolean {
+  if (markup.startsWith('<!--')) {
+    return markup.length >= 7 && markup.indexOf('-->', 4) === markup.length - 3;
+  }
+  if (!markup.startsWith('{') || !markup.endsWith('}')) {
+    return false;
+  }
+  const tokens = literalTokens(markup.slice(1, -1));
+  const [only, ...more] = tokens ?? [];
+  return tokens !== undefined && more.length === 0 && (only === undefined || /^["'`]|^-?\.?\d/.test(only.text));
+}
+
+
+const LITERAL_TOKEN =
+  /\s+|\/\*[\s\S]*?\*\/|\/\/[^\r\n]*(?=\r?\n)|"(?:\\[\s\S]|[^"\\\r\n])*"|'(?:\\[\s\S]|[^'\\\r\n])*'|`(?:\\[\s\S]|\$(?!\{)|[^`\\$])*`|-?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?|[A-Za-z_$][\w$]*|[[\]{}:,.]/giy;
+const LITERAL_WORDS: ReadonlySet<string> = new Set(['true', 'false', 'null', 'undefined']);
+
+interface LiteralToken {
+  readonly text: string;
+  readonly start: number;
+}
+export interface LiteralReference {
+  readonly name: string;
+  readonly start: number;
+}
+interface LiteralReading {
+  readonly tokens: readonly LiteralToken[];
+  readonly imports: ReadonlySet<string>;
+  readonly references: LiteralReference[];
+}
+
+function literalTokens(source: string): readonly LiteralToken[] | undefined {
+  if (source.length > DEFAULT_VALUE_LIMITS.literalCharsMax) {
+    return undefined;
+  }
+  const tokens: LiteralToken[] = [];
+  let at = 0;
+  while (at < source.length) {
+    LITERAL_TOKEN.lastIndex = at;
+    const found = LITERAL_TOKEN.exec(source)?.[0];
+    if (found === undefined || tokens.length > DEFAULT_VALUE_LIMITS.literalTokensMax) {
+      return undefined;
+    }
+    assert(found.length > 0, 'literalTokens: every token moves the reading on');
+    if (!/^(?:\s|\/\*|\/\/)/.test(found)) {
+      tokens.push({ text: found, start: at });
+    }
+    at += found.length;
+  }
+  assert(at === source.length, 'literalTokens: the tokens cover the whole source');
+  return tokens;
+}
+
+export function literalReferences(source: string, imports: ReadonlySet<string>): readonly LiteralReference[] | undefined {
+  const tokens = literalTokens(source);
+  if (tokens === undefined) {
+    return undefined;
+  }
+  const reading: LiteralReading = { tokens, imports, references: [] };
+  const whole = literalEnd(reading, 0, 0) === tokens.length;
+  assert(
+    reading.references.every((reference) => imports.has(reference.name)),
+    'literalReferences: only the given imports are referred to',
+  );
+  return whole ? reading.references : undefined;
+}
+
+export function isLiteralSource(source: string): boolean {
+  return literalReferences(source, new Set()) !== undefined;
+}
+
+function literalEnd(reading: LiteralReading, at: number, depth: number): number | undefined {
+  const token = reading.tokens[at];
+  if (token === undefined || depth > DEFAULT_VALUE_LIMITS.literalDepthMax) {
+    return undefined;
+  }
+  if (token.text === '[' || token.text === '{') {
+    return collectionEnd(reading, at, depth);
+  }
+  if (/^["'`]|^-?\.?\d/.test(token.text) || LITERAL_WORDS.has(token.text)) {
+    return at + 1;
+  }
+  if (!reading.imports.has(token.text)) {
+    return undefined;
+  }
+  reading.references.push({ name: token.text, start: token.start });
+  return reading.tokens[at + 1]?.text === '.' && reading.tokens[at + 2]?.text === 'src' ? at + 3 : at + 1;
+}
+
+function collectionEnd(reading: LiteralReading, at: number, depth: number): number | undefined {
+  const { tokens } = reading;
+  assert(tokens[at]?.text === '[' || tokens[at]?.text === '{', 'collectionEnd: starts at a list or an object');
+  const close = tokens[at]?.text === '[' ? ']' : '}';
+  let next = at + 1;
+  while (next < tokens.length && tokens[next]?.text !== close) {
+    if (close === '}') {
+      const key = tokens[next]?.text ?? '';
+      if (!/^["']|^[A-Za-z_$\d]/.test(key) || tokens[next + 1]?.text !== ':') {
+        return undefined;
+      }
+      next += 2;
+    }
+    const end = literalEnd(reading, next, depth + 1);
+    if (end === undefined) {
+      return undefined;
+    }
+    const after = tokens[end]?.text;
+    if (after !== ',' && after !== close) {
+      return undefined;
+    }
+    assert(end > at, 'collectionEnd: each item moves the reading on');
+    next = after === ',' ? end + 1 : end;
+  }
+  return tokens[next]?.text === close ? next + 1 : undefined;
+}
+
+
+export interface AssetDefaultUse {
+  readonly owner: string;
+  readonly prop: string;
+  readonly file: string;
+}
+
+export function defaultAssetUses(config: ComponentDefaults): readonly AssetDefaultUse[] {
+  const uses: AssetDefaultUse[] = [];
+  let visited = 0;
+  const walk = (owner: string, recipe: ComponentRecipe, depth: number): void => {
+    visited += 1;
+    assert(depth <= DEFAULT_VALUE_LIMITS.walkDepthMax, 'Recipes are walked to their stored depth');
+    assert(visited <= DEFAULT_VALUE_LIMITS.walkNodesMax, 'Recipes are walked to their stored node count');
+    for (const [prop, asset] of Object.entries(recipe.assets ?? {})) {
+      uses.push({ owner, prop, file: asset.file });
+    }
+    for (const [prop, literal] of Object.entries(recipe.literals ?? {})) {
+      uses.push(...Object.values(literalImports(literal)).map((file) => ({ owner, prop, file })));
+    }
+    for (const child of recipe.children ?? []) {
+      if (!('literal' in child)) {
+        walk(owner, child, depth + 1);
+      }
+    }
+  };
+  for (const [owner, recipe] of Object.entries(config.components)) {
+    walk(owner, recipe, 0);
+  }
+  return uses;
+}
+
+export function relinkDefaultAssets(config: ComponentDefaults, from: string, to: string): ComponentDefaults {
+  assert(from.length > 0, 'A move names what moved');
+  assert(to.length > 0, 'A move names where it went');
+  let changed = false;
+  const moved = (file: string): string => {
+    const next = file === from ? to : file.startsWith(`${from}/`) ? `${to}${file.slice(from.length)}` : file;
+    if (next === file || !isAssetDefaultFile(next)) {
+      return file;
+    }
+    changed = true;
+    return next;
+  };
+  const relinkLiteral = (literal: LiteralDefault): LiteralDefault =>
+    typeof literal === 'string'
+      ? literal
+      : { source: literal.source, imports: Object.fromEntries(Object.entries(literal.imports).map(([name, file]) => [name, moved(file)])) };
+  const relink = <T extends ComponentRecipe>(recipe: T, depth: number): T => {
+    assert(depth <= DEFAULT_VALUE_LIMITS.walkDepthMax, 'Relink depth is bounded by the recipe parser');
+    const { assets, literals } = recipe;
+    const children = recipe.children?.map((child): RecipeChild => ('literal' in child ? child : relink(child, depth + 1)));
+    return {
+      ...recipe,
+      ...(assets === undefined
+        ? {}
+        : { assets: Object.fromEntries(Object.entries(assets).map(([prop, asset]) => [prop, { ...asset, file: moved(asset.file) }])) }),
+      ...(literals === undefined ? {} : { literals: Object.fromEntries(Object.entries(literals).map(([prop, literal]) => [prop, relinkLiteral(literal)])) }),
+      ...(children === undefined ? {} : { children }),
+    };
+  };
+  const components = Object.fromEntries(Object.entries(config.components).map(([owner, recipe]) => [owner, relink(recipe, 0)]));
+  assert(Object.keys(components).length === Object.keys(config.components).length, 'relinkDefaultAssets: every component keeps its recipe');
+  return changed ? { version: 1, components } : config;
+}
+
+export function withoutMissingAssets<T extends ResolvedNode>(
+  root: T,
+  exists: (file: string) => boolean,
+): { readonly node: T; readonly missing: readonly string[] } {
+  const missing = new Set<string>();
+  const there = (file: string): boolean => {
+    const found = exists(file);
+    if (!found) {
+      missing.add(file);
+    }
+    return found;
+  };
+  const prune = <N extends ResolvedNode>(node: N, depth: number): N => {
+    assert(depth <= DEFAULT_VALUE_LIMITS.walkDepthMax, 'A resolved instance has bounded depth');
+    if ('literal' in node) {
+      return node;
+    }
+    const assets = Object.entries(node.assets ?? {}).filter(([, asset]) => there(asset.file));
+    const literals = Object.entries(node.literals ?? {}).filter(([, literal]) => Object.values(literalImports(literal)).map(there).every(Boolean));
+    const content =
+      node.content.kind === 'children' ? { kind: 'children' as const, children: node.content.children.map((child) => prune(child, depth + 1)) } : node.content;
+    return {
+      ...node,
+      content,
+      ...(node.assets === undefined ? {} : { assets: Object.fromEntries(assets) }),
+      ...(node.literals === undefined ? {} : { literals: Object.fromEntries(literals) }),
+    };
+  };
+  const node = prune(root, 0);
+  return { node, missing: [...missing] };
+}

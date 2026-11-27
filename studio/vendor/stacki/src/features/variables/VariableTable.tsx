@@ -1,0 +1,674 @@
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { VariableBlock, VariableCell, VariableGroup } from '../../ipc/variablesBridge';
+import type { WireColumn } from '../../../shared/ipc/ipcResults';
+import type { VariableCellProps } from './VariableCell';
+import type { VariableSlot, VariableRename, SlotOffset } from './variableRows';
+import { assert } from '../../../shared/core/assert';
+import { LIMITS } from '../../../shared/core/limits';
+import { buildSheetSlots, stemOf, sectionPrefix, rowRenames } from './variableRows';
+import type { ScrollLanes } from './variableScroll';
+import { useVariableSheetScroll, VariableScrollBar } from './VariableSheetScroll';
+import Cell from './VariableCell';
+import useListReorder from '../../ui/useListReorder';
+import MoreMenu from '../../ui/MoreMenu';
+import VariableTypeIcon from './VariableTypeIcon';
+import VariableNameCell, { VariableVisibilityButton, type VariableVisibilityControl } from './VariableNameCell';
+import { useTranslate } from '../../lib/i18n/useTranslate';
+import { PencilIcon, CopyIcon, TrashIcon, DragIcon, PlusIcon } from '../../ui/Icons';
+import { CodeInline } from '../../ui/CodeBlock';
+import { labelParts, labelPlainText } from '../../../shared/page/commentLabel';
+
+type EditName = (name: string) => boolean | void | Promise<boolean | void>;
+type AddVariable = (block: VariableBlock, columns: readonly WireColumn[], word: string) => void | Promise<void>;
+export interface SheetActions {
+  readonly onSave: VariableCellProps['onSave'];
+  readonly onMove?: (slots: readonly VariableSlot[], from: number, to: number) => void | Promise<void>;
+  readonly onAdd?: AddVariable | undefined;
+  readonly onRename?: ((renames: readonly VariableRename[]) => boolean | void | Promise<boolean | void>) | undefined;
+  readonly onRetitle?: ((block: VariableBlock, title: string) => boolean | Promise<boolean>) | undefined;
+  readonly onDuplicateSection?: ((block: VariableBlock) => void | Promise<void>) | undefined;
+  readonly onDeleteSection?: ((block: VariableBlock) => void | Promise<void>) | undefined;
+  readonly fluidOf?: VariableCellProps['fluidOf'];
+  readonly onDraft?: VariableCellProps['onDraft'];
+  readonly visibility?: VariableVisibilityControl | undefined;
+}
+export interface SheetProps extends SheetActions {
+  readonly blocks: readonly VariableBlock[];
+  readonly group: VariableGroup;
+}
+interface SectionMenuProps {
+  readonly onRename: () => void;
+  readonly onDuplicate: () => void;
+  readonly onDelete: () => void;
+}
+interface EditableNameProps {
+  readonly value: string;
+  readonly onRename?: EditName | undefined;
+  readonly className?: string;
+  readonly title?: string;
+  readonly openSignal?: number;
+  readonly children?: React.ReactNode;
+}
+type Reorder = ReturnType<typeof useListReorder>;
+interface NewVariableProps {
+  readonly block: VariableBlock;
+  readonly columns: readonly WireColumn[];
+  readonly onAdd?: AddVariable | undefined;
+  readonly template: string;
+  readonly slotProps?: ReturnType<Reorder['slotProps']>;
+  readonly dropping: boolean;
+}
+interface TableProps extends SheetActions {
+  readonly block: VariableBlock;
+  readonly group: VariableGroup;
+  readonly sectionDrag: {
+    readonly props: React.HTMLAttributes<HTMLElement>;
+    readonly className: string;
+  };
+  readonly scrollLanes: ScrollLanes;
+  readonly rowsDrag: Reorder;
+  readonly slotOffset?: number;
+  readonly showHead?: boolean;
+}
+const SAVE_ON = ['Enter', 'Tab'];
+
+function reportEditFailure(error: unknown): void {
+  console.error('[stacki] variable edit failed:', error);
+}
+const LABEL_TRACKS = 'calc(var(--vars-inset) + 18px) var(--vars-name-col)';
+const valueTracks = (count: number) =>
+  `repeat(${count}, minmax(max(var(--vars-col-min), var(--vars-col-fit, 0px)), max(var(--vars-col), var(--vars-col-fit, 0px))))`;
+function sheetOffset(offsets: readonly SlotOffset[], index: number): SlotOffset {
+  const offset = offsets[index];
+  assert(offset !== undefined, 'Variable table: missing block offset');
+  assert(offset.rows >= offset.head, 'Variable table: rows precede their heading');
+  return offset;
+}
+
+function SectionMenu({ onRename, onDuplicate, onDelete }: SectionMenuProps) {
+  const translate = useTranslate();
+  return (
+    <MoreMenu
+      className="vars-section-menu"
+      title={translate('variables.group.options')}
+      items={[
+        { label: translate('variables.menu.rename'), icon: <PencilIcon size={13} />, onSelect: onRename },
+        { label: translate('variables.menu.duplicate'), icon: <CopyIcon size={13} />, onSelect: onDuplicate },
+        { label: translate('variables.menu.delete'), icon: <TrashIcon size={13} />, danger: true, onSelect: onDelete },
+      ]}
+    />
+  );
+}
+
+function useEditableName(props: EditableNameProps) {
+  const { value, onRename, openSignal } = props;
+
+  const [editing, setEditing] = useState(false);
+  const seen = useRef(openSignal);
+  useEffect(() => {
+    if (openSignal === seen.current) {
+      return;
+    }
+    seen.current = openSignal;
+    setText(value);
+    setEditing(true);
+  }, [openSignal, value]);
+  const [text, setText] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const done = useRef(false);
+
+  useEffect(() => {
+    if (!editing) {
+      return undefined;
+    }
+    done.current = false;
+    const input = inputRef.current;
+    input?.focus();
+    input?.select();
+    return undefined;
+  }, [editing]);
+
+  const rename = async () => {
+    if (done.current) {
+      return;
+    }
+    done.current = true;
+    const next = text.trim();
+    setEditing(false);
+    if (!next || next === value) {
+      setText(value);
+      return;
+    }
+    const ok = await onRename?.(next);
+    if (!ok) {
+      setText(value);
+    }
+  };
+  const commit = (): void => {
+    void rename().catch(reportEditFailure);
+  };
+  const cancel = () => {
+    done.current = true;
+    setEditing(false);
+    setText(value);
+  };
+
+  return { ...props, editing, setEditing, text, setText, inputRef, commit, cancel };
+}
+function EditableName(props: EditableNameProps) {
+  const state = useEditableName(props);
+  return <EditableNameView state={state} />;
+}
+function EditableNameView({ state }: { readonly state: ReturnType<typeof useEditableName> }) {
+  const translate = useTranslate();
+  const { value, className, title, children } = state;
+  const { editing, setEditing, text, setText, inputRef, commit, cancel } = state;
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        className={`vars-rename ${className || ''}`}
+        data-drag-through=""
+        title={title ? translate('variables.name.dragOrRename', { name: title }) : translate('variables.name.clickToRename')}
+        onClick={() => {
+          setText(value);
+          setEditing(true);
+        }}
+      >
+        {children ?? value}
+      </button>
+    );
+  }
+  return (
+    <input
+      ref={inputRef}
+      className={`vars-rename-input ${className || ''}`}
+      value={text}
+      spellCheck={false}
+      onChange={(event) => setText(event.target.value)}
+      onBlur={commit}
+      onKeyDown={(event) => {
+        event.stopPropagation();
+        if (SAVE_ON.includes(event.key)) {
+          event.preventDefault();
+          commit();
+        }
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          cancel();
+        }
+      }}
+    />
+  );
+}
+
+function useSheet(props: SheetProps) {
+  const { blocks, group, onMove: moveSlots } = props;
+
+  const { slots, offsets: slotOffsets } = useMemo(() => buildSheetSlots(blocks), [blocks]);
+  const rowsDrag = useListReorder({
+    count: slots.length,
+    onMove: (from, to) => {
+      void Promise.resolve(moveSlots?.(slots, from, to)).catch(reportEditFailure);
+    },
+  });
+  const scroll = useVariableSheetScroll(blocks, group.columns.length);
+  const scrollSync = scroll.sync;
+  const scrollLanes = scroll.lanes;
+
+  const headRef = useRef<HTMLDivElement>(null);
+  const headStripRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => scrollSync.register(headStripRef.current ?? undefined), [scrollSync]);
+  useLayoutEffect(() => {
+    const head = headRef.current;
+    if (!head || typeof ResizeObserver !== 'function') {
+      return undefined;
+    }
+    const host = head.parentElement;
+    if (!host) {
+      return undefined;
+    }
+    const apply = () => host.style.setProperty('--vars-head-h', `${head.offsetHeight}px`);
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(head);
+    return () => observer.disconnect();
+  }, []);
+
+  const single = group.columns.length === 1;
+
+  return {
+    ...props,
+    slots,
+    slotOffsets,
+    rowsDrag,
+    scroll,
+    scrollSync,
+    scrollLanes,
+    headRef,
+    headStripRef,
+    single,
+  };
+}
+export default function Sheet(props: SheetProps) {
+  const state = useSheet(props);
+  return <SheetView state={state} />;
+}
+function SheetView({ state }: { readonly state: ReturnType<typeof useSheet> }) {
+  const translate = useTranslate();
+  const { blocks, group, onSave, onAdd, onRename, onRetitle, onDuplicateSection, onDeleteSection, fluidOf, onDraft, visibility } = state;
+  const { slotOffsets, rowsDrag, scrollLanes } = state;
+  return (
+    <div className="vars-sheet">
+      <div className="cms-detail-body vars-body" ref={state.scroll.bodyRef}>
+        <SheetHeader state={state} />
+        {blocks.map((block, index) => (
+          <Table
+            key={index}
+            block={block}
+            group={group}
+            onSave={onSave}
+            sectionDrag={{
+              props: block.title !== undefined ? rowsDrag.rowProps(sheetOffset(slotOffsets, index).head) : {},
+              className: block.title !== undefined ? rowsDrag.rowClass(sheetOffset(slotOffsets, index).head) : '',
+            }}
+            onAdd={onAdd}
+            onRename={onRename}
+            onRetitle={onRetitle}
+            onDuplicateSection={onDuplicateSection}
+            onDeleteSection={onDeleteSection}
+            rowsDrag={rowsDrag}
+            slotOffset={sheetOffset(slotOffsets, index).rows}
+            fluidOf={fluidOf}
+            onDraft={onDraft}
+            visibility={visibility}
+            scrollLanes={scrollLanes}
+            showHead={block.kind === 'matrix'}
+          />
+        ))}
+        {!blocks.length && <div className="props-empty">{translate('variables.noMatches')}</div>}
+      </div>
+      <VariableScrollBar scroll={state.scroll} />
+    </div>
+  );
+}
+
+function useNewVariable(props: NewVariableProps) {
+  const { block, columns, onAdd } = props;
+
+  const [typing, setTyping] = useState(false);
+  const [word, setWord] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (typing) {
+      inputRef.current?.focus();
+    }
+  }, [typing]);
+
+  const add = async () => {
+    const next = word.trim();
+    setTyping(false);
+    setWord('');
+    if (next) {
+      await onAdd?.(block, columns, next);
+    }
+  };
+  const commit = (): void => {
+    void add().catch(reportEditFailure);
+  };
+
+  return { ...props, typing, setTyping, word, setWord, inputRef, commit };
+}
+function NewVariable(props: NewVariableProps) {
+  const state = useNewVariable(props);
+  return <NewVariableView state={state} />;
+}
+function NewVariableView({ state }: { readonly state: ReturnType<typeof useNewVariable> }) {
+  const translate = useTranslate();
+  const { block, template, slotProps, dropping } = state;
+  const { typing, setTyping, word, setWord, inputRef, commit } = state;
+  if (!typing) {
+    return (
+      <div className={`vars-row vars-add ${dropping ? 'drop-before' : ''}`} style={{ gridTemplateColumns: template }} {...(slotProps || {})}>
+        <span />
+        <button className="vars-add-btn" onClick={() => setTyping(true)}>
+          <PlusIcon size={11} /> {translate('variables.new')}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`vars-row vars-add ${dropping ? 'drop-before' : ''}`} style={{ gridTemplateColumns: template }} {...(slotProps || {})}>
+      <span />
+      <span className="vars-add-field">
+        <span className="vars-add-stem">{block.kind === 'matrix' ? '…-' : stemOf(block)}</span>
+        <input
+          maxLength={LIMITS.attrCharsMax}
+          ref={inputRef}
+          value={word}
+          placeholder="name"
+          spellCheck={false}
+          onChange={(event) => setWord(event.target.value)}
+          onBlur={commit}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              commit();
+            }
+            if (event.key === 'Escape') {
+              event.preventDefault();
+              setTyping(false);
+              setWord('');
+            }
+          }}
+        />
+      </span>
+    </div>
+  );
+}
+
+function useVariableTable(props: TableProps) {
+  const { block, group, scrollLanes, rowsDrag, slotOffset = 0 } = props;
+
+  const columns = block.kind === 'matrix' ? block.columns : group.columns;
+  assert(columns !== undefined, 'Variable table: matrix columns are required');
+  assert(columns.length <= LIMITS.scanEntriesMax, 'Variable table: column limit exceeded');
+  const single = columns.length === 1;
+  const scrollSync = scrollLanes.lane(columns.length);
+  const labelTemplate = LABEL_TRACKS;
+  const valueTemplate = valueTracks(columns.length);
+  const reorder = {
+    rowProps: (index: number) => rowsDrag.rowProps(slotOffset + index),
+    rowClass: (index: number) => rowsDrag.rowClass(slotOffset + index),
+  };
+  const [hovered, setHovered] = useState<number | undefined>(undefined);
+  const headRef = useRef<HTMLDivElement>(null);
+  const rowsRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const removeRows = scrollSync.register(rowsRef.current ?? undefined);
+    const removeHead = scrollSync.register(headRef.current ?? undefined);
+    return () => {
+      removeRows?.();
+      removeHead?.();
+    };
+  }, [scrollSync, props.showHead]);
+  const prefix = sectionPrefix(block);
+  const [renameSignal, setRenameSignal] = useState(0);
+  const rowProps = (index: number) => ({
+    className: `vars-row ${reorder.rowClass(index)} ${hovered === index ? 'is-hover' : ''}`,
+    onMouseEnter: () => setHovered(index),
+    onMouseLeave: () => setHovered((at) => (at === index ? undefined : at)),
+  });
+
+  return {
+    ...props,
+    showHead: props.showHead ?? true,
+    slotOffset,
+    columns,
+    single,
+    labelTemplate,
+    valueTemplate,
+    reorder,
+    hovered,
+    setHovered,
+    headRef,
+    rowsRef,
+    scrollSync,
+    prefix,
+    renameSignal,
+    setRenameSignal,
+    rowProps,
+  };
+}
+function Table(props: TableProps) {
+  const state = useVariableTable(props);
+  return <TableView state={state} />;
+}
+function TableView({ state }: { readonly state: ReturnType<typeof useVariableTable> }) {
+  const { block, onAdd, rowsDrag, slotOffset = 0 } = state;
+  const { columns, labelTemplate } = state;
+  return (
+    <div className="vars-table">
+      <div className="vars-fixed">
+        {}
+        <TableFixedHead state={state} />
+        <TableRowNames state={state} />
+        {}
+        <NewVariable
+          block={block}
+          columns={columns}
+          onAdd={onAdd}
+          template={labelTemplate}
+          slotProps={rowsDrag.slotProps(slotOffset + block.rows.length)}
+          dropping={rowsDrag.dropIndex === slotOffset + block.rows.length}
+        />
+      </div>
+
+      <div className="vars-scroll">
+        {}
+        <TableScrollHead state={state} />
+        <TableScrollRows state={state} />
+        {}
+      </div>
+    </div>
+  );
+}
+
+function SheetHeader({ state }: { readonly state: ReturnType<typeof useSheet> }) {
+  const translate = useTranslate();
+  const { group, headRef, headStripRef, single } = state;
+  return (
+    <div className="vars-table vars-sheet-head" ref={headRef}>
+      <div className="vars-fixed">
+        <div className="vars-row is-head" style={{ gridTemplateColumns: LABEL_TRACKS }}>
+          <div />
+          <div className="vars-head">{translate('variables.head.name')}</div>
+        </div>
+      </div>
+      <div className="vars-scroll">
+        <div className="vars-scroll-head" ref={headStripRef} data-scroll-lane={group.columns.length}>
+          <div className="vars-row is-head" style={{ gridTemplateColumns: valueTracks(group.columns.length) }}>
+            {group.columns.map((column) => (
+              <div key={column.id} className="vars-head" title={column.selector || column.label}>
+                {single && group.kind === 'single' ? translate('variables.head.value') : column.label}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CommentHeading({ state, title }: { readonly state: ReturnType<typeof useVariableTable>; readonly title: string }) {
+  const { block, onRetitle, onDuplicateSection, onDeleteSection } = state;
+  const { renameSignal, setRenameSignal } = state;
+  return (
+    <>
+      <EditableName
+        className="vars-section-text"
+        value={title}
+        title={block.description ?? labelPlainText(title)}
+        openSignal={renameSignal}
+        onRename={(next) => onRetitle?.(block, next)}
+      >
+        <CommentTitle title={title} />
+      </EditableName>
+      <SectionMenu
+        onRename={() => setRenameSignal((signal) => signal + 1)}
+        onDuplicate={() => {
+          void Promise.resolve(onDuplicateSection?.(block)).catch(reportEditFailure);
+        }}
+        onDelete={() => {
+          void Promise.resolve(onDeleteSection?.(block)).catch(reportEditFailure);
+        }}
+      />
+    </>
+  );
+}
+
+function CommentTitle({ title }: { readonly title: string }) {
+  return (
+    <>
+      {labelParts(title).map((part, index) =>
+        part.kind === 'code' ? <CodeInline key={index} text={part.text} language="css" /> : <React.Fragment key={index}>{part.text}</React.Fragment>,
+      )}
+    </>
+  );
+}
+
+function TableTitle({ state }: { readonly state: ReturnType<typeof useVariableTable> }) {
+  const translate = useTranslate();
+  const { block, onRename, sectionDrag, labelTemplate, prefix } = state;
+  return (
+    <>
+      {block.title && (
+        <h3 className={`vars-row vars-section ${sectionDrag?.className || ''}`} style={{ gridTemplateColumns: labelTemplate }} {...(sectionDrag?.props || {})}>
+          <span className="vars-grip" title={translate('variables.dragToReorder')}>
+            <DragIcon size={11} />
+          </span>
+          {prefix ? (
+            <EditableName
+              className="vars-section-text"
+              value={prefix}
+              title={prefix}
+              onRename={(next) =>
+                onRename?.(
+                  block.rows.flatMap((row) =>
+                    row.name
+                      ? [
+                          {
+                            from: row.name,
+                            to: `--${next.trim().replace(/^--/, '')}-${row.label}`,
+                          },
+                        ]
+                      : [],
+                  ),
+                )
+              }
+            />
+          ) : block.titleStart !== undefined ? (
+            <CommentHeading state={state} title={block.title} />
+          ) : (
+            <span className="vars-section-text" title={block.description ?? labelPlainText(block.title)}>
+              <CommentTitle title={block.title} />
+            </span>
+          )}
+        </h3>
+      )}
+    </>
+  );
+}
+
+function TableFixedHead({ state }: { readonly state: ReturnType<typeof useVariableTable> }) {
+  const translate = useTranslate();
+  const { showHead, labelTemplate } = state;
+  return (
+    <div className="vars-fixed-head">
+      <TableTitle state={state} />
+      {showHead && (
+        <div className="vars-row is-head" style={{ gridTemplateColumns: labelTemplate }}>
+          <div />
+          <div className="vars-head">{translate('variables.head.name')}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TableRowNames({ state }: { readonly state: ReturnType<typeof useVariableTable> }) {
+  const translate = useTranslate();
+  const { block, onRename, labelTemplate, reorder, rowProps } = state;
+  return (
+    <>
+      {block.rows.map((row, index) => (
+        <div
+          key={row.name || row.label}
+          style={{ gridTemplateColumns: labelTemplate }}
+          {...reorder.rowProps(index)}
+          {...rowProps(index)}
+        >
+          <span className="vars-grip" title={translate('variables.dragToReorder')}>
+            <DragIcon size={11} />
+          </span>
+          <VariableNameCell title={row.name || row.label}>
+            <VariableTypeIcon kind={row.cells.find((cell) => cell !== undefined)?.kind ?? ''} />
+            <EditableName
+              className="vars-name-text"
+              value={row.label}
+              title={row.name || row.label}
+              onRename={(next) => onRename?.(rowRenames(block, row, next))}
+            />
+          </VariableNameCell>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function TableScrollHead({ state }: { readonly state: ReturnType<typeof useVariableTable> }) {
+  const translate = useTranslate();
+  const { block, group, showHead, columns, single, valueTemplate, headRef } = state;
+  return (
+    <div className="vars-scroll-head" ref={headRef} data-scroll-lane={columns.length}>
+      {block.title && (
+        <div className="vars-row vars-section" style={{ gridTemplateColumns: valueTemplate }} aria-hidden="true" />
+      )}
+      {showHead && (
+        <div className="vars-row is-head" style={{ gridTemplateColumns: valueTemplate }}>
+          {columns.map((column) => (
+            <div key={column.id} className="vars-head" title={column.selector || column.label}>
+              {single && group.kind === 'single' ? translate('variables.head.value') : column.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TableScrollRows({ state }: { readonly state: ReturnType<typeof useVariableTable> }) {
+  const { block, onSave, fluidOf, onDraft, scrollSync, columns, valueTemplate, rowsRef, rowProps, visibility } = state;
+  return (
+    <div
+      className="vars-scroll-rows"
+      ref={rowsRef}
+      data-scroll-lane={columns.length}
+      onScroll={(event) => {
+        const { scrollLeft } = event.currentTarget;
+        scrollSync.broadcast(event.currentTarget, scrollLeft);
+      }}
+    >
+      {block.rows.map((row, index) => (
+        <div key={row.name || row.label} style={{ gridTemplateColumns: valueTemplate }} {...rowProps(index)}>
+          {columns.map((column, at) => (
+            <ValueCellHost key={column.id} cell={row.cells[at]} visibility={visibility}>
+              <Cell cell={row.cells[at]} onSave={onSave} fluidOf={fluidOf} onDraft={onDraft} />
+            </ValueCellHost>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ValueCellHost(props: {
+  readonly cell: VariableCell | undefined;
+  readonly visibility: VariableVisibilityControl | undefined;
+  readonly children: React.ReactNode;
+}) {
+  const { cell, visibility, children } = props;
+  if (visibility === undefined || cell === undefined || cell.name.length === 0) {
+    return <>{children}</>;
+  }
+  return (
+    <div className="vars-cell-host">
+      {children}
+      <span className="vars-cell-tools">
+        <VariableVisibilityButton name={cell.name} visibility={visibility} />
+      </span>
+    </div>
+  );
+}

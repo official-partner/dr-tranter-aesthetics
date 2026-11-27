@@ -1,0 +1,327 @@
+import { centralIcon } from '../../ui/central/CentralIcon';
+import { add as centralAdd } from '../../ui/central/centralGeometry';
+
+import { useState } from 'react';
+import ColorSwatch from './components/ColorSwatch';
+import { ShadowLength, ShadowColorRow } from './ShadowFields';
+import { parseShadows, serializeShadows, blankShadow, shadowLabel, type Shadow } from './model/textShadow';
+import { parseHideable, serializeHideable, type Hideable } from './model/hideable';
+import LayerList from './LayerList';
+import LayerPopover from './LayerPopover';
+import { displayOf, type Display, withImportant } from './model/styleDisplay';
+import { useComputedValue } from './model/computedStyle';
+import { type Props, PropLabel, LiveInput } from './TypographyKit';
+import { useTranslate } from '../../lib/i18n/useTranslate';
+import type { Translator } from '../../lib/i18n/localeContext';
+
+
+const BLACK_KEYWORD = 'black';
+
+export function StrokeRow(props: Props) {
+  const { read, busy, clearProp, onProvenance, onSelectSelector } = props;
+  const translate = useTranslate();
+  const widthDisplay = displayOf(read('-webkit-text-stroke-width'));
+  const colorDisplay = displayOf(read('-webkit-text-stroke-color'));
+  const computedColor = useComputedValue(colorDisplay.present ? '' : '-webkit-text-stroke-color');
+  const combined = eitherDisplay(widthDisplay, colorDisplay);
+  return (
+    <div className="embed-editor_break-row">
+      <PropLabel
+        label={translate('style.textStrokeShadow.stroke')}
+        prop="-webkit-text-stroke-width"
+        display={combined}
+        contributors={read('-webkit-text-stroke-width')?.contributors ?? []}
+        busy={busy}
+        onClear={() => clearProp(['-webkit-text-stroke-width', '-webkit-text-stroke-color'])}
+        onProvenance={onProvenance}
+        onSelectSelector={onSelectSelector}
+      />
+      <div className="embed-editor_break-pair embed-editor_stroke-pair">
+        <div className="embed-editor_type-cell">
+          <StrokeInput
+            prop="-webkit-text-stroke-width"
+            display={widthDisplay}
+            placeholder="0px"
+            ariaLabel={translate('style.textStrokeShadow.strokeWidth')}
+            {...props}
+          />
+          <StrokeCaption label={translate('style.textStrokeShadow.width')} prop="-webkit-text-stroke-width" display={widthDisplay} {...props} />
+        </div>
+        <div className="embed-editor_type-cell">
+          <div className="embed-editor_type-field">
+            <ColorSwatch
+              value={colorDisplay.present ? colorDisplay.value : computedColor}
+              busy={busy}
+              ariaLabel={translate('style.textStrokeShadow.strokeColor')}
+              onChange={(color, live) => {
+                if (live) {
+                  props.liveSetProp('-webkit-text-stroke-color', color, colorDisplay.important);
+                } else {
+                  props.setProp('-webkit-text-stroke-color', color, colorDisplay.important);
+                }
+              }}
+            />
+            <StrokeInput
+              prop="-webkit-text-stroke-color"
+              display={colorDisplay}
+              placeholder={BLACK_KEYWORD}
+              ariaLabel={translate('style.textStrokeShadow.strokeColor')}
+              {...props}
+            />
+          </div>
+          <StrokeCaption label={translate('style.textStrokeShadow.color')} prop="-webkit-text-stroke-color" display={colorDisplay} {...props} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function eitherDisplay(first: Display, second: Display): Display {
+  return {
+    present: first.present || second.present,
+    isSelected: first.isSelected || second.isSelected,
+    overridden: false,
+    winnerSelector: '',
+    value: '',
+    important: false,
+  };
+}
+
+export function StrokeInput({
+  prop,
+  display,
+  placeholder,
+  ariaLabel,
+  busy,
+  setProp,
+  clearProp,
+  liveSetProp,
+}: {
+  prop: string;
+  display: Display;
+  placeholder: string;
+  ariaLabel: string;
+} & Props) {
+  return (
+    <LiveInput
+      value={display.present ? withImportant(display) : ''}
+      busy={busy}
+      placeholder={placeholder}
+      ariaLabel={ariaLabel}
+      className="u-input embed-editor_size-input"
+      dataProp={prop}
+      prop={prop}
+      onCommit={(value, important) => setProp(prop, value, important)}
+      onLiveCommit={(value, important) => liveSetProp(prop, value, important)}
+      onClear={() => clearProp(prop)}
+    />
+  );
+}
+
+export function StrokeCaption({
+  label,
+  prop,
+  display,
+  read,
+  busy,
+  clearProp,
+  onProvenance,
+  onSelectSelector,
+}: { label: string; prop: string; display: Display } & Props) {
+  return (
+    <PropLabel
+      label={label}
+      prop={prop}
+      display={display}
+      contributors={read(prop)?.contributors ?? []}
+      busy={busy}
+      onClear={() => clearProp(prop)}
+      onProvenance={onProvenance}
+      onSelectSelector={onSelectSelector}
+    />
+  );
+}
+
+
+export const ShadowPlusIcon = centralIcon(centralAdd);
+
+export type ShadowPatch = { x?: string; y?: string; blur?: string; color?: string };
+
+export function ShadowEditor({ shadow, busy, onChange }: { shadow: Shadow; busy: boolean; onChange: (patch: ShadowPatch, live: boolean) => void }) {
+  const translate = useTranslate();
+  return (
+    <div className="embed-editor_type-shadow-editor">
+      <ShadowLength
+        label="X"
+        value={shadow.x}
+        busy={busy}
+        onCommit={(value) => onChange({ x: value }, false)}
+        onLive={(value) => onChange({ x: value }, true)}
+      />
+      <ShadowLength
+        label="Y"
+        value={shadow.y}
+        busy={busy}
+        onCommit={(value) => onChange({ y: value }, false)}
+        onLive={(value) => onChange({ y: value }, true)}
+      />
+      <ShadowLength
+        label={translate('style.textStrokeShadow.blur')}
+        value={shadow.blur}
+        busy={busy}
+        onCommit={(value) => onChange({ blur: value }, false)}
+        onLive={(value) => onChange({ blur: value }, true)}
+      />
+      <ShadowColorRow color={shadow.color} busy={busy} onChange={(color, live) => onChange({ color: color }, live)} />
+    </div>
+  );
+}
+
+export const SHADOW_PREVIEW_CHECKERBOARD = 'conic-gradient(#8883 25%, transparent 0 50%, #8883 0 75%, transparent 0) 0 0 / 10px 10px';
+
+export function TextShadowsRow(props: Props) {
+  const { read, busy, clearProp, onProvenance, onSelectSelector } = props;
+  const translate = useTranslate();
+  const display = displayOf(read('text-shadow'));
+  const computed = useComputedValue(display.present ? '' : 'text-shadow');
+  const rows = parseHideable(display.present ? display.value : computed, ',', parseShadows);
+  const shadows = rows.map((row) => row.item);
+  const [openIndex, setOpenIndex] = useState<number | undefined>(undefined);
+  const [anchorElement, setAnchorElement] = useState<HTMLElement | undefined>(undefined);
+  const edit = shadowRowEdits({ rows, props, setOpenIndex });
+  const openShadow = openIndex === undefined ? undefined : shadows[openIndex];
+
+  return (
+    <div className="embed-editor_type-shadows">
+      <div className="embed-editor_bg-layers-head">
+        <PropLabel
+          label={translate('style.textStrokeShadow.textShadows')}
+          prop="text-shadow"
+          display={display}
+          contributors={read('text-shadow')?.contributors ?? []}
+          busy={busy}
+          onClear={() => clearProp('text-shadow')}
+          onProvenance={onProvenance}
+          onSelectSelector={onSelectSelector}
+        />
+        <button
+          type="button"
+          className="embed-editor_icon-btn"
+          onClick={edit.add}
+          disabled={busy}
+          title={translate('style.textStrokeShadow.addShadow')}
+          aria-label={translate('style.textStrokeShadow.addTextShadow')}
+        >
+          <ShadowPlusIcon />
+        </button>
+      </div>
+      <LayerList
+        count={shadows.length}
+        busy={busy}
+        ariaLabel={translate('style.textStrokeShadow.textShadows')}
+        onOpen={(i, element) => {
+          const showing = openIndex === i && anchorElement === element;
+          setOpenIndex(showing ? undefined : i);
+          setAnchorElement(element);
+        }}
+        onReorder={edit.reorder}
+        onRemove={edit.remove}
+        isHidden={(i) => rows[i]?.hidden ?? false}
+        onToggleHidden={edit.toggle}
+        renderRow={(i) => shadowLayerRow(shadows[i], i, translate)}
+      />
+      {openIndex !== undefined && anchorElement && openShadow ? (
+        <LayerPopover anchorEl={anchorElement} ariaLabel={translate('style.textStrokeShadow.textShadow')} onClose={() => setOpenIndex(undefined)}>
+          <ShadowEditor shadow={openShadow} busy={busy} onChange={(shadowPatch, live) => edit.patch(openIndex, shadowPatch, live ? 'live' : 'commit')} />
+        </LayerPopover>
+      ) : undefined}
+    </div>
+  );
+}
+
+export function shadowLayerRow(shadow: Shadow | undefined, index: number, translate: Translator) {
+  if (shadow === undefined) {
+    throw new Error(`Text shadow ${index} is missing`);
+  }
+  const colorLayer = `linear-gradient(${shadow.color}, ${shadow.color})`;
+  return {
+    preview: (
+      <span
+        className="embed-editor_bg-layer-preview"
+        style={{
+          background: `${colorLayer}, ${SHADOW_PREVIEW_CHECKERBOARD}`,
+        }}
+        aria-hidden="true"
+      />
+    ),
+    label: shadowLabel(shadow, translate),
+  };
+}
+
+export function shadowRowEdits({
+  rows,
+  props,
+  setOpenIndex,
+}: {
+  rows: Array<Hideable<Shadow>>;
+  props: Props;
+  setOpenIndex: React.Dispatch<React.SetStateAction<number | undefined>>;
+}) {
+  const write = (next: Array<Hideable<Shadow>>, mode: 'live' | 'commit') => {
+    const value = serializeHideable(next, ',', serializeShadows);
+    const { important } = displayOf(props.read('text-shadow'));
+    if (mode === 'live') {
+      if (value) {
+        props.liveSetProp('text-shadow', value, important);
+      }
+      return;
+    }
+    if (value) {
+      props.setProp('text-shadow', value, important);
+    } else {
+      props.clearProp('text-shadow');
+    }
+  };
+  return {
+    add: () => {
+      const next = [...rows, { item: blankShadow(), hidden: false }];
+      write(next, 'commit');
+      setOpenIndex(next.length - 1);
+    },
+    remove: (i: number) => {
+      write(
+        rows.filter((_, j) => j !== i),
+        'commit',
+      );
+      setOpenIndex((current) => {
+        if (current === i) {
+          return undefined;
+        }
+        return current !== undefined && current > i ? current - 1 : current;
+      });
+    },
+    reorder: (from: number, to: number) => {
+      if (from === to) {
+        return;
+      }
+      const next = [...rows];
+      const [moved] = next.splice(from, 1);
+      if (moved === undefined) {
+        return;
+      }
+      next.splice(to, 0, moved);
+      write(next, 'commit');
+      setOpenIndex((current) => (current === from ? to : current));
+    },
+    patch: (i: number, shadowPatch: ShadowPatch, mode: 'live' | 'commit') =>
+      write(
+        rows.map((row, j) => (j === i ? { ...row, item: { ...row.item, ...shadowPatch } } : row)),
+        mode,
+      ),
+    toggle: (i: number) =>
+      write(
+        rows.map((row, j) => (j === i ? { ...row, hidden: !row.hidden } : row)),
+        'commit',
+      ),
+  };
+}

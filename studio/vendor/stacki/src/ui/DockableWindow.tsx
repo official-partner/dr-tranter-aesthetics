@@ -1,0 +1,82 @@
+import { useRef } from 'react';
+import type { ReactNode } from 'react';
+import { MaximizeIcon, MinimizeIcon } from './Icons';
+import { PopupScopeContext, usePopupScope } from './popupScope';
+import { useWindowRectangle } from './useWindowRectangle';
+import { WindowResizeHandles } from './WindowResizeHandles';
+import type { WindowSize } from './windowGeometry';
+import './popup.css';
+import './panelHeader.css';
+import './dockableWindow.css';
+import { useTranslate } from '../lib/i18n/useTranslate';
+
+export type WindowMode = 'docked' | 'floating';
+interface DockableWindowProps {
+  readonly mode: WindowMode;
+  readonly onModeChange: (mode: WindowMode) => void;
+  readonly label: string;
+  readonly header: ReactNode;
+  readonly trailing?: ReactNode;
+  readonly children: ReactNode;
+  readonly minimumSize: WindowSize;
+  readonly storageKey?: string;
+  readonly initialSize?: WindowSize;
+  readonly hidden?: boolean;
+  readonly dockToggle?: 'header' | 'none';
+  readonly className?: string;
+}
+
+export default function DockableWindow(props: DockableWindowProps) {
+  const translate = useTranslate();
+  const windowState = useWindowRectangle(props.minimumSize, props.storageKey, props.initialSize);
+  const { rectangle } = windowState;
+  const floating = props.mode === 'floating';
+  const surface = useRef<HTMLDivElement>(null);
+  const scope = usePopupScope(surface, { active: floating, role: 'dialog', anchor: undefined });
+  const action = translate(floating ? 'ui.dockableWindow.dock' : 'ui.dockableWindow.undock');
+  return (
+    <div
+      ref={surface}
+      className={`popup-surface dockable-window ${props.className ?? ''}`}
+      data-window-mode={props.mode}
+      hidden={!floating && props.hidden}
+      role={floating ? 'dialog' : undefined}
+      aria-label={props.label}
+      style={
+        floating
+          ? {
+              left: rectangle.x,
+              top: rectangle.y,
+              width: rectangle.width,
+              height: rectangle.height,
+            }
+          : undefined
+      }
+    >
+      <PopupScopeContext.Provider value={scope}>
+        <div
+          className="dockable-window-header"
+          tabIndex={floating ? 0 : undefined}
+          aria-label={floating ? translate('ui.dockableWindow.moveHint') : undefined}
+          onPointerDown={floating ? (event) => windowState.start(event) : undefined}
+          onKeyDown={floating ? (event) => windowState.onKeyDown(event) : undefined}
+        >
+          {props.header}
+          {(props.dockToggle ?? 'header') === 'header' && (
+            <button
+              className="ghost dockable-window-toggle"
+              title={action}
+              aria-label={action}
+              onClick={() => props.onModeChange(floating ? 'docked' : 'floating')}
+            >
+              {floating ? <MaximizeIcon size={14} /> : <MinimizeIcon size={14} />}
+            </button>
+          )}
+          {props.trailing}
+        </div>
+        <div className="dockable-window-body">{props.children}</div>
+        {floating && <WindowResizeHandles windowState={windowState} />}
+      </PopupScopeContext.Provider>
+    </div>
+  );
+}

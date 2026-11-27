@@ -1,0 +1,68 @@
+import { caretByGeometry, pointOnWords, selectTextOffsets } from './frameTextSelection';
+
+export { pointOnWords };
+
+function wordAt(text: string, offset: number): { readonly start: number; readonly end: number } {
+  const isWord = (character: string | undefined) => character !== undefined && /[\p{L}\p{N}_]/u.test(character);
+  const inside = isWord(text[offset]) || !isWord(text[offset - 1]) ? offset : offset - 1;
+  let start = inside;
+  let end = inside;
+  const kind = isWord(text[inside]);
+  for (let step = 0; start > 0 && isWord(text[start - 1]) === kind && step < text.length; step++) {
+    start--;
+  }
+  for (let step = 0; end < text.length && isWord(text[end]) === kind && step < text.length; step++) {
+    end++;
+  }
+  return { start, end };
+}
+
+export function installInterceptedPointer(root: HTMLElement, nodes: readonly Text[]): () => void {
+  let anchor: number | undefined;
+  const text = () => nodes.map((node) => node.data).join('');
+  const offsetAt = (event: MouseEvent) => caretByGeometry(nodes, event.clientX, event.clientY)?.start;
+  const intercepted = (event: MouseEvent) =>
+    !(event.target instanceof Node && root.contains(event.target)) && pointOnWords(nodes, event.clientX, event.clientY);
+  const down = (event: MouseEvent) => {
+    if (event.button !== 0 || !intercepted(event)) {
+      return;
+    }
+    const offset = offsetAt(event);
+    if (offset === undefined) {
+      return;
+    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    root.focus({ preventScroll: true });
+    if (event.detail >= 3) {
+      selectTextOffsets(nodes, { start: 0, end: text().length });
+      anchor = undefined;
+    } else if (event.detail === 2) {
+      selectTextOffsets(nodes, wordAt(text(), offset));
+      anchor = undefined;
+    } else {
+      selectTextOffsets(nodes, { start: offset, end: offset });
+      anchor = offset;
+    }
+  };
+  const move = (event: MouseEvent) => {
+    if (anchor === undefined) {
+      return;
+    }
+    const offset = offsetAt(event);
+    if (offset !== undefined) {
+      selectTextOffsets(nodes, { start: Math.min(anchor, offset), end: Math.max(anchor, offset) });
+    }
+  };
+  const up = () => {
+    anchor = undefined;
+  };
+  window.addEventListener('mousedown', down, true);
+  window.addEventListener('mousemove', move, true);
+  window.addEventListener('mouseup', up, true);
+  return () => {
+    window.removeEventListener('mousedown', down, true);
+    window.removeEventListener('mousemove', move, true);
+    window.removeEventListener('mouseup', up, true);
+  };
+}

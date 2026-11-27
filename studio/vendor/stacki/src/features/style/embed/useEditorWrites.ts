@@ -1,0 +1,461 @@
+
+import { CREATE_STYLE_TAG_KEY } from '../model/newStyleTarget';
+import { useTranslate } from '../../../lib/i18n/useTranslate';
+import { useEffect, useMemo, useRef } from 'react';
+import { saveEmbedSource } from '../model/toolPreferences';
+import { hslaToRgba } from '../model/colorWrite';
+import { writtenValue } from '../model/lengthUnit';
+import { contextKeyOf, ruleOnLayer } from '../model/resolved';
+import { hoverStyle } from '../model/liveRuleEdits';
+import { canvasPreviewProp, type CanvasPreviewContext } from './canvasPreview';
+import type { PreviewProp } from '../connectFieldHelpers';
+import { pseudoPickPending, usePanelLayer } from './editorModel';
+import type { ParsedRule } from '../model/styleTypes';
+import { optionsFor } from '../model/nativeStyles';
+import { embedSourceClassSuffix, type EmbedDocument } from '../model/webflow';
+import { type SetProp, type PropWrite, type LiveSetProp, EMPTY_RESOLVED, EMPTY_RULE_MODEL } from './EditorBasics';
+import { isSupportedCssValue } from './ResolvedRows';
+import { type SourceOption } from './LayoutRows';
+import { useBusyState, useScanState, useSelectionState, useNativeState } from './useEditorFoundation';
+import { useRefresh } from './useEditorScanning';
+import { usePropEdits, useLiveEdits, useRuleActions, useOpenEmbed, useElementTokens } from './useEditorRuleEdits';
+import { useActiveSelector, useSelectorPick, useTypedSelector, useFocusProp, useSourceDocument, useRenameQuery, useQuerySuggestions } from './useEditorElement';
+import { useStyleContexts, useNativeTarget, useResolved, useSelectorChips, useContextChange } from './useEditorContexts';
+import { useNativeOps, useWriteNewRule, useCreateRule, useAddQuery, useNativeSet, useNativeCreate, useAutoSelect } from './useEditorResolution';
+
+export function useSetProp(
+  scanState: ReturnType<typeof useScanState>,
+  liveEdits: ReturnType<typeof useLiveEdits>,
+  activeSelectorHook: ReturnType<typeof useActiveSelector>,
+  nativeTarget: ReturnType<typeof useNativeTarget>,
+  resolvedHook: ReturnType<typeof useResolved>,
+  createRule: ReturnType<typeof useCreateRule>,
+  addQuery: ReturnType<typeof useAddQuery>,
+  nativeSet: ReturnType<typeof useNativeSet>,
+  nativeCreate: ReturnType<typeof useNativeCreate>,
+  autoSelect: ReturnType<typeof useAutoSelect>,
+) {
+  const { setStatus } = scanState;
+  const { liveOriginRef } = liveEdits;
+  const { activeSelector } = activeSelectorHook;
+  const { creatableClass } = nativeTarget;
+  const { selectedNativeIndex } = resolvedHook;
+  const { createSelectedRule } = createRule;
+  const { propLayer, writeEmbedProp } = addQuery;
+  const { nativeSetOrFallback } = nativeSet;
+  const { nativeCreateAndSet } = nativeCreate;
+  const { autoSelectForEdit } = autoSelect;
+
+  const setProp: SetProp = (prop, typed, important) => {
+    hoverStyle.settle(prop, writtenValue(prop, typed));
+    const write: PropWrite = { prop, value: writtenValue(prop, typed), important };
+    liveOriginRef.current.delete(prop);
+    if (pseudoPickPending(activeSelector)) {
+      setStatus('Reading this pseudo-element’s rules. Try that again in a moment.');
+      return undefined;
+    }
+    if (!activeSelector) {
+      const route = autoSelectForEdit();
+      if (route && 'native' in route) {
+        return nativeSetOrFallback(route.native, write);
+      }
+      if (route && 'embedSelector' in route) {
+        return createSelectedRule(write, route.embedSelector);
+      }
+      setStatus('Nothing to style here — add a class in Webflow first.');
+      return undefined;
+    }
+    if (propLayer(prop) === 'native') {
+      if (selectedNativeIndex !== undefined) {
+        return nativeSetOrFallback(selectedNativeIndex, write);
+      }
+      if (creatableClass) {
+        return nativeCreateAndSet(creatableClass, write);
+      }
+    }
+    return writeEmbedProp(write);
+  };
+  return { setProp };
+}
+
+export function useClearProp(
+  selectionState: ReturnType<typeof useSelectionState>,
+  propEdits: ReturnType<typeof usePropEdits>,
+  liveEdits: ReturnType<typeof useLiveEdits>,
+  ruleActions: ReturnType<typeof useRuleActions>,
+  styleContextsHook: ReturnType<typeof useStyleContexts>,
+  resolvedHook: ReturnType<typeof useResolved>,
+  nativeOps: ReturnType<typeof useNativeOps>,
+  writeNewRuleHook: ReturnType<typeof useWriteNewRule>,
+  addQuery: ReturnType<typeof useAddQuery>,
+) {
+  const { stateKey } = selectionState;
+  const { onClearProp } = propEdits;
+  const { liveOriginRef } = liveEdits;
+  const { onRevertProp } = ruleActions;
+  const { currentContext } = styleContextsHook;
+  const { selectedNativeIndex } = resolvedHook;
+  const { nativeClearAt } = nativeOps;
+  const { ruleFor, rulesSetting } = writeNewRuleHook;
+  const { propLayer, supersedeFirstTagWrite } = addQuery;
+
+  const clearProp = (prop: string | string[]): Promise<void> => {
+    const props = Array.isArray(prop) ? prop : [prop];
+    hoverStyle.clear(props);
+    const settled: Promise<unknown>[] = [];
+    props.forEach((prop) => liveOriginRef.current.delete(prop));
+    const nativeProps = props.filter((prop) => propLayer(prop) === 'native');
+    const embedProps = props.filter((prop) => propLayer(prop) === 'embed');
+    if (nativeProps.length && selectedNativeIndex !== undefined) {
+      settled.push(nativeClearAt(selectedNativeIndex, nativeProps, optionsFor(currentContext, stateKey)));
+    }
+    const byRule = new Map<string, { rule: ParsedRule; props: string[] }>();
+    for (const embedProp of embedProps) {
+      for (const rule of rulesSetting(embedProp)) {
+        const entry = byRule.get(rule.ruleId) ?? { rule, props: [] };
+        entry.props.push(embedProp);
+        byRule.set(rule.ruleId, entry);
+      }
+    }
+    for (const embedProp of embedProps) {
+      supersedeFirstTagWrite(embedProp);
+    }
+    byRule.forEach(({ rule, props: ruleProps }) => settled.push(onClearProp(rule, ruleProps)));
+    return Promise.all(settled).then(() => undefined);
+  };
+  const revertProp = (prop: string) => {
+    const rule = ruleFor(prop);
+    if (propLayer(prop) === 'native' || !rule) {
+      return;
+    }
+    onRevertProp(rule, prop);
+  };
+  return { clearProp, revertProp };
+}
+
+export function useLiveSetProp(
+  selectionState: ReturnType<typeof useSelectionState>,
+  nativeState: ReturnType<typeof useNativeState>,
+  liveEdits: ReturnType<typeof useLiveEdits>,
+  activeSelectorHook: ReturnType<typeof useActiveSelector>,
+  styleContextsHook: ReturnType<typeof useStyleContexts>,
+  nativeOps: ReturnType<typeof useNativeOps>,
+  writeNewRuleHook: ReturnType<typeof useWriteNewRule>,
+  addQuery: ReturnType<typeof useAddQuery>,
+  autoSelect: ReturnType<typeof useAutoSelect>,
+  clearPropHook: ReturnType<typeof useClearProp>,
+  createRule: ReturnType<typeof useCreateRule>,
+) {
+  const { stateKey } = selectionState;
+  const { nativeModelRef } = nativeState;
+  const { onLiveSetProps } = liveEdits;
+  const { activeSelector } = activeSelectorHook;
+  const { currentContext } = styleContextsHook;
+  const { nativeLiveSet } = nativeOps;
+  const { ruleFor } = writeNewRuleHook;
+  const { nativeHandle, propLayer } = addQuery;
+  const { autoSelectForEdit } = autoSelect;
+  const { revertProp } = clearPropHook;
+  const { liveCreateInNestedQuery } = createRule;
+
+  const liveSetProp: LiveSetProp = (propOrProps, typed, important) => {
+    const props = typeof propOrProps === 'string' ? [propOrProps] : propOrProps;
+    hoverStyle.clear(props);
+    if (typed === undefined) {
+      props.forEach(revertProp);
+      return;
+    }
+    if (pseudoPickPending(activeSelector)) {
+      return;
+    }
+    if (!activeSelector) {
+      const route = autoSelectForEdit();
+      if (route && 'native' in route) {
+        const handle = nativeModelRef.current?.styles[route.native]?.style;
+        if (handle) {
+          for (const prop of props) {
+            const value = writtenValue(prop, typed);
+            if (isSupportedCssValue(prop, value)) {
+              nativeLiveSet(handle, prop, hslaToRgba(value), optionsFor(currentContext, stateKey));
+            }
+          }
+        }
+      }
+      return;
+    }
+    const embedWrites: Array<{
+      readonly rule: ParsedRule;
+      readonly prop: string;
+      readonly value: string;
+      readonly important: boolean;
+    }> = [];
+    for (const prop of props) {
+      const value = writtenValue(prop, typed);
+      if (!isSupportedCssValue(prop, value)) {
+        continue;
+      }
+      if (propLayer(prop) === 'native') {
+        const handle = nativeHandle();
+        if (handle) {
+          nativeLiveSet(handle, prop, hslaToRgba(value), optionsFor(currentContext, stateKey));
+          continue;
+        }
+      }
+      const rule = ruleFor(prop);
+      if (rule) {
+        embedWrites.push({ rule, prop, value, important });
+      } else {
+        liveCreateInNestedQuery({ prop, value, important });
+      }
+    }
+    onLiveSetProps(embedWrites);
+  };
+  const previewProp = useCanvasPreview({ stateKey, activeSelector });
+  return { liveSetProp, previewProp };
+}
+
+function useCanvasPreview(context: CanvasPreviewContext): PreviewProp {
+  useEffect(() => () => hoverStyle.clear(hoverStyle.showing()), []);
+  return canvasPreviewProp(context);
+}
+
+export function useSourceOptions(
+  nativeState: ReturnType<typeof useNativeState>,
+  elementTokens: ReturnType<typeof useElementTokens>,
+  styleContextsHook: ReturnType<typeof useStyleContexts>,
+  nativeTarget: ReturnType<typeof useNativeTarget>,
+  resolvedHook: ReturnType<typeof useResolved>,
+) {
+  const translate = useTranslate();
+  const { nativeModel } = nativeState;
+  const { model } = elementTokens;
+  const { currentContext } = styleContextsHook;
+  const { createOffered, creatableClass, embedList } = nativeTarget;
+  const { effectiveSource, selectedNativeIndex } = resolvedHook;
+
+  const nativeStyleName =
+    effectiveSource === 'native'
+      ? selectedNativeIndex !== undefined && nativeModel
+        ? nativeModel.styles[selectedNativeIndex]?.displayName || nativeModel.styles[selectedNativeIndex]?.className || ''
+        : creatableClass
+      : undefined;
+  const sourceNote: string | undefined = undefined;
+
+  const layer = usePanelLayer();
+  const embedsWithRules = useMemo(() => {
+    const set = new Set<string>();
+    if (!model || currentContext.embedAtContext === undefined) {
+      return set;
+    }
+    for (const matched of [...model.base, ...model.conditional]) {
+      if (contextKeyOf(matched.rule) === currentContext.embedAtContext && ruleOnLayer(matched, layer)) {
+        set.add(matched.rule.embedKey);
+      }
+    }
+    return set;
+  }, [model, currentContext, layer]);
+
+  const sourceOptions = useMemo<SourceOption[]>(() => {
+    const embedOption = (embedDocument: EmbedDocument, indent = false): SourceOption => ({
+      value: embedDocument.source.key,
+      label: embedDocument.source.label,
+      marked: embedsWithRules.has(embedDocument.source.key),
+      fromComponent: embedDocument.source.fromComponent,
+      indent,
+    });
+    const optionList: SourceOption[] = [];
+    if (createOffered) {
+      optionList.push({ value: CREATE_STYLE_TAG_KEY, label: translate('styleModel.embed.source.createStyleTag', { tag: '<style>' }), create: true });
+    }
+    for (const embedDocument of embedList) {
+      if (!embedDocument.source.fromComponent) {
+        optionList.push(embedOption(embedDocument));
+      }
+    }
+    const byComponent = new Map<string, EmbedDocument[]>();
+    for (const embedDocument of embedList) {
+      if (!embedDocument.source.fromComponent) {
+        continue;
+      }
+      const name = embedDocument.source.componentName ?? translate('styleModel.embed.source.component');
+      byComponent.set(name, [...(byComponent.get(name) ?? []), embedDocument]);
+    }
+    for (const [name, docs] of byComponent) {
+      optionList.push({ value: `__component__${name}`, label: name, heading: true });
+      docs.forEach((embedDocument, i) => {
+        const triggerName = docs.length > 1 ? `${name} #${i + 1}` : name;
+        optionList.push({
+          ...embedOption(embedDocument, true),
+          triggerLabel: `${triggerName}${embedSourceClassSuffix(embedDocument.source)}`,
+        });
+      });
+    }
+    return optionList;
+  }, [createOffered, embedList, embedsWithRules, translate]);
+  return { nativeStyleName, sourceNote, sourceOptions };
+}
+
+export function useEmbedNav(
+  nativeState: ReturnType<typeof useNativeState>,
+  openEmbed: ReturnType<typeof useOpenEmbed>,
+  sourceOptionsHook: ReturnType<typeof useSourceOptions>,
+) {
+  const { nativeModel } = nativeState;
+  const { openEmbedByKey } = openEmbed;
+  const { sourceOptions } = sourceOptionsHook;
+
+  const embedLabelByKey = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const option of sourceOptions) {
+      if (option.heading) {
+        continue;
+      }
+      map.set(option.value, option.triggerLabel ?? option.label);
+    }
+    return map;
+  }, [sourceOptions]);
+
+  const embedNav = useMemo(() => ({ open: openEmbedByKey, labelFor: (key: string) => embedLabelByKey.get(key) ?? key }), [openEmbedByKey, embedLabelByKey]);
+
+  const nativeHasAny = nativeModel?.styles.some((style) => style.propsByContext.size > 0) ?? false;
+  return { embedLabelByKey, embedNav, nativeHasAny };
+}
+
+export function useSelectionCard(
+  selectionState: ReturnType<typeof useSelectionState>,
+  elementTokens: ReturnType<typeof useElementTokens>,
+  activeSelectorHook: ReturnType<typeof useActiveSelector>,
+  selectorPick: ReturnType<typeof useSelectorPick>,
+  typedSelector: ReturnType<typeof useTypedSelector>,
+  focusPropHook: ReturnType<typeof useFocusProp>,
+  selectorChipsHook: ReturnType<typeof useSelectorChips>,
+) {
+  const { selectedSelectorText } = selectionState;
+  const { scan, selectorSuggestions, snapshot } = elementTokens;
+  const { activeSelector } = activeSelectorHook;
+  const { selectActiveSelector } = selectorPick;
+  const { addTypedSelector, deselect } = typedSelector;
+  const { onSelectSelector } = focusPropHook;
+  const { selectorChips } = selectorChipsHook;
+
+  const cardSelection = {
+    snapshot,
+    selectedSelector: activeSelector,
+    activePicked: selectedSelectorText !== undefined,
+    selectionSettled: scan === undefined || scan.settled,
+    selectionAwaiting: scan?.awaitingFirstAnswer === true,
+    selectors: selectorChips,
+    suggestions: selectorSuggestions,
+    activeSelector,
+    onSelectActive: selectActiveSelector,
+    onDeselect: deselect,
+    onAddSelector: addTypedSelector,
+    onSelectSelector,
+  };
+  return { cardSelection };
+}
+
+export function useContextCard(
+  scanState: ReturnType<typeof useScanState>,
+  selectionState: ReturnType<typeof useSelectionState>,
+  elementTokens: ReturnType<typeof useElementTokens>,
+  sourceDocumentHook: ReturnType<typeof useSourceDocument>,
+  renameQuery: ReturnType<typeof useRenameQuery>,
+  querySuggestionsHook: ReturnType<typeof useQuerySuggestions>,
+  resolvedHook: ReturnType<typeof useResolved>,
+  selectorChipsHook: ReturnType<typeof useSelectorChips>,
+  contextChange: ReturnType<typeof useContextChange>,
+  addQuery: ReturnType<typeof useAddQuery>,
+  embedNavHook: ReturnType<typeof useEmbedNav>,
+) {
+  const { cssCodeOpen, setCssCodeOpen } = scanState;
+  const { context } = selectionState;
+  const { model } = elementTokens;
+  const { queryUses, sourceDocument } = sourceDocumentHook;
+  const { onRenameQuery } = renameQuery;
+  const { querySuggestions } = querySuggestionsHook;
+  const { resolved } = resolvedHook;
+  const { contextInfos, orderedContexts } = selectorChipsHook;
+  const { onContextChange, contextFollow, contextsSettled } = contextChange;
+  const { onAddQuery } = addQuery;
+  const { embedLabelByKey } = embedNavHook;
+
+  const held = useHeldWhileUnsettled({ contexts: orderedContexts, contextInfos, context }, { settled: contextsSettled });
+  const cardContexts = {
+    cssCodeOpen,
+    onToggleCssCode: () => setCssCodeOpen((open) => !open),
+    model: model ?? EMPTY_RULE_MODEL,
+    resolved: resolved ?? EMPTY_RESOLVED,
+    contexts: held.contexts,
+    contextInfos: held.contextInfos,
+    context: held.context,
+    onContext: onContextChange,
+    contextFollow,
+    onAddQuery,
+    onRenameQuery,
+    queryUses,
+    sourceLabel: (sourceDocument && embedLabelByKey.get(sourceDocument.source.key)) ?? sourceDocument?.source.label ?? 'this file',
+    querySuggestions,
+  };
+  return { cardContexts };
+}
+
+export function useSourceCard(
+  busyState: ReturnType<typeof useBusyState>,
+  scanState: ReturnType<typeof useScanState>,
+  nativeState: ReturnType<typeof useNativeState>,
+  refreshHook: ReturnType<typeof useRefresh>,
+  ruleActions: ReturnType<typeof useRuleActions>,
+  nativeTarget: ReturnType<typeof useNativeTarget>,
+  writeNewRuleHook: ReturnType<typeof useWriteNewRule>,
+  setPropHook: ReturnType<typeof useSetProp>,
+  clearPropHook: ReturnType<typeof useClearProp>,
+  liveSetPropHook: ReturnType<typeof useLiveSetProp>,
+  sourceOptionsHook: ReturnType<typeof useSourceOptions>,
+) {
+  const { busy } = busyState;
+  const { phase, scanningMore } = scanState;
+  const { manualSourcePickRef, pendingKeys, selectionKeyRef, setSourceSelection } = nativeState;
+  const { resolving } = refreshHook;
+  const { onRemoveRule, onSaveCssRule } = ruleActions;
+  const { effectiveSourceSelection } = nativeTarget;
+  const { selectedRule } = writeNewRuleHook;
+  const { setProp } = setPropHook;
+  const { clearProp } = clearPropHook;
+  const { liveSetProp, previewProp } = liveSetPropHook;
+  const { nativeStyleName, sourceNote, sourceOptions } = sourceOptionsHook;
+
+  const cardSource = {
+    sourceValue: effectiveSourceSelection,
+    sourceOptions,
+    onSourceChange: (value: string) => {
+      manualSourcePickRef.current = { selectionKey: selectionKeyRef.current, sourceKey: value };
+      setSourceSelection(value);
+      saveEmbedSource(value);
+    },
+    sourceNote,
+    nativeStyleName,
+    loading: phase === 'scanning' || scanningMore,
+    resolving,
+    busy,
+    pending: selectedRule ? pendingKeys.has(selectedRule.embedKey) : false,
+  };
+  const cardWrites = {
+    setProp,
+    clearProp,
+    liveSetProp,
+    previewProp,
+    onAdd: setProp,
+    onSaveCssRule,
+    onRemoveRule,
+  };
+  return { cardSource, cardWrites };
+}
+
+function useHeldWhileUnsettled<T>(value: T, state: { readonly settled: boolean }): T {
+  const heldRef = useRef(value);
+  if (state.settled) {
+    heldRef.current = value;
+  }
+  return heldRef.current;
+}
