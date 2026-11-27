@@ -34,9 +34,14 @@ const { render = true } = Astro.props;
       </div>
     </aside>
     <script is:inline>
-      try {
-        if (sessionStorage.getItem("dta-registration") === "closed") document.currentScript.previousElementSibling.hidden = true;
-      } catch {}
+      (function () {
+        var strip = document.currentScript.previousElementSibling;
+        try {
+          if (sessionStorage.getItem("dta-registration") === "closed") strip.hidden = true;
+        } catch (e) {}
+        /* its height before the first paint, so the home's opening is sized once (HeroHome) */
+        document.documentElement.style.setProperty("--registration-height", strip.hidden ? "0px" : strip.offsetHeight + "px");
+      })();
     </script>
   )
 }
@@ -145,8 +150,10 @@ const { render = true } = Astro.props;
         const easing = css.getPropertyValue("--ease-smooth").trim();
         const h = strip.offsetHeight;
         const fold = strip.animate([{ height: `${h}px`, opacity: 1 }, { height: "0px", paddingBlock: "0px", opacity: 0 }], { duration, easing });
-        /* the menu's button rises with the bar, frame by frame (Nav, nav:place) */
+        /* the menu's button rises with the bar and the home's opening grows as the strip folds, frame by frame (Nav,
+           nav:place; HeroHome, --registration-height): the opening's foot stays where it is */
         const step = () => {
+          measure();
           dispatchEvent(new Event("nav:place"));
           if (fold.playState === "running") requestAnimationFrame(step);
         };

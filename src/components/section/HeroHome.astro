@@ -33,12 +33,14 @@ import { clinic } from "@/data/clinic";
 
 <style is:global>
   @layer components {
-    /* The home's opening fills the screen (100svh, Sam, Nov 10): the photo takes the room left and scales down when
-       it lacks some, its bottom-left corner fixed on its column. It never grows past its columns' width. */
+    /* The home's opening fills the screen (100svh, Sam, Nov 10), less the registration strip above it while it shows
+       (--registration-height, Registration.astro; Sam, Nov 27: its foot stays in view, and it grows back to the full
+       screen as the strip folds away): the photo takes the room left and scales down when it lacks some, its
+       bottom-left corner fixed on its column. It never grows past its columns' width. */
     .hero-home_wrap {
       display: flex;
       flex-direction: column;
-      min-height: 100svh;
+      min-height: calc(100svh - var(--registration-height, 0px));
       padding-top: calc(var(--site-margin) + var(--space-10));
       @media (width >= 64rem) {
         padding-top: var(--section-padding);
