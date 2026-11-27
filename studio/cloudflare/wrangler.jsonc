@@ -21,7 +21,7 @@
   ],
   "durable_objects": { "bindings": [{ "name": "PREVIEW", "class_name": "PreviewContainer" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["PreviewContainer"] }],
-  "r2_buckets": [{ "binding": "DRAFTS", "bucket_name": "dr-tranter-studio-drafts" }],
+  "r2_buckets": [{ "binding": "DRAFTS", "bucket_name": "dr-tranter-studio-drafts-2" }],
   "vars": {
     "STUDIO_ORIGIN": "https://tranter.officialpartner.work",
     "PREVIEW_ORIGIN": "https://tranter-preview.officialpartner.work",
