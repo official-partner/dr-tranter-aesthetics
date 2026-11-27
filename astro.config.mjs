@@ -5,6 +5,7 @@ import { SITE_NAME, SITE_URL, SITE_LOCALE } from "./src/consts.ts";
 import { isNoindexRoute } from "./src/utils/seo.ts";
 import opSystem from "./integrations/op-system.mjs";
 import opLive, { STATIC_DIR } from "./integrations/op-live.mjs";
+import { lstatSync } from "node:fs";
 
 // The staging (branch review) is rendered on demand by a Worker and reads OP's working copy of the collections;
 // main, and any build without it, stays static. OP_LIVE=1 or 0 decides; unset, Cloudflare's build of review is live.
@@ -51,5 +52,9 @@ export default defineConfig({
     // __OP_STAGING__: the staging's build and its inner static pass (the pages site.json lists): where a draft shows
     define: { __OP_LIVE__: JSON.stringify(LIVE), __OP_STAGING__: JSON.stringify(LIVE || process.env.OP_LIVE_INNER === "1") },
     build: { cssTarget: "safari15.4" },
+    // Stacki Studio's container links node_modules to a folder outside the site (/opt/site): followed to its real
+    // path, Astro's own components (ClientRouter) fail with « No cached compile metadata ». Kept as the link, they
+    // compile. Only when node_modules is a link, so every other build is untouched.
+    resolve: { preserveSymlinks: (() => { try { return lstatSync("node_modules").isSymbolicLink(); } catch { return false; } })() },
   },
 });
