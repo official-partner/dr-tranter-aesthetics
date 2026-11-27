@@ -11,10 +11,11 @@ import { clinic } from "@/data/clinic";
 <Sheet id="enquiry" also={["enquiry-careers"]} labelledby="enquiry-title" theme="light" class="enquiry_wrap">
   <h2 class="enquiry_title text-style-h2" id="enquiry-title">Send an enquiry</h2>
   <hr class="sheet_rule enquiry_rule" />
-  <p class="enquiry_label text-style-label">Enquiry</p>
-  <div class="enquiry_body">
-    <p class="enquiry_careers text-style-main">We're always glad to hear from experienced practitioners who share the clinic's approach to considered, evidence-led care. Send us your details and a little about your background below.</p>
-    <div class="sheet_card theme-stone">
+  {/* the whole enquiry on the stone, edge to edge down to the panel's foot (Sam, Nov 26, comment 37) */}
+  <div class="enquiry_band theme-stone">
+    <p class="enquiry_label text-style-label">Enquiry</p>
+    <div class="enquiry_body">
+      <p class="enquiry_careers text-style-main">We're always glad to hear from experienced practitioners who share the clinic's approach to considered, evidence-led care. Send us your details and a little about your background below.</p>
       <iframe class="enquiry_form" src={clinic.enquiryForm} title="Enquiry form" loading="lazy"></iframe>
     </div>
   </div>
@@ -26,6 +27,21 @@ import { clinic } from "@/data/clinic";
     .enquiry_label,
     .enquiry_body {
       grid-column: margin / end;
+    }
+    /* the panel ends on the band: no sand under it */
+    .enquiry_wrap .sheet_layout {
+      padding-bottom: 0;
+    }
+    /* the band runs to the panel's edges (its margin taken back, its columns those of the sheet) and starts right on
+       the hairline */
+    .enquiry_band {
+      grid-column: margin / end;
+      display: grid;
+      grid-template-columns: subgrid;
+      row-gap: var(--space-7);
+      margin-top: calc(var(--space-7) * -1);
+      margin-inline: calc(var(--site-margin) * -1);
+      padding: var(--section-padding) var(--site-margin);
     }
     .enquiry_body {
       display: grid;
@@ -52,9 +68,12 @@ import { clinic } from "@/data/clinic";
       .enquiry_rule {
         grid-row: 2;
       }
+      .enquiry_band {
+        grid-row: 3;
+      }
       .enquiry_label,
       .enquiry_body {
-        grid-row: 3;
+        grid-row: 1;
       }
       .enquiry_label {
         grid-column: margin / main;
