@@ -134,9 +134,11 @@ import { clinic } from "@/data/clinic";
       &[class*="theme-"] {
         background-color: transparent;
       }
+      /* at its place in the bar, the bar's own distance from the top of the screen added while the bar still shows
+         below it (--top-shift: the registration strip above it, until it scrolls away) */
       &[data-fixed] {
         position: fixed;
-        top: var(--_toggle-top);
+        top: calc(var(--_toggle-top) + var(--top-shift, 0px));
         right: var(--_toggle-right);
       }
     }
@@ -228,14 +230,29 @@ import { clinic } from "@/data/clinic";
       nav.classList.toggle("theme-mist", menuColours);
     };
 
-    /* The button's place: fixed where its stand-in sits in the bar (the bar is at the page's top) */
+    /* The button's place (Sam, Nov 27, comment 38). It is fixed where its stand-in sits in the bar, counted from the
+       bar's top, plus --top-shift: how far below the top of the screen the bar still is. On a page where the bar opens
+       the page, that is nothing; on the home with the registration strip, the strip's height at the top of the page,
+       less as the strip scrolls away, nothing once it is gone: the button rises with the bar, then stays at its usual
+       place. The menu opens from the same value, frozen while it is open (Registration.astro): the strip in it while
+       some of it shows, none once scrolled past. */
     const space = toggle.nextElementSibling as HTMLElement | null;
+    let shift = -1;
+    const lift = () => {
+      if (root.dataset.menu) return;
+      const next = Math.max(0, Math.round(nav.getBoundingClientRect().top));
+      if (next === shift) return;
+      shift = next;
+      root.style.setProperty("--top-shift", `${shift}px`);
+    };
     const place = () => {
       if (!space || root.dataset.menu) return;
       toggle.dataset.fixed = "";
       const r = space.getBoundingClientRect();
-      toggle.style.setProperty("--_toggle-top", `${r.top + scrollY}px`);
+      toggle.style.setProperty("--_toggle-top", `${r.top - nav.getBoundingClientRect().top}px`);
       toggle.style.setProperty("--_toggle-right", `${root.clientWidth - r.right}px`);
+      shift = -1;
+      lift();
     };
     /* The button's colours: the theme of the section under it; the menu's own while the menu is open (`back`: the menu
        is lifting past it, the page's colours come back) */
@@ -247,10 +264,12 @@ import { clinic } from "@/data/clinic";
         const under = document.elementsFromPoint(r.x + r.width / 2, r.y + r.height / 2).find((el) => !nav.contains(el));
         const host = under?.closest('[class*="theme-"]');
         name = [...(host?.classList ?? [])].find((c) => c.startsWith("theme-"));
-        /* nothing themed under it (a page change's snapshot covers the page while it runs): keep its colours until
-           the page shows again, never a guess that could match the ground (Sam, Nov 26: « le menu burger... invisible ») */
+        /* A part of the page with no theme of its own wears the page's ground, the light one (the home's concerns:
+           Sam, Nov 27, comment 38, the button stayed dark there). Nothing of the page under it at all (a page change's
+           snapshot covers the page while it runs): its colours kept until the page shows again (Nov 26). */
         if (!name) {
-          if (old) return;
+          const ofPage = under && under !== root && under !== document.body && Boolean(under.closest("main, footer, .site-top"));
+          if (!ofPage && old) return;
           name = "theme-light";
         }
       }
@@ -259,7 +278,7 @@ import { clinic } from "@/data/clinic";
       if (name) toggle.classList.add(name);
     };
     let frame = 0;
-    const follow = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; tint(); }); };
+    const follow = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; lift(); tint(); }); };
     place();
     tint();
     document.fonts?.ready.then(() => { place(); tint(); });
@@ -267,6 +286,8 @@ import { clinic } from "@/data/clinic";
     /* and again once a page change, the loading screen or the arriving page's motion is over: while they run, what is
        under the button is their cover, not the page */
     window.addEventListener("nav:retint", follow, { signal });
+    /* the strip folding away moves the bar without a scroll */
+    window.addEventListener("nav:place", follow, { signal });
     const watch = new MutationObserver(follow);
     watch.observe(root, { attributes: true, attributeFilter: ["data-loader", "data-arrive", "data-page-transition"] });
     signal.addEventListener("abort", () => watch.disconnect());

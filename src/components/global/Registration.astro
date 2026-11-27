@@ -88,23 +88,29 @@ const { render = true } = Astro.props;
         top: 100%;
       }
     }
-    /* The menu open while the strip shows (Sam, Nov 26): the strip is part of the menu, at the top of the screen, the
-       bar right under it and the panel under the bar, so the menu's button stays where the bar puts it and the logo and
-       Book stay in view. The strip's place in the page is kept (no jump under the scrim); its height is
-       --registration-height, written by the script below. */
+    /* The menu opened over the strip (Sam, Nov 26 and 27, comment 38): everything stays where it was on screen. The
+       strip is part of the menu as much as it showed (all of it at the top of the page, none once scrolled past), the
+       bar right under it and the panel under the bar, so the menu's button, the logo and Book keep their places.
+       --top-shift is how far the bar was below the top of the screen when the menu opened (Nav, frozen while it is
+       open); --registration-height the strip's height (the script below). The strip's place in the page is kept: no
+       jump under the scrim. */
     html:is([data-menu="open"], [data-menu="closing"]) .site-top:has(> .registration_wrap:not([hidden])) {
       min-height: var(--registration-height);
       & > .registration_wrap {
         position: fixed;
         inset: 0 0 auto;
         z-index: var(--z-strip);
+        translate: 0 calc(var(--top-shift, 0px) - var(--registration-height));
       }
+    }
+    /* the bar and the panel at that distance, the strip shown or folded away (a folded strip: none) */
+    html:is([data-menu="open"], [data-menu="closing"]) .site-top:has(> .registration_wrap) {
       & > .nav_wrap {
-        top: var(--registration-height);
+        top: var(--top-shift, 0px);
       }
       & .menu_wrap {
-        top: var(--registration-height);
-        max-height: calc(100svh - var(--registration-height));
+        top: var(--top-shift, 0px);
+        max-height: calc(100svh - var(--top-shift, 0px));
       }
     }
     @media (width >= 64rem) {
@@ -138,17 +144,18 @@ const { render = true } = Astro.props;
         const duration = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : (parseFloat(v) || 0) * (v.endsWith("ms") ? 1 : 1000);
         const easing = css.getPropertyValue("--ease-smooth").trim();
         const h = strip.offsetHeight;
-        /* the menu's button, fixed where the bar was, rises with it, then takes its new place (Nav, on resize) */
-        const toggle = document.querySelector<HTMLElement>(".nav_toggle[data-fixed]");
-        const lift = toggle?.animate([{ translate: "0 0" }, { translate: `0 -${h}px` }], { duration, easing, fill: "forwards" });
-        strip
-          .animate([{ height: `${h}px`, opacity: 1 }, { height: "0px", paddingBlock: "0px", opacity: 0 }], { duration, easing })
-          .finished.then(() => {
-            strip.hidden = true;
-            /* the menu's button to its new place, the strip's height to none (Nav and measure, on resize) */
-            dispatchEvent(new Event("resize"));
-            lift?.cancel();
-          });
+        const fold = strip.animate([{ height: `${h}px`, opacity: 1 }, { height: "0px", paddingBlock: "0px", opacity: 0 }], { duration, easing });
+        /* the menu's button rises with the bar, frame by frame (Nav, nav:place) */
+        const step = () => {
+          dispatchEvent(new Event("nav:place"));
+          if (fold.playState === "running") requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+        fold.finished.then(() => {
+          strip.hidden = true;
+          measure();
+          dispatchEvent(new Event("nav:place"));
+        });
       },
       { signal },
     );
