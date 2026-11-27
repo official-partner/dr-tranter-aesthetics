@@ -19,9 +19,16 @@ export const platformFetch: Fetcher = (input, init) => fetch(input, init);
 export async function fetchJson(fetcher: Fetcher, url: string, init: RequestInit): Promise<Result<unknown, FetchFailure>> {
   let response: Response;
   try {
-    response = await fetcher(url, { ...init, redirect: 'error', signal: AbortSignal.timeout(FETCH_LIMITS.timeoutMs) });
+    // OP patch (Nov 26, 2026): Cloudflare Workers refuse `redirect: 'error'` ("Invalid redirect value, must be one of
+    // "follow" or "manual""), so every sign-in failed with token-network. `manual` keeps the same rule: a redirect is
+    // never followed, and is refused below as a status failure. Drop this patch once Stacki ships the same fix.
+    response = await fetcher(url, { ...init, redirect: 'manual', signal: AbortSignal.timeout(FETCH_LIMITS.timeoutMs) });
   } catch {
     return err({ kind: 'network' });
+  }
+  if (response.status >= 300 && response.status < 400) {
+    await response.body?.cancel().catch(() => undefined);
+    return err({ kind: 'status', status: response.status });
   }
   if (!response.ok) {
     await response.body?.cancel().catch(() => undefined);

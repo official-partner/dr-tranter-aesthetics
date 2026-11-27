@@ -46,6 +46,9 @@ cover. How to build with Lumos: AGENTS.md, below.
   `studio/cloudflare/wrangler.jsonc` (Worker `dr-tranter-studio`, editor https://tranter.officialpartner.work/studio,
   preview https://tranter-preview.officialpartner.work, R2 `dr-tranter-studio-drafts`). Its Publish commits to
   `review`, so a Studio edit shows on the staging and in OP System like any other change: pull before working.
+- One patch of ours in Stacki's files (Nov 26): `studio/src/features/auth/providers/boundedFetch.ts` uses
+  `redirect: 'manual'` where Stacki 1.4.20 writes `'error'`, which Cloudflare Workers refuse (Google sign-in failed with
+  « token-network »). A Studio update brings Stacki's file back: check it still has the fix, else put the patch back.
 - The site's `tsconfig.json` excludes `studio/` (astro check ran out of memory reading it).
 
 ## OP System
